@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
-using System.Web.Http.Description;
-using Arysoft.ARI.NF48.Api;
-using Arysoft.ARI.NF48.Api.CustomEntities;
+﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Models.Mappings;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
@@ -44,7 +40,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 items = items.Where(e => e.Status == filters.Status);
             }
-            else {
+            else 
+            {
                 items = items.Where(e => e.Status != StatusType.Nothing);
             }
 
@@ -97,7 +94,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         }
 
         // GET: api/NaceCodes/5
-        [ResponseType(typeof(NaceCode))]
+        [ResponseType(typeof(ApiResponse<NaceCode>))]
         public async Task<IHttpActionResult> GetNaceCode(Guid id)
         {
             NaceCode naceCode = await db.NaceCodes.FindAsync(id);
@@ -114,15 +111,14 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(NaceCode))]
         public async Task<IHttpActionResult> PostNaceCode(NaceCodePostDto naceCodeDto)
         {
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            await DeleteTmpByUserAsync(naceCodeDto.UpdatedUser);
+
             var naceCode = NaceCodeMappings.PostToNaceCode(naceCodeDto);
 
             naceCode.NaceCodeID = Guid.NewGuid();
             naceCode.Updated = DateTime.Now;
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
             db.NaceCodes.Add(naceCode);
 
@@ -142,17 +138,23 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = naceCode.NaceCodeID }, naceCode);
+            //return CreatedAtRoute("DefaultApi", new { id = naceCode.NaceCodeID }, naceCode);
+            var response = new ApiResponse<NaceCode>(naceCode);
+            return Ok(response);
         }
 
         // PUT: api/NaceCodes/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutNaceCode(Guid id, NaceCode naceCode)
+        public async Task<IHttpActionResult> PutNaceCode(Guid id, NaceCodePutDto naceCodeDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            var naceCode = NaceCodeMappings.PutToNaceCode(naceCodeDto);
+
+            // Validate if not exist a duplicate item with Sector, Division, Group and Class
+
+            naceCode.Status = naceCode.Status == StatusType.Nothing ? StatusType.Active : naceCode.Status;
+            naceCode.Updated = DateTime.Now;
 
             if (id != naceCode.NaceCodeID)
             {
@@ -177,7 +179,11 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            //var response = new ApiResponse<bool>(true);
+            //return Ok(response);
+            //StatusCode(HttpStatusCode.NoContent);
+            var response = new ApiResponse<NaceCode>(naceCode);
+            return Ok(response);
         }
 
         // DELETE: api/NaceCodes/5
@@ -190,10 +196,20 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 return NotFound();
             }
 
-            db.NaceCodes.Remove(naceCode);
+            if (naceCode.Status == StatusType.Deleted)
+            {
+                db.NaceCodes.Remove(naceCode);
+            }
+            else
+            {
+                naceCode.Status = naceCode.Status == StatusType.Active ? StatusType.Inactive : StatusType.Deleted;
+                db.Entry(naceCode).State = EntityState.Modified;
+            }
+
             await db.SaveChangesAsync();
 
-            return Ok(naceCode);
+            var response = new ApiResponse<NaceCode>(naceCode);
+            return Ok(response);
         }
 
         protected override void Dispose(bool disposing)
@@ -205,9 +221,24 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             base.Dispose(disposing);
         }
 
+        // PRIVATED
+
         private bool NaceCodeExists(Guid id)
         {
             return db.NaceCodes.Count(e => e.NaceCodeID == id) > 0;
+        }
+
+        private async Task DeleteTmpByUserAsync(string username)
+        {
+            var items = await db.NaceCodes
+                .Where(n => n.UpdatedUser == username && n.Status == StatusType.Nothing)
+                .ToListAsync();
+
+            foreach(var item in items)
+            {
+                db.Entry(item).State = EntityState.Deleted;
+            }
+            //await db.SaveChangesAsync();
         }
     }
 }

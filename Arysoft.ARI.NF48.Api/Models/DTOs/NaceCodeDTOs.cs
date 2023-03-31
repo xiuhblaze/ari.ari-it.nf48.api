@@ -9,6 +9,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
     public class NaceCodePostDto
     {   
+        [StringLength(50)]
+        public string UpdatedUser { get; set; }
+    }
+
+    public class NaceCodePutDto
+    {
+        public Guid NaceCodeID { get; set; }
+
         public int? Sector { get; set; }
 
         public int? Division { get; set; }
@@ -19,6 +27,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(500)]
         public string Description { get; set; }
+
+        public StatusType Status { get; set; }
 
         [StringLength(50)]
         public string UpdatedUser { get; set; }
