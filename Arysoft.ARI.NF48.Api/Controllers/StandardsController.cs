@@ -41,7 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 );
             }
 
-            if (filters.Status != StatusType.Nothing)
+            if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
                 standards = standards.Where(s => s.Status == filters.Status);
             }

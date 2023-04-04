@@ -33,10 +33,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if(!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
-                items = items.Where(e => e.Description.ToLower().Contains(filters.Text));
+                items = items.Where(e => e.Description != null && e.Description.ToLower().Contains(filters.Text));
             }
 
-            if (filters.Status != StatusType.Nothing)
+            if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);
             }

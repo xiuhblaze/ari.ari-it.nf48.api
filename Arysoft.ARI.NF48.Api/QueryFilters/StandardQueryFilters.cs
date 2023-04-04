@@ -6,7 +6,7 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
     {
         public string Texto { get; set; }
 
-        public StatusType Status { get; set; }
+        public StatusType? Status { get; set; }
 
         public StandardsOrderType Order { get; set; }
     }

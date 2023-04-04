@@ -10,7 +10,7 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
     {
         public string Text { get; set; }
 
-        public StatusType Status { get; set; }
+        public StatusType? Status { get; set; }
 
         public NaceCodeOrderType Order { get; set; }
     }
