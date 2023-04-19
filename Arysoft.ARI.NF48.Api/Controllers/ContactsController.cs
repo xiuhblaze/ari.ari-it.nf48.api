@@ -146,7 +146,63 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var response = new ApiResponse<Contact>(contact);
 
             return Ok(response);
-        }
+        } // PostContact
+
+        // PUT: api/Contact/5
+        public async Task<IHttpActionResult> PutContact(Guid id, ContactPutDto contactDto)
+        {
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            var contact = ContactMappings.PutToContact(contactDto);
+
+            contact.Status = contact.Status == StatusType.Nothing ? StatusType.Active : contact.Status;
+            contact.Updated = DateTime.Now;
+
+            if (id != contact.ContactID)
+            {
+                return BadRequest();
+            }
+
+            db.Entry(contact).State = EntityState.Modified;
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            { 
+                return BadRequest(ex.Message);
+            }
+
+            var response = new ApiResponse<Contact>(contact);
+            return Ok(response);
+        } // PutContact
+
+        // DELETE: api/Contact/5
+        [ResponseType(typeof(Contact))]
+        public async Task<IHttpActionResult> DeleteContact(Guid id)
+        {
+            var contact = await db.Contacts.FindAsync(id);
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            if (contact.Status == StatusType.Deleted)
+            {
+                db.Contacts.Remove(contact);
+            }
+            else
+            {
+                contact.Status = contact.Status == StatusType.Active ? StatusType.Inactive : StatusType.Deleted;
+                db.Entry(contact).State = EntityState.Modified;
+            }
+
+            await db.SaveChangesAsync();
+
+            var response = new ApiResponse<Contact>(contact);
+            return Ok(response);
+        } // DeleteContact
 
         // PRIVATED
 
