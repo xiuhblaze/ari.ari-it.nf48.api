@@ -128,7 +128,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
             catch (DbUpdateException)
             {
-                if (NaceCodeExists(naceCode.NaceCodeID))
+                if (await NaceCodeExistsAsync(naceCode.NaceCodeID))
                 {
                     return Conflict();
                 }
@@ -169,7 +169,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!NaceCodeExists(id))
+                if (!await NaceCodeExistsAsync(id))
                 {
                     return NotFound();
                 }
@@ -223,9 +223,9 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         // PRIVATED
 
-        private bool NaceCodeExists(Guid id)
+        private async Task<bool> NaceCodeExistsAsync(Guid id)
         {
-            return db.NaceCodes.Count(e => e.NaceCodeID == id) > 0;
+            return await db.NaceCodes.AnyAsync(e => e.NaceCodeID == id);
         }
 
         private async Task DeleteTmpByUserAsync(string username)
