@@ -12,6 +12,7 @@ namespace Arysoft.ARI.NF48.Api.Models.Mappings
         {
             var contact = new Contact
             {
+                OrganizationID = contactPostDto.OrganizationID,
                 UpdatedUser = contactPostDto.UpdatedUser
             };
 

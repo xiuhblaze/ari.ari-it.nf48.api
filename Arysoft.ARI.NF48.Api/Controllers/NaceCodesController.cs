@@ -45,7 +45,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 items = items.Where(e => e.Status != StatusType.Nothing);
             }
 
-            // Orden
+            // Order
 
             switch (filters.Order)
             {   

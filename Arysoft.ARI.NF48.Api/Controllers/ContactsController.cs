@@ -149,19 +149,24 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // PostContact
 
         // PUT: api/Contact/5
+        [ResponseType(typeof(ApiResponse<Contact>))]
         public async Task<IHttpActionResult> PutContact(Guid id, ContactPutDto contactDto)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            var contact = ContactMappings.PutToContact(contactDto);
+            if (id != contactDto.ContactID) { return BadRequest(); }
 
-            contact.Status = contact.Status == StatusType.Nothing ? StatusType.Active : contact.Status;
+            var contact = await db.Contacts.FindAsync(id);
+
+            contact.FirstName = contactDto.FirstName;
+            contact.LastName = contactDto.LastName;
+            contact.Phone = contactDto.Phone;
+            contact.PhoneExtensions = contactDto.PhoneExtensions;
+            contact.Email = contactDto.Email;
+            contact.Position = contactDto.Position;
+            contact.Status = contactDto.Status == StatusType.Nothing ? StatusType.Active : contactDto.Status;
             contact.Updated = DateTime.Now;
-
-            if (id != contact.ContactID)
-            {
-                return BadRequest();
-            }
+            contact.UpdatedUser = contactDto.UpdatedUser;
 
             db.Entry(contact).State = EntityState.Modified;
 

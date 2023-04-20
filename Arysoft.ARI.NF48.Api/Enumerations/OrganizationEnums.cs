@@ -14,4 +14,17 @@ namespace Arysoft.ARI.NF48.Api.Enumerations
         Inactive,
         Deleted
     }
+
+    public enum OrganizationOrderType
+    { 
+        Nothing,
+        Name,
+        LegalEntity,
+        Status,
+        Updated,
+        NameDesc,
+        LegalEntityDesc,
+        StatusDesc,
+        UpdatedDesc
+    }
 }
