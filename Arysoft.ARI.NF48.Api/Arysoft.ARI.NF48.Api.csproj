@@ -187,6 +187,7 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
+    <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
     <Compile Include="Models\Mappings\ContactMappings.cs" />
     <Compile Include="Models\Mappings\NaceCodeMappings.cs" />
     <Compile Include="Models\NaceCode.cs" />

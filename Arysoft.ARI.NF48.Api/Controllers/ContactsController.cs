@@ -144,13 +144,12 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
 
             var response = new ApiResponse<Contact>(contact);
-
             return Ok(response);
         } // PostContact
 
         // PUT: api/Contact/5
         [ResponseType(typeof(ApiResponse<Contact>))]
-        public async Task<IHttpActionResult> PutContact(Guid id, ContactPutDto contactDto)
+        public async Task<IHttpActionResult> PutContact(Guid id, [FromBody] ContactPutDto contactDto)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 

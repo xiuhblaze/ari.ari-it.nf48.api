@@ -1,15 +1,22 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
+﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
 using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.Http.Results;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
@@ -74,7 +81,152 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                     break;
             }
 
-            return Ok(items);
+            // Pagination
+
+            var pagedItems = PagedList<Organization>.Create(items, filters.PageNumber, filters.PageSize);
+            var response = new ApiResponse<IEnumerable<Organization>>(pagedItems);
+            var metadata = new Metadata
+            {
+                TotalCount = pagedItems.TotalCount,
+                PageSize = pagedItems.PageSize,
+                CurrentPage = pagedItems.CurrentPage,
+                TotalPages = pagedItems.TotalPages,
+                HasPreviousPage = pagedItems.HasPreviousPage,
+                HasNextPage = pagedItems.HasNextPage
+            };
+            response.Meta = metadata;
+
+            return Ok(response);
+        } // GetOrganizations
+
+        [ResponseType(typeof(ApiResponse<Organization>))]
+        public async Task<IHttpActionResult> GetOrganization(Guid id)
+        {
+            var organization = await db.Organizations.FindAsync(id);
+
+            if (organization == null) { return NotFound(); }
+
+            var response = new ApiResponse<Organization>(organization);
+            return Ok(response);
+        } // GetOrganization
+
+        // POST: api/Organization
+        [ResponseType(typeof(ApiResponse<Organization>))]
+        public async Task<IHttpActionResult> PostOrganization([FromBody] OrganizationPostDto organizationDto)
+        {
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            await DeleteTmpByUserAsync(organizationDto.UpdatedUser);
+
+            var item = new Organization { 
+                OrganizationID = Guid.NewGuid(),
+                Status = OrganizationStatusType.Nothing,
+                Updated = DateTime.Now,
+                UpdatedUser = organizationDto.UpdatedUser
+            };
+
+            db.Organizations.Add(item);
+
+            try 
+            { 
+                await db.SaveChangesAsync();
+            } 
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            var response = new ApiResponse<Organization>(item);
+            return Ok(response);
+        } // PostOrganization
+
+        // PUT: api/Organization/5
+        [ResponseType(typeof(ApiResponse<Organization>))]
+        public async Task<IHttpActionResult> PutOrganization(Guid id, [FromBody] OrganizationPutDto organizationDto)
+        { 
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (id != organizationDto.OrganizationID) return BadRequest("ID mismatch.");
+
+            var item = await db.Organizations.FindAsync(id);
+
+            if (item == null) return NotFound();
+
+            item.Name = organizationDto.Name;
+            item.LegalEntity = organizationDto.LegalEntity;
+            item.LogoFile = organizationDto.LogoFile;
+            item.Website = organizationDto.Website;
+            item.Phone = organizationDto.Phone;
+            item.Status = organizationDto.Status == OrganizationStatusType.Nothing ? OrganizationStatusType.New : organizationDto.Status;
+            item.Updated = DateTime.Now;
+            item.UpdatedUser = organizationDto.UpdatedUser;
+
+            db.Entry(item).State = EntityState.Modified;
+
+            try 
+            {
+                await db.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            var response = new ApiResponse<Organization>(item);
+            return Ok(response);
+        } // PutOrganization
+
+
+        public async Task<IHttpActionResult> DeleteOrganization(Guid id)
+        {
+            var item = await db.Organizations.FindAsync(id);
+
+            // The item with the specified ID, does not exist.
+            if (item == null) return NotFound();
+
+            if (item.Status == OrganizationStatusType.Deleted)
+            {
+                db.Organizations.Remove(item);
+            }
+            else {
+                item.Status = item.Status == OrganizationStatusType.Inactive ? OrganizationStatusType.Deleted : OrganizationStatusType.Inactive;
+                db.Entry(item).State = EntityState.Modified;
+            }
+
+            await db.SaveChangesAsync();
+
+            var response = new ApiResponse<Organization>(item);
+            return Ok(response);
+        } // DeleteOrganization
+
+        // PRIVATE 
+
+        private async Task DeleteTmpByUserAsync(string username)
+        {
+            var items = await db.Organizations
+                .Where(o => 
+                    o.UpdatedUser == username 
+                    && o.Status == OrganizationStatusType.Nothing)
+                .ToListAsync();
+
+            foreach(var item in items)
+            {
+                db.Entry(item).State = EntityState.Deleted;
+            }
+        }
+
+        private async Task DeleteTmpByPublicFromADay()
+        { 
+            var items = await db.Organizations
+                .Where(o => 
+                    o.UpdatedUser == "public"
+                    && o.Status == OrganizationStatusType.Nothing
+                    && o.Updated > DateTime.Now.AddDays(-1))
+                .ToListAsync();
+
+            foreach (var item in items)
+            {
+                db.Entry(item).State = EntityState.Deleted;
+            }
         }
     }
 }
