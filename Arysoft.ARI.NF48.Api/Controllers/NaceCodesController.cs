@@ -97,15 +97,13 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(ApiResponse<NaceCode>))]
         public async Task<IHttpActionResult> GetNaceCode(Guid id)
         {
-            NaceCode naceCode = await db.NaceCodes.FindAsync(id);
-            if (naceCode == null)
-            {
-                return NotFound();
-            }
-
+            var naceCode = await db.NaceCodes.FindAsync(id);
+            
+            if (naceCode == null) return NotFound();
+            
             var response = new ApiResponse<NaceCode>(naceCode);
             return Ok(response);
-        }
+        } // GetNaceCode
 
         // POST: api/NaceCodes
         [ResponseType(typeof(NaceCode))]
@@ -115,43 +113,46 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             await DeleteTmpByUserAsync(naceCodeDto.UpdatedUser);
 
-            var naceCode = NaceCodeMappings.PostToNaceCode(naceCodeDto);
+            var item = new NaceCode
+            {
+                NaceCodeID = Guid.NewGuid(),
+                Status = StatusType.Nothing,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+                UpdatedUser = naceCodeDto.UpdatedUser
+            };
 
-            naceCode.NaceCodeID = Guid.NewGuid();
-            naceCode.Updated = DateTime.Now;
-
-            db.NaceCodes.Add(naceCode);
+            db.NaceCodes.Add(item);
 
             try
             {
                 await db.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (Exception ex)
             {
-                if (await NaceCodeExistsAsync(naceCode.NaceCodeID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
 
-            //return CreatedAtRoute("DefaultApi", new { id = naceCode.NaceCodeID }, naceCode);
-            var response = new ApiResponse<NaceCode>(naceCode);
+            var response = new ApiResponse<NaceCode>(item);
             return Ok(response);
-        }
+        } // PostNaceCode
 
         // PUT: api/NaceCodes/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutNaceCode(Guid id, NaceCodePutDto naceCodeDto)
+        [ResponseType(typeof(ApiResponse<NaceCode>))]
+        public async Task<IHttpActionResult> PutNaceCode(Guid id, [FromBody] NaceCodePutDto naceCodeDto)
         {
-            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (id != naceCodeDto.NaceCodeID) return BadRequest("ID mismatch");
 
-            var naceCode = NaceCodeMappings.PutToNaceCode(naceCodeDto);
+            var item = await db.NaceCodes.FindAsync(id);
 
             // Validate if not exist a duplicate item with Sector, Division, Group and Class
+
+            item.Sector = naceCodeDto.Sector;
+            item.Division = naceCodeDto.Division;
+            item.Group = naceCodeDto.Group;
+            item.Class = naceCodeDto.Class;
+            item.Description = naceCodeDto.Description;
 
             naceCode.Status = naceCode.Status == StatusType.Nothing ? StatusType.Active : naceCode.Status;
             naceCode.Updated = DateTime.Now;

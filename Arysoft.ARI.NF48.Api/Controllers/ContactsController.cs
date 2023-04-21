@@ -119,31 +119,26 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             await DeleteTmpByUserAsync(contactDto.UpdatedUser);
 
-            var contact = ContactMappings.PostToContact(contactDto);
+            //var contact = ContactMappings.PostToContact(contactDto);
+            var item = new Contact { 
+                ContactID = Guid.NewGuid(),
+                OrganizationID = contactDto.OrganizationID,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+                UpdatedUser = contactDto.UpdatedUser
+            };
 
-            contact.ContactID = Guid.NewGuid();
-            contact.FirstName = string.Empty;
-            contact.Updated = DateTime.Now;
-
-            db.Contacts.Add(contact);
+            db.Contacts.Add(item);
 
             try {
                 await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (await ContactExistAsync(contact.ContactID))
-                {
-                    return Conflict();
-                }
-                else { throw; }
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
 
-            var response = new ApiResponse<Contact>(contact);
+            var response = new ApiResponse<Contact>(item);
             return Ok(response);
         } // PostContact
 
@@ -153,21 +148,23 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (id != contactDto.ContactID) { return BadRequest(); }
+            if (id != contactDto.ContactID) { return BadRequest("ID mismatch"); }
 
-            var contact = await db.Contacts.FindAsync(id);
+            var item = await db.Contacts.FindAsync(id);
 
-            contact.FirstName = contactDto.FirstName;
-            contact.LastName = contactDto.LastName;
-            contact.Phone = contactDto.Phone;
-            contact.PhoneExtensions = contactDto.PhoneExtensions;
-            contact.Email = contactDto.Email;
-            contact.Position = contactDto.Position;
-            contact.Status = contactDto.Status == StatusType.Nothing ? StatusType.Active : contactDto.Status;
-            contact.Updated = DateTime.Now;
-            contact.UpdatedUser = contactDto.UpdatedUser;
+            if (item == null) return NotFound();
 
-            db.Entry(contact).State = EntityState.Modified;
+            item.FirstName = contactDto.FirstName;
+            item.LastName = contactDto.LastName;
+            item.Phone = contactDto.Phone;
+            item.PhoneExtensions = contactDto.PhoneExtensions;
+            item.Email = contactDto.Email;
+            item.Position = contactDto.Position;
+            item.Status = contactDto.Status == StatusType.Nothing ? StatusType.Active : contactDto.Status;
+            item.Updated = DateTime.Now;
+            item.UpdatedUser = contactDto.UpdatedUser;
+
+            db.Entry(item).State = EntityState.Modified;
 
             try
             {
@@ -178,7 +175,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 return BadRequest(ex.Message);
             }
 
-            var response = new ApiResponse<Contact>(contact);
+            var response = new ApiResponse<Contact>(item);
             return Ok(response);
         } // PutContact
 

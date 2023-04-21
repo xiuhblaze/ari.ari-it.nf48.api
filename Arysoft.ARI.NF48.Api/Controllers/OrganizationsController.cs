@@ -121,6 +121,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var item = new Organization { 
                 OrganizationID = Guid.NewGuid(),
                 Status = OrganizationStatusType.Nothing,
+                Created = DateTime.Now,
                 Updated = DateTime.Now,
                 UpdatedUser = organizationDto.UpdatedUser
             };
