@@ -14,6 +14,7 @@ using Arysoft.ARI.NF48.Api;
 using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
 
@@ -93,102 +94,100 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetStandards
 
         // GET: api/Standards/5
-        [ResponseType(typeof(Standard))]
+        [ResponseType(typeof(ApiResponse<Standard>))]
         public async Task<IHttpActionResult> GetStandard(Guid id)
         {
-            Standard standard = await db.Standards.FindAsync(id);
-            if (standard == null)
-            {
-                return NotFound();
-            }
+            var item = await db.Standards.FindAsync(id);
+            if (item == null) return NotFound();
 
-            return Ok(standard);
+            var response = new ApiResponse<Standard>(item);
+            return Ok(response);
         }
 
         // POST: api/Standards
-        [ResponseType(typeof(Standard))]
-        public async Task<IHttpActionResult> PostStandard(Standard standard)
+        [ResponseType(typeof(ApiResponse<Standard>))]
+        public async Task<IHttpActionResult> PostStandard([FromBody] StandardPostDto itemDto)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            await DeleteTmpByUserAsync(standard.UpdatedUser);
+            await DeleteTmpByUserAsync(itemDto.UpdatedUser);
 
-            standard.StandardID = Guid.NewGuid();
-            standard.Updated = DateTime.Now;
+            var item = new Standard { 
+                StandardID = Guid.NewGuid(),
+                Status = StatusType.Nothing,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+                UpdatedUser = itemDto.UpdatedUser
+            };
 
-            db.Standards.Add(standard);
+            db.Standards.Add(item);
 
             try
             {
                 await db.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (Exception ex)
             {
-                if (StandardExists(standard.StandardID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = standard.StandardID }, standard);
-        }
+            var response = new ApiResponse<Standard>(item);
+            return Ok(response);
+        } // PostStandard
 
         // PUT: api/Standards/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutStandard(Guid id, Standard standard)
+        [ResponseType(typeof(ApiResponse<Standard>))]
+        public async Task<IHttpActionResult> PutStandard(Guid id, [FromBody] StandardPutDto itemDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (id != itemDto.StandardID) return BadRequest("ID mismatch");
+            
+            var item = await db.Standards.FindAsync(id);
 
-            if (id != standard.StandardID)
-            {
-                return BadRequest();
-            }
+            if (item == null) return NotFound();
 
-            standard.Updated = DateTime.Now;
+            item.Name = itemDto.Name;
+            item.Description = itemDto.Description;
+            item.Status = itemDto.Status;
+            item.Updated = DateTime.Now;
 
-            db.Entry(standard).State = EntityState.Modified;
+            db.Entry(item).State = EntityState.Modified;
 
             try
             {
                 await db.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!StandardExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+            var response = new ApiResponse<Standard>(item);
+            return Ok(response);
+        } // PutStandard
 
         // DELETE: api/Standards/5
-        [ResponseType(typeof(Standard))]
+        [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteStandard(Guid id)
         {
-            Standard standard = await db.Standards.FindAsync(id);
-            if (standard == null)
+            var item = await db.Standards.FindAsync(id);
+            if (item == null) return NotFound();
+
+            if (item.Status == StatusType.Deleted)
             {
-                return NotFound();
+                db.Standards.Remove(item);
+            }
+            else 
+            {
+                item.Status = item.Status == StatusType.Active ? StatusType.Inactive : StatusType.Deleted;
+                db.Entry(item).State = EntityState.Modified;
             }
 
-            db.Standards.Remove(standard);
             await db.SaveChangesAsync();
 
-            return Ok(standard);
-        }
+            var response = new ApiResponse<bool>(true);
+            return Ok(response);
+        } // DeleteStandard 
 
         protected override void Dispose(bool disposing)
         {
@@ -197,11 +196,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
-        }
-
-        private bool StandardExists(Guid id)
-        {
-            return db.Standards.Count(e => e.StandardID == id) > 0;
         }
 
         private async Task DeleteTmpByUserAsync(string username)

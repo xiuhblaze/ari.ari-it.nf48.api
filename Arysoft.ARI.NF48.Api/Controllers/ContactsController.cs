@@ -2,22 +2,15 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using Arysoft.ARI.NF48.Api.Models.Mappings;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
-using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
-using System.Web.Http.Results;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
@@ -119,7 +112,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             await DeleteTmpByUserAsync(contactDto.UpdatedUser);
 
-            //var contact = ContactMappings.PostToContact(contactDto);
             var item = new Contact { 
                 ContactID = Guid.NewGuid(),
                 OrganizationID = contactDto.OrganizationID,
@@ -180,15 +172,12 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // PutContact
 
         // DELETE: api/Contact/5
-        [ResponseType(typeof(Contact))]
+        [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteContact(Guid id)
         {
             var contact = await db.Contacts.FindAsync(id);
-            if (contact == null)
-            {
-                return NotFound();
-            }
-
+            if (contact == null) return NotFound();
+            
             if (contact.Status == StatusType.Deleted)
             {
                 db.Contacts.Remove(contact);
@@ -201,7 +190,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             await db.SaveChangesAsync();
 
-            var response = new ApiResponse<Contact>(contact);
+            var response = new ApiResponse<bool>(true);
             return Ok(response);
         } // DeleteContact
 

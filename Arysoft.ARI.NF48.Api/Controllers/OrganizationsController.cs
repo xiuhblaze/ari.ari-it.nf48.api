@@ -102,11 +102,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(ApiResponse<Organization>))]
         public async Task<IHttpActionResult> GetOrganization(Guid id)
         {
-            var organization = await db.Organizations.FindAsync(id);
+            var item = await db.Organizations.FindAsync(id);
+            if (item == null) return NotFound(); 
 
-            if (organization == null) { return NotFound(); }
-
-            var response = new ApiResponse<Organization>(organization);
+            var response = new ApiResponse<Organization>(item);
             return Ok(response);
         } // GetOrganization
 
@@ -188,14 +187,15 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 db.Organizations.Remove(item);
             }
-            else {
+            else 
+            {
                 item.Status = item.Status == OrganizationStatusType.Inactive ? OrganizationStatusType.Deleted : OrganizationStatusType.Inactive;
                 db.Entry(item).State = EntityState.Modified;
             }
 
             await db.SaveChangesAsync();
 
-            var response = new ApiResponse<Organization>(item);
+            var response = new ApiResponse<bool>(true);
             return Ok(response);
         } // DeleteOrganization
 

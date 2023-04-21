@@ -2,14 +2,12 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using Arysoft.ARI.NF48.Api.Models.Mappings;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -154,38 +152,23 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             item.Class = naceCodeDto.Class;
             item.Description = naceCodeDto.Description;
 
-            naceCode.Status = naceCode.Status == StatusType.Nothing ? StatusType.Active : naceCode.Status;
-            naceCode.Updated = DateTime.Now;
+            item.Status = naceCodeDto.Status == StatusType.Nothing ? StatusType.Active : naceCodeDto.Status;
+            item.Updated = DateTime.Now;
 
-            if (id != naceCode.NaceCodeID)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(naceCode).State = EntityState.Modified;
+            db.Entry(item).State = EntityState.Modified;
 
             try
             {
                 await db.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!await NaceCodeExistsAsync(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
 
-            //var response = new ApiResponse<bool>(true);
-            //return Ok(response);
-            //StatusCode(HttpStatusCode.NoContent);
-            var response = new ApiResponse<NaceCode>(naceCode);
+            var response = new ApiResponse<NaceCode>(item);
             return Ok(response);
-        }
+        } // PutNaceCode
 
         // DELETE: api/NaceCodes/5
         [ResponseType(typeof(NaceCode))]
