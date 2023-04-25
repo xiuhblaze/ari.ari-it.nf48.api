@@ -30,6 +30,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         [StringLength(500)]
         public string ActivitesDescription { get; set; }
 
+        public StatusType Status { get; set; }
+
         // RELATIONS
 
         public Site Site { get; set; }

@@ -170,6 +170,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NaceCodesController.cs" />
     <Compile Include="Controllers\OrganizationsController.cs" />
+    <Compile Include="Controllers\ShiftsController.cs" />
     <Compile Include="Controllers\StandardsController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="CustomEntities\Metadata.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
+    <Compile Include="Models\DTOs\ShiftDTOs.cs" />
     <Compile Include="Models\DTOs\StandardDTOs.cs" />
     <Compile Include="Models\NaceCode.cs" />
     <Compile Include="Models\Organization.cs" />
@@ -199,6 +201,7 @@
     <Compile Include="QueryFilters\ContactQueryFilters.cs" />
     <Compile Include="QueryFilters\NaceCodeQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
+    <Compile Include="QueryFilters\ShiftQueryFilters.cs" />
     <Compile Include="QueryFilters\StandardQueryFilters.cs" />
     <Compile Include="Response\ApiResponse.cs" />
   </ItemGroup>
