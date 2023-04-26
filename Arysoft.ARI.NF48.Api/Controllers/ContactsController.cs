@@ -37,6 +37,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 );
             }
 
+            //TODO: Agregar el filtro por OrganizationID
+
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);

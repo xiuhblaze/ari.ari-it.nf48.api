@@ -179,6 +179,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             if (item.Status == OrganizationStatusType.Deleted)
             {
+                // TODO: Validar que no tenga Sites o Contacts asociados (eliminarlos o no dejarlo borrar)
                 db.Organizations.Remove(item);
             }
             else 

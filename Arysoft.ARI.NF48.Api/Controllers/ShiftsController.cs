@@ -8,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -20,6 +18,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
     {
         private AriContext db = new AriContext();
 
+        [HttpGet]
+        [ResponseType(typeof(ApiResponse<IEnumerable<Shift>>))]
         public IHttpActionResult GetShifts([FromUri] ShiftQueryFilters filters)
         {
             var items = db.Shifts.AsEnumerable();
@@ -29,7 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (!string.IsNullOrEmpty(filters.Text))
             { 
                 filters.Text = filters.Text.ToLower().Trim();
-                items = items.Where(e => e.ActivitesDescription == filters.Text);
+                items = items.Where(e => e.ActivitesDescription.ToLower().Contains(filters.Text));
             }
 
             if (filters.SiteID != null && filters.SiteID != Guid.Empty)

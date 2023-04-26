@@ -37,6 +37,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(500)]
         public string ActivitesDescription { get; set; }
 
+        [Required]
         public StatusType Status { get; set; }
 
         [StringLength(50)]

@@ -19,6 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid ContactID { get; set; }
 
+        [Required]
         [StringLength(100)]
         public string FirstName { get; set; }
 
@@ -31,6 +32,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(20)]
         public string PhoneExtensions { get; set; }
 
+        [Required]
         [EmailAddress]
         [StringLength(250)]
         public string Email { get; set; }
@@ -40,6 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StatusType Status { get; set; }
 
+        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     }
