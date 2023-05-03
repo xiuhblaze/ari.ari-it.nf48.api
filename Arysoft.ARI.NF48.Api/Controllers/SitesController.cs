@@ -107,6 +107,9 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var item = await db.Sites.FindAsync(id);
             if (item == null) return NotFound();
 
+            // HACK: Validar si tiene el status 0, aun no es un registro consultable
+            // HACK: Validar si esta en estatus de eliminado, que tenga el permiso para verlo
+
             var response = new ApiResponse<Site>(item);
             return Ok(response);
         } // GetShift
@@ -156,6 +159,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var item = await db.Sites.FindAsync(id);
 
             if (item == null) return NotFound();
+
+            // HACK: Validar que no se duplique el orden
 
             item.Description = siteDto.Description;
             item.LocationDescription = siteDto.LocationDescription;

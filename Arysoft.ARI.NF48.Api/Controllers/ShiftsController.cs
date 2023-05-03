@@ -29,7 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (!string.IsNullOrEmpty(filters.Text))
             { 
                 filters.Text = filters.Text.ToLower().Trim();
-                items = items.Where(e => e.ActivitesDescription.ToLower().Contains(filters.Text));
+                items = items.Where(e => e.ActivitiesDescription.ToLower().Contains(filters.Text));
             }
 
             if (filters.SiteID != null && filters.SiteID != Guid.Empty)
@@ -162,7 +162,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             item.NoEmployees = shiftDto.NoEmployees;
             item.ShiftBegin = shiftDto.ShiftBegin;
             item.ShiftEnd = shiftDto.ShiftEnd;
-            item.ActivitesDescription = shiftDto.ActivitesDescription;            
+            item.ActivitiesDescription = shiftDto.ActivitiesDescription;            
             item.Status = shiftDto.Status == StatusType.Nothing ? StatusType.Active : shiftDto.Status;
             item.Updated = DateTime.Now;
             item.UpdatedUser = shiftDto.UpdatedUser;

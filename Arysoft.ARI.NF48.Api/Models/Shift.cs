@@ -28,7 +28,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public int? ShiftEnd { get; set; }
 
         [StringLength(500)]
-        public string ActivitesDescription { get; set; }
+        public string ActivitiesDescription { get; set; }
 
         public StatusType Status { get; set; }
 
