@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\Users\xiuhb\source\repos\ARI\wwwroot.api</_PublishTargetUrl>
-    <History>True|2023-05-03T04:18:44.6856683Z;True|2023-04-03T20:22:28.6862894-06:00;True|2023-04-03T20:17:15.9000935-06:00;True|2023-03-30T22:23:08.9419762-06:00;True|2023-03-29T22:46:01.5337517-06:00;True|2023-03-29T22:26:47.5288083-06:00;True|2023-03-28T23:19:52.0020982-06:00;True|2023-03-01T19:18:00.2294338-06:00;True|2023-01-26T00:08:47.6842119-06:00;True|2023-01-24T18:46:04.8188676-06:00;True|2023-01-19T23:05:00.2997893-06:00;</History>
+    <History>True|2023-09-16T01:18:52.8737138Z;True|2023-09-13T21:16:53.2252910-06:00;True|2023-08-28T20:15:18.9642059-06:00;True|2023-08-19T20:50:43.5358993-06:00;True|2023-05-02T22:18:44.6856683-06:00;True|2023-04-03T20:22:28.6862894-06:00;True|2023-04-03T20:17:15.9000935-06:00;True|2023-03-30T22:23:08.9419762-06:00;True|2023-03-29T22:46:01.5337517-06:00;True|2023-03-29T22:26:47.5288083-06:00;True|2023-03-28T23:19:52.0020982-06:00;True|2023-03-01T19:18:00.2294338-06:00;True|2023-01-26T00:08:47.6842119-06:00;True|2023-01-24T18:46:04.8188676-06:00;True|2023-01-19T23:05:00.2997893-06:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -79,10 +79,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>09/10/2013 16:29:20</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.dll">
-      <publishTime>02/05/2023 22:18:43</publishTime>
+      <publishTime>09/15/2023 19:18:51</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.pdb">
-      <publishTime>02/05/2023 22:18:43</publishTime>
+      <publishTime>09/15/2023 19:18:51</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>04/16/2020 14:38:42</publishTime>
@@ -124,7 +124,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>07/08/2020 16:52:58</publishTime>
     </File>
     <File Include="bin/Microsoft.Web.Infrastructure.dll">
-      <publishTime>05/27/2022 22:39:10</publishTime>
+      <publishTime>05/27/2022 17:39:10</publishTime>
     </File>
     <File Include="bin/Newtonsoft.Json.dll">
       <publishTime>11/23/2022 20:10:26</publishTime>
@@ -220,43 +220,43 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/18/2020 19:52:02</publishTime>
     </File>
     <File Include="bin/System.Net.Http.Formatting.dll">
-      <publishTime>05/27/2022 22:41:34</publishTime>
+      <publishTime>05/27/2022 17:41:34</publishTime>
     </File>
     <File Include="bin/System.Web.Cors.dll">
       <publishTime>05/27/2022 17:41:44</publishTime>
     </File>
     <File Include="bin/System.Web.Helpers.dll">
-      <publishTime>05/27/2022 22:41:54</publishTime>
+      <publishTime>05/27/2022 17:41:54</publishTime>
     </File>
     <File Include="bin/System.Web.Http.Cors.dll">
       <publishTime>05/27/2022 17:42:16</publishTime>
     </File>
     <File Include="bin/System.Web.Http.dll">
-      <publishTime>05/27/2022 22:41:46</publishTime>
+      <publishTime>05/27/2022 17:41:46</publishTime>
     </File>
     <File Include="bin/System.Web.Http.WebHost.dll">
-      <publishTime>05/27/2022 22:41:54</publishTime>
+      <publishTime>05/27/2022 17:41:54</publishTime>
     </File>
     <File Include="bin/System.Web.Mvc.dll">
-      <publishTime>05/27/2022 22:42:20</publishTime>
+      <publishTime>05/27/2022 17:42:20</publishTime>
     </File>
     <File Include="bin/System.Web.Optimization.dll">
       <publishTime>02/11/2014 14:26:04</publishTime>
     </File>
     <File Include="bin/System.Web.Razor.dll">
-      <publishTime>05/27/2022 22:42:06</publishTime>
+      <publishTime>05/27/2022 17:42:06</publishTime>
     </File>
     <File Include="bin/System.Web.WebPages.Deployment.dll">
-      <publishTime>05/27/2022 22:42:46</publishTime>
+      <publishTime>05/27/2022 17:42:46</publishTime>
     </File>
     <File Include="bin/System.Web.WebPages.dll">
-      <publishTime>05/27/2022 22:42:16</publishTime>
+      <publishTime>05/27/2022 17:42:16</publishTime>
     </File>
     <File Include="bin/System.Web.WebPages.Razor.dll">
-      <publishTime>05/27/2022 22:42:50</publishTime>
+      <publishTime>05/27/2022 17:42:50</publishTime>
     </File>
     <File Include="bin/WebGrease.dll">
-      <publishTime>01/23/2014 12:57:34</publishTime>
+      <publishTime>01/23/2014 07:57:34</publishTime>
     </File>
     <File Include="Content/bootstrap-theme.css">
       <publishTime>01/17/2023 23:16:21</publishTime>
@@ -349,7 +349,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>01/17/2023 23:16:07</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>05/02/2023 22:37:55</publishTime>
+      <publishTime>08/19/2023 20:50:42</publishTime>
     </File>
   </ItemGroup>
 </Project>

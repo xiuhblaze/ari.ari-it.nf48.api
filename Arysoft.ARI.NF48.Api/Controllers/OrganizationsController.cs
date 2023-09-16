@@ -43,7 +43,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
             else
             {
-                items = items.Where(e => e.Status != OrganizationStatusType.Nothing);
+                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
+                items = (bool)filters.IncludeDeleted
+                    ? items.Where(e => e.Status != OrganizationStatusType.Nothing)
+                    : items.Where(e => e.Status != OrganizationStatusType.Nothing && e.Status != OrganizationStatusType.Deleted);
             }
 
             // Order

@@ -29,14 +29,14 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(ApiResponse<IEnumerable<Standard>>))]
         public IHttpActionResult GetStandards([FromUri]StandardQueryFilters filters)
         {
-            var standards = db.Standards.AsEnumerable();
+            var items = db.Standards.AsEnumerable();
 
             // Filtros
 
             if (!string.IsNullOrEmpty(filters.Texto)) 
             {
                 filters.Texto = filters.Texto.Trim().ToLower();
-                standards = standards.Where(s =>
+                items = items.Where(s =>
                     s.Name.ToLower().Contains(filters.Texto)
                     || s.Description.ToLower().Contains(filters.Texto)
                 );
@@ -44,39 +44,45 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
-                standards = standards.Where(s => s.Status == filters.Status);
+                items = items.Where(e => e.Status == filters.Status);
             }
             else
             {
-                standards = standards.Where(s => s.Status != StatusType.Nothing);
+                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
+                items = (bool)filters.IncludeDeleted
+                    ? items.Where(e => e.Status != StatusType.Nothing)
+                    : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
 
             // Orden
 
             switch (filters.Order) {
                 case StandardsOrderType.Name:
-                    standards = standards.OrderBy(s => s.Name);
+                    items = items.OrderBy(s => s.Name);
                     break;
                 case StandardsOrderType.Status:
-                    standards = standards.OrderBy(s => s.Status);
+                    items = items.OrderBy(s => s.Status);
                     break;
                 case StandardsOrderType.Update:
-                    standards = standards.OrderBy(s => s.Updated);
+                    items = items.OrderBy(s => s.Updated);
+                    break;
+                case StandardsOrderType.NameDesc:
+                    items = items.OrderByDescending(s => s.Name);
                     break;
                 case StandardsOrderType.StatusDesc:
-                    standards = standards.OrderByDescending(s => s.Status);
+                    items = items.OrderByDescending(s => s.Status);
                     break;
                 case StandardsOrderType.UpdateDesc:
-                    standards = standards.OrderByDescending(s => s.Updated);
+                    items = items.OrderByDescending(s => s.Updated);
                     break;
                 default:
-                    standards = standards.OrderBy(s => s.Name);
+                    items = items.OrderBy(s => s.Name);
                     break;
             }
 
             // Paginación
 
-            var pagedStandards = PagedList<Standard>.Create(standards, filters.PageNumber, filters.PageSize);
+            var pagedStandards = PagedList<Standard>.Create(items, filters.PageNumber, filters.PageSize);
 
             var response = new ApiResponse<IEnumerable<Standard>>(pagedStandards);
             var metadata = new Metadata

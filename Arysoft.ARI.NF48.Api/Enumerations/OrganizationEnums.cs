@@ -9,7 +9,7 @@ namespace Arysoft.ARI.NF48.Api.Enumerations
     {
         Nothing,
         New,
-        Aproved,
+        Approved,
         Active,
         Inactive,
         Deleted

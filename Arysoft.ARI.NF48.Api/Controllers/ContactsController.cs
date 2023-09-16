@@ -45,7 +45,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
             else
             {
-                items = items.Where(e => e.Status != StatusType.Nothing);
+                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
+                items = (bool)filters.IncludeDeleted
+                    ? items.Where(e => e.Status != StatusType.Nothing)
+                    : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
 
             // Orden
@@ -117,6 +120,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var item = new Contact { 
                 ContactID = Guid.NewGuid(),
                 OrganizationID = contactDto.OrganizationID,
+                Status = StatusType.Nothing,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
                 UpdatedUser = contactDto.UpdatedUser

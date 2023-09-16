@@ -13,7 +13,7 @@ namespace Arysoft.ARI.NF48.Api
             // Configuración y servicios de Web API
 
             // CORS
-            var cors = new EnableCorsAttribute("http://localhost:3000", "*", "*");
+            var cors = new EnableCorsAttribute("http://localhost:5173,http://localhost:3000", "*", "*");
             //var cors = new EnableCorsAttribute("http://ari.arysoft.com.mx", "*", "*");
 
             config.EnableCors(cors);
