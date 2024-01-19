@@ -26,6 +26,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string Description { get; set; }
 
+        public int? MaxReductionsDays { get; set; }
+
         [Required]
         public StatusType Status { get; set; }
 

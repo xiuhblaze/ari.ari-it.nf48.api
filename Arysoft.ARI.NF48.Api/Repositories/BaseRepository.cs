@@ -1,0 +1,65 @@
+﻿using Arysoft.ARI.NF48.Api.Models;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+
+namespace Arysoft.ARI.NF48.Api.Repositories
+{
+    public class BaseRepository<T> where T : BaseModel
+    {
+        private readonly AriContext _context;
+        protected readonly DbSet<T> _model;
+
+        // CONSTRUCTOR
+
+        public BaseRepository()
+        {
+            _context = new AriContext();
+            _model = _context.Set<T>();
+        }
+
+        // METHODS
+
+        public IEnumerable<T> Gets()
+        {
+            return _model.AsEnumerable();
+        }
+
+        public async Task<T> GetAsync(Guid id)
+        {
+            return await _model
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+        }
+
+        public void Add(T item)
+        { 
+            _model.Add(item);
+        }
+
+        public void Update(T item)
+        {
+            _context.Entry(item).State = EntityState.Modified;
+        }
+
+        public void Delete(T item)
+        { 
+            // T item = await GetAsync(id);
+            _model.Remove(item);
+        }
+
+        public void SaveChanges()
+        { 
+            _context.SaveChanges();
+        }
+
+        public async Task SaveChangesAsync()
+        { 
+            await _context.SaveChangesAsync();
+        }
+
+    }
+}

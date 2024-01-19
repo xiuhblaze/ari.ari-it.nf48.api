@@ -13,6 +13,7 @@ using System.Web.Http.Description;
 using Arysoft.ARI.NF48.Api;
 using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
@@ -152,10 +153,13 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             if (item == null) return NotFound();
 
-            item.Name = itemDto.Name;
-            item.Description = itemDto.Description;
-            item.Status = itemDto.Status;
-            item.Updated = DateTime.Now;
+            item = StandardMapping.ItemPutDtoToStandard(itemDto);
+
+            //item.Name = itemDto.Name;
+            //item.Description = itemDto.Description;
+            //item.MaxReductionsDays = itemDto.MaxReductionsDays;
+            //item.Status = itemDto.Status;
+            //item.Updated = DateTime.Now;
 
             db.Entry(item).State = EntityState.Modified;
 

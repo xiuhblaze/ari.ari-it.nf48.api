@@ -9,6 +9,11 @@ namespace Arysoft.ARI.NF48.Api.Models
     public abstract class BaseModel
     {
         [Required]
+        public Guid ID { get; set; }
+
+        // Rest of properties ...
+
+        [Required]
         [DataType(DataType.DateTime)]
         public DateTime Created { get; set; }
 

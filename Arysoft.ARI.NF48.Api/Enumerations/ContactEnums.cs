@@ -2,7 +2,7 @@
 {
     public enum ContactOrderType
     {
-        Ninguno,
+        Nothing,
         FirstName,
         LastName,
         Updated,

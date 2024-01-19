@@ -19,7 +19,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         [StringLength(250)]
         public string Description { get; set; }
-                
+
+        public int? MaxReductionsDays { get; set; } 
+
         public StatusType Status { get; set; }
     }
 }

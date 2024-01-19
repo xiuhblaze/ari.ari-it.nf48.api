@@ -24,6 +24,18 @@ namespace Arysoft.ARI.NF48.Api
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+
+            modelBuilder.Entity<User>()
+                .Property(m => m.ID)
+                .HasColumnName("UserID");
+
+            modelBuilder.Entity<User>()
+                .HasMany(e => e.Roles)
+                .WithMany(e => e.Users)
+                .Map(e => e.MapLeftKey("UserID")
+                    .MapRightKey("RoleID")
+                    .ToTable("RolesUsers")
+                );
         }
     }
 }
