@@ -242,14 +242,18 @@
     <Compile Include="Enumerations\ContactEnums.cs" />
     <Compile Include="Enumerations\NaceCodeEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
+    <Compile Include="Enumerations\RoleEnums.cs" />
     <Compile Include="Enumerations\ShiftEnums.cs" />
     <Compile Include="Enumerations\SiteEnums.cs" />
     <Compile Include="Enumerations\StandardEnums.cs" />
     <Compile Include="Enumerations\GeneralEnums.cs" />
     <Compile Include="Enumerations\UserEnums.cs" />
+    <Compile Include="Exceptions\BusinessException.cs" />
+    <Compile Include="Filters\ExcepionHandlingAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Invokers\MyApiControllerActionInvoker.cs" />
     <Compile Include="Mappings\StandardMapping.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Models\BaseModel.cs" />
@@ -274,6 +278,7 @@
     <Compile Include="QueryFilters\ContactQueryFilters.cs" />
     <Compile Include="QueryFilters\NaceCodeQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
+    <Compile Include="QueryFilters\RoleQueryFilters.cs" />
     <Compile Include="QueryFilters\ShiftQueryFilters.cs" />
     <Compile Include="QueryFilters\SiteQueryFilters.cs" />
     <Compile Include="QueryFilters\StandardQueryFilters.cs" />
@@ -282,9 +287,12 @@
     <Compile Include="Repositories\RoleRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Response\ApiResponse.cs" />
+    <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Tools\Encrypt.cs" />
+    <Compile Include="Tools\FullName.cs" />
+    <Compile Include="Tools\GetModelStateErrors.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

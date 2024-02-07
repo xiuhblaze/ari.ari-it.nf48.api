@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using Arysoft.ARI.NF48.Api.Filters;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -18,6 +15,8 @@ namespace Arysoft.ARI.NF48.Api
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            GlobalConfiguration.Configuration.Filters.Add(new ExcepionHandlingAttribute());
         }
     }
 }

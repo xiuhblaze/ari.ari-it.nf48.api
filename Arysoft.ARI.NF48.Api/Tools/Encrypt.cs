@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Tools
 {
-    public class Encrypt
+    public partial class Encrypt
     {
         public static string GetSHA256(string value)
         {

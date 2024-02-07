@@ -16,6 +16,7 @@ namespace Arysoft.ARI.NF48.Api
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<Site> Sites { get; set; }
         public DbSet<Standard> Standards { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public AriContext() : base("DefaultConnection") { }
 

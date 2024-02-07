@@ -22,10 +22,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ContactID = item.ContactID,
                     Username = item.Username,
                     Email = item.Email,
-                    FullName = item.FirstName + (!string.IsNullOrEmpty(item.LastName) ? " " + item.LastName : string.Empty),
+                    FullName = Tools.Strings.FullName(item.FirstName, null, item.LastName),
                     Status = item.Status,
-                    OrganizationName = item.Organization.Name,
-                    ContactName = item.Contact.FirstName + (!string.IsNullOrEmpty(item.Contact.LastName) ? " " + item.Contact.LastName : string.Empty)
+                    OrganizationName = item.Organization != null 
+                        ? item.Organization.Name 
+                        : null,
+                    ContactName = item.Contact != null
+                        ? Tools.Strings.FullName(item.Contact.FirstName, null, item.Contact.LastName)
+                        : null
                     // Roles = RolesToListDto(item.Roles)
                 };
 
@@ -50,10 +54,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                OrganizationName = item.Organization.Name,
-                ContactName = item.Contact.FirstName + (!string.IsNullOrEmpty(item.Contact.LastName) 
-                    ? " " + item.Contact.LastName 
-                    : string.Empty)
+                OrganizationName = item.Organization != null 
+                    ? item.Organization.Name 
+                    : null,
+                ContactName = item.Contact != null 
+                    ? Tools.Strings.FullName(item.Contact.FirstName, null ,item.Contact.LastName)
+                    : null
                 // Roles = RolesToListDto(item.Roles)
             };
 
@@ -79,6 +85,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return item;
         } // ItemEditDtoToUser
 
+        public static User ItemDeleteDtoToUser(UserDeleteDto itemDto)
+        {
+            var item = new User()
+            {
+                ID = itemDto.ID,
+                UpdatedUser = itemDto.UpdatedUser
+            };
 
+            return item;
+        } // ItemDeleteDtoToUser
     }
 }

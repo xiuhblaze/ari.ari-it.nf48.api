@@ -1,10 +1,9 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.Models;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {
@@ -20,34 +19,41 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync();
         } // GetByUsername
 
-        public async Task UpdateAsync(User item)
+        public async Task<User> UpdateAsync(User item)
         {
-            var currentItem = await _model.FindAsync(item.ID) ?? throw new Exception("The record to update was not found");
+            var foundItem = await _model.FindAsync(item.ID) 
+                ?? throw new BusinessException("The record to update was not found");
 
-            currentItem.OrganizationID = item.OrganizationID;
-            currentItem.ContactID = item.ContactID;
-            currentItem.Username = item.Username;
-            currentItem.PasswordHash = item.PasswordHash;
-            currentItem.Email = item.Email;
-            currentItem.FirstName = item.FirstName;
-            currentItem.LastName = item.LastName;
-            currentItem.Status = item.Status;
-            currentItem.Updated = item.Updated;
-            currentItem.UpdatedUser = item.UpdatedUser;
+            foundItem.OrganizationID = item.OrganizationID;
+            foundItem.ContactID = item.ContactID;
+            foundItem.Username = item.Username;
+            foundItem.PasswordHash = string.IsNullOrEmpty(item.PasswordHash) 
+                ? foundItem.PasswordHash
+                : item.PasswordHash;
+            foundItem.Email = item.Email;
+            foundItem.FirstName = item.FirstName;
+            foundItem.LastName = item.LastName;
+            foundItem.Status = item.Status;
+            foundItem.Updated = item.Updated;
+            foundItem.UpdatedUser = item.UpdatedUser;
 
-            Update(currentItem);
+            Update(foundItem);
+
+            return foundItem;
         } // UpdateAsync
 
         public async Task DeleteTmpByUser(string username)
         { 
             var items = await _model
-                .Where(m => m.UpdatedUser.ToUpper() == username.ToUpper() && m.Status == Enumerations.StatusType.Nothing)
-                .ToListAsync();
+                .Where(m => 
+                    m.UpdatedUser.ToUpper() == username.ToUpper() 
+                    && m.Status == Enumerations.StatusType.Nothing
+                ).ToListAsync();
 
             foreach(var item in items)
             {
                 _model.Remove(item);
             }
-        }
+        } // DeleteTmpByUser
     }
 }

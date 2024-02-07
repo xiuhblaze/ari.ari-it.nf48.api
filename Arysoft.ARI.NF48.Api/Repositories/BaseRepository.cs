@@ -46,9 +46,9 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         }
 
         public void Delete(T item)
-        { 
-            // T item = await GetAsync(id);
-            _model.Remove(item);
+        {
+            _context.Entry(item).State = EntityState.Deleted;
+            //_model.Remove(item);
         }
 
         public void SaveChanges()

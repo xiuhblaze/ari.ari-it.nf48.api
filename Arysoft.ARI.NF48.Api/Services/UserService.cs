@@ -1,14 +1,12 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
-using Arysoft.ARI.NF48.Api.Response;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -50,7 +48,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
                 items = (bool)filters.IncludeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)
-                    : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
+                    : items.Where(e => e.Status != StatusType.Nothing 
+                        && e.Status != StatusType.Deleted);
             }
 
             // Order
@@ -94,7 +93,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Pagination
 
-            var pagedItems = PagedList<User>.Create(items, filters.PageNumber, filters.PageSize);
+            var pagedItems = PagedList<User>
+                .Create(items, filters.PageNumber, filters.PageSize);
             
             return pagedItems;
         } // Gets
@@ -110,8 +110,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (string.IsNullOrEmpty(item.UpdatedUser))
             {
-                throw new Exception("User was not specified");
-            } 
+                throw new BusinessException("User was not specified");
+            }
 
             // Assign values
 
@@ -133,39 +133,49 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validations 
 
+            //HACK: Validar que el usuario no este eliminado para validarlo
             if (await _userRepository.GetByUsername(item.Username, item.ID) != null)
             {
-                throw new Exception("The username already exist.");
+                throw new BusinessException("The username already exist.");
             }
 
-            // HACK: Ver si faltan más validaciones
+            if (!string.IsNullOrEmpty(item.PasswordHash))
+            {
+                item.PasswordHash = Tools.Encrypt.GetSHA256(item.PasswordHash);
+            }
 
             // Execute queries
 
             if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
             item.Updated = DateTime.Now;
 
-            await _userRepository.UpdateAsync(item);
+            var updatedItem = await _userRepository.UpdateAsync(item);
             await _userRepository.SaveChangesAsync();
 
-            return item;
-        }
+            return updatedItem;
+        } // UpdateAsync
 
-        public async Task DeleteAsync(Guid id)
-        { 
-            var item = await _userRepository.GetAsync(id) 
-                ?? throw new Exception("Item was not found");
+        public async Task DeleteAsync(User item)
+        {   
+            var foundItem = await _userRepository.GetAsync(item.ID) 
+                ?? throw new BusinessException("Item was not found");
 
-            if (item.Status == StatusType.Deleted)
+            if (foundItem.Status == StatusType.Deleted)
             {
-                _userRepository.Delete(item);
+                _userRepository.Delete(foundItem);
             }
-            else {
-                item.Status = item.Status == StatusType.Active ? StatusType.Inactive : StatusType.Deleted;
-                await _userRepository.UpdateAsync(item);
+            else
+            {
+                foundItem.Status = foundItem.Status == StatusType.Active 
+                    ? StatusType.Inactive 
+                    : StatusType.Deleted;
+                foundItem.Updated = DateTime.Now;
+                foundItem.UpdatedUser = item.UpdatedUser;
+
+                await _userRepository.UpdateAsync(foundItem);
             }
 
             await _userRepository.SaveChangesAsync();
-        }
+        } // DeleteAsync
     }
 }
