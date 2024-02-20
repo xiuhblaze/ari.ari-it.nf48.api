@@ -9,9 +9,6 @@ namespace Arysoft.ARI.NF48.Api.Models
     [Table("Roles")]
     public class Role : BaseModel
     {
-        [Key]
-        public Guid RoleID { get; set; }
-
         [StringLength(50)]
         public string Name { get; set; }
 
@@ -22,6 +19,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public ICollection<User> Users { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }

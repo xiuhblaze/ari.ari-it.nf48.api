@@ -1,9 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -15,29 +13,34 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
             foreach (var item in items)
             {
-                var itemDto = new UserListItemDto
-                {
-                    ID = item.ID,
-                    OrganizationID = item.OrganizationID,
-                    ContactID = item.ContactID,
-                    Username = item.Username,
-                    Email = item.Email,
-                    FullName = Tools.Strings.FullName(item.FirstName, null, item.LastName),
-                    Status = item.Status,
-                    OrganizationName = item.Organization != null 
-                        ? item.Organization.Name 
-                        : null,
-                    ContactName = item.Contact != null
-                        ? Tools.Strings.FullName(item.Contact.FirstName, null, item.Contact.LastName)
-                        : null
-                    // Roles = RolesToListDto(item.Roles)
-                };
-
-                itemsDto.Add(itemDto);
+                itemsDto.Add(UserToItemListDto(item));
             }
 
             return itemsDto;
         } // UsersRoListDto
+
+        public static UserListItemDto UserToItemListDto(User item)
+        {
+            return new UserListItemDto
+            {
+                ID = item.ID,
+                OrganizationID = item.OrganizationID,
+                ContactID = item.ContactID,
+                Username = item.Username,
+                Email = item.Email,
+                FullName = Tools.Strings.FullName(item.FirstName, null, item.LastName),
+                Status = item.Status,
+                OrganizationName = item.Organization != null
+                    ? item.Organization.Name
+                    : null,
+                ContactName = item.Contact != null
+                    ? Tools.Strings.FullName(item.Contact.FirstName, null, item.Contact.LastName)
+                    : null,
+                Roles = item.Roles != null
+                    ? RoleMapping.RolesToListDto(item.Roles).ToList()
+                    : null
+            };
+        } // UserToItemListDto
 
         public static UserDetailDto UserToDetailDto(User item)
         {
@@ -59,8 +62,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 ContactName = item.Contact != null 
                     ? Tools.Strings.FullName(item.Contact.FirstName, null ,item.Contact.LastName)
+                    : null,
+                Roles = item.Roles != null
+                    ? RoleMapping.RolesToListDto(item.Roles).ToList()
                     : null
-                // Roles = RolesToListDto(item.Roles)
             };
 
             return itemDto;

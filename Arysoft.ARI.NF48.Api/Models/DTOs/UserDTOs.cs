@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -27,7 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string ContactName { get; set; }
 
-        public ICollection<Role> Roles { get; set; }
+        public ICollection<RoleItemListDto> Roles { get; set; }
     } // UserListItemDto
 
     public class UserDetailDto
@@ -58,7 +56,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string ContactName { get; set; }
 
-        public ICollection<Role> Roles { get; set; }
+        public ICollection<RoleItemListDto> Roles { get; set; }
     } // UserDetailDto
 
     public class UserPostDto
@@ -94,11 +92,22 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string LastName { get; set; }
 
+        [EnumDataType(typeof(StatusType))]
         public StatusType Status { get; set; }
 
+        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // UserPutDto
+
+    public class UserAddRoleDto
+    {
+        [Required]
+        public Guid ID { get; set; }
+
+        [Required]
+        public Guid RoleID { get; set; }
+    } // UserAddRoleDto
 
     public class UserDeleteDto
     {

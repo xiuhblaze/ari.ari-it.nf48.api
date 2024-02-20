@@ -10,7 +10,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class BaseRepository<T> where T : BaseModel
     {
-        private readonly AriContext _context;
+        protected readonly AriContext _context;
         protected readonly DbSet<T> _model;
 
         // CONSTRUCTOR
@@ -23,12 +23,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         // METHODS
 
-        public IEnumerable<T> Gets()
+        public virtual IEnumerable<T> Gets()
         {
             return _model.AsEnumerable();
         }
 
-        public async Task<T> GetAsync(Guid id)
+        public virtual async Task<T> GetAsync(Guid id)
         {
             return await _model
                 .AsNoTracking()

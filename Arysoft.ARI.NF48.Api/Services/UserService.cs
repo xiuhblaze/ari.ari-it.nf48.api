@@ -13,12 +13,15 @@ namespace Arysoft.ARI.NF48.Api.Services
     public class UserService
     {
         private readonly UserRepository _userRepository;
+        private readonly RoleRepository roleRepository;
+        private AriContext db = new AriContext();
 
         // CONSTRUCTORS
 
         public UserService()
         {
             _userRepository = new UserRepository();
+            roleRepository = new RoleRepository();
         }
 
         // METHODS
@@ -154,6 +157,18 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return updatedItem;
         } // UpdateAsync
+
+        /// <summary>
+        /// Add a role to a user according to IDs
+        /// </summary>
+        /// <param name="id">User Id to add role</param>
+        /// <param name="roleID">Role to add</param>
+        /// <returns></returns>
+        public async Task AddRoleAsync(Guid id, Guid roleID)
+        {
+            await _userRepository.AddRoleAsync(id, roleID);
+            await _userRepository.SaveChangesAsync();            
+        } // AddRoleAsync
 
         public async Task DeleteAsync(User item)
         {   

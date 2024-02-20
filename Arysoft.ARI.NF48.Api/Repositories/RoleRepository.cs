@@ -28,8 +28,10 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public async Task DeleteTmpByUser(string username)
         {
             var items = await _model
-                .Where(m => m.UpdatedUser.ToUpper() == username.ToUpper() && m.Status == StatusType.Nothing)
-                .ToListAsync();
+                .Where(m => 
+                    m.UpdatedUser.ToUpper() == username.ToUpper() 
+                    && m.Status == StatusType.Nothing
+                ).ToListAsync();
 
             foreach (var item in items)
             {

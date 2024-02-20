@@ -9,7 +9,6 @@ using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -30,7 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<UserListItemDto>>))]
         public IHttpActionResult GetUsers([FromUri] UserQueryFilters filters)
-        { 
+        {
             var items = _userService.Gets(filters);
             var itemsDto = UserMapping.UsersToListDto(items);
 
@@ -59,7 +58,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 var response = new ApiResponse<UserDetailDto>(itemDto);
 
                 return Ok(response);
-            } 
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
@@ -68,8 +67,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [ResponseType(typeof(ApiResponse<UserDetailDto>))]
         public async Task<IHttpActionResult> PostUser([FromBody] UserPostDto itemAddDto)
-        {   
-            if (!ModelState.IsValid) throw new BusinessException(Strings.GetModelStateErrors(ModelState)); 
+        {
+            if (!ModelState.IsValid) throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             var item = await _userService
                 .AddAsync(new User { UpdatedUser = itemAddDto.UpdatedUser });
@@ -77,12 +76,12 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var response = new ApiResponse<UserDetailDto>(itemDto);
 
             return Ok(response);
-            
+
         } // PostUser
 
         [ResponseType(typeof(ApiResponse<UserDetailDto>))]
         public async Task<IHttpActionResult> PutUser(Guid id, [FromBody] UserPutDto itemEditDto)
-        {   
+        {
             if (!ModelState.IsValid) throw new BusinessException(Strings.GetModelStateErrors(ModelState));
             if (id != itemEditDto.ID) throw new BusinessException("ID mismatch");
 
@@ -91,8 +90,21 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var itemDto = UserMapping.UserToDetailDto(item);
             var response = new ApiResponse<UserDetailDto>(itemDto);
 
-            return Ok(response);            
+            return Ok(response);
         } // PutUser
+
+        [HttpPost]
+        [Route("add-role/{id}")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> AddRole(Guid id, [FromBody] UserAddRoleDto itemAddRole)
+        {
+            if (id != itemAddRole.ID) throw new BusinessException("ID mismatch");
+
+            await _userService.AddRoleAsync(id, itemAddRole.RoleID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // AddRole
 
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteUser(Guid id, [FromBody] UserDeleteDto itemDeleteDto)

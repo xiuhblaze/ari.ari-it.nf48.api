@@ -42,7 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Filters
             };
             string jsonError = JsonConvert.SerializeObject(validationGeneral);
             throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.InternalServerError)
-            { 
+            {
                 //Content = new StringContent("An error occurred, please try again or contact the administrator."),
                 Content = new StringContent(jsonError, Encoding.UTF8, "application/json"),
                 ReasonPhrase = "Critical Exception"

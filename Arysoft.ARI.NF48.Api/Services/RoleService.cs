@@ -89,17 +89,16 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validations
 
-            if (string.IsNullOrEmpty(item.UpdatedUser))
-            {
+            if (string.IsNullOrEmpty(item.UpdatedUser))            
                 throw new BusinessException("User was not specified");
-            }
-
+            
             // Assign values
 
             item.ID = Guid.NewGuid();
             item.Status = StatusType.Nothing;
             item.Created = DateTime.Now;
             item.Updated = DateTime.Now;
+            item.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
 
@@ -125,7 +124,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             return updatedItem;
         } // UpdateAsync
 
-        public async Task DeleteAsync(User item)
+        public async Task DeleteAsync(Role item)
         {
             var foundItem = await _roleRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("Item was not found");

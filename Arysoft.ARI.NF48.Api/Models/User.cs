@@ -34,10 +34,10 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public Organization Organization { get; set; }
+        public virtual Organization Organization { get; set; }
 
-        public Contact Contact { get; set; }
+        public virtual Contact Contact { get; set; }
 
-        public ICollection<Role> Roles { get; set; }
+        public virtual ICollection<Role> Roles { get; set; }
     }
 }

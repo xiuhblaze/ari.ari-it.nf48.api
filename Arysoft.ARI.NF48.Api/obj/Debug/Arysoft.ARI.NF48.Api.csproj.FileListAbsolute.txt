@@ -158,7 +158,6 @@ C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\bin\es
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\bin\es\System.Web.WebPages.Razor.resources.dll
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\obj\Debug\Arysoft.ARI.NF48.Api.csproj.AssemblyReference.cache
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\obj\Debug\Arysoft.ARI.NF48.Api.csproj.CoreCompileInputs.cache
-C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\obj\Debug\Arysoft.ARI.NF48.Api.csproj.CopyComplete
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\obj\Debug\Arysoft.ARI.NF48.Api.dll
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\obj\Debug\Arysoft.ARI.NF48.Api.pdb
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\bin\Microsoft.Bcl.AsyncInterfaces.dll
@@ -205,3 +204,4 @@ C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\bin\Sy
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\bin\System.Threading.Tasks.Extensions.xml
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\bin\System.ValueTuple.xml
 C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\bin\System.Web.Http.Owin.xml
+C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\obj\Debug\Arysoft..E791C817.Up2Date
