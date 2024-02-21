@@ -11,9 +11,6 @@ namespace Arysoft.ARI.NF48.Api.Models
     [Table("NaceCodes")]
     public class NaceCode : BaseModel
     {
-        [Key]
-        public Guid NaceCodeID { get; set; }
-
         public int? Sector { get; set; }
 
         public int? Division { get; set; }

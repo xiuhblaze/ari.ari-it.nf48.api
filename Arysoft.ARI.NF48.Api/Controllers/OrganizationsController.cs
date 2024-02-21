@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
@@ -115,7 +116,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             await DeleteTmpByUserAsync(organizationDto.UpdatedUser);
 
             var item = new Organization { 
-                OrganizationID = Guid.NewGuid(),
+                ID = Guid.NewGuid(),
                 Status = OrganizationStatusType.Nothing,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,

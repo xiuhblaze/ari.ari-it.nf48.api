@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
@@ -118,7 +119,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             await DeleteTmpByUserAsync(contactDto.UpdatedUser);
 
             var item = new Contact { 
-                ContactID = Guid.NewGuid(),
+                ID = Guid.NewGuid(),
                 OrganizationID = contactDto.OrganizationID,
                 Status = StatusType.Nothing,
                 Created = DateTime.Now,
@@ -146,7 +147,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            if (id != contactDto.ContactID) { return BadRequest("ID mismatch"); }
+            if (id != contactDto.ID) { return BadRequest("ID mismatch"); }
 
             var item = await db.Contacts.FindAsync(id);
 
@@ -204,7 +205,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         private async Task<bool> ContactExistAsync(Guid id)
         {
-            return await db.Contacts.AnyAsync(c => c.ContactID == id);
+            return await db.Contacts.AnyAsync(c => c.ID == id);
         }
 
         private async Task DeleteTmpByUserAsync(string username)

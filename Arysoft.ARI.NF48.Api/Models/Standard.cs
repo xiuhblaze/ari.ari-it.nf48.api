@@ -11,9 +11,6 @@ namespace Arysoft.ARI.NF48.Api.Models
     [Table("Standards")]
     public class Standard : BaseModel
     {
-        [Key]
-        public Guid StandardID { get; set; }
-
         [StringLength(100)]
         public string Name { get; set; }
 

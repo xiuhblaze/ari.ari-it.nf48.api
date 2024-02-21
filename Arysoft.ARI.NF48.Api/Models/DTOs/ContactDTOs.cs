@@ -17,7 +17,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class ContactPutDto
     {
         [Required]
-        public Guid ContactID { get; set; }
+        public Guid ID { get; set; }
 
         [Required]
         [StringLength(100)]

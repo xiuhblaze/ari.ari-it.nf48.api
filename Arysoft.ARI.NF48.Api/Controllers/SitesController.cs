@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
@@ -127,7 +128,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = new Site
             {
-                SiteID = Guid.NewGuid(),
+                ID = Guid.NewGuid(),
                 OrganizationID = siteDto.OrganizationID,                
                 Status = StatusType.Nothing,
                 Order = 0,

@@ -13,7 +13,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {
             var item = new Standard();
 
-            item.StandardID = itemDto.StandardID;
+            item.ID = itemDto.StandardID;
             item.Name = itemDto.Name;
             item.Description = itemDto.Description;
             item.MaxReductionsDays = itemDto.MaxReductionsDays;

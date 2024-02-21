@@ -227,7 +227,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="AriContext.cs" />
+    <Compile Include="Data\AriContext.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -240,6 +240,14 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomEntities\Metadata.cs" />
     <Compile Include="CustomEntities\PagedList.cs" />
+    <Compile Include="Data\Configurations\ContactConfiguration.cs" />
+    <Compile Include="Data\Configurations\NaceCodeConfiguration.cs" />
+    <Compile Include="Data\Configurations\OrganizationConfiguration.cs" />
+    <Compile Include="Data\Configurations\RolesConfiguration.cs" />
+    <Compile Include="Data\Configurations\ShiftConfiguration.cs" />
+    <Compile Include="Data\Configurations\SiteConfiguration.cs" />
+    <Compile Include="Data\Configurations\StandardConfiguration.cs" />
+    <Compile Include="Data\Configurations\UserConfiguration.cs" />
     <Compile Include="Enumerations\ContactEnums.cs" />
     <Compile Include="Enumerations\NaceCodeEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />

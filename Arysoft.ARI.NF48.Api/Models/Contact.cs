@@ -8,9 +8,6 @@ namespace Arysoft.ARI.NF48.Api.Models
     [Table("Contacts")]
     public class Contact : BaseModel
     {
-        [Key]
-        public Guid ContactID { get; set; }
-
         public Guid OrganizationID { get; set; }
 
         [StringLength(100)]

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -11,7 +8,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         [Required]
         public Guid ID { get; set; }
 
-        // Rest of properties ...
+        // Rest of properties in each model...
 
         [Required]
         [DataType(DataType.DateTime)]

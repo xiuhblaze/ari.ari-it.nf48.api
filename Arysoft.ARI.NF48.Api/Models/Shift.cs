@@ -11,9 +11,6 @@ namespace Arysoft.ARI.NF48.Api.Models
     [Table("Shifts")]
     public class Shift : BaseModel
     {
-        [Key]
-        public Guid ShiftID { get; set; }
-
         public Guid SiteID { get; set; }
 
         public ShiftType Type { get; set; }

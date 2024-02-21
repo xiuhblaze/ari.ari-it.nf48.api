@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
@@ -116,7 +117,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = new NaceCode
             {
-                NaceCodeID = Guid.NewGuid(),
+                ID = Guid.NewGuid(),
                 Status = StatusType.Nothing,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
@@ -212,7 +213,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         private async Task<bool> NaceCodeExistsAsync(Guid id)
         {
-            return await db.NaceCodes.AnyAsync(e => e.NaceCodeID == id);
+            return await db.NaceCodes.AnyAsync(e => e.ID == id);
         }
 
         private async Task DeleteTmpByUserAsync(string username)

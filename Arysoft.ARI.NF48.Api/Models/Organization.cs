@@ -9,9 +9,6 @@ namespace Arysoft.ARI.NF48.Api.Models
     [Table("Organizations")]
     public class Organization : BaseModel
     {
-        [Key]
-        public Guid OrganizationID { get; set; }
-
         [StringLength(250)]
         public string Name { get; set; }
 

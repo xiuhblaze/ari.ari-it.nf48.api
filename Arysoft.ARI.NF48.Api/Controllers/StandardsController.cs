@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Cors;
-using System.Web.Http.Description;
-using Arysoft.ARI.NF48.Api;
-using Arysoft.ARI.NF48.Api.CustomEntities;
+﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
-{   
+{
     public class StandardsController : ApiController
     {
         private AriContext db = new AriContext();
@@ -120,7 +116,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             await DeleteTmpByUserAsync(itemDto.UpdatedUser);
 
             var item = new Standard { 
-                StandardID = Guid.NewGuid(),
+                ID = Guid.NewGuid(),
                 Status = StatusType.Nothing,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,

@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
@@ -125,7 +126,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = new Shift
             {
-                ShiftID = Guid.NewGuid(),
+                ID = Guid.NewGuid(),
                 SiteID = shiftDto.SiteID,
                 Type = ShiftType.Nothing,
                 Status = StatusType.Nothing,
