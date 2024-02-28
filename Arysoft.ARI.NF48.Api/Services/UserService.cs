@@ -14,15 +14,15 @@ namespace Arysoft.ARI.NF48.Api.Services
     public class UserService
     {
         private readonly UserRepository _userRepository;
-        private readonly RoleRepository roleRepository;
-        private AriContext db = new AriContext();
+        //private readonly RoleRepository roleRepository;
+        //private AriContext db = new AriContext();
 
         // CONSTRUCTORS
 
         public UserService()
         {
             _userRepository = new UserRepository();
-            roleRepository = new RoleRepository();
+            //roleRepository = new RoleRepository();
         }
 
         // METHODS

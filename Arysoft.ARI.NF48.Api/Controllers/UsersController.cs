@@ -94,7 +94,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // PutUser
 
         [HttpPost]
-        [Route("add-role/{id}")]
+        [Route("Users/add-role/{id}")]
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> AddRole(Guid id, [FromBody] UserAddRoleDto itemAddRole)
         {

@@ -7,4 +7,12 @@
         Inactive,
         Deleted
     }
+
+    public enum LanguageType
+    {
+        Nothing,
+        English,
+        Spanish,
+        Other
+    }
 }

@@ -8,11 +8,20 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
         public static void Configure(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Role>()
+                .ToTable("Roles")
                 .HasKey(m => m.ID);
 
             modelBuilder.Entity<Role>()
                 .Property(m => m.ID)
                 .HasColumnName("RoleID");
+
+            modelBuilder.Entity<Role>()
+                .Property(m => m.Name)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Role>()
+                .Property(m => m.Description)
+                .HasMaxLength(250);
         } // Configure
     }
 }

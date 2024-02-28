@@ -36,21 +36,6 @@ namespace Arysoft.ARI.NF48.Api.Data
             SiteConfiguration.Configure(modelBuilder);
             StandardConfiguration.Configure(modelBuilder);
             UserConfiguration.Configure(modelBuilder);
-
-            //modelBuilder.Entity<Role>()
-            //    .Property(m => m.ID)
-            //    .HasColumnName("RoleID");
-
-            //modelBuilder.Entity<User>()
-            //    .Property(m => m.ID)
-            //    .HasColumnName("UserID");
-
-            //modelBuilder.Entity<User>()
-            //    .HasMany(u => u.Roles).WithMany(r => r.Users)
-            //    .Map(e => e.MapLeftKey("UserID")
-            //        .MapRightKey("RoleID")
-            //        .ToTable("RolesUsers")
-            //    );
         }
     }
 }

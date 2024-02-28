@@ -28,8 +28,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
+        public ICollection<Application> Applications { get; set; }
+
         public ICollection<Contact> Contacts { get; set; }
 
         public ICollection<Site> Sites { get; set; }
+
     }
 }
