@@ -1,12 +1,9 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
-    [Table("Organizations")]
     public class Organization : BaseModel
     {
         [StringLength(250)]

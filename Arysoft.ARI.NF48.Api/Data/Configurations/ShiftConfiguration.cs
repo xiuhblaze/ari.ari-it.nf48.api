@@ -12,11 +12,20 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
         public static void Configure(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Shift>()
+                .ToTable("Shifts")
                 .HasKey(m => m.ID);
 
             modelBuilder.Entity<Shift>()
                 .Property(m => m.ID)
                 .HasColumnName("ShiftID");
+
+            modelBuilder.Entity<Shift>()
+                .Property(m => m.ActivitiesDescription)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Shift>()
+                .Property(m => m.Status)
+                .IsRequired();
         } // Configure
     }
 }

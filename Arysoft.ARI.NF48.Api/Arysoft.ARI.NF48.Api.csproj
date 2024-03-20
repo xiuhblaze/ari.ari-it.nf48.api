@@ -265,12 +265,14 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Invokers\MyApiControllerActionInvoker.cs" />
+    <Compile Include="Mappings\ApplicationMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
     <Compile Include="Mappings\StandardMapping.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Models\Application.cs" />
     <Compile Include="Models\BaseModel.cs" />
     <Compile Include="Models\Contact.cs" />
+    <Compile Include="Models\DTOs\ApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\AuthDTOs.cs" />
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />

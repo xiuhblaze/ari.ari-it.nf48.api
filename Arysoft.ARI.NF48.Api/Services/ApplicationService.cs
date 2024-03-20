@@ -1,11 +1,13 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -84,14 +86,116 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Order
 
             switch (filters.Order)
-            { 
-                //TODO: AQUI VOY
+            {
+                case ApplicationOrderType.Organization:
+                    items = items.OrderBy(i => i.Organization.Name); 
+                    break;
+                case ApplicationOrderType.Created:
+                    items = items.OrderBy(i => i.Created);
+                    break;
+                case ApplicationOrderType.OrganizationDesc:
+                    items = items.OrderByDescending(i => i.Organization.Name);
+                    break;
+                case ApplicationOrderType.CreatedDesc:
+                    items = items.OrderByDescending(i => i.Created);
+                    break;
+                default:
+                    items = items.OrderByDescending(i => i.Created);
+                    break;
             }
+
+            // Pagination
 
             var pagedItems = PagedList<Application>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
             return pagedItems;
         } // Gets 
+
+        /// <summary>
+        /// Gets a application register with the id gived
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Application> GetAsync(Guid id)
+        { 
+            return await _applicationRepository.GetAsync(id);
+        } // GetAsync
+
+        /// <summary>
+        /// Add a application register with the updated user gived
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task<Application> AddAsync(Application item)
+        {
+            if (string.IsNullOrEmpty(item.UpdatedUser))
+                throw new BusinessException("User was not specified");
+
+            // Assign values
+
+            item.ID = Guid.NewGuid();
+            item.Status = ApplicationStatusType.Nothing;
+            item.Created = DateTime.Now;
+            item.Updated = DateTime.Now;
+
+            // Excecute queries
+
+            await _applicationRepository.DeleteTmpByUser(item.UpdatedUser);
+            _applicationRepository.Add(item);
+            await _applicationRepository.SaveChangesAsync();
+
+            return item;
+        } // AddAsync
+
+        /// <summary>
+        /// Update the values of a register with the 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public async Task<Application> UpdateAsync(Application item)
+        {
+            // TODO: Validations
+
+            // - Validar de acuerdo al tipo de Standard
+            // - Validar de acuerdo al Status en el que se encuentra el Application Form
+
+            // Assigning values
+
+            if (item.Status == ApplicationStatusType.Nothing) item.Status = ApplicationStatusType.New;
+            item.Updated = DateTime.Now;
+
+            // Excecute queries
+
+            var updatedItem = await _applicationRepository.UpdateAsync(item);
+            await _applicationRepository.SaveChangesAsync();
+
+            return updatedItem;
+        } // UpdateAsync
+
+        public async Task DeleteAsync(Application item)
+        {
+            var foundItem = await _applicationRepository.GetAsync(item.ID)
+                ?? throw new BusinessException("Item to delete was not found");
+
+            if (foundItem.Status == ApplicationStatusType.Deleted)
+            {
+                _applicationRepository.Delete(foundItem);
+            }
+            else
+            {
+                foundItem.Status = foundItem.Status >= ApplicationStatusType.New && foundItem.Status <= ApplicationStatusType.Active
+                    ? ApplicationStatusType.Cancel
+                    : ApplicationStatusType.Deleted;
+                foundItem.Updated = DateTime.Now;
+                foundItem.UpdatedUser = item.UpdatedUser;
+
+                await _applicationRepository.UpdateAsync(foundItem);
+            }
+
+            await _applicationRepository.SaveChangesAsync();
+        } // DeleteAsync
+
     }
 }

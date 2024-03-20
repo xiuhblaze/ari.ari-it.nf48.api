@@ -2,11 +2,59 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
+    public class OrganizationItemListDto
+    {
+        public Guid ID { get; set; }
+
+        public string Name { get; set; }
+
+        public string LegalEntity { get; set; }
+
+        public string LogoFile { get; set; }
+
+        public string Website { get; set; }
+
+        public string Phone { get; set; }
+
+        public OrganizationStatusType Status { get; set; }
+
+        public DateTime Created { get; set; }        
+    } // OrganizationItemListDto
+
+    public class OrganizationItemDetailDto
+    {
+        public Guid ID { get; set; }
+
+        public string Name { get; set; }
+
+        public string LegalEntity { get; set; }
+
+        public string LogoFile { get; set; }
+
+        public string Website { get; set; }
+
+        public string Phone { get; set; }
+
+        public OrganizationStatusType Status { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime Updated { get; set; }
+
+        public string UpdatedUser { get; set; }
+
+        // RELATIONS
+        
+        public virtual ICollection<ApplicationItemListDto> Applications { get; set; }
+
+        //public ICollection<ContactItemListDto> Contacts { get; set; }
+
+        //public ICollection<SiteItemListDto> Sites { get; set; }
+    }
+
     public class OrganizationPostDto
     {
         [StringLength(50)]
