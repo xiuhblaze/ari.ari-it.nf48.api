@@ -11,6 +11,7 @@ namespace Arysoft.ARI.NF48.Api.Data
 {
     public class AriContext : DbContext
     {
+        public DbSet<Application> Applications { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<NaceCode> NaceCodes { get; set; }
         public DbSet<Organization> Organizations { get; set; }
@@ -28,6 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Data
 
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
+            ApplicationConfiguration.Configure(modelBuilder);
             ContactConfiguration.Configure(modelBuilder);
             OrganizationConfiguration.Configure(modelBuilder);
             NaceCodeConfiguration.Configure(modelBuilder);

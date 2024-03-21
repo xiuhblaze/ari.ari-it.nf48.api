@@ -26,7 +26,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrtanizationName = item.Organization.Name,
                 StandardName = item.Standard.Name,
                 // Specific
-                NaceCodeName = item.NaceCode.Description,
+                NaceCodeName = item.NaceCode != null ? item.NaceCode.Description : string.Empty,
                 ProcessScope = item.ProcessScope,
                 Services = item.Services,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
