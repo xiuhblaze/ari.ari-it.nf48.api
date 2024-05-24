@@ -159,5 +159,30 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
+
+        public async Task DeleteAsync(Contact item)
+        {
+            var foundItem = await _contactRepository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            // Validations
+
+            // - Que no sea el único contacto
+
+            if (foundItem.Status == StatusType.Deleted)
+            {
+                _contactRepository.Delete(foundItem);
+            }
+            else 
+            {
+                foundItem.Status = foundItem.Status == StatusType.Active
+                    ? StatusType.Inactive
+                    : StatusType.Deleted;
+                foundItem.Updated = DateTime.Now;
+                foundItem.UpdatedUser = item.UpdatedUser;
+
+                _contactRepository.Update(foundItem);
+            }
+        } // DeleteAsync
     }
 }

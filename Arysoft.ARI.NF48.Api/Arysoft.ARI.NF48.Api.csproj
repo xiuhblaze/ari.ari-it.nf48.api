@@ -267,6 +267,7 @@
     </Compile>
     <Compile Include="Invokers\MyApiControllerActionInvoker.cs" />
     <Compile Include="Mappings\ApplicationMapping.cs" />
+    <Compile Include="Mappings\ContactMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
     <Compile Include="Mappings\ShiftMapping.cs" />

@@ -20,6 +20,7 @@
     <WebStackScaffolding_IsAsyncSelected>True</WebStackScaffolding_IsAsyncSelected>
     <NameOfLastUsedPublishProfile>C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\Properties\PublishProfiles\Publicar en local.pubxml</NameOfLastUsedPublishProfile>
     <WebStackScaffolding_IsViewGenerationSelected>False</WebStackScaffolding_IsViewGenerationSelected>
+    <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
