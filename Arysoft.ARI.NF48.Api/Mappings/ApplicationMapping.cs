@@ -23,7 +23,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ApplicationItemListDto
             {
                 ID = item.ID,
-                OrtanizationName = item.Organization.Name,
+                OrganizationName = item.Organization.Name,
                 StandardName = item.Standard.Name,
                 // Specific
                 NaceCodeName = item.NaceCode != null ? item.NaceCode.Description : string.Empty,
@@ -72,7 +72,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 // Relations
-                //Organization = OrganizationMapping.OrganizationToItemListDto(item.Organization),
+                Organization = OrganizationMapping.OrganizationToItemListDto(item.Organization),
             };
         } // ApplicationToItemDetailDto
 

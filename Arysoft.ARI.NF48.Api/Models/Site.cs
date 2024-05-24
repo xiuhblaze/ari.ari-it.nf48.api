@@ -1,27 +1,18 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
-    [Table("Sites")]
     public class Site : BaseModel
     {
-        [Key]
-        public Guid SiteID { get; set; }
-
         public Guid OrganizationID { get; set; }
 
-        //public Guid LocationID { get; set; } // próximamente
+        //public Guid LocationID { get; set; } // next
 
-        [StringLength(500)]
         public string Description { get; set; }
 
-        [StringLength(500)]
         public string LocationDescription { get; set; }
 
         /// <summary>
@@ -33,11 +24,10 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public Organization Organization { get; set; }
+        public virtual Organization Organization { get; set; }
+
+        public virtual ICollection<Shift> Shifts { get; set; }
 
         //public Location Location { get; set; } // próximamente
-
-        public ICollection<Shift> Shifts { get; set; }
-
     }
 }

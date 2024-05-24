@@ -31,10 +31,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             { 
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e => 
-                    e.Name.ToLower().Contains(filters.Text)
-                    || e.LegalEntity.ToLower().Contains(filters.Text)
-                    || e.Website.ToLower().Contains(filters.Text)
-                    || e.Phone.ToLower().Contains(filters.Text)
+                    (e.Name != null && e.Name.ToLower().Contains(filters.Text))
+                    || (e.LegalEntity != null && e.LegalEntity.ToLower().Contains(filters.Text))
+                    || (e.Website != null && e.Website.ToLower().Contains(filters.Text))
+                    || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))
                 );
             }
 

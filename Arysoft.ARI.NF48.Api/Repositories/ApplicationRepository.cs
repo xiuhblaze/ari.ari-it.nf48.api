@@ -14,7 +14,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public override IEnumerable<Application> Gets()
         {
             return _model
-                .Include(m => m.Organization)
+                .Include(m => m.Organization) // Parece que asi va a jala Sites...
                 .Include(m => m.Standard)
                 .Include(m => m.NaceCode)
                 .AsEnumerable();

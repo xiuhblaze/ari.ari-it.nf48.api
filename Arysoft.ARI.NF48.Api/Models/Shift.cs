@@ -7,16 +7,13 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid SiteID { get; set; }
 
-        public ShiftType Type { get; set; }
+        public ShiftType? Type { get; set; }
 
         public int? NoEmployees { get; set; }
 
-        /// <summary>
-        /// Horario de turno, en horas (24hrs)
-        /// </summary>
-        public int? ShiftBegin { get; set; }
+        public DateTime? ShiftBegin { get; set; }
 
-        public int? ShiftEnd { get; set; }
+        public DateTime? ShiftEnd { get; set; }
 
         public string ActivitiesDescription { get; set; }
 
@@ -24,6 +21,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public Site Site { get; set; }
+        public virtual Site Site { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var items = _userRepository.Gets();
 
             if (!string.IsNullOrEmpty(filters.Text))
-            { 
+            {
                 filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(e =>
                     e.Username.ToLower().Contains(filters.Text)
@@ -48,11 +48,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 items = items.Where(e => e.Status == filters.Status);
             }
-            else { 
+            else {
                 if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
                 items = (bool)filters.IncludeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)
-                    : items.Where(e => e.Status != StatusType.Nothing 
+                    : items.Where(e => e.Status != StatusType.Nothing
                         && e.Status != StatusType.Deleted);
             }
 
@@ -99,7 +99,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var pagedItems = PagedList<User>
                 .Create(items, filters.PageNumber, filters.PageSize);
-            
+
             return pagedItems;
         } // Gets
 
@@ -107,6 +107,16 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             return await _userRepository.GetAsync(id);
         } // GetAsync
+
+        public async Task<User> LoginAsync(string username, string password)
+        { 
+            string passwordHash = Tools.Encrypt.GetSHA256(password);
+
+            var foundItem = await _userRepository.GetUserByLoginAsync(username, passwordHash)
+                ?? throw new BusinessException("The username or password is not valid");
+
+            return foundItem;
+        } // LoginAsync
 
         public async Task<User> AddAsync(User item)
         {

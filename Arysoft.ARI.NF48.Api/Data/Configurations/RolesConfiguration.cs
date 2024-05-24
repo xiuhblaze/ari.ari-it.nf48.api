@@ -22,6 +22,18 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             modelBuilder.Entity<Role>()
                 .Property(m => m.Description)
                 .HasMaxLength(250);
+
+            modelBuilder.Entity<Role>()
+                .Property(m => m.Created)
+                .IsRequired();
+
+            modelBuilder.Entity<Role>()
+                .Property(m => m.Updated)
+                .IsRequired();
+
+            modelBuilder.Entity<Role>()
+                .Property(m => m.UpdatedUser)
+                .HasMaxLength(50);
         } // Configure
     }
 }

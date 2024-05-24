@@ -4,6 +4,51 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
+    public class ContactItemListDto
+    {
+        public Guid ID { get; set; }
+
+        public string OrganizationName { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string Phone { get; set; }
+
+        public string PhoneExtensions { get; set; }
+
+        public string Email { get; set; }
+
+        public string Position { get; set; }
+
+        public StatusType Status { get; set; }
+
+    } // ContactItemListDto
+
+    public class ContactItemDetailDto
+    {
+        public Guid ID { get; set; }
+
+        public Guid OrganizationID { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string Phone { get; set; }
+
+        public string PhoneExtensions { get; set; }
+
+        public string Email { get; set; }
+
+        public string Position { get; set; }
+
+        public StatusType Status { get; set; }
+
+        public Organization Organization { get; set; } // HACK: Cambiar por OrganizationItemListDto
+    } // ContactItemDetailDto
+
     public class ContactPostDto
     {
         [Required]

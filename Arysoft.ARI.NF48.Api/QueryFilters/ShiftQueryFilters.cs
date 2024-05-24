@@ -12,9 +12,9 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public Guid? SiteID { get; set; }
 
-        //public int? ShiftStart { get; set; }
+        //public DateTime? ShiftStart { get; set; }
 
-        //public int? ShiftEnd { get; set; }
+        //public datetime? ShiftFinish { get; set; }
 
         public ShiftType? Type { get; set; }
 

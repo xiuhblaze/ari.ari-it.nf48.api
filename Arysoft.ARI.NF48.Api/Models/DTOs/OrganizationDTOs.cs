@@ -21,7 +21,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public OrganizationStatusType Status { get; set; }
 
-        public DateTime Created { get; set; }        
     } // OrganizationItemListDto
 
     public class OrganizationItemDetailDto
@@ -48,11 +47,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
         
-        public virtual ICollection<ApplicationItemListDto> Applications { get; set; }
+        public ICollection<ApplicationItemListDto> Applications { get; set; }
 
         //public ICollection<ContactItemListDto> Contacts { get; set; }
 
-        //public ICollection<SiteItemListDto> Sites { get; set; }
+        public ICollection<SiteItemListDto> Sites { get; set; }
     }
 
     public class OrganizationPostDto

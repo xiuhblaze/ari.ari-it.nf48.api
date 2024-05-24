@@ -52,7 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> GetRole(Guid id)
         { 
             var item = await roleService.GetAsync(id) 
-                ?? throw new BusinessException("No se encontró el registro");
+                ?? throw new BusinessException("Item not found");
             var itemDto = RoleMapping.RoleToItemDetailDto(item);    
             var response = new ApiResponse<RoleItemDetailDto>(itemDto);
 

@@ -42,6 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             modelBuilder.Entity<Organization>()
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50);
+    
         } // Configure
     }
 }

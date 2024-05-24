@@ -227,7 +227,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Controllers\ApplicationController.cs" />
+    <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Data\AriContext.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
@@ -267,7 +267,10 @@
     </Compile>
     <Compile Include="Invokers\MyApiControllerActionInvoker.cs" />
     <Compile Include="Mappings\ApplicationMapping.cs" />
+    <Compile Include="Mappings\OrganizationMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
+    <Compile Include="Mappings\ShiftMapping.cs" />
+    <Compile Include="Mappings\SiteMapping.cs" />
     <Compile Include="Mappings\StandardMapping.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Models\Application.cs" />
@@ -303,11 +306,17 @@
     <Compile Include="QueryFilters\UserQueryFilters.cs" />
     <Compile Include="Repositories\ApplicationRepository.cs" />
     <Compile Include="Repositories\BaseRepository.cs" />
+    <Compile Include="Repositories\ContactRepository.cs" />
     <Compile Include="Repositories\RoleRepository.cs" />
+    <Compile Include="Repositories\ShiftRepository.cs" />
+    <Compile Include="Repositories\SiteRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Response\ApiResponse.cs" />
     <Compile Include="Services\ApplicationService.cs" />
+    <Compile Include="Services\ContactService.cs" />
     <Compile Include="Services\RoleService.cs" />
+    <Compile Include="Services\ShiftService.cs" />
+    <Compile Include="Services\SiteService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Tools\Encrypt.cs" />

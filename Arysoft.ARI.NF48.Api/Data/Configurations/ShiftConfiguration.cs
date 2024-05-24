@@ -1,9 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Data.Configurations
 {
@@ -25,6 +21,19 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<Shift>()
                 .Property(m => m.Status)
+                .IsRequired();
+
+            modelBuilder.Entity<Shift>()
+                .Property(m => m.Created)
+                .IsRequired();
+
+            modelBuilder.Entity<Shift>()
+                .Property(m => m.Updated)
+                .IsRequired();
+
+            modelBuilder.Entity<Shift>()
+                .Property(m => m.UpdatedUser)
+                .HasMaxLength(50)
                 .IsRequired();
         } // Configure
     }

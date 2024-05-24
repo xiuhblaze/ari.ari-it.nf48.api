@@ -15,13 +15,13 @@ using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
-    public class ApplicationController : ApiController
+    public class ApplicationsController : ApiController
     {
         private ApplicationService _applicationService;
 
         // CONSTRUCTOR 
 
-        public ApplicationController()
+        public ApplicationsController()
         {
             _applicationService = new ApplicationService();
         }

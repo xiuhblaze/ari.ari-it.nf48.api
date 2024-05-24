@@ -38,6 +38,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync();
         } // GetByUsername
 
+        public async Task<User> GetUserByLoginAsync(string username, string passwordHash)
+        {
+            return await _model
+                .Include(m => m.Roles)
+                .Where(m => m.Username == username && m.PasswordHash == passwordHash)
+                .FirstOrDefaultAsync();
+        } // GetUserByLoginAsync
+
         public async Task<User> UpdateAsync(User item)
         {
             var foundItem = await _model.FindAsync(item.ID) 
