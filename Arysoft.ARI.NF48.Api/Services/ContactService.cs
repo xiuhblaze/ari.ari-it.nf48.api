@@ -163,11 +163,11 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task DeleteAsync(Contact item)
         {
             var foundItem = await _contactRepository.GetAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found");
+                ?? throw new BusinessException("The record to delete was not found");
 
             // Validations
 
-            // - Que no sea el único contacto
+            // - Que no sea el último contacto
 
             if (foundItem.Status == StatusType.Deleted)
             {

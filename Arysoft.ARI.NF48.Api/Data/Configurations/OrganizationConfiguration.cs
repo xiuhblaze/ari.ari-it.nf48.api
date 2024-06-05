@@ -40,9 +40,18 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<Organization>()
+                .Property(m => m.Created)
+                .IsRequired();
+
+            modelBuilder.Entity<Organization>()
+                .Property(m => m.Updated)
+                .IsRequired();
+
+            modelBuilder.Entity<Organization>()
                 .Property(m => m.UpdatedUser)
-                .HasMaxLength(50);
-    
+                .HasMaxLength(50)
+                .IsRequired();
+
         } // Configure
     }
 }

@@ -21,6 +21,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         private readonly AriContext db = new AriContext();
         private readonly SiteService _siteService;
 
+        // CONSTRUCTOR
+
         public SitesController()
         {
             _siteService = new SiteService();

@@ -91,33 +91,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var response = new ApiResponse<ShiftItemDetailDto>(itemDto);
 
             return Ok(response);
-
-            //var item = await db.Shifts.FindAsync(id);
-
-            //if (item == null) return NotFound();
-
-            //item.Type = shiftDto.Type;
-            //item.NoEmployees = shiftDto.NoEmployees;
-            //item.ShiftBegin = shiftDto.ShiftBegin;
-            //item.ShiftEnd = shiftDto.ShiftEnd;
-            //item.ActivitiesDescription = shiftDto.ActivitiesDescription;            
-            //item.Status = shiftDto.Status == StatusType.Nothing ? StatusType.Active : shiftDto.Status;
-            //item.Updated = DateTime.Now;
-            //item.UpdatedUser = shiftDto.UpdatedUser;
-
-            //db.Entry(item).State = EntityState.Modified;
-
-            //try
-            //{
-            //    await db.SaveChangesAsync();
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
-
-            //var response = new ApiResponse<Shift>(item);
-            //return Ok(response);
         } // PutShift
 
         // DELETE: api/Shift/5
@@ -132,40 +105,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var response = new ApiResponse<bool>(true);
 
             return Ok(response);
-
-            //var shift = await db.Shifts.FindAsync(id);
-            //if (shift == null) return NotFound();
-
-            //if (shift.Status == StatusType.Deleted)
-            //{
-            //    db.Shifts.Remove(shift);
-            //}
-            //else
-            //{
-            //    shift.Status = shift.Status == StatusType.Active ? StatusType.Inactive : StatusType.Deleted;
-            //    db.Entry(shift).State = EntityState.Modified;
-            //}
-
-            //await db.SaveChangesAsync();
-
-            //var response = new ApiResponse<bool>(true);
-            //return Ok(response);
         } // DeleteShift
 
-        // PRIVATE
-
-        //private async Task DeleteTmpByUserAsync(string username)
-        //{
-        //    var items = await db.Shifts
-        //        .Where(o =>
-        //            o.UpdatedUser == username
-        //            && o.Status == StatusType.Nothing)
-        //        .ToListAsync();
-
-        //    foreach (var item in items)
-        //    {
-        //        db.Entry(item).State = EntityState.Deleted;
-        //    }
-        //}
     }
 }

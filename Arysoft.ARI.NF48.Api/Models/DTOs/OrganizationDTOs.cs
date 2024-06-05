@@ -21,6 +21,18 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public OrganizationStatusType Status { get; set; }
 
+        // Extras
+
+        public string ContactName { get; set; }
+
+        public string ContactEmail { get; set; }
+
+        public string ContactPhone { get; set; }
+
+        public string SiteDescription { get; set; }
+
+        public string SiteLocation { get; set; }
+
     } // OrganizationItemListDto
 
     public class OrganizationItemDetailDto
@@ -49,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         
         public ICollection<ApplicationItemListDto> Applications { get; set; }
 
-        //public ICollection<ContactItemListDto> Contacts { get; set; }
+        public ICollection<ContactItemListDto> Contacts { get; set; }
 
         public ICollection<SiteItemListDto> Sites { get; set; }
     }
@@ -81,6 +93,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public OrganizationStatusType Status { get; set; }
 
+        [StringLength(50)]
+        public string UpdatedUser { get; set; }
+    }
+
+    public class OrganizationDeleteDto
+    {
+        [Required]
+        public Guid ID { get; set; }
+
+        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     }
