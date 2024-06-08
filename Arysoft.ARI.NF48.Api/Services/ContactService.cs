@@ -117,8 +117,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             item.ID = Guid.NewGuid();
             item.Status = StatusType.Nothing;
-            item.Created = DateTime.Now; 
-            item.Updated = DateTime.Now;
+            item.Created = DateTime.UtcNow; 
+            item.Updated = DateTime.UtcNow;
 
             // Execute queries
 
@@ -149,7 +149,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
-            foundItem.Updated = DateTime.Now;
+            foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
@@ -178,7 +178,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Status = foundItem.Status == StatusType.Active
                     ? StatusType.Inactive
                     : StatusType.Deleted;
-                foundItem.Updated = DateTime.Now;
+                foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
                 _contactRepository.Update(foundItem);

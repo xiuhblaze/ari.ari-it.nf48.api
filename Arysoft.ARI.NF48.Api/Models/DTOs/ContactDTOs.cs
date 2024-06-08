@@ -52,7 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
-        public Organization Organization { get; set; } // HACK: Cambiar por OrganizationItemListDto
+        public OrganizationItemListDto Organization { get; set; }
     } // ContactItemDetailDto
 
     public class ContactPostDto

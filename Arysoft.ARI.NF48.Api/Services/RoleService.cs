@@ -96,8 +96,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             item.ID = Guid.NewGuid();
             item.Status = StatusType.Nothing;
-            item.Created = DateTime.Now;
-            item.Updated = DateTime.Now;
+            item.Created = DateTime.UtcNow;
+            item.Updated = DateTime.UtcNow;
             item.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
@@ -116,7 +116,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-            item.Updated = DateTime.Now;
+            item.Updated = DateTime.UtcNow;
 
             var updatedItem = await _roleRepository.UpdateAsync(item);
             await _roleRepository.SaveChangesAsync();
@@ -138,7 +138,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Status = foundItem.Status == StatusType.Active
                     ? StatusType.Inactive
                     : StatusType.Deleted;
-                foundItem.Updated = DateTime.Now;
+                foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
                 await _roleRepository.UpdateAsync(foundItem);

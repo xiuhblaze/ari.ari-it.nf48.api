@@ -137,8 +137,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             item.ID = Guid.NewGuid();
             item.Status = ApplicationStatusType.Nothing;
-            item.Created = DateTime.Now;
-            item.Updated = DateTime.Now;
+            item.Created = DateTime.UtcNow;
+            item.Updated = DateTime.UtcNow;
 
             // Excecute queries
 
@@ -164,7 +164,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             if (item.Status == ApplicationStatusType.Nothing) item.Status = ApplicationStatusType.New;
-            item.Updated = DateTime.Now;
+            item.Updated = DateTime.UtcNow;
 
             // Excecute queries
 
@@ -188,7 +188,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Status = foundItem.Status >= ApplicationStatusType.New && foundItem.Status <= ApplicationStatusType.Active
                     ? ApplicationStatusType.Cancel
                     : ApplicationStatusType.Deleted;
-                foundItem.Updated = DateTime.Now;
+                foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
                 await _applicationRepository.UpdateAsync(foundItem);

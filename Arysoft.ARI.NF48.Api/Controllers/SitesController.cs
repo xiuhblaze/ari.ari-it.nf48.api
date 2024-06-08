@@ -1,5 +1,4 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
-using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models;
@@ -17,8 +16,7 @@ using System.Web.Http.Description;
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
     public class SitesController : ApiController
-    {
-        private readonly AriContext db = new AriContext();
+    {   
         private readonly SiteService _siteService;
 
         // CONSTRUCTOR
@@ -53,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(ApiResponse<SiteItemDetailDto>))]
         public async Task<IHttpActionResult> GetSite(Guid id)
         {
-            var item = await db.Sites.FindAsync(id)
+            var item = await _siteService.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
             var itemDto = SiteMapping.SiteToItemDetailDto(item);
             var response = new ApiResponse<SiteItemDetailDto>(itemDto);

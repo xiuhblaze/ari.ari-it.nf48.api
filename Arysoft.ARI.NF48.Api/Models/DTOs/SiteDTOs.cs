@@ -47,7 +47,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public IEnumerable<ShiftItemListDto> Shifts { get; set; } 
 
-        public Organization Organization { get; set; } // HACK: Cambiar por OrganizationItemListDto
+        public OrganizationItemListDto Organization { get; set; } 
 
     } // SiteItemDetailDto
 

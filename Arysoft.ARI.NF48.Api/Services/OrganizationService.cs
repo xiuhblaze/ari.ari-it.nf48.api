@@ -5,10 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -97,17 +95,13 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // GetAsync
 
         public async Task<Organization> AddAsync(Organization item)
-        {
-            // Validations
-
-            // -- no validations
-
+        {   
             // Assigning values
 
             item.ID = Guid.NewGuid();
             item.Status = OrganizationStatusType.Nothing;
-            item.Created = DateTime.Now;
-            item.Updated = DateTime.Now;
+            item.Created = DateTime.UtcNow;
+            item.Updated = DateTime.UtcNow;
 
             // Execute queries
 
@@ -137,7 +131,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Status = item.Status == OrganizationStatusType.Nothing 
                 ? OrganizationStatusType.New 
                 : item.Status;
-            foundItem.Updated = DateTime.Now;
+            foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
@@ -168,7 +162,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Status = foundItem.Status < OrganizationStatusType.Inactive
                     ? OrganizationStatusType.Inactive
                     : OrganizationStatusType.Deleted;
-                foundItem.Updated = DateTime.Now;
+                foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
                 _organizationRepository.Update(foundItem);

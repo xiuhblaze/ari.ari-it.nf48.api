@@ -53,7 +53,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Shifts = item.Shifts != null 
                     ? ShiftMapping.ShiftsToListDto(item.Shifts) 
                     : new List<ShiftItemListDto>(),
-                Organization = item.Organization ?? new Organization(), // HACK: Cambiar por OrganizationItemListDto
+                Organization = item.Organization != null
+                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization) 
+                    : null
             };
         } // SiteToItemDetailDto
 

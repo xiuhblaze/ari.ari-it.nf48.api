@@ -23,11 +23,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // Extras
 
+        public int NoContacts { get; set; }
+
         public string ContactName { get; set; }
 
         public string ContactEmail { get; set; }
 
         public string ContactPhone { get; set; }
+
+        public int NoSites { get; set; }
 
         public string SiteDescription { get; set; }
 
@@ -59,11 +63,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
         
-        public ICollection<ApplicationItemListDto> Applications { get; set; }
+        public IEnumerable<ApplicationItemListDto> Applications { get; set; }
 
-        public ICollection<ContactItemListDto> Contacts { get; set; }
+        public IEnumerable<ContactItemListDto> Contacts { get; set; }
 
-        public ICollection<SiteItemListDto> Sites { get; set; }
+        public IEnumerable<SiteItemListDto> Sites { get; set; }
     }
 
     public class OrganizationPostDto
@@ -74,7 +78,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class OrganizationPutDto
     {
-        public Guid OrganizationID { get; set; }
+        public Guid ID { get; set; }
 
         [StringLength(250)]
         public string Name { get; set; }

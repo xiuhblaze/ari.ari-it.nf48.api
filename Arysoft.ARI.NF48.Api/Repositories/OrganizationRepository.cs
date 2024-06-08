@@ -14,7 +14,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var items = await _model
                 .Where(m => 
                     m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
-                    && m.Status == Enumerations.OrganizationStatusType.Nothing
+                    && m.Status == OrganizationStatusType.Nothing
                 ).ToListAsync();
 
             foreach (var item in items)

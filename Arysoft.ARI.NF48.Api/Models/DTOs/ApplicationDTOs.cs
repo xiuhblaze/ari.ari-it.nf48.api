@@ -107,7 +107,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // public StandardItemListDto Standard { get; set; }
 
-        // public NaceCodeItemListDto NaceCode { get; set; }
+        public NaceCodeItemListDto NaceCode { get; set; }
 
         // public RiskLevelItemListDto RiskLevel { get; set; }
 
