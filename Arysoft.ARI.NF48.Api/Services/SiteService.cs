@@ -5,11 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -108,8 +105,8 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validations
 
-            if (string.IsNullOrEmpty(item.UpdatedUser)) // Debe de validar si existe el usuario
-                throw new BusinessException("Updated user was not specified");
+            //if (string.IsNullOrEmpty(item.UpdatedUser)) // Debe de validar si existe el usuario
+            //    throw new BusinessException("Updated user was not specified");
 
             if (item.OrganizationID == null || item.OrganizationID == Guid.Empty)
                 throw new BusinessException("Must first assign Organization");

@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -15,7 +16,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public int? MaxReductionsDays { get; set; }
 
         public StatusType Status { get; set; }
-    }
+
+        public int NoApplications { get; set; }
+    } // StandardItemListDto
 
     public class StandardItemDetailDto
     {
@@ -34,7 +37,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
-    }
+
+        // RELATIONS
+
+        public IEnumerable<ApplicationItemListDto> Applications { get; set; }
+    } // StandardItemDetailDto
 
     public class StandardPostDto
     {
@@ -46,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class StandardPutDto
     {
         [Required]
-        public Guid StandardID { get; set; }
+        public Guid ID { get; set; }
 
         [Required]
         [StringLength(100)]
