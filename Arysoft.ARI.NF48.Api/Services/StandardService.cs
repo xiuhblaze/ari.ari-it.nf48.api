@@ -122,6 +122,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
+            foundItem.MaxReductionDays = item.MaxReductionDays;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
@@ -129,9 +130,15 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.UpdatedUser = item.UpdatedUser;
 
             // Excecute queries
-
-            _standardRepository.Update(foundItem);
-            await _standardRepository.SaveChangesAsync();
+            try
+            {
+                _standardRepository.Update(foundItem);
+                await _standardRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
             return foundItem;
         } // UpdateAsync

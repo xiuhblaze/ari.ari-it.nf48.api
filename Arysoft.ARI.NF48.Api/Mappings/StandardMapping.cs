@@ -23,9 +23,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new StandardItemListDto
             { 
                 ID = item.ID,
+                Name = item.Name,
                 Description = item.Description,
-                MaxReductionsDays = item.MaxReductionsDays,
+                MaxReductionDays = item.MaxReductionDays,
                 Status = item.Status,
+                Updated = item.Updated,
+                UpdatedUser = item.UpdatedUser,
                 NoApplications = item.Applications != null ? item.Applications.Count : 0
             };
         } // StandardToItemListDto
@@ -35,8 +38,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new StandardItemDetailDto
             {
                 ID = item.ID,
+                Name = item.Name,
                 Description = item.Description,
-                MaxReductionsDays = item.MaxReductionsDays,
+                MaxReductionDays = item.MaxReductionDays,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -62,9 +66,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             item.ID = itemDto.ID;
             item.Name = itemDto.Name;
             item.Description = itemDto.Description;
-            item.MaxReductionsDays = itemDto.MaxReductionsDays;
+            item.MaxReductionDays = itemDto.MaxReductionDays;
             item.Status = itemDto.Status;
-            item.UpdatedUser = item.UpdatedUser;
+            item.UpdatedUser = itemDto.UpdatedUser;
 
             return item;
         } // ItemEditDtoToStandard

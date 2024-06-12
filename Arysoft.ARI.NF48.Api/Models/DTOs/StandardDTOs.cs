@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -13,11 +14,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
-        public int? MaxReductionsDays { get; set; }
+        public int? MaxReductionDays { get; set; }
 
         public StatusType Status { get; set; }
 
         public int NoApplications { get; set; }
+
+        public DateTime Updated { get; set; }
+
+        public string UpdatedUser { get; set; }
     } // StandardItemListDto
 
     public class StandardItemDetailDto
@@ -28,7 +33,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
-        public int? MaxReductionsDays { get; set; }
+        public int? MaxReductionDays { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -62,7 +67,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string Description { get; set; }
 
-        public int? MaxReductionsDays { get; set; }
+        
+        public int? MaxReductionDays { get; set; }
 
         [Required]
         public StatusType Status { get; set; }
