@@ -73,6 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser,
                 // Relations
                 Organization = OrganizationMapping.OrganizationToItemListDto(item.Organization),
+                Standard = StandardMapping.StandardToItemListDto(item.Standard),
             };
         } // ApplicationToItemDetailDto
 

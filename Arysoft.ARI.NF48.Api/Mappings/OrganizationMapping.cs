@@ -33,6 +33,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Website = item.Website,
                 Phone = item.Phone,
                 Status = item.Status,
+                Updated = item.Updated,
+                UpdatedUser = item.UpdatedUser,
                 NoContacts = item.Contacts != null ? item.Contacts.Count() : 0,
                 ContactName = firstContact != null ? firstContact.FirstName : string.Empty,
                 ContactEmail = firstContact != null ? firstContact.Email : string.Empty,

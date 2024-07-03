@@ -21,6 +21,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public OrganizationStatusType Status { get; set; }
 
+        public DateTime Updated { get; set; }
+
+        public string UpdatedUser { get; set; }
+
         // Extras
 
         public int NoContacts { get; set; }
