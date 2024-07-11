@@ -1,5 +1,4 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
 using System.Collections.Generic;
@@ -31,41 +30,41 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync();
         } // GetAsync
 
-        public async Task<Application> UpdateAsync(Application item)
-        {
-            var foundItem = await _model.FindAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found");
+        //public async Task<Application> UpdateAsync(Application item)
+        //{
+        //    var foundItem = await _model.FindAsync(item.ID)
+        //        ?? throw new BusinessException("The record to update was not found");
 
-            foundItem.OrganizationID = item.OrganizationID;
-            foundItem.StandardID = item.StandardID;
-            foundItem.NaceCodeID = item.NaceCodeID;
-            foundItem.RiskLevelID = item.RiskLevelID;
-            foundItem.ProcessScope = item.ProcessScope;
-            foundItem.NumProcess = item.NumProcess;
-            foundItem.Services = item.Services;
-            foundItem.LegalRequirements = item.LegalRequirements;
-            foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
-            foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
-	        foundItem.AutomationLevel = item.AutomationLevel;
-	        foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
-	        foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
-	        foundItem.AuditLanguage = item.AuditLanguage;
-	        foundItem.CurrentCertificationExpirationDate = item.CurrentCertificationExpirationDate;
-	        foundItem.CurrentCertificationBy = item.CurrentCertificationBy;
-	        foundItem.CurrentStandards = item.CurrentStandards;
-	        foundItem.TotalEmployes = item.TotalEmployes;
-	        foundItem.OutsourcedProcess = item.OutsourcedProcess;
-	        foundItem.AnyConsultancy = item.AnyConsultancy;
-	        foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
-	        foundItem.Status = item.Status;
+        //    foundItem.OrganizationID = item.OrganizationID;
+        //    foundItem.StandardID = item.StandardID;
+        //    foundItem.NaceCodeID = item.NaceCodeID;
+        //    foundItem.RiskLevelID = item.RiskLevelID;
+        //    foundItem.ProcessScope = item.ProcessScope;
+        //    foundItem.NumProcess = item.NumProcess;
+        //    foundItem.Services = item.Services;
+        //    foundItem.LegalRequirements = item.LegalRequirements;
+        //    foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
+        //    foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
+	       // foundItem.AutomationLevel = item.AutomationLevel;
+	       // foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
+	       // foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+	       // foundItem.AuditLanguage = item.AuditLanguage;
+	       // foundItem.CurrentCertificationExpirationDate = item.CurrentCertificationExpirationDate;
+	       // foundItem.CurrentCertificationBy = item.CurrentCertificationBy;
+	       // foundItem.CurrentStandards = item.CurrentStandards;
+	       // foundItem.TotalEmployes = item.TotalEmployes;
+	       // foundItem.OutsourcedProcess = item.OutsourcedProcess;
+	       // foundItem.AnyConsultancy = item.AnyConsultancy;
+	       // foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
+	       // foundItem.Status = item.Status;
             
-            foundItem.Updated = item.Updated;
-            foundItem.UpdatedUser = item.UpdatedUser;
+        //    foundItem.Updated = item.Updated;
+        //    foundItem.UpdatedUser = item.UpdatedUser;
 
-            Update(foundItem);
+        //    Update(foundItem);
 
-            return foundItem;
-        } // UpdateAsync
+        //    return foundItem;
+        //} // UpdateAsync
 
         public async Task DeleteTmpByUser(string username)
         {

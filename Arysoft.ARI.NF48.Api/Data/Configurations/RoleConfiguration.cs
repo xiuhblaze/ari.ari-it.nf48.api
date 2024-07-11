@@ -3,7 +3,7 @@ using System.Data.Entity;
 
 namespace Arysoft.ARI.NF48.Api.Data.Configurations
 {
-    public class RolesConfiguration
+    public class RoleConfiguration
     {
         public static void Configure(DbModelBuilder modelBuilder)
         {

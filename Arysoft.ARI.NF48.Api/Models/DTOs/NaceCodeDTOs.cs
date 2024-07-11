@@ -48,7 +48,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     } // NaceCodeItemDetailDto
 
     public class NaceCodePostDto
-    {   
+    {
+        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     }

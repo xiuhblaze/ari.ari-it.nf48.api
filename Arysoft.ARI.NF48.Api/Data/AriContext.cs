@@ -26,10 +26,12 @@ namespace Arysoft.ARI.NF48.Api.Data
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
             ApplicationConfiguration.Configure(modelBuilder);
+            Category22KConfiguration.Configure(modelBuilder);
             ContactConfiguration.Configure(modelBuilder);
             OrganizationConfiguration.Configure(modelBuilder);
             NaceCodeConfiguration.Configure(modelBuilder);
-            RolesConfiguration.Configure(modelBuilder);
+            PersonConfiguration.Configure(modelBuilder);
+            RoleConfiguration.Configure(modelBuilder);
             ShiftConfiguration.Configure(modelBuilder);
             SiteConfiguration.Configure(modelBuilder);
             StandardConfiguration.Configure(modelBuilder);

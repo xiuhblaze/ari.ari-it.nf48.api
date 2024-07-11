@@ -16,6 +16,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? RiskLevelID { get; set; }
 
+        public Guid? Category22KID { get; set; }
+
         public string ProcessScope { get; set; }
 
         public int? NumProcess { get; set; }
@@ -61,5 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual Standard Standard { get; set; }
 
         public virtual NaceCode NaceCode { get; set; }
+
+        public virtual Category22K Category22K { get; set; }
     }
 }

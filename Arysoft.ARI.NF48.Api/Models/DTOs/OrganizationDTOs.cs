@@ -76,12 +76,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class OrganizationPostDto
     {
+        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     }
 
     public class OrganizationPutDto
     {
+        [Required]
         public Guid ID { get; set; }
 
         [StringLength(250)]

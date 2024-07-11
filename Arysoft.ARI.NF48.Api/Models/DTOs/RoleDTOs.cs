@@ -46,6 +46,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class RolePutDto
     {
+        [Required]
         public Guid ID { get; set; }
 
         [Required]

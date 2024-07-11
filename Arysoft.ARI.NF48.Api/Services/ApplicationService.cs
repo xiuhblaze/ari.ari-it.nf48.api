@@ -156,6 +156,9 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <returns></returns>
         public async Task<Application> UpdateAsync(Application item)
         {
+            var foundItem = await _applicationRepository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
             // TODO: Validations
 
             // - Validar de acuerdo al tipo de Standard
@@ -163,15 +166,39 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            if (item.Status == ApplicationStatusType.Nothing) item.Status = ApplicationStatusType.New;
-            item.Updated = DateTime.UtcNow;
+            foundItem.OrganizationID = item.OrganizationID;
+            foundItem.StandardID = item.StandardID;
+            foundItem.NaceCodeID = item.NaceCodeID;
+            foundItem.RiskLevelID = item.RiskLevelID;
+            foundItem.ProcessScope = item.ProcessScope;
+            foundItem.NumProcess = item.NumProcess;
+            foundItem.Services = item.Services;
+            foundItem.LegalRequirements = item.LegalRequirements;
+            foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
+            foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
+            foundItem.AutomationLevel = item.AutomationLevel;
+            foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
+            foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+            foundItem.AuditLanguage = item.AuditLanguage;
+            foundItem.CurrentCertificationExpirationDate = item.CurrentCertificationExpirationDate;
+            foundItem.CurrentCertificationBy = item.CurrentCertificationBy;
+            foundItem.CurrentStandards = item.CurrentStandards;
+            foundItem.TotalEmployes = item.TotalEmployes;
+            foundItem.OutsourcedProcess = item.OutsourcedProcess;
+            foundItem.AnyConsultancy = item.AnyConsultancy;
+            foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
+            foundItem.Status = item.Status == ApplicationStatusType.Nothing
+                ? ApplicationStatusType.New
+                : item.Status;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = item.UpdatedUser;
 
             // Excecute queries
 
-            var updatedItem = await _applicationRepository.UpdateAsync(item);
+            _applicationRepository.Update(foundItem);
             await _applicationRepository.SaveChangesAsync();
 
-            return updatedItem;
+            return foundItem;
         } // UpdateAsync
 
         public async Task DeleteAsync(Application item)
@@ -191,7 +218,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                await _applicationRepository.UpdateAsync(foundItem);
+                _applicationRepository.Update(foundItem);
             }
 
             await _applicationRepository.SaveChangesAsync();
