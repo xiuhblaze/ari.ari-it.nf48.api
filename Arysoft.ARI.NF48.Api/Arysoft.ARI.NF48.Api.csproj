@@ -229,6 +229,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Controllers\Categories22KController.cs" />
+    <Compile Include="Controllers\PersonsController.cs" />
     <Compile Include="Data\AriContext.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
@@ -259,6 +260,7 @@
     <Compile Include="Enumerations\ContactEnums.cs" />
     <Compile Include="Enumerations\NaceCodeEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
+    <Compile Include="Enumerations\PersonEnums.cs" />
     <Compile Include="Enumerations\RoleEnums.cs" />
     <Compile Include="Enumerations\ShiftEnums.cs" />
     <Compile Include="Enumerations\SiteEnums.cs" />
@@ -276,6 +278,7 @@
     <Compile Include="Mappings\ContactMapping.cs" />
     <Compile Include="Mappings\NaceCodeMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
+    <Compile Include="Mappings\PersonMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
     <Compile Include="Mappings\ShiftMapping.cs" />
     <Compile Include="Mappings\SiteMapping.cs" />
@@ -292,6 +295,7 @@
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
+    <Compile Include="Models\DTOs\PersonDTOs.cs" />
     <Compile Include="Models\DTOs\RoleDTOs.cs" />
     <Compile Include="Models\DTOs\ShiftDTOs.cs" />
     <Compile Include="Models\DTOs\SiteDTOs.cs" />
@@ -312,6 +316,7 @@
     <Compile Include="QueryFilters\ContactQueryFilters.cs" />
     <Compile Include="QueryFilters\NaceCodeQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
+    <Compile Include="QueryFilters\PersonQueryFilters.cs" />
     <Compile Include="QueryFilters\RoleQueryFilters.cs" />
     <Compile Include="QueryFilters\ShiftQueryFilters.cs" />
     <Compile Include="QueryFilters\SiteQueryFilters.cs" />
@@ -323,6 +328,7 @@
     <Compile Include="Repositories\ContactRepository.cs" />
     <Compile Include="Repositories\NaceCodeRepository.cs" />
     <Compile Include="Repositories\OrganizationRepository.cs" />
+    <Compile Include="Repositories\PersonRepository.cs" />
     <Compile Include="Repositories\RoleRepository.cs" />
     <Compile Include="Repositories\ShiftRepository.cs" />
     <Compile Include="Repositories\SiteRepository.cs" />
@@ -334,6 +340,7 @@
     <Compile Include="Services\ContactService.cs" />
     <Compile Include="Services\NaceCodeService.cs" />
     <Compile Include="Services\OrganizationService.cs" />
+    <Compile Include="Services\PersonService.cs" />
     <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\ShiftService.cs" />
     <Compile Include="Services\SiteService.cs" />

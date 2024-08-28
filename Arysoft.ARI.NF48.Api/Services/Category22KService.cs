@@ -123,6 +123,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - Que no haya duplicados
+            if (await _category22KRepository.ExistByCategorySubCategoryAsync(item.Category, item.SubCategory))
+                throw new BusinessException("The Category and sub category already exist");
 
             // Assigning values
 

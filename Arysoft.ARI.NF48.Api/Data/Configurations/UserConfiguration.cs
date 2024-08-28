@@ -36,6 +36,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50);
 
             modelBuilder.Entity<User>()
+                .Property(m => m.Status)
+                .IsRequired();
+
+            modelBuilder.Entity<User>()
                 .Property(m => m.Created)
                 .IsRequired();
 
@@ -45,6 +49,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<User>()
                 .Property(m => m.UpdatedUser)
+                .IsRequired()
                 .HasMaxLength(50);
 
             // RELATIONS

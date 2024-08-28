@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -14,7 +15,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public StatusType Status { get; set; }
 
         // RELATIONS
-
-        public virtual Person Persona { get; set; }
+                
+        // public virtual Person Person { get; set; }
     }
 }

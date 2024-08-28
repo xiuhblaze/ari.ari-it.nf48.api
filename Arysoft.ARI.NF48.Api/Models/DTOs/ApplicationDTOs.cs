@@ -8,41 +8,60 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        // Organization
+        // ORGANIZATION
 
         public string OrganizationName { get; set; }
 
         public string Sites { get; set; }
 
-        public int NoEmployees { get; set; }
-
         public string LogoFile { get; set; }
 
         public string ContactName { get; set; }
 
-        // Standard
-
         public string StandardName { get; set; }
+
+        // SPECIFIC
 
         public string NaceCodeName { get; set; }
 
-        public string ProcessScope { get; set; }
+        public string Category22KName { get; set; }
+
+        public int? HACCP { get; set; }
+
+        public string Scope { get; set; }
+
+        public int? NumberScope { get; set; }
+
+        public string Seasonality { get; set; }
 
         public string Services { get; set; }
+
+        public string LegalRequirements { get; set; }
 
         public bool? AnyCriticalComplaint { get; set; }
 
         public bool? IsDesignResponsibility { get; set; }
 
+        // General
+
         public LanguageType? AuditLanguage { get; set; }
 
+        public int? TotalEmployees { get; set; }
+
         public bool? AnyConsultancy { get; set; }
+
+        public DateTime? ReviewDate { get; set; }
+
+        public string UsernameSales { get; set; }
+
+        public string UsernameReviewer { get; set; }
 
         public ApplicationStatusType Status { get; set; }
 
         public DateTime Created { get; set; }
     } // ApplicationListItemDto
 
+    
     public class ApplicationItemDetailDto
     {
         public Guid ID { get; set; }
@@ -57,9 +76,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? RiskLevelID { get; set; }
 
-        public string ProcessScope { get; set; }
+        public Guid? Category22KID { get; set; }
 
-        public int? NumProcess { get; set; }
+        public Guid? UserSalesID { get; set; }
+
+        public Guid? UserReviewerID { get; set; }
+
+        public int? HACCP { get; set; }                         // FSSC, 22K
+
+        public string Scope { get; set; }                       // FSSC, 22K
+
+        public int? NumberScope { get; set; }                   // FSSC, 22K -> # lineas de producto
+
+        public string Seasonality { get; set; }                 // FSSC, 22K
 
         public string Services { get; set; }
 
@@ -85,13 +114,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CurrentStandards { get; set; }
 
-        public int? TotalEmployes { get; set; }
+        public int? TotalEmployees { get; set; }
 
         public string OutsourcedProcess { get; set; }
 
         public bool? AnyConsultancy { get; set; }
 
         public string AnyConsultancyBy { get; set; }
+
+        public DateTime? ReviewDate { get; set; }
+
+        public string ReviewJustification { get; set; }
+
+        public string ReviewComments { get; set; }
 
         public ApplicationStatusType Status { get; set; }
 
@@ -111,12 +146,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // public RiskLevelItemListDto RiskLevel { get; set; }
 
+        public Category22KItemListDto Category22K { get; set; }
+
     } // ApplicationItemDetailDto
+
 
     public class ApplicationPostDto
     {
         public string UpdatedUser { get; set; }
-    }
+    } // ApplicationPostDto
+
 
     public class ApplicationPutDto
     {
@@ -135,10 +174,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? RiskLevelID { get; set; }
 
-        [StringLength(1000)]
-        public string ProcessScope { get; set; }
+        public Guid? Category22KID { get; set; }                // FSSC, 22K
 
-        public int? NumProcess { get; set; }
+        public Guid? UserSalesID { get; set; }
+
+        public Guid? UserReviewerID { get; set; }
+
+        public int? HACCP { get; set; }                         // FSSC, 22K
+
+        [StringLength(1000)]
+        public string Scope { get; set; }                       // FSSC, 22K
+
+        public int? NumberScope { get; set; }                   // FSSC, 22K -> # lineas de producto
+
+        [StringLength(500)]
+        public string Seasonality { get; set; }                 // FSSC, 22K
 
         [StringLength(1000)]
         public string Services { get; set; }
@@ -171,7 +221,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string CurrentStandards { get; set; }
 
-        public int? TotalEmployes { get; set; }
+        public int? TotalEmployees { get; set; }
 
         [StringLength(1000)]
         public string OutsourcedProcess { get; set; }
@@ -181,10 +231,17 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string AnyConsultancyBy { get; set; }
 
+        public DateTime? ReviewDate { get; set; }
+
+        public string ReviewJustification { get; set; }
+
+        public string ReviewComments { get; set; }
+
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ApplicationPutDto
+
 
     public class ApplicationStatusDto
     {
@@ -201,6 +258,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ApplicationStatusDto
+
 
     public class ApplicationDeleteDto
     {

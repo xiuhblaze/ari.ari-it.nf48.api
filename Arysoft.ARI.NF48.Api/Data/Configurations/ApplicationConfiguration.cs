@@ -16,8 +16,12 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnName("ApplicationID");
 
             modelBuilder.Entity<Application>()
-                .Property(m => m.ProcessScope)
+                .Property(m => m.Scope)
                 .HasMaxLength(1000);
+
+            modelBuilder.Entity<Application>()
+                .Property(m => m.Seasonality)
+                .HasMaxLength(500);
 
             modelBuilder.Entity<Application>()
                 .Property(m => m.Services)
@@ -71,7 +75,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<Application>() // Ver si es necesario
                 .HasOptional(a => a.Organization);
-            
+
         } // Configure
     }
 }

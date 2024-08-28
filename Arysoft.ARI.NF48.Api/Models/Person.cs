@@ -17,5 +17,13 @@ namespace Arysoft.ARI.NF48.Api.Models
         public string LocationDescription { get; set; }
 
         public StatusType Status { get; set; }
+
+        // RELATIONS
+
+        // public virtual Auditor Auditor { get; set; }
+
+        //public virtual Contact Contact { get; set; }
+
+        //public virtual User User { get; set; }
     }
 }

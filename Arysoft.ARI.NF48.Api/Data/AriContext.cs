@@ -1,5 +1,4 @@
 ﻿using Arysoft.ARI.NF48.Api.Data.Configurations;
-using Arysoft.ARI.NF48.Api.Models;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 
@@ -30,7 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Data
             ContactConfiguration.Configure(modelBuilder);
             OrganizationConfiguration.Configure(modelBuilder);
             NaceCodeConfiguration.Configure(modelBuilder);
-            PersonConfiguration.Configure(modelBuilder);
+            // PersonConfiguration.Configure(modelBuilder);
             RoleConfiguration.Configure(modelBuilder);
             ShiftConfiguration.Configure(modelBuilder);
             SiteConfiguration.Configure(modelBuilder);

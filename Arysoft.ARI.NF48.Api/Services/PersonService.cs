@@ -10,44 +10,35 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class ContactService
+    public class PersonService
     {
-        private readonly ContactRepository _contactRepository;
+        private readonly PersonRepository _personRepository;
 
         // CONSTRUCTOR
 
-        public ContactService()
+        public PersonService()
         {
-            _contactRepository = new ContactRepository();
+            _personRepository = new PersonRepository();
         }
 
         // METHODS
 
-        public PagedList<Contact> Gets(ContactQueryFilters filters)
+        public PagedList<Person> Gets(PersonQueryFilters filters)
         {
-            var items = _contactRepository.Gets();
+            var items = _personRepository.Gets();
 
             // Filters
 
             if (!string.IsNullOrEmpty(filters.Text))
             {
-                filters.Text = filters.Text.Trim().ToLower();
+                filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e =>
-                    e.FirstName.ToLower().Contains(filters.Text)
-                    || e.MiddleName.ToLower().Contains(filters.Text)
-                    || e.LastName.ToLower().Contains(filters.Text)
-                    || e.Phone.ToLower().Contains(filters.Text)
-                    || e.PhoneAlt.ToLower().Contains(filters.Text)
-                    || e.Email.ToLower().Contains(filters.Text)
-                    || e.LocationDescription.ToLower().Contains(filters.Text)
-                    || e.Position.ToLower().Contains(filters.Text)
-                    || (e.Organization != null && e.Organization.Name.ToLower().Contains(filters.Text))
+                    (e.FirstName != null && e.FirstName.ToLower().Contains(filters.Text))
+                    || (e.LastName != null && e.LastName.ToLower().Contains(filters.Text))
+                    || (e.Email != null && e.Email.ToLower().Contains(filters.Text))
+                    || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))
+                    || (e.LocationDescription != null && e.LocationDescription.ToLower().Contains(filters.Text))
                 );
-            }
-
-            if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
-            {
-                items = items.Where(e => e.OrganizationID == filters.OrganizationID);
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
@@ -62,126 +53,118 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
 
-            // Orden
+            // Order
 
             switch (filters.Order)
             {
-                case ContactOrderType.FirstName:
+                case PersonOrderType.Name:
                     items = items.OrderBy(e => e.FirstName)
-                        .ThenBy(e => e.MiddleName)
                         .ThenBy(e => e.LastName);
                     break;
-                case ContactOrderType.Updated:
+                case PersonOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
-                case ContactOrderType.FirstNameDesc:
+                case PersonOrderType.NameDesc:
                     items = items.OrderByDescending(e => e.FirstName)
-                        .ThenByDescending(e => e.MiddleName)
                         .ThenByDescending(e => e.LastName);
-                    break;                
-                case ContactOrderType.UpdatedDesc:
+                    break;
+                case PersonOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
                 default:
                     items = items.OrderBy(e => e.FirstName)
-                        .ThenBy(e => e.MiddleName)
                         .ThenBy(e => e.LastName);
                     break;
             }
-
+        
             // Paging
 
-            var pagedItems = PagedList<Contact>
+            var pagedItems = PagedList<Person>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
             return pagedItems;
         } // Gets
 
-        public async Task<Contact> GetAsync(Guid id)
-        { 
-            return await _contactRepository.GetAsync(id);
+        public async Task<Person> GetAsync(Guid id)
+        {
+            return await _personRepository.GetAsync(id);
         } // GetAsync
 
-        public async Task<Contact> AddAsync(Contact item)
-        {
-            // Validations
-
-            if (item.OrganizationID == Guid.Empty)
-            {
-                throw new BusinessException("Must first assign Organization");
-            }
+        public async Task<Person> AddAsync(Person item)
+        { 
 
             // Assigning values
 
             item.ID = Guid.NewGuid();
-            item.Status = StatusType.Nothing;
-            item.Created = DateTime.UtcNow; 
+            item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
             // Execute queries
 
-            await _contactRepository.DeleteTmpByUser(item.UpdatedUser);
-            _contactRepository.Add(item);
-            await _contactRepository.SaveChangesAsync();
+            await _personRepository.DeleteTmpByUser(item.UpdatedUser);
+            _personRepository.Add(item);
+            await _personRepository.SaveChangesAsync();
 
             return item;
         } // AddAsync
 
-        public async Task<Contact> UpdateAsync(Contact item)
+        public async Task<Person> UpdateAsync(Person item)
         {
             // Validations
 
-            // HACK: - Que el nombre no se repita
+            // - Que la persona ya exista - creo que va a ser solo un warning en el frontend
 
-            var foundItem = await _contactRepository.GetAsync(item.ID)
+            var foundItem = await _personRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             // Assigning values
 
             foundItem.FirstName = item.FirstName;
-            foundItem.MiddleName = item.MiddleName;
             foundItem.LastName = item.LastName;
             foundItem.Email = item.Email;
             foundItem.Phone = item.Phone;
             foundItem.PhoneAlt = item.PhoneAlt;
             foundItem.LocationDescription = item.LocationDescription;
-            foundItem.Position = item.Position;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
-            // Execute queries
+            // Excecute queries
 
-            _contactRepository.Update(foundItem);
-            await _contactRepository.SaveChangesAsync();
+            _personRepository.Update(foundItem);
+            await _personRepository.SaveChangesAsync();
 
             return foundItem;
         } // UpdateAsync
 
-        public async Task DeleteAsync(Contact item)
+        public async Task DeleteAsync(Person item)
         {
-            var foundItem = await _contactRepository.GetAsync(item.ID)
+            var foundItem = await _personRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
 
             // Validations
 
-            // - Que no sea el último contacto
+            // - Que no tenga certificados activos, who knows
 
             if (foundItem.Status == StatusType.Deleted)
             {
-                _contactRepository.Delete(foundItem);
+                //! Considerar eliminar todas las asociaciones al registro antes de su eliminación tales como
+                //  contacts, auditors, users, ...
+                _personRepository.Delete(foundItem);
             }
-            else 
+            else
             {
-                foundItem.Status = foundItem.Status == StatusType.Active
+                foundItem.Status = foundItem.Status < StatusType.Active
                     ? StatusType.Inactive
                     : StatusType.Deleted;
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                _contactRepository.Update(foundItem);
+                _personRepository.Update(foundItem);
             }
         } // DeleteAsync
     }

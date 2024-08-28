@@ -25,19 +25,37 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationName = item.Organization.Name,
                 StandardName = item.Standard.Name,
-                // Specific
-                NaceCodeName = item.NaceCode != null ? item.NaceCode.Description : string.Empty,
-                ProcessScope = item.ProcessScope,
+                // SPECIFIC
+                NaceCodeName = item.NaceCode != null 
+                    ? item.NaceCode.Description 
+                    : string.Empty,
+                Category22KName = item.Category22K != null 
+                    ? Category22KMapping.Category22KToSummary(item.Category22K) 
+                    : string.Empty,
+                HACCP = item.HACCP,
+                Scope = item.Scope,
+                NumberScope = item.NumberScope,
+                Seasonality = item.Seasonality,
                 Services = item.Services,
+                LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 IsDesignResponsibility = item.IsDesignResponsibility,
-                // General
+                // GENERAL
                 AuditLanguage = item.AuditLanguage,
+                TotalEmployees = item.TotalEmployees,
                 AnyConsultancy = item.AnyConsultancy,
+                ReviewDate = item.ReviewDate,
+                UsernameSales = item.UserSales != null
+                    ? Tools.Strings.FullName(item.UserSales.FirstName, null, item.UserSales.LastName)
+                    : string.Empty,
+                UsernameReviewer = item.UserReviewer != null
+                    ? Tools.Strings.FullName(item.UserReviewer.FirstName, null, item.UserReviewer.LastName)
+                    : string.Empty,
                 Status = item.Status,
                 Created = item.Created
             };
         } // ApplicationToItemListDto
+
 
         public static ApplicationItemDetailDto ApplicationToItemDetailDto(Application item)
         {   
@@ -46,11 +64,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 StandardID = item.StandardID,
-                // Specific
+                // SPECIFIC
                 NaceCodeID = item.NaceCodeID,
                 RiskLevelID = item.RiskLevelID,
-                ProcessScope = item.ProcessScope,
-                NumProcess = item.NumProcess,
+                Category22KID = item.Category22KID,
+                HACCP = item.HACCP,
+                Scope = item.Scope,
+                NumberScope = item.NumberScope,
+                Seasonality = item.Seasonality,
                 Services = item.Services,
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
@@ -58,15 +79,18 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AutomationLevel = item.AutomationLevel,
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
-                // General
+                // GENERAL
                 AuditLanguage = item.AuditLanguage,
                 CurrentCertificationExpirationDate = item.CurrentCertificationExpirationDate,
                 CurrentCertificationBy = item.CurrentCertificationBy,
                 CurrentStandards = item.CurrentStandards,
-                TotalEmployes = item.TotalEmployes,
+                TotalEmployees = item.TotalEmployees,
                 OutsourcedProcess = item.OutsourcedProcess,
                 AnyConsultancy = item.AnyConsultancy,
                 AnyConsultancyBy = item.AnyConsultancyBy,
+                ReviewDate = item.ReviewDate,
+                ReviewJustification = item.ReviewJustification,
+                ReviewComments = item.ReviewComments,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -74,6 +98,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // Relations
                 Organization = OrganizationMapping.OrganizationToItemListDto(item.Organization),
                 Standard = StandardMapping.StandardToItemListDto(item.Standard),
+                NaceCode = NaceCodeMapping.NaceCodeToItemListDto(item.NaceCode),
+                //RiskLevel = RiskLevelMapping.RiskLevelToItemListDto(item.RiskLevel),
+                Category22K = Category22KMapping.Category22KToItemListDto(item.Category22K),
             };
         } // ApplicationToItemDetailDto
 
@@ -87,8 +114,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // Specific
                 NaceCodeID = itemDto.NaceCodeID,
                 RiskLevelID = itemDto.RiskLevelID,
-                ProcessScope = itemDto.ProcessScope,
-                NumProcess = itemDto.NumProcess,
+                HACCP = itemDto.HACCP,
+                Scope = itemDto.Scope,
+                NumberScope = itemDto.NumberScope,
+                Seasonality = itemDto.Seasonality,
                 Services = itemDto.Services,
                 LegalRequirements = itemDto.LegalRequirements,
                 AnyCriticalComplaint = itemDto.AnyCriticalComplaint,
@@ -101,10 +130,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 CurrentCertificationExpirationDate = itemDto.CurrentCertificationExpirationDate,
                 CurrentCertificationBy = itemDto.CurrentCertificationBy,
                 CurrentStandards = itemDto.CurrentStandards,
-                TotalEmployes = itemDto.TotalEmployes,
+                TotalEmployees = itemDto.TotalEmployees,
                 OutsourcedProcess = itemDto.OutsourcedProcess,
                 AnyConsultancy = itemDto.AnyConsultancy,
                 AnyConsultancyBy = itemDto.AnyConsultancyBy,
+                ReviewDate = itemDto.ReviewDate,
+                ReviewJustification = itemDto.ReviewJustification,
+                ReviewComments = itemDto.ReviewComments,
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemEditDtoToApplication

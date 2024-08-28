@@ -123,6 +123,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
             foundItem.MaxReductionDays = item.MaxReductionDays;
+            foundItem.SalesMaxReductionDays = item.SalesMaxReductionDays;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;

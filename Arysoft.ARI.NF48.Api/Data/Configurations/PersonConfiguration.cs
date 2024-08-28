@@ -56,6 +56,14 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            //modelBuilder.Entity<Person>()
+            //    .HasOptional(m => m.Contact)
+            //    .WithRequired(c => c.Person);
+
+            //modelBuilder.Entity<Person>()
+            //    .HasOptional(m => m.User)
+            //    .WithRequired(u => u.Person);
         }
     }
 }

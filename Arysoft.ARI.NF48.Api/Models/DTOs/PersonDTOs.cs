@@ -1,40 +1,17 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
-    public class ContactItemListDto
+    public class PersonItemListDto
     {
         public Guid ID { get; set; }
-
-        public string OrganizationName { get; set; }
-
-        public string FullName { get; set; }
-        
-        public string Email { get; set; }
-
-        public string Phone { get; set; }
-
-        public string PhoneAlt { get; set; }
-
-        public string LocationDescription { get; set; }
-
-        public string Position { get; set; }
-
-        public StatusType Status { get; set; }
-
-    } // ContactItemListDto
-
-    public class ContactItemDetailDto
-    {
-        public Guid ID { get; set; }
-
-        public Guid OrganizationID { get; set; }
 
         public string FirstName { get; set; }
-
-        public string MiddleName { get; set; }
 
         public string LastName { get; set; }
 
@@ -46,7 +23,31 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string LocationDescription { get; set; }
 
-        public string Position { get; set; }
+        public StatusType Status { get; set; }
+
+        public bool IsAuditor { get; set; }
+
+        public bool IsContact { get; set; }
+
+        public bool IsUser { get; set; }
+
+    }
+
+    public class PersonItemDetailDto
+    {
+        public Guid ID { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string Email { get; set; }
+
+        public string Phone { get; set; }
+
+        public string PhoneAlt { get; set; }
+
+        public string LocationDescription { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -56,38 +57,34 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
-        public OrganizationItemListDto Organization { get; set; }
+        public Auditor Auditor { get; set; } // HACK: Cambiarlo por AuditorItemListDto
 
-        public PersonItemListDto Person { get; set; }
-    } // ContactItemDetailDto
+        public ContactItemListDto Contact { get; set; }
 
-    public class ContactPostDto
+        public UserListItemDto User { get; set; }
+    }
+
+    public class PersonPostDto
     {
-        [Required]
-        public Guid OrganizationID { get; set; }
-
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     }
 
-    public class ContactPutDto
+    public class PersonPutDto
     {
-        [Required]
+        [Required(ErrorMessage = "ID is required")]
         public Guid ID { get; set; }
 
-        [Required]
         [StringLength(50)]
+        [Required(ErrorMessage = "First name is requiered")]
         public string FirstName { get; set; }
-
-        [StringLength(50)]
-        public string MiddleName { get; set; }
 
         [StringLength(50)]
         public string LastName { get; set; }
 
-        [Required]
         [StringLength(250)]
+        [Required(ErrorMessage = "E-Mail is requiered")]
         public string Email { get; set; }
 
         [StringLength(25)]
@@ -96,13 +93,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(25)]
         public string PhoneAlt { get; set; }
 
-        [StringLength(500)]
+        [StringLength(1000)]
         public string LocationDescription { get; set; }
 
         [Required]
-        [StringLength(250)]
-        public string Position { get; set; }
-
         public StatusType Status { get; set; }
 
         [Required]
@@ -110,7 +104,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
     }
 
-    public class ContactDeleteDto
+    public class PersonDeleteDto
     {
         [Required]
         public Guid ID { get; set; }

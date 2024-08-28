@@ -47,7 +47,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
-        public SiteItemListDto Site { get; set; } // // HACK: Cambiar por SiteItemListDto cuando exista
+        public SiteItemListDto Site { get; set; }
     } // ShiftItemDetailDto
 
     public class ShiftPostDto

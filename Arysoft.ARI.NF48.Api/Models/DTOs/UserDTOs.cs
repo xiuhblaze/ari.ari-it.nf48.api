@@ -9,9 +9,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid? OrganizationID { get; set; }
+        public Guid? OwnerID { get; set; }
 
-        public Guid? ContactID { get; set; }
+        public string OwnerName { get; set; }
 
         public string Username { get; set; }
 
@@ -19,11 +19,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string FullName { get; set; }
 
+        public UserType Type { get; set; }
+
         public StatusType Status { get; set; }
-
-        public string OrganizationName { get; set; }
-
-        public string ContactName { get; set; }
 
         public ICollection<RoleItemListDto> Roles { get; set; }
     } // UserListItemDto
@@ -32,9 +30,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid? OrganizationID { get; set; }
+        public Guid? OwnerID { get; set; }
 
-        public Guid? ContactID { get; set; }
+        public string OwnerName { get; set; }
 
         public string Username { get; set; }
 
@@ -44,6 +42,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string LastName { get; set; }
 
+        public UserType Type { get; set; }
+
         public StatusType Status { get; set; }
 
         public DateTime Created { get; set; }
@@ -51,10 +51,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
-
-        public string OrganizationName { get; set; }
-
-        public string ContactName { get; set; }
 
         public ICollection<RoleItemListDto> Roles { get; set; }
     } // UserDetailDto
@@ -70,27 +66,27 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid? OrganizationID { get; set; }
-
-        public Guid? ContactID { get; set; }
+        public Guid? OwnerID { get; set; }
 
         [Required]
         [StringLength(50)]
         public string Username { get; set; }
 
         [StringLength(64)]
-        public string PasswordHash { get; set; }
+        public string Password { get; set; } // INFO: Este solo recibe el password 
 
         [Required]
         [StringLength(255)]
         public string Email { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string FirstName { get; set; }
 
         [StringLength(50)]
         public string LastName { get; set; }
+
+        [EnumDataType(typeof(UserType))]
+        public UserType Type { get; set; }
 
         [EnumDataType(typeof(StatusType))]
         public StatusType Status { get; set; }

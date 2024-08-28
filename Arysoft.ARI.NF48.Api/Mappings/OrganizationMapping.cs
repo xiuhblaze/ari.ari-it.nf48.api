@@ -36,9 +36,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 NoContacts = item.Contacts != null ? item.Contacts.Count() : 0,
-                ContactName = firstContact != null ? firstContact.FirstName : string.Empty,
-                ContactEmail = firstContact != null ? firstContact.Email : string.Empty,
-                ContactPhone = firstContact != null ? firstContact.Phone : string.Empty,
+                ContactName = firstContact != null  
+                    ? firstContact.FirstName 
+                    : string.Empty,
+                ContactEmail = firstContact != null 
+                    ? firstContact.Email 
+                    : string.Empty,
+                ContactPhone = firstContact != null
+                    ? firstContact.Phone 
+                    : string.Empty,
                 NoSites = item.Sites != null ? item.Sites.Count() : 0,
                 SiteDescription = mainSite != null ? mainSite.Description : string.Empty,
                 SiteLocation = mainSite != null ? mainSite.LocationDescription : string.Empty,

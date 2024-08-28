@@ -1,5 +1,4 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
-using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
@@ -14,15 +13,12 @@ namespace Arysoft.ARI.NF48.Api.Services
     public class UserService
     {
         private readonly UserRepository _userRepository;
-        //private readonly RoleRepository roleRepository;
-        //private AriContext db = new AriContext();
-
+        
         // CONSTRUCTORS
 
         public UserService()
         {
-            _userRepository = new UserRepository();
-            //roleRepository = new RoleRepository();
+            _userRepository = new UserRepository();;
         }
 
         // METHODS
@@ -41,7 +37,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || e.LastName.ToLower().Contains(filters.Text)
                     || e.UpdatedUser.ToLower().Contains(filters.Text)
                 );
+            }
 
+            if (filters.Type != null && filters.Type != UserType.Nothing)
+            {
+                items = items.Where(e => e.Type == filters.Type);
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
@@ -66,12 +66,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case UserOrderType.Email:
                     items = items.OrderBy(e => e.Email);
                     break;
-                case UserOrderType.FirstName:
-                    items = items.OrderBy(e => e.FirstName);
-                    break;
-                case UserOrderType.LastName:
-                    items = items.OrderBy(e => e.LastName);
-                    break;
                 case UserOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
@@ -80,12 +74,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
                 case UserOrderType.EmailDesc:
                     items = items.OrderByDescending(e => e.Email);
-                    break;
-                case UserOrderType.FirstNameDesc:
-                    items = items.OrderByDescending(e => e.FirstName);
-                    break;
-                case UserOrderType.LastNameDesc:
-                    items = items.OrderByDescending(e => e.LastName);
                     break;
                 case UserOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
@@ -143,30 +131,60 @@ namespace Arysoft.ARI.NF48.Api.Services
             return item;
         } // AddAsync
 
+        /// <summary>
+        /// Actualiza la información de un registro en la base de datos
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task<User> UpdateAsync(User item)
         {
+            var foundItem = await _userRepository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
             // Validations 
 
-            //HACK: Validar que el usuario no este eliminado para validarlo
-            if (await _userRepository.GetByUsername(item.Username, item.ID) != null)
+            if (string.IsNullOrEmpty(item.FirstName))
+                throw new BusinessException("Must first name specify");
+
+            if (string.IsNullOrEmpty(item.Email))
+                throw new BusinessException("Must email an specify");
+
+            if (item.Type == UserType.Nothing)
+                throw new BusinessException("Must user type specify");
+
+            var sameNameUser = await _userRepository.GetByUsername(item.Username, item.ID);
+            if (sameNameUser != null)
             {
-                throw new BusinessException("The username already exist.");
+                if (sameNameUser.Status == StatusType.Deleted)
+                    throw new BusinessException("The username was used but deleted.");
+                else
+                    throw new BusinessException("The username already exist.");
             }
 
-            if (!string.IsNullOrEmpty(item.PasswordHash))
-            {
-                item.PasswordHash = Tools.Encrypt.GetSHA256(item.PasswordHash);
-            }
+            // Assigning values
+
+            foundItem.OwnerID = item.OwnerID;            
+            foundItem.Username = item.Username;
+            foundItem.PasswordHash = string.IsNullOrEmpty(item.PasswordHash)
+                ? foundItem.PasswordHash
+                : Tools.Encrypt.GetSHA256(item.PasswordHash);
+            foundItem.Email = item.Email;
+            foundItem.FirstName = item.FirstName;
+            foundItem.LastName = item.LastName;
+            foundItem.Type = item.Type;
+            foundItem.Status = item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
-
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-            item.Updated = DateTime.UtcNow;
-
-            var updatedItem = await _userRepository.UpdateAsync(item);
+            
+            _userRepository.Update(foundItem);
             await _userRepository.SaveChangesAsync();
 
-            return updatedItem;
+            return foundItem;
         } // UpdateAsync
 
         /// <summary>
@@ -198,7 +216,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                await _userRepository.UpdateAsync(foundItem);
+                _userRepository.Update(foundItem);
             }
 
             await _userRepository.SaveChangesAsync();

@@ -14,7 +14,6 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public override IEnumerable<User> Gets()
         {
             return _model
-                .Include(m => m.Organization)
                 .Include(m => m.Roles)
                 .AsEnumerable();
         } // Gets
@@ -45,29 +44,6 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Where(m => m.Username == username && m.PasswordHash == passwordHash)
                 .FirstOrDefaultAsync();
         } // GetUserByLoginAsync
-
-        public async Task<User> UpdateAsync(User item)
-        {
-            var foundItem = await _model.FindAsync(item.ID) 
-                ?? throw new BusinessException("The record to update was not found");
-
-            foundItem.OrganizationID = item.OrganizationID;
-            foundItem.ContactID = item.ContactID;
-            foundItem.Username = item.Username;
-            foundItem.PasswordHash = string.IsNullOrEmpty(item.PasswordHash) 
-                ? foundItem.PasswordHash
-                : item.PasswordHash;
-            foundItem.Email = item.Email;
-            foundItem.FirstName = item.FirstName;
-            foundItem.LastName = item.LastName;
-            foundItem.Status = item.Status;
-            foundItem.Updated = item.Updated;
-            foundItem.UpdatedUser = item.UpdatedUser;
-
-            Update(foundItem);
-
-            return foundItem;
-        } // UpdateAsync
 
         public async Task AddRoleAsync(Guid id, Guid roleID)
         {

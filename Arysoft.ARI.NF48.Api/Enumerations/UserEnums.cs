@@ -1,17 +1,24 @@
 ﻿namespace Arysoft.ARI.NF48.Api.Enumerations
 {
+    public enum UserType
+    { 
+        Nothing,
+        Admin,
+        Auditor,
+        Organization,
+        Sales,
+        SuperAdmin
+    }
+
+
     public enum UserOrderType
     {
         Nothing,
         Username,
         Email,
-        FirstName,
-        LastName,
         Updated,
         UsernameDesc,
         EmailDesc,
-        FirstNameDesc,
-        LastNameDesc,
         UpdatedDesc,
     }
 }

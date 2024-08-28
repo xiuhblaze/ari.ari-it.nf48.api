@@ -1,11 +1,11 @@
 ﻿namespace Arysoft.ARI.NF48.Api.Enumerations
 {
-    public enum ContactOrderType
+    public enum PersonOrderType
     {
         Nothing,
-        FirstName,
+        Name,
         Updated,
-        FirstNameDesc,
+        NameDesc,
         UpdatedDesc
     }
 }

@@ -6,8 +6,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 {
     public class ShiftMapping
     {
-
-
         public static IEnumerable<ShiftItemListDto> ShiftsToListDto(IEnumerable<Shift> items)
         {
             var itemsDto = new List<ShiftItemListDto>();

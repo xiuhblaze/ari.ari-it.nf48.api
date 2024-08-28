@@ -50,7 +50,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             { 
                 filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(i => 
-                    i.ProcessScope.ToLower().Contains(filters.Text)
+                    i.Scope.ToLower().Contains(filters.Text)
+                    || i.Seasonality.ToLower().Contains(filters.Text)
                     || i.Services.ToLower().Contains(filters.Text)
                     || i.LegalRequirements.ToLower().Contains(filters.Text)
                     || i.CriticalComplaintComments.ToLower().Contains(filters.Text)
@@ -62,6 +63,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || i.AnyConsultancyBy.ToLower().Contains(filters.Text)
                     || (i.Organization != null && i.Organization.Name.ToLower().Contains(filters.Text))
                     || (i.Standard != null && i.Standard.Name.ToLower().Contains(filters.Text))
+                    || (i.UserSales != null && i.UserSales.FirstName.ToLower().Contains(filters.Text))
+                    || (i.UserSales != null && i.UserSales.LastName.ToLower().Contains(filters.Text))
+                    || (i.UserReviewer != null && i.UserReviewer.FirstName.ToLower().Contains(filters.Text))
+                    || (i.UserReviewer != null && i.UserReviewer.LastName.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -170,8 +175,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.StandardID = item.StandardID;
             foundItem.NaceCodeID = item.NaceCodeID;
             foundItem.RiskLevelID = item.RiskLevelID;
-            foundItem.ProcessScope = item.ProcessScope;
-            foundItem.NumProcess = item.NumProcess;
+            foundItem.Category22KID = item.Category22KID;
+            foundItem.UserSalesID = item.UserSalesID;
+            foundItem.UserReviewerID = item.UserReviewerID;
+            foundItem.HACCP = item.HACCP;
+            foundItem.Scope = item.Scope;
+            foundItem.NumberScope = item.NumberScope;
+            foundItem.Seasonality = item.Seasonality;
             foundItem.Services = item.Services;
             foundItem.LegalRequirements = item.LegalRequirements;
             foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
@@ -183,10 +193,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.CurrentCertificationExpirationDate = item.CurrentCertificationExpirationDate;
             foundItem.CurrentCertificationBy = item.CurrentCertificationBy;
             foundItem.CurrentStandards = item.CurrentStandards;
-            foundItem.TotalEmployes = item.TotalEmployes;
+            foundItem.TotalEmployees = item.TotalEmployees;
             foundItem.OutsourcedProcess = item.OutsourcedProcess;
             foundItem.AnyConsultancy = item.AnyConsultancy;
             foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
+            foundItem.ReviewDate = item.ReviewDate;
+            foundItem.ReviewJustification = item.ReviewJustification;
+            foundItem.ReviewComments = item.ReviewComments;
             foundItem.Status = item.Status == ApplicationStatusType.Nothing
                 ? ApplicationStatusType.New
                 : item.Status;

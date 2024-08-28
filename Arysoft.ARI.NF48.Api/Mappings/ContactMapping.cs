@@ -24,11 +24,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = item.ID,
                 OrganizationName = item.Organization != null ? item.Organization.Name : string.Empty,
-                FirstName = item.FirstName,
-                LastName = item.LastName,
-                Phone = item.Phone,
-                PhoneExtensions = item.PhoneExtensions,
+                FullName = item.FirstName
+                    + (string.IsNullOrEmpty(item.MiddleName) ? string.Empty : " " + item.MiddleName)
+                    + (string.IsNullOrEmpty(item.LastName) ? string.Empty : " " + item.LastName),
                 Email = item.Email,
+                Phone = item.Phone,
+                PhoneAlt = item.PhoneAlt,
+                LocationDescription = item.LocationDescription,
                 Position = item.Position,
                 Status = item.Status
             };
@@ -41,10 +43,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 FirstName = item.FirstName,
+                MiddleName = item.MiddleName,
                 LastName = item.LastName,
-                Phone = item.Phone,
-                PhoneExtensions = item.PhoneExtensions,
                 Email = item.Email,
+                Phone = item.Phone,
+                PhoneAlt = item.PhoneAlt,
+                LocationDescription = item.LocationDescription,
                 Position = item.Position,
                 Status = item.Status,
                 Created = item.Created,
@@ -71,10 +75,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = itemDto.ID,
                 FirstName = itemDto.FirstName,
+                MiddleName = itemDto.MiddleName,
                 LastName = itemDto.LastName,
-                Phone = itemDto.Phone,
-                PhoneExtensions= itemDto.PhoneExtensions,
                 Email = itemDto.Email,
+                Phone = itemDto.Phone,
+                PhoneAlt = itemDto.PhoneAlt,
+                LocationDescription = itemDto.LocationDescription,
                 Position = itemDto.Position,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

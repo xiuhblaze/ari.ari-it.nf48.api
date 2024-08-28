@@ -17,19 +17,31 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<Contact>()
                 .Property(m => m.FirstName)
-                .HasMaxLength(100);
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Contact>()
-                .Property(m => m.Phone)
-                .HasMaxLength(10);
+                .Property(m => m.MiddleName)
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Contact>()
-                .Property(m => m.PhoneExtensions)
-                .HasMaxLength(20);
+                .Property(m => m.LastName)
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Contact>()
                 .Property(m => m.Email)
                 .HasMaxLength(250);
+
+            modelBuilder.Entity<Contact>()
+                .Property(m => m.Phone)
+                .HasMaxLength(25);
+
+            modelBuilder.Entity<Contact>()
+                .Property(m => m.PhoneAlt)
+                .HasMaxLength(25);
+
+            modelBuilder.Entity<Contact>()
+                .Property(m => m.LocationDescription)
+                .HasMaxLength(500);
 
             modelBuilder.Entity<Contact>()
                 .Property(m => m.Position)

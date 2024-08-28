@@ -91,5 +91,16 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemDeleteDtoToCategory22K
+
+        public static string Category22KToSummary(Category22K item)
+        {
+            var summary = item.Category;
+
+            summary += string.IsNullOrEmpty(item.CategoryDescription)
+                ? string.Empty 
+                : " " + item.CategoryDescription;
+
+            return summary;
+        } // Category22KToSummary
     }
 }

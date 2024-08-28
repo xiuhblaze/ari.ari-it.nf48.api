@@ -9,7 +9,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Description { get; set; }
 
-        public int? MaxReductionDays { get; set; } 
+        public int? MaxReductionDays { get; set; }
+
+        public int? SalesMaxReductionDays { get; set; }
 
         public StatusType Status { get; set; }
 

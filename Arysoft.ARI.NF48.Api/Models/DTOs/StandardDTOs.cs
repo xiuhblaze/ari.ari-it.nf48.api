@@ -16,6 +16,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? MaxReductionDays { get; set; }
 
+        public int? SalesMaxReductionDays { get; set; }
+
         public StatusType Status { get; set; }
 
         public int NoApplications { get; set; }
@@ -34,6 +36,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string Description { get; set; }
 
         public int? MaxReductionDays { get; set; }
+
+        public int? SalesMaxReductionDays { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -67,8 +71,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string Description { get; set; }
 
-        
+        [Range(0, 20, ErrorMessage = "Value for Max Reduction Days must be between {1} and {2}.")]
         public int? MaxReductionDays { get; set; }
+
+        [Range(0, 20, ErrorMessage = "Value for Max Reduction Days must be between {1} and {2}.")]
+        public int? SalesMaxReductionDays { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

@@ -25,13 +25,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         public virtual IEnumerable<T> Gets()
         {
-            return _model.AsEnumerable();
+            return _model
+                .AsEnumerable();
+                // .AsNoTracking()
         }
 
         public virtual async Task<T> GetAsync(Guid id)
         {
-            return await _model
-                .AsNoTracking()
+            return await _model                
                 .FirstOrDefaultAsync(m => m.ID == id);
         }
 
