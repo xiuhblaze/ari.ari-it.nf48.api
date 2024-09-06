@@ -180,9 +180,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
-            
-            _userRepository.Update(foundItem);
-            await _userRepository.SaveChangesAsync();
+     
+            try 
+            { 
+                _userRepository.Update(foundItem);
+                await _userRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
             return foundItem;
         } // UpdateAsync
@@ -219,7 +226,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _userRepository.Update(foundItem);
             }
 
-            await _userRepository.SaveChangesAsync();
+            _userRepository.SaveChanges();
         } // DeleteAsync
     }
 }

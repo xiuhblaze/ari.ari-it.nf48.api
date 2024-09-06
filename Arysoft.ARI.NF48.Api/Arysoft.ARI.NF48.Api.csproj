@@ -229,6 +229,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Controllers\Categories22KController.cs" />
+    <Compile Include="Controllers\DayCalculationConceptsController.cs" />
     <Compile Include="Controllers\PersonsController.cs" />
     <Compile Include="Data\AriContext.cs" />
     <Compile Include="Controllers\AuthController.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Data\Configurations\AuditorConfiguration.cs" />
     <Compile Include="Data\Configurations\Category22KConfiguration.cs" />
     <Compile Include="Data\Configurations\ContactConfiguration.cs" />
+    <Compile Include="Data\Configurations\DayConfigurationConceptConfiguration.cs" />
     <Compile Include="Data\Configurations\NaceCodeConfiguration.cs" />
     <Compile Include="Data\Configurations\OrganizationConfiguration.cs" />
     <Compile Include="Data\Configurations\PersonConfiguration.cs" />
@@ -258,6 +260,7 @@
     <Compile Include="Enumerations\ApplicationEnum.cs" />
     <Compile Include="Enumerations\Category22KEnums.cs" />
     <Compile Include="Enumerations\ContactEnums.cs" />
+    <Compile Include="Enumerations\DayCalculationConceptEnums.cs" />
     <Compile Include="Enumerations\NaceCodeEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
     <Compile Include="Enumerations\PersonEnums.cs" />
@@ -289,10 +292,12 @@
     <Compile Include="Models\BaseModel.cs" />
     <Compile Include="Models\Category22K.cs" />
     <Compile Include="Models\Contact.cs" />
+    <Compile Include="Models\DayCalculationConcept.cs" />
     <Compile Include="Models\DTOs\ApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\AuthDTOs.cs" />
     <Compile Include="Models\DTOs\Category22KDTOs.cs" />
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
+    <Compile Include="Models\DTOs\DayCalculationConceptDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
     <Compile Include="Models\DTOs\PersonDTOs.cs" />
@@ -314,6 +319,7 @@
     <Compile Include="QueryFilters\BaseQueryFilters.cs" />
     <Compile Include="QueryFilters\Category22KQueryFilters.cs" />
     <Compile Include="QueryFilters\ContactQueryFilters.cs" />
+    <Compile Include="QueryFilters\DayCalculationConceptQueryFilters.cs" />
     <Compile Include="QueryFilters\NaceCodeQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
     <Compile Include="QueryFilters\PersonQueryFilters.cs" />
@@ -326,6 +332,7 @@
     <Compile Include="Repositories\BaseRepository.cs" />
     <Compile Include="Repositories\Category22KRepository.cs" />
     <Compile Include="Repositories\ContactRepository.cs" />
+    <Compile Include="Repositories\DayCalculationConceptRepository.cs" />
     <Compile Include="Repositories\NaceCodeRepository.cs" />
     <Compile Include="Repositories\OrganizationRepository.cs" />
     <Compile Include="Repositories\PersonRepository.cs" />
@@ -338,6 +345,7 @@
     <Compile Include="Services\ApplicationService.cs" />
     <Compile Include="Services\Category22KService.cs" />
     <Compile Include="Services\ContactService.cs" />
+    <Compile Include="Services\DayCalculationConceptService.cs" />
     <Compile Include="Services\NaceCodeService.cs" />
     <Compile Include="Services\OrganizationService.cs" />
     <Compile Include="Services\PersonService.cs" />
@@ -406,6 +414,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\DayCalculationConcepts\" />
     <Folder Include="Views\NaceCodes\" />
   </ItemGroup>
   <ItemGroup>

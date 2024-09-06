@@ -173,6 +173,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.OrganizationID = item.OrganizationID;
             foundItem.StandardID = item.StandardID;
+            // SPECIFIC
             foundItem.NaceCodeID = item.NaceCodeID;
             foundItem.RiskLevelID = item.RiskLevelID;
             foundItem.Category22KID = item.Category22KID;
@@ -189,6 +190,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.AutomationLevel = item.AutomationLevel;
             foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
             foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+            // GENERAL
             foundItem.AuditLanguage = item.AuditLanguage;
             foundItem.CurrentCertificationExpirationDate = item.CurrentCertificationExpirationDate;
             foundItem.CurrentCertificationBy = item.CurrentCertificationBy;
@@ -208,12 +210,25 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Excecute queries
 
-            _applicationRepository.Update(foundItem);
-            await _applicationRepository.SaveChangesAsync();
+            try
+            { 
+                _applicationRepository.Update(foundItem);
+                await _applicationRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
             return foundItem;
         } // UpdateAsync
 
+        /// <summary>
+        /// Delete a record logically and then physically
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task DeleteAsync(Application item)
         {
             var foundItem = await _applicationRepository.GetAsync(item.ID)
@@ -234,7 +249,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _applicationRepository.Update(foundItem);
             }
 
-            await _applicationRepository.SaveChangesAsync();
+            _applicationRepository.SaveChanges();
         } // DeleteAsync
 
     }

@@ -135,8 +135,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            _naceCodeRepository.Update(foundItem);
-            await _naceCodeRepository.SaveChangesAsync();
+            try
+            { 
+                _naceCodeRepository.Update(foundItem);
+                await _naceCodeRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
             return foundItem;
         } // UpdateAsync
@@ -161,6 +168,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 _naceCodeRepository.Update(foundItem);
             }
+
+            _naceCodeRepository.SaveChanges();
         } // DeleteAsync
     }
 }

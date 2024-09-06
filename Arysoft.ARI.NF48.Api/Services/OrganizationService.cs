@@ -167,6 +167,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 _organizationRepository.Update(foundItem);
             }
+
+            _organizationRepository.SaveChanges();
         } // DeleteAsync
     }
 }

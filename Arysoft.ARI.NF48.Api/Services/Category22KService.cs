@@ -143,8 +143,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            _category22KRepository.Update(foundItem);
-            await _category22KRepository.SaveChangesAsync();
+            try
+            { 
+                _category22KRepository.Update(foundItem);
+                await _category22KRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
             return foundItem;
         } // UpdateAsync
@@ -174,6 +181,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 _category22KRepository.Update(foundItem);
             }
+
+            _category22KRepository.SaveChanges();
         } // DeleteAsync
     }
 }

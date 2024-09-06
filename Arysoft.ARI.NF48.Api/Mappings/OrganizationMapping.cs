@@ -21,7 +21,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static OrganizationItemListDto OrganizationToItemListDto(Organization item)
         {
-            var firstContact = item.Contacts.FirstOrDefault();
+            var firstContact = item.Contacts?.FirstOrDefault();
             var mainSite = item.Sites.OrderBy(s => s.Order).FirstOrDefault();
 
             return new OrganizationItemListDto

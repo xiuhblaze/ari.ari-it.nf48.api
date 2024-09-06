@@ -1,5 +1,6 @@
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Arysoft.ARI.NF48.Api.Tools;
 using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
@@ -24,9 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = item.ID,
                 OrganizationName = item.Organization != null ? item.Organization.Name : string.Empty,
-                FullName = item.FirstName
-                    + (string.IsNullOrEmpty(item.MiddleName) ? string.Empty : " " + item.MiddleName)
-                    + (string.IsNullOrEmpty(item.LastName) ? string.Empty : " " + item.LastName),
+                FullName = Strings.FullName(item.FirstName, item.MiddleName, item.LastName),
                 Email = item.Email,
                 Phone = item.Phone,
                 PhoneAlt = item.PhoneAlt,

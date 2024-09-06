@@ -111,17 +111,36 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Role> UpdateAsync(Role item)
         {
+            var foundItem = await _roleRepository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
             // Validations
+
+            // - Otro rol con el mismo nombre
+
+            // Assigning values
+
+            foundItem.Name = item.Name;
+            foundItem.Description = item.Description;
+            foundItem.Status = foundItem.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status;
+            foundItem.Updated = item.Updated;
+            foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-            item.Updated = DateTime.UtcNow;
+            try
+            { 
+                _roleRepository.Update(item);
+                await _roleRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
-            var updatedItem = await _roleRepository.UpdateAsync(item);
-            await _roleRepository.SaveChangesAsync();
-
-            return updatedItem;
+            return foundItem;
         } // UpdateAsync
 
         public async Task DeleteAsync(Role item)
@@ -141,10 +160,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                await _roleRepository.UpdateAsync(foundItem);
+                _roleRepository.Update(foundItem);
             }
 
-            await _roleRepository.SaveChangesAsync();
+            _roleRepository.SaveChanges();
         } // DeleteAsync
     }
 }

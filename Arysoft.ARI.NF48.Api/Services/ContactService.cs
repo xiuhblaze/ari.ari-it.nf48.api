@@ -154,8 +154,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            _contactRepository.Update(foundItem);
-            await _contactRepository.SaveChangesAsync();
+            try
+            { 
+                _contactRepository.Update(foundItem);
+                await _contactRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
             return foundItem;
         } // UpdateAsync
@@ -183,6 +190,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 _contactRepository.Update(foundItem);
             }
+
+            _contactRepository.SaveChanges();
         } // DeleteAsync
     }
 }

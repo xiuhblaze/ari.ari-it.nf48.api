@@ -23,8 +23,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ApplicationItemListDto
             {
                 ID = item.ID,
-                OrganizationName = item.Organization.Name,
-                StandardName = item.Standard.Name,
+                OrganizationName = item.Organization != null 
+                    ? item.Organization.Name
+                    : string.Empty,
+                StandardName = item.Standard != null
+                    ? item.Standard.Name
+                    : string.Empty,
                 // SPECIFIC
                 NaceCodeName = item.NaceCode != null 
                     ? item.NaceCode.Description 
@@ -96,11 +100,19 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 // Relations
-                Organization = OrganizationMapping.OrganizationToItemListDto(item.Organization),
-                Standard = StandardMapping.StandardToItemListDto(item.Standard),
-                NaceCode = NaceCodeMapping.NaceCodeToItemListDto(item.NaceCode),
+                Organization = item.Organization != null
+                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization)
+                    : null,
+                Standard = item.Standard != null
+                    ? StandardMapping.StandardToItemListDto(item.Standard)
+                    : null,
+                NaceCode = item.NaceCode != null 
+                    ? NaceCodeMapping.NaceCodeToItemListDto(item.NaceCode)
+                    : null,
                 //RiskLevel = RiskLevelMapping.RiskLevelToItemListDto(item.RiskLevel),
-                Category22K = Category22KMapping.Category22KToItemListDto(item.Category22K),
+                Category22K = item.Category22K != null
+                    ? Category22KMapping.Category22KToItemListDto(item.Category22K)
+                    : null,
             };
         } // ApplicationToItemDetailDto
 
@@ -111,9 +123,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 OrganizationID = itemDto.OrganizationID,
                 StandardID = itemDto.StandardID,
-                // Specific
+                // SPECIFIC
                 NaceCodeID = itemDto.NaceCodeID,
                 RiskLevelID = itemDto.RiskLevelID,
+                Category22KID = itemDto.Category22KID,
                 HACCP = itemDto.HACCP,
                 Scope = itemDto.Scope,
                 NumberScope = itemDto.NumberScope,
@@ -125,7 +138,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AutomationLevel = itemDto.AutomationLevel,
                 IsDesignResponsibility = itemDto.IsDesignResponsibility,
                 DesignResponsibilityJustify = itemDto.DesignResponsibilityJustify,
-                // General
+                // GENERAL
                 AuditLanguage = itemDto.AuditLanguage,
                 CurrentCertificationExpirationDate = itemDto.CurrentCertificationExpirationDate,
                 CurrentCertificationBy = itemDto.CurrentCertificationBy,

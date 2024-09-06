@@ -153,8 +153,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            _shiftRepository.Update(foundItem);            
-            await _shiftRepository.SaveChangesAsync();
+            try
+            { 
+                _shiftRepository.Update(foundItem);            
+                await _shiftRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
 
             return foundItem;
         } // UpdateAsync
@@ -179,7 +186,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _shiftRepository.Update(foundItem);
             }
 
-            await _shiftRepository.SaveChangesAsync();
+            _shiftRepository.SaveChanges();
         } // DeleteAsync
     }
 }
