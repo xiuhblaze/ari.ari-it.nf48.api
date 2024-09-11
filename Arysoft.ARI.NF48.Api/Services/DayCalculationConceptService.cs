@@ -5,10 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -33,7 +31,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (filters.StandardID.HasValue)
             {
-                items = items.Where(e => e.StandarID == filters.StandardID);
+                items = items.Where(e => e.StandardID == filters.StandardID);
             }
 
             if (!string.IsNullOrEmpty(filters.Text))
@@ -102,6 +100,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<DayCalculationConcept> AddAsync(DayCalculationConcept item)
         {
             item.ID = Guid.NewGuid();
+            item.Unit = DayCalculationConceptUnitType.Nothing;
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -124,7 +123,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            foundItem.StandarID = item.StandarID;
+            foundItem.StandardID = item.StandardID;
             foundItem.Description = item.Description;
             foundItem.Increase = item.Increase;
             foundItem.Decrease = item.Decrease;

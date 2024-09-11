@@ -8,22 +8,24 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {
-    public class DayCalculationConceptRepository : BaseRepository<DayCalculationConcept>
+    public class DayCalculationConceptApplicationRepository : BaseRepository<DayCalculationConceptApplication>
     {
-        public override IEnumerable<DayCalculationConcept> Gets()
+        public override IEnumerable<DayCalculationConceptApplication> Gets()
         {
             return _model
-                .Include(m => m.Standard)
+                .Include(m => m.DayCalculationConcept)
+                .Include(m => m.Application)
                 .AsEnumerable();
         } // Gets
 
-        public override async Task<DayCalculationConcept> GetAsync(Guid id)
+        public override async Task<DayCalculationConceptApplication> GetAsync(Guid id)
         {
             return await _model
-                .Include(m => m.Standard)
+                .Include(m => m.DayCalculationConcept)
+                .Include(m => m.Application)
                 .Where(m => m.ID == id)
                 .FirstOrDefaultAsync();
-        } // Get Async
+        } // Get
 
         public async Task DeleteTmpByUser(string username)
         {
