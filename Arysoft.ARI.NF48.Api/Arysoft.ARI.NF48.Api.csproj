@@ -229,6 +229,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Controllers\Categories22KController.cs" />
+    <Compile Include="Controllers\DayCalculationConceptApplicationsController.cs" />
     <Compile Include="Controllers\DayCalculationConceptsController.cs" />
     <Compile Include="Controllers\PersonsController.cs" />
     <Compile Include="Data\AriContext.cs" />
@@ -281,6 +282,7 @@
     <Compile Include="Mappings\ApplicationMapping.cs" />
     <Compile Include="Mappings\Category22KMapping.cs" />
     <Compile Include="Mappings\ContactMapping.cs" />
+    <Compile Include="Mappings\DayCalculationConceptApplicationMapping.cs" />
     <Compile Include="Mappings\DayCalculationConceptMapping.cs" />
     <Compile Include="Mappings\NaceCodeMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
@@ -301,6 +303,7 @@
     <Compile Include="Models\DTOs\AuthDTOs.cs" />
     <Compile Include="Models\DTOs\Category22KDTOs.cs" />
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
+    <Compile Include="Models\DTOs\DayCalculationConceptApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\DayCalculationConceptDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />

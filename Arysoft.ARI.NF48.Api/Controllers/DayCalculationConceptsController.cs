@@ -50,6 +50,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetDayCalculationConcepts
 
+        [HttpGet]
         [ResponseType(typeof(ApiResponse<DayCalculationConceptItemDetailDto>))]
         public async Task<IHttpActionResult> GetDayCalculationConcept(Guid id)
         {

@@ -99,11 +99,20 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<DayCalculationConceptApplication> AddAsync(DayCalculationConceptApplication item)
         {
+            //* Probablemente esto va a ser generado cuando se haga un nuevo AppForm
+            
             if (item.ApplicationID == Guid.Empty)
                 throw new BusinessException("The ApplicationID must not be empty");
 
             if (item.DayCalculationConceptID == Guid.Empty)
                 throw new BusinessException("The Day Calculation Concept Association must not be empty");
+
+            // Validations
+
+            // - No duplicar el concepto en una misma application
+            // - Validar si el Application Form y el Day Calculation Concept son del mismo estandard
+
+            // Assigning values
 
             item.ID = Guid.NewGuid();
             item.Unit = DayCalculationConceptUnitType.Nothing;
@@ -121,11 +130,11 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<DayCalculationConceptApplication> UpdateAsync(DayCalculationConceptApplication item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found"); 
+                ?? throw new BusinessException("The record to update was not found");
 
             // Validations
 
-            // - No duplicar el concepto en una misma application
+            // - Que no se salga de los varlores maximos o minimos
 
             // Assigning values
 
@@ -155,6 +164,31 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateAsync
 
-        //TODO: Aqui voy!
+        public async Task DeleteAsync(DayCalculationConceptApplication item)
+        {
+            var foundItem = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            // Validations
+
+            // Que el Application Form no esté cerrado
+
+            if (foundItem.Status == StatusType.Deleted)
+            {
+                _repository.Delete(foundItem);
+            }
+            else
+            {
+                foundItem.Status = foundItem.Status < StatusType.Inactive
+                    ? StatusType.Inactive
+                    : StatusType.Deleted;
+                foundItem.Updated = DateTime.UtcNow;
+                foundItem.UpdatedUser = item.UpdatedUser;
+
+                _repository.Update(foundItem);
+            }
+
+            _repository.SaveChanges();
+        } // DeleteAsync
     }
 }
