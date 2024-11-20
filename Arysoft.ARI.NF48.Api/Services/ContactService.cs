@@ -146,6 +146,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.PhoneAlt = item.PhoneAlt;
             foundItem.LocationDescription = item.LocationDescription;
             foundItem.Position = item.Position;
+            foundItem.PhotoFilename = item.PhotoFilename;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;

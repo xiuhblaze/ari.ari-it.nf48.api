@@ -22,6 +22,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Position { get; set; }
 
+        public string PhotoFilename { get; set; }
+
         public StatusType Status { get; set; }
 
     } // ContactItemListDto
@@ -47,6 +49,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string LocationDescription { get; set; }
 
         public string Position { get; set; }
+
+        public string PhotoFilename { get; set; }
 
         public StatusType Status { get; set; }
 

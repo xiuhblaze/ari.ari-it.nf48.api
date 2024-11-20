@@ -31,6 +31,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 PhoneAlt = item.PhoneAlt,
                 LocationDescription = item.LocationDescription,
                 Position = item.Position,
+                PhotoFilename = item.PhotoFilename,
                 Status = item.Status
             };
         } // ContactToItemListDto
@@ -49,6 +50,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 PhoneAlt = item.PhoneAlt,
                 LocationDescription = item.LocationDescription,
                 Position = item.Position,
+                PhotoFilename = item.PhotoFilename,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
