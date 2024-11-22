@@ -40,7 +40,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(25);
 
             modelBuilder.Entity<Contact>()
-                .Property(m => m.LocationDescription)
+                .Property(m => m.Address)
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Contact>()
@@ -50,6 +50,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             modelBuilder.Entity<Contact>()
                 .Property(m => m.PhotoFilename)
                 .HasMaxLength(250);
+
+            modelBuilder.Entity<Contact>()
+                .Property(m => m.IsMainContact)
+                .IsRequired();
 
             modelBuilder.Entity<Contact>()
                 .Property(m => m.Status)

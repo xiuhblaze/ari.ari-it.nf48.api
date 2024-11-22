@@ -28,8 +28,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationName = item.Organization.Name,
                 Description = item.Description,
-                LocationDescription = item.LocationDescription,
-                Order = item.Order,
+                Address = item.Address,
+                IsMainSite = item.IsMainSite,
                 Status = item.Status,
                 NoShifts = item.Shifts != null ? item.Shifts.Count() : 0,
                 NoEmployees = item.Shifts != null ? item.Shifts.Sum(s => s.NoEmployees) ?? 0 : 0,
@@ -43,8 +43,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 Description = item.Description,
-                LocationDescription = item.LocationDescription,
-                Order = item.Order,
+                Address = item.Address,
+                IsMainSite = item.IsMainSite,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -74,8 +74,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             { 
                 ID = itemDto.ID,
                 Description = itemDto.Description,
-                LocationDescription = itemDto.LocationDescription,
-                Order = itemDto.Order,
+                Address = itemDto.Address,
+                IsMainSite = itemDto.IsMainSite,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

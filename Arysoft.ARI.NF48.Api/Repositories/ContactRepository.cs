@@ -26,6 +26,25 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         } // GetAsync
 
         /// <summary>
+        /// Establece como no contacto principal (false) a todos los contactos
+        /// de una organizacion, indistintamente de su status.
+        /// </summary>
+        /// <param name="organizationID"></param>
+        /// <returns></returns>
+        public async Task SetToNotContactMainAsync(Guid organizationID)
+        {
+            var items = await _model
+                .Where(m => m.OrganizationID == organizationID)
+                .ToListAsync();
+
+            foreach (var item in items)
+            {
+                item.IsMainContact = false;
+                Update(item);
+            }
+        } // SetToNotContactMainAsync
+
+        /// <summary>
         /// Elimina todos los registros temporales generados por el usuario
         /// </summary>
         /// <param name="username">Nombre del usuario que ha generado los registros temporales</param>

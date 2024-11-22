@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,8 +22,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static OrganizationItemListDto OrganizationToItemListDto(Organization item)
         {
-            var firstContact = item.Contacts?.FirstOrDefault();
-            var mainSite = item.Sites.OrderBy(s => s.Order).FirstOrDefault();
+            var mainContact = item.Contacts?
+                .Where(c => c.IsMainContact && c.Status == StatusType.Active)
+                .FirstOrDefault();
+            var mainSite = item.Sites.OrderBy(s => s.IsMainSite).FirstOrDefault();
+
+            // Si no hay un contacto principal, pon el que sea
+            if (mainContact == null) mainContact = item.Contacts?
+                .Where(c => c.Status == StatusType.Active)
+                .FirstOrDefault();
 
             return new OrganizationItemListDto
             {
@@ -36,18 +44,18 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 NoContacts = item.Contacts != null ? item.Contacts.Count() : 0,
-                ContactName = firstContact != null  
-                    ? firstContact.FirstName 
+                ContactName = mainContact != null  
+                    ? mainContact.FirstName 
                     : string.Empty,
-                ContactEmail = firstContact != null 
-                    ? firstContact.Email 
+                ContactEmail = mainContact != null 
+                    ? mainContact.Email 
                     : string.Empty,
-                ContactPhone = firstContact != null
-                    ? firstContact.Phone 
+                ContactPhone = mainContact != null
+                    ? mainContact.Phone 
                     : string.Empty,
                 NoSites = item.Sites != null ? item.Sites.Count() : 0,
                 SiteDescription = mainSite != null ? mainSite.Description : string.Empty,
-                SiteLocation = mainSite != null ? mainSite.LocationDescription : string.Empty,
+                SiteLocation = mainSite != null ? mainSite.Address : string.Empty,
             };
         } // OrganizationToItemListDto
 

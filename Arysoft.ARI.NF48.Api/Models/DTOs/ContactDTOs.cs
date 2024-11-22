@@ -18,11 +18,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string PhoneAlt { get; set; }
 
-        public string LocationDescription { get; set; }
+        public string Address { get; set; }
 
         public string Position { get; set; }
 
         public string PhotoFilename { get; set; }
+
+        public bool IsMainContact { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -46,11 +48,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string PhoneAlt { get; set; }
 
-        public string LocationDescription { get; set; }
+        public string Address { get; set; }
 
         public string Position { get; set; }
 
         public string PhotoFilename { get; set; }
+
+        public bool IsMainContact { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -99,12 +103,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string PhoneAlt { get; set; }
 
         [StringLength(500)]
-        public string LocationDescription { get; set; }
+        public string Address { get; set; }
 
         [Required]
         [StringLength(250)]
         public string Position { get; set; }
 
+        [Required]
+        public bool IsMainContact { get; set; }
+
+        [Required]
         public StatusType Status { get; set; }
 
         [Required]

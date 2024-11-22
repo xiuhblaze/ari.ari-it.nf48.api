@@ -29,9 +29,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Email = item.Email,
                 Phone = item.Phone,
                 PhoneAlt = item.PhoneAlt,
-                LocationDescription = item.LocationDescription,
+                Address = item.Address,
                 Position = item.Position,
                 PhotoFilename = item.PhotoFilename,
+                IsMainContact = item.IsMainContact,
                 Status = item.Status
             };
         } // ContactToItemListDto
@@ -48,9 +49,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Email = item.Email,
                 Phone = item.Phone,
                 PhoneAlt = item.PhoneAlt,
-                LocationDescription = item.LocationDescription,
+                Address = item.Address,
                 Position = item.Position,
                 PhotoFilename = item.PhotoFilename,
+                IsMainContact = item.IsMainContact,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -81,8 +83,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Email = itemDto.Email,
                 Phone = itemDto.Phone,
                 PhoneAlt = itemDto.PhoneAlt,
-                LocationDescription = itemDto.LocationDescription,
+                Address = itemDto.Address,
                 Position = itemDto.Position,
+                IsMainContact = itemDto.IsMainContact,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

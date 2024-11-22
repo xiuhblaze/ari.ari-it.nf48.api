@@ -9,6 +9,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public string Text { get; set; }
 
+        public ContactIsMainType? IsMain { get; set; }
+
         public StatusType? Status { get; set; }
 
         public ContactOrderType Order { get; set; }

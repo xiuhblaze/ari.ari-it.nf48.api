@@ -20,11 +20,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Site>()
-                .Property(m => m.LocationDescription)
+                .Property(m => m.Address)
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Site>()
-                .Property(m => m.Order)
+                .Property(m => m.IsMainSite)
                 .IsRequired();
 
             modelBuilder.Entity<Site>()

@@ -13,9 +13,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
-        public string LocationDescription { get; set; }
+        public string Address { get; set; }
 
-        public int Order { get; set; }
+        public bool IsMainSite { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -33,9 +33,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
-        public string LocationDescription { get; set; }
+        public string Address { get; set; }
 
-        public int Order { get; set; }
+        public bool IsMainSite { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -71,12 +71,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string Description { get; set; }
 
         [StringLength(500)]
-        public string LocationDescription { get; set; }
+        public string Address { get; set; }
 
-        /// <summary>
-        /// Order in the organization's hierarchy, 1 is the main site.
-        /// </summary>
-        public int Order { get; set; }
+        [Required]
+        public bool IsMainSite { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

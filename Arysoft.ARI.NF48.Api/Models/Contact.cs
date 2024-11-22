@@ -19,11 +19,13 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string PhoneAlt { get; set; }
 
-        public string LocationDescription { get; set; }
+        public string Address { get; set; }
 
         public string Position { get; set; }
 
         public string PhotoFilename { get; set; }
+
+        public bool IsMainContact { get; set; }
 
         public StatusType Status { get; set; }
 

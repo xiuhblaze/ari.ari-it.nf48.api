@@ -34,7 +34,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e =>
                     e.Description.ToLower().Contains(filters.Text)
-                    || e.LocationDescription.ToLower().Contains(filters.Text)
+                    || e.Address.ToLower().Contains(filters.Text)
                 );
             }
 
@@ -62,8 +62,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case SiteOrderType.Description:
                     items = items.OrderBy(e => e.Description);
                     break;
-                case SiteOrderType.Order:
-                    items = items.OrderBy(e => e.Order);
+                case SiteOrderType.IsMainSite:
+                    items = items.OrderBy(e => e.IsMainSite);
                     break;
                 case SiteOrderType.Status:
                     items = items.OrderBy(e => e.Status);
@@ -74,8 +74,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case SiteOrderType.DescriptionDesc:
                     items = items.OrderByDescending(e => e.Description);
                     break;
-                case SiteOrderType.OrderDesc:
-                    items = items.OrderByDescending(e => e.Order);
+                case SiteOrderType.IsMainSiteDesc:
+                    items = items.OrderByDescending(e => e.IsMainSite);
                     break;
                 case SiteOrderType.StatusDesc:
                     items = items.OrderByDescending(e => e.Status);
@@ -84,7 +84,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Updated);
                     break;
                 default:
-                    items = items.OrderBy(e => e.Order);
+                    items = items.OrderBy(e => e.IsMainSite);
                     break;
             }
 
@@ -127,6 +127,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             return item;
         } // AddAsync
 
+        /// <summary>
+        /// Actualiza la información de un Site, si es un registro nuevo (Status: 0), lo marca como
+        /// activo, si es el sitio principal (true), marca el resto como secundarios (false)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task<Site> UpdateAsync(Site item)
         { 
             // Validations
@@ -134,16 +141,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _siteRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.Order != foundItem.Order)  // Si el orden cambió, reajustar la de todos los demas Site
+            if (item.IsMainSite)
             {
-                UpdateOrder(item);
+                await _siteRepository.SetToNotSiteMainAsync(foundItem.OrganizationID);
             }
 
             // Assigning values
 
             foundItem.Description = item.Description;
-            foundItem.LocationDescription = item.LocationDescription;
-            foundItem.Order = item.Order;
+            foundItem.Address = item.Address;
+            foundItem.IsMainSite = item.IsMainSite;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
@@ -191,29 +198,5 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             _siteRepository.SaveChanges();
         } // DeleteAsync
-
-        // PRIVATE
-
-        private void UpdateOrder(Site site)
-        {
-            var items = _siteRepository.Gets()
-                .Where(m => 
-                    m.OrganizationID == site.OrganizationID 
-                    && m.ID != site.ID
-                    && m.Status == StatusType.Active)
-                .OrderBy(m => m.Order)
-                .ToList();
-
-            int i = 1;
-            foreach (var item in items)
-            {
-                if (i != site.Order)
-                { 
-                    item.Order = i;
-                    _siteRepository.Update(item);
-                }
-                i++;
-            }
-        } // UpdateOrder
     }
 }

@@ -9,11 +9,11 @@ namespace Arysoft.ARI.NF48.Api.Enumerations
     {
         Nothing,
         Description,
-        Order,
+        IsMainSite,
         Status,
         Updated,
         DescriptionDesc,
-        OrderDesc,
+        IsMainSiteDesc,
         StatusDesc,
         UpdatedDesc
     }

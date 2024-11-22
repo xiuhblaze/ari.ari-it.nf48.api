@@ -39,7 +39,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || e.Phone.ToLower().Contains(filters.Text)
                     || e.PhoneAlt.ToLower().Contains(filters.Text)
                     || e.Email.ToLower().Contains(filters.Text)
-                    || e.LocationDescription.ToLower().Contains(filters.Text)
+                    || e.Address.ToLower().Contains(filters.Text)
                     || e.Position.ToLower().Contains(filters.Text)
                     || (e.Organization != null && e.Organization.Name.ToLower().Contains(filters.Text))
                 );
@@ -136,6 +136,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _contactRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
+            if (item.IsMainContact)
+            {
+                // Poner los demas contactos de la organización en false
+                await _contactRepository.SetToNotContactMainAsync(foundItem.OrganizationID);
+            }
+
             // Assigning values
 
             foundItem.FirstName = item.FirstName;
@@ -144,9 +150,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Email = item.Email;
             foundItem.Phone = item.Phone;
             foundItem.PhoneAlt = item.PhoneAlt;
-            foundItem.LocationDescription = item.LocationDescription;
+            foundItem.Address = item.Address;
             foundItem.Position = item.Position;
             foundItem.PhotoFilename = item.PhotoFilename;
+            foundItem.IsMainContact = item.IsMainContact;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
