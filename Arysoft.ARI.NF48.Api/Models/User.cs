@@ -18,7 +18,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string LastName { get; set; }
 
-        public UserType Type { get; set; }
+        public UserType? Type { get; set; }
 
         public StatusType Status { get; set; }
 

@@ -48,7 +48,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 items = items.Where(e => e.Status == filters.Status);
             }
-            else {
+            else
+            {
                 if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
                 items = (bool)filters.IncludeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)

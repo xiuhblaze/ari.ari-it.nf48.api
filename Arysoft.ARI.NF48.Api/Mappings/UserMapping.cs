@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Username = item.Username,
                 Email = item.Email,
                 FullName = Tools.Strings.FullName(item.FirstName, null, item.LastName),
-                Type = item.Type,
+                Type = item.Type ?? UserType.Nothing,
                 Status = item.Status,                
                 Roles = item.Roles != null
                     ? RoleMapping.RolesToListDto(item.Roles).ToList()
@@ -48,7 +49,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Email = item.Email,
                 FirstName = item.FirstName,
                 LastName = item.LastName,
-                Type = item.Type,
+                Type = item.Type ?? UserType.Nothing,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,

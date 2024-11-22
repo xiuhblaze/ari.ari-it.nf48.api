@@ -147,10 +147,12 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                     File.Move(uploadedFilePath, newFilePath);
                 }
 
+                var item = await _contactService.GetAsync(itemEditDto.ID)
+                    ?? throw new BusinessException("Item not found");
+
                 var itemToEdit = ContactMapping.ItemEditDtoToContact(itemEditDto);
-                //itemToEdit.PhotoFilename = !string.IsNullOrEmpty(newFileName) ? newFileName : itemToEdit.PhotoFilename;
-                itemToEdit.PhotoFilename = newFileName ?? itemToEdit.PhotoFilename;
-                var item = await _contactService.UpdateAsync(itemToEdit);
+                itemToEdit.PhotoFilename = newFileName ?? item.PhotoFilename; // Si no trae un archivo, que deje el que estaba
+                item = await _contactService.UpdateAsync(itemToEdit);
                 var itemDto = ContactMapping.ContactToItemDetailDto(item);
                 var response = new ApiResponse<ContactItemDetailDto>(itemDto);
 
@@ -160,8 +162,47 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 throw new BusinessException("Exception: " + ex.Message);
             }
-
         } // PutWithFileContact
+
+        [HttpDelete]
+        [Route("api/contacts/delete-file/{id}")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> DeleteFile(Guid id, [FromBody] ContactDeleteDto itemDelDto)
+        {
+            string deletePath = System.Web.Hosting.HostingEnvironment.MapPath("~/Files/Contacts");
+
+            if (id != itemDelDto.ID)
+                throw new BusinessException("ID mismatch");
+
+            var item = await _contactService.GetAsync(id)
+                ?? throw new BusinessException("Contact not found");
+
+            try
+            {
+                if (!string.IsNullOrEmpty(item.PhotoFilename))
+                {
+                    deletePath = Path.Combine(deletePath, item.PhotoFilename);
+
+                    if (File.Exists(deletePath))
+                    {
+                        File.Delete(deletePath);
+
+                        item.PhotoFilename = null;
+                        item.UpdatedUser = itemDelDto.UpdatedUser;
+
+                        await _contactService.UpdateAsync(item);
+
+                        return Ok(new ApiResponse<bool>(true));
+                    }
+                    else throw new BusinessException("The file to delete not exist");
+                }
+                else throw new BusinessException("The contact has no photo file");
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException("Exception: " + ex.Message);
+            }
+        } // DeleteFile
 
         // DELETE: api/Contact/5
         [ResponseType(typeof(ApiResponse<bool>))]
@@ -176,6 +217,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var item = ContactMapping.ItemDeleteDtoToContact(itemDelDto);
             await _contactService.DeleteAsync(item);
             var response = new ApiResponse<bool>(true);
+
+            //TODO: Si el Status es Delete borrar el archivo fisico
 
             return Ok(response);
         } // DeleteContact

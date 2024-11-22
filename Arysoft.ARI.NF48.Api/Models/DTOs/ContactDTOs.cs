@@ -61,8 +61,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
 
         public OrganizationItemListDto Organization { get; set; }
-
-        public PersonItemListDto Person { get; set; }
     } // ContactItemDetailDto
 
     public class ContactPostDto
