@@ -71,6 +71,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                         .ThenBy(e => e.MiddleName)
                         .ThenBy(e => e.LastName);
                     break;
+                case ContactOrderType.IsMainContact:
+                    items = items.OrderBy(e => e.IsMainContact)
+                        .ThenBy(e => e.FirstName);
+                    break;
                 case ContactOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
@@ -78,7 +82,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.FirstName)
                         .ThenByDescending(e => e.MiddleName)
                         .ThenByDescending(e => e.LastName);
-                    break;                
+                    break;
+                case ContactOrderType.IsMainContactDesc:
+                    items = items.OrderByDescending(e => e.IsMainContact)
+                        .ThenByDescending(e => e.FirstName);
+                    break;
                 case ContactOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;

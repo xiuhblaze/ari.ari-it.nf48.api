@@ -4,10 +4,10 @@
     {
         Nothing,
         FirstName,
-        MainContact,
+        IsMainContact,
         Updated,
         FirstNameDesc,
-        MainContactDesc,
+        IsMainContactDesc,
         UpdatedDesc
     }
 
