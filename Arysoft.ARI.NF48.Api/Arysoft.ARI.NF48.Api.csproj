@@ -228,6 +228,9 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\ApplicationsController.cs" />
+    <Compile Include="Controllers\AuditorDocumentsController.cs" />
+    <Compile Include="Controllers\AuditorsController.cs" />
+    <Compile Include="Controllers\CatAuditorDocumentsController.cs" />
     <Compile Include="Controllers\Categories22KController.cs" />
     <Compile Include="Controllers\DayCalculationConceptApplicationsController.cs" />
     <Compile Include="Controllers\DayCalculationConceptsController.cs" />
@@ -246,6 +249,8 @@
     <Compile Include="CustomEntities\PagedList.cs" />
     <Compile Include="Data\Configurations\ApplicationConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditorConfiguration.cs" />
+    <Compile Include="Data\Configurations\AuditorDocumentConfiguration.cs" />
+    <Compile Include="Data\Configurations\CatAuditorDocumentConfiguration.cs" />
     <Compile Include="Data\Configurations\Category22KConfiguration.cs" />
     <Compile Include="Data\Configurations\ContactConfiguration.cs" />
     <Compile Include="Data\Configurations\DayCalculationConceptApplicationConfiguration.cs" />
@@ -258,6 +263,9 @@
     <Compile Include="Data\Configurations\StandardConfiguration.cs" />
     <Compile Include="Data\Configurations\UserConfiguration.cs" />
     <Compile Include="Enumerations\ApplicationEnum.cs" />
+    <Compile Include="Enumerations\AuditorDocumentEnums.cs" />
+    <Compile Include="Enumerations\AuditorEnums.cs" />
+    <Compile Include="Enumerations\CatAuditorDocumentEnums.cs" />
     <Compile Include="Enumerations\Category22KEnums.cs" />
     <Compile Include="Enumerations\ContactEnums.cs" />
     <Compile Include="Enumerations\DayCalculationConceptApplicationEnums.cs" />
@@ -276,8 +284,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Invokers\MyApiControllerActionInvoker.cs" />
+    <Compile Include="IO\FileRepository.cs" />
     <Compile Include="Mappings\ApplicationMapping.cs" />
+    <Compile Include="Mappings\AuditorDocumentMapping.cs" />
+    <Compile Include="Mappings\CatAuditorDocumentMapping.cs" />
     <Compile Include="Mappings\Category22KMapping.cs" />
+    <Compile Include="Mappings\AuditorMapping.cs" />
     <Compile Include="Mappings\ContactMapping.cs" />
     <Compile Include="Mappings\DayCalculationConceptApplicationMapping.cs" />
     <Compile Include="Mappings\DayCalculationConceptMapping.cs" />
@@ -290,13 +302,18 @@
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Models\Application.cs" />
     <Compile Include="Models\Auditor.cs" />
+    <Compile Include="Models\AuditorDocument.cs" />
     <Compile Include="Models\BaseModel.cs" />
+    <Compile Include="Models\CatAuditorDocument.cs" />
     <Compile Include="Models\Category22K.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\DayCalculationConcept.cs" />
     <Compile Include="Models\DayCalculationConceptApplication.cs" />
     <Compile Include="Models\DTOs\ApplicationDTOs.cs" />
+    <Compile Include="Models\DTOs\AuditorDocumentDTOs.cs" />
+    <Compile Include="Models\DTOs\AuditorDTOs.cs" />
     <Compile Include="Models\DTOs\AuthDTOs.cs" />
+    <Compile Include="Models\DTOs\CatAuditorDocumentDTOs.cs" />
     <Compile Include="Models\DTOs\Category22KDTOs.cs" />
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
     <Compile Include="Models\DTOs\DayCalculationConceptApplicationDTOs.cs" />
@@ -317,7 +334,10 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryFilters\ApplicationQueryFilters.cs" />
+    <Compile Include="QueryFilters\AuditorDocumentQueryFilters.cs" />
+    <Compile Include="QueryFilters\AuditorQueryFilters.cs" />
     <Compile Include="QueryFilters\BaseQueryFilters.cs" />
+    <Compile Include="QueryFilters\CatAuditorDocumentQueryFilters.cs" />
     <Compile Include="QueryFilters\Category22KQueryFilters.cs" />
     <Compile Include="QueryFilters\ContactQueryFilters.cs" />
     <Compile Include="QueryFilters\DayCalculationConceptApplicationQueryFilters.cs" />
@@ -330,7 +350,10 @@
     <Compile Include="QueryFilters\StandardQueryFilters.cs" />
     <Compile Include="QueryFilters\UserQueryFilters.cs" />
     <Compile Include="Repositories\ApplicationRepository.cs" />
+    <Compile Include="Repositories\AuditorDocumentRepository.cs" />
+    <Compile Include="Repositories\AuditorRepository.cs" />
     <Compile Include="Repositories\BaseRepository.cs" />
+    <Compile Include="Repositories\CatAuditorDocumentRepository.cs" />
     <Compile Include="Repositories\Category22KRepository.cs" />
     <Compile Include="Repositories\ContactRepository.cs" />
     <Compile Include="Repositories\DayCalculationConceptApplicationRepository.cs" />
@@ -344,6 +367,9 @@
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Response\ApiResponse.cs" />
     <Compile Include="Services\ApplicationService.cs" />
+    <Compile Include="Services\AuditorDocumentService.cs" />
+    <Compile Include="Services\AuditorService.cs" />
+    <Compile Include="Services\CatAuditorDocumentService.cs" />
     <Compile Include="Services\Category22KService.cs" />
     <Compile Include="Services\ContactService.cs" />
     <Compile Include="Services\DayCalculationConceptApplicationService.cs" />

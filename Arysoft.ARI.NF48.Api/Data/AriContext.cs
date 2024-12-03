@@ -15,6 +15,9 @@ namespace Arysoft.ARI.NF48.Api.Data
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
             ApplicationConfiguration.Configure(modelBuilder);
+            AuditorConfiguration.Configure(modelBuilder);
+            AuditorDocumentConfiguration.Configure(modelBuilder);
+            CatAuditorDocumentConfiguration.Configure(modelBuilder);
             Category22KConfiguration.Configure(modelBuilder);
             ContactConfiguration.Configure(modelBuilder);
             DayCalculationConceptConfiguration.Configure(modelBuilder);

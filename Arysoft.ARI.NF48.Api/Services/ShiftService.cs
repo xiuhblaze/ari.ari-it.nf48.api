@@ -47,6 +47,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 items = items.Where(e => e.Type == filters.Type);
             }
 
+            // HACK: En modo de prueba, no estoy seguro de vayan afuncionar correctamente
+            if (filters.ShiftStart != null)
+            {
+                items = items.Where(e => e.ShiftStart <= filters.ShiftStart && e.ShiftEnd >= filters.ShiftStart);
+            }
+
+            if (filters.ShiftEnd != null)
+            {
+                items = items.Where(e => e.ShiftStart <= filters.ShiftEnd && e.ShiftEnd >= filters.ShiftEnd);
+             }
+
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);
@@ -138,11 +149,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _shiftRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
+            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+
             // Assigning values
 
             foundItem.Type = item.Type;
             foundItem.NoEmployees = item.NoEmployees;
-            foundItem.ShiftBegin = item.ShiftBegin;
+            foundItem.ShiftStart = item.ShiftStart;
             foundItem.ShiftEnd = item.ShiftEnd;
             foundItem.ActivitiesDescription = item.ActivitiesDescription;
             foundItem.Status = foundItem.Status == StatusType.Nothing 

@@ -10,44 +10,49 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class ContactService
+    public class AuditorService
     {
-        private readonly ContactRepository _contactRepository;
+        private readonly AuditorRepository _auditorRepository;
 
         // CONSTRUCTOR
 
-        public ContactService()
+        public AuditorService()
         {
-            _contactRepository = new ContactRepository();
+            _auditorRepository = new AuditorRepository();
         }
 
         // METHODS
 
-        public PagedList<Contact> Gets(ContactQueryFilters filters)
+        public PagedList<Auditor> Gets(AuditorQueryFilters filters)
         {
-            var items = _contactRepository.Gets();
+            var items = _auditorRepository.Gets();
 
             // Filters
 
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.Trim().ToLower();
-                items = items.Where(e =>
+                items = items.Where(e => 
                     e.FirstName.ToLower().Contains(filters.Text)
                     || e.MiddleName.ToLower().Contains(filters.Text)
                     || e.LastName.ToLower().Contains(filters.Text)
-                    || e.Phone.ToLower().Contains(filters.Text)
-                    || e.PhoneAlt.ToLower().Contains(filters.Text)
                     || e.Email.ToLower().Contains(filters.Text)
+                    || e.Phone.ToLower().Contains(filters.Text)
                     || e.Address.ToLower().Contains(filters.Text)
-                    || e.Position.ToLower().Contains(filters.Text)
-                    || (e.Organization != null && e.Organization.Name.ToLower().Contains(filters.Text))
                 );
             }
 
-            if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
+            if (filters.IsLeader != null && filters.IsLeader != AuditorLeaderType.Nothing)
             {
-                items = items.Where(e => e.OrganizationID == filters.OrganizationID);
+                switch (filters.IsLeader)
+                {
+                    case AuditorLeaderType.Leader:
+                        items = items.Where(e => e.IsLeadAuditor);
+                        break;
+                    case AuditorLeaderType.Regular:
+                        items = items.Where(e => !e.IsLeadAuditor);
+                        break;
+                }
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
@@ -66,91 +71,80 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
-                case ContactOrderType.FirstName:
+                case AuditorOrderType.FirstName:
                     items = items.OrderBy(e => e.FirstName)
                         .ThenBy(e => e.MiddleName)
                         .ThenBy(e => e.LastName);
                     break;
-                case ContactOrderType.IsMainContact:
-                    items = items.OrderBy(e => e.IsMainContact)
-                        .ThenBy(e => e.FirstName);
+                case AuditorOrderType.IsLeader:
+                    items = items.OrderBy(e => e.IsLeadAuditor);
                     break;
-                case ContactOrderType.Updated:
+                case AuditorOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
-                case ContactOrderType.FirstNameDesc:
+                case AuditorOrderType.FirstNameDesc:
                     items = items.OrderByDescending(e => e.FirstName)
                         .ThenByDescending(e => e.MiddleName)
                         .ThenByDescending(e => e.LastName);
                     break;
-                case ContactOrderType.IsMainContactDesc:
-                    items = items.OrderByDescending(e => e.IsMainContact)
-                        .ThenByDescending(e => e.FirstName);
+                case AuditorOrderType.IsLeaderDesc:
+                    items = items.OrderByDescending(e => e.IsLeadAuditor);
                     break;
-                case ContactOrderType.UpdatedDesc:
+                case AuditorOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
-                    break;
-                default:
-                    items = items.OrderBy(e => e.FirstName)
-                        .ThenBy(e => e.MiddleName)
-                        .ThenBy(e => e.LastName);
                     break;
             }
 
             // Paging
 
-            var pagedItems = PagedList<Contact>
+            var pagedItems = PagedList<Auditor>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
             return pagedItems;
         } // Gets
 
-        public async Task<Contact> GetAsync(Guid id)
-        { 
-            return await _contactRepository.GetAsync(id);
+        public async Task<Auditor> GetAsync(Guid id)
+        {
+            return await _auditorRepository.GetAsync(id);
         } // GetAsync
 
-        public async Task<Contact> AddAsync(Contact item)
+        public async Task<Auditor> AddAsync(Auditor item)
         {
             // Validations
 
-            if (item.OrganizationID == Guid.Empty)
+            if (string.IsNullOrEmpty(item.UpdatedUser))
             {
-                throw new BusinessException("Must first assign Organization");
+                throw new BusinessException("Must specify a username");
             }
 
             // Assigning values
 
             item.ID = Guid.NewGuid();
             item.Status = StatusType.Nothing;
-            item.Created = DateTime.UtcNow; 
+            item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
             // Execute queries
 
-            await _contactRepository.DeleteTmpByUser(item.UpdatedUser);
-            _contactRepository.Add(item);
-            await _contactRepository.SaveChangesAsync();
+            await _auditorRepository.DeleteTmpByUser(item.UpdatedUser);
+            _auditorRepository.Add(item);
+            _auditorRepository.SaveChanges();
 
             return item;
         } // AddAsync
 
-        public async Task<Contact> UpdateAsync(Contact item)
+        public async Task<Auditor> UpdateAsync(Auditor item)
         {
             // Validations
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+            if (await _auditorRepository.GetByFullNameAsync(
+                item.FirstName, item.MiddleName, item.LastName, item.ID) != null) 
+                throw new BusinessException("The name already exist");
 
-            // HACK: - Que el nombre no se repita
-
-            var foundItem = await _contactRepository.GetAsync(item.ID)
+            var foundItem = await _auditorRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.IsMainContact)
-            {
-                // Poner los demas contactos de la organización en false
-                await _contactRepository.SetToNotContactMainAsync(foundItem.OrganizationID);
-            }
+            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
             // Assigning values
 
@@ -159,11 +153,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.LastName = item.LastName;
             foundItem.Email = item.Email;
             foundItem.Phone = item.Phone;
-            foundItem.PhoneAlt = item.PhoneAlt;
             foundItem.Address = item.Address;
-            foundItem.Position = item.Position;
             foundItem.PhotoFilename = item.PhotoFilename;
-            foundItem.IsMainContact = item.IsMainContact;
+            foundItem.FeePayment = item.FeePayment;
+            foundItem.IsLeadAuditor = item.IsLeadAuditor;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
@@ -173,9 +166,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             try
-            { 
-                _contactRepository.Update(foundItem);
-                await _contactRepository.SaveChangesAsync();
+            {
+                _auditorRepository.Update(foundItem);
+                _auditorRepository.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -185,22 +178,20 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateAsync
 
-        public async Task DeleteAsync(Contact item)
+        public async Task DeleteAsync(Auditor item)
         {
-            var foundItem = await _contactRepository.GetAsync(item.ID)
+            var foundItem = await _auditorRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
 
             // Validations
 
-            //TODO: Que no sea el último contacto
-
-            // Excecute queries
+            // ( no hay validaciones por el momento )
 
             if (foundItem.Status == StatusType.Deleted)
             {
-                _contactRepository.Delete(foundItem);
+                _auditorRepository.Delete(foundItem);
             }
-            else 
+            else
             {
                 foundItem.Status = foundItem.Status == StatusType.Active
                     ? StatusType.Inactive
@@ -208,10 +199,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                _contactRepository.Update(foundItem);
+                _auditorRepository.Update(foundItem);
             }
 
-            _contactRepository.SaveChanges();
+            _auditorRepository.SaveChanges();
         } // DeleteAsync
     }
 }

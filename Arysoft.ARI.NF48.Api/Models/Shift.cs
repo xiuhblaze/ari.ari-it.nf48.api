@@ -11,9 +11,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public int? NoEmployees { get; set; }
 
-        public DateTime? ShiftBegin { get; set; }
+        public TimeSpan? ShiftStart { get; set; }
 
-        public DateTime? ShiftEnd { get; set; }
+        public TimeSpan? ShiftEnd { get; set; }
 
         public string ActivitiesDescription { get; set; }
 

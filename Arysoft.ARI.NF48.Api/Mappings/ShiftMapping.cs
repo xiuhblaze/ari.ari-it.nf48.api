@@ -28,7 +28,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : string.Empty,
                 Type = item.Type,
                 NoEmployees = item.NoEmployees,
-                ShiftBegin = item.ShiftBegin,
+                ShiftStart = item.ShiftStart,
                 ShiftEnd = item.ShiftEnd,
                 ActivitiesDescription = item.ActivitiesDescription,
                 Status = item.Status
@@ -43,14 +43,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteID = item.SiteID,
                 Type = item.Type,
                 NoEmployees = item.NoEmployees,
-                ShiftBegin = item.ShiftBegin,
+                ShiftStart = item.ShiftStart,
                 ShiftEnd = item.ShiftEnd,
                 ActivitiesDescription = item.ActivitiesDescription,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                Site = SiteMapping.SiteToItemListDto(item.Site)
+
+                Site = item.Site != null
+                    ? SiteMapping.SiteToItemListDto(item.Site)
+                    : null
             };
 
             return itemDto;
@@ -72,7 +75,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Type = itemDto.Type,
                 NoEmployees = itemDto.NoEmployees,
-                ShiftBegin = itemDto.ShiftBegin,
+                ShiftStart = itemDto.ShiftStart,
                 ShiftEnd = itemDto.ShiftEnd,
                 ActivitiesDescription = itemDto.ActivitiesDescription,
                 Status = itemDto.Status,

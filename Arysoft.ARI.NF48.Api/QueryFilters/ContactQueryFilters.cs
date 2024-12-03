@@ -13,6 +13,6 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public StatusType? Status { get; set; }
 
-        public ContactOrderType Order { get; set; }
+        public ContactOrderType? Order { get; set; }
     }
 }

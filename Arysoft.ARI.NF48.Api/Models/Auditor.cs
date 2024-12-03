@@ -1,12 +1,23 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
     public class Auditor : BaseModel
     {
-        public Guid PersonID { get; set; }
+        public string FirstName { get; set; }
+
+        public string MiddleName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string Email { get; set; }
+
+        public string Phone { get; set; }
+
+        public string Address { get; set; }
+
+        public string PhotoFilename { get; set; }
 
         public decimal FeePayment { get; set; }
 
@@ -15,7 +26,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public StatusType Status { get; set; }
 
         // RELATIONS
-                
-        // public virtual Person Person { get; set; }
+
+        public virtual ICollection<AuditorDocument> Documents { get; set;  }
+
     }
 }

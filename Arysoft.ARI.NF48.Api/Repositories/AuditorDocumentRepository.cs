@@ -1,0 +1,29 @@
+﻿using Arysoft.ARI.NF48.Api.Models;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Arysoft.ARI.NF48.Api.Repositories
+{
+    public class AuditorDocumentRepository : BaseRepository<AuditorDocument>
+    {
+        /// <summary>
+        /// Elimina todos los registros temporales generados por el usuario
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public async Task DeleteTmpByUser(string username)
+        {
+            var items = await _model
+                .Where(m =>
+                    m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
+                    && m.Status == Enumerations.StatusType.Nothing)
+                .ToListAsync();
+
+            foreach (var item in items)
+            {
+                _model.Remove(item);
+            }
+        } // DeleteTmpByUser
+    }
+}

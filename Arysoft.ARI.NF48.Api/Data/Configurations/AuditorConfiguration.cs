@@ -16,8 +16,32 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnName("AuditorID");
 
             modelBuilder.Entity<Auditor>()
-                .Property(m => m.PersonID)
-                .IsRequired();
+                .Property(m => m.FirstName)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Auditor>()
+                .Property(m => m.MiddleName)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Auditor>()
+                .Property(m => m.LastName)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Auditor>()
+                .Property(m => m.Email)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<Auditor>()
+                .Property(m => m.Phone)
+                .HasMaxLength(25);
+
+            modelBuilder.Entity<Auditor>()
+                .Property(m => m.Address)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Auditor>()
+                .Property(m => m.PhotoFilename)
+                .HasMaxLength(250);
 
             modelBuilder.Entity<Auditor>()
                 .Property(m => m.Status)

@@ -14,9 +14,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? NoEmployees { get; set; }
 
-        public DateTime? ShiftBegin { get; set; }
+        public TimeSpan? ShiftStart { get; set; }
 
-        public DateTime? ShiftEnd { get; set; }
+        public TimeSpan? ShiftEnd { get; set; }
 
         public string ActivitiesDescription { get; set; }
 
@@ -33,9 +33,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? NoEmployees { get; set; }
 
-        public DateTime? ShiftBegin { get; set; }
+        public TimeSpan? ShiftStart { get; set; }
 
-        public DateTime? ShiftEnd { get; set; }
+        public TimeSpan? ShiftEnd { get; set; }
 
         public string ActivitiesDescription { get; set; }
 
@@ -68,15 +68,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public ShiftType Type { get; set; }
 
+        [Required]
         public int NoEmployees { get; set; }
 
         [Required]
-        //[Range(0, 23, ErrorMessage = "Only hours, can be between 0 .. 23")]
-        public DateTime? ShiftBegin { get; set; }
+        public TimeSpan? ShiftStart { get; set; }
 
         [Required]
-        //[Range(0, 23, ErrorMessage = "Only hours, can be between 0 .. 23")]
-        public DateTime? ShiftEnd { get; set; }
+        public TimeSpan? ShiftEnd { get; set; }
 
         [StringLength(500)]
         public string ActivitiesDescription { get; set; }
