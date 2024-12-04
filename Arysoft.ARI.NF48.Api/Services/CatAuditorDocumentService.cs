@@ -33,8 +33,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e => 
-                    e.Description.ToLower().Contains(filters.Text)
-                    || e.LegalDescription.ToLower().Contains(filters.Text)
+                    e.Name.ToLower().Contains(filters.Text)
+                    || e.Description.ToLower().Contains(filters.Text)
                 );
             }
 
@@ -66,7 +66,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 case CatAuditorDocumentOrderType.DocumentType:
                     items = items.OrderBy(e => e.DocumentType)
-                        .ThenBy(e => e.Status);
+                        .ThenBy(e => e.Order);
                     break;
                 case CatAuditorDocumentOrderType.Order:
                     items = items.OrderBy(e => e.Order);
@@ -76,7 +76,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
                 case CatAuditorDocumentOrderType.DocumentTypeDesc:
                     items = items.OrderByDescending(e => e.DocumentType)
-                        .ThenByDescending(e => e.Status);
+                        .ThenByDescending(e => e.Order);
                     break;
                 case CatAuditorDocumentOrderType.OrderDesc:
                     items = items.OrderByDescending(e => e.Order);
@@ -143,8 +143,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
+            foundItem.Name = item.Name;
             foundItem.Description = item.Description;
-            foundItem.LegalDescription = item.LegalDescription;
             foundItem.DocumentType = item.DocumentType;
             foundItem.SubCategory = item.SubCategory;
             foundItem.UpdateEvery = item.UpdateEvery;

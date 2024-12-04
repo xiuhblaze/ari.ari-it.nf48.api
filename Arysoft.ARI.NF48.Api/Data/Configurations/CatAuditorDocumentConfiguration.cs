@@ -16,11 +16,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnName("CatAuditorDocumentID");
 
             modelBuilder.Entity<CatAuditorDocument>()
-                .Property(m => m.Description)
+                .Property(m => m.Name)
                 .HasMaxLength(50);
 
             modelBuilder.Entity<CatAuditorDocument>()
-                .Property(m => m.LegalDescription)
+                .Property(m => m.Description)
                 .HasMaxLength(500);
 
             modelBuilder.Entity<CatAuditorDocument>()

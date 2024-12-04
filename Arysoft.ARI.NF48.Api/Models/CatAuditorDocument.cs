@@ -5,9 +5,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 {
     public class CatAuditorDocument : BaseModel
     {
-        public string Description { get; set; }
+        public string Name { get; set; }
 
-        public string LegalDescription { get; set; }
+        public string Description { get; set; }
 
         public CatAuditorDocumentType? DocumentType { get; set; }
 

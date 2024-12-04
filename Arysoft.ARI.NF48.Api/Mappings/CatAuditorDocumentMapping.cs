@@ -23,8 +23,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new CatAuditorDocumentItemListDto
             {
                 ID = item.ID,
+                Name = item.Name,
                 Description = item.Description,
-                LegalDescription = item.LegalDescription,
                 DocumentType = item.DocumentType,
                 SubCategory = item.SubCategory,
                 UpdateEvery = item.UpdateEvery,
@@ -45,8 +45,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new CatAuditorDocumentItemDetailDto
             {
                 ID = item.ID,
+                Name = item.Name,
                 Description = item.Description,
-                LegalDescription = item.LegalDescription,
                 DocumentType = item.DocumentType,
                 SubCategory = item.SubCategory,
                 UpdateEvery = item.UpdateEvery,
@@ -78,8 +78,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new CatAuditorDocument
             {
                 ID = itemDto.ID,
+                Name = itemDto.Name,
                 Description = itemDto.Description,
-                LegalDescription = itemDto.LegalDescription,
                 DocumentType = itemDto.DocumentType,
                 SubCategory = itemDto.SubCategory,
                 UpdateEvery = itemDto.UpdateEvery,
