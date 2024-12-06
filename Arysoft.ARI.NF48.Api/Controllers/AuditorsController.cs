@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 
@@ -96,65 +97,99 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         //    return Ok(response);
         //} // PutAuditor
 
+        //[ResponseType(typeof(ApiResponse<AuditorItemDetailDto>))]
+        //public async Task<IHttpActionResult> PutAuditor()
+        //{
+        //    if (!Request.Content.IsMimeMultipartContent())
+        //        throw new BusinessException("Unssuported media type");
+
+        //    // Obteniendo los datos recibidos
+
+        //    var tmpPath = System.Web.Hosting.HostingEnvironment.MapPath("~/files/tmp");
+        //    if (!Directory.Exists(tmpPath))
+        //        Directory.CreateDirectory(tmpPath);
+        //    var provider = new MultipartFormDataStreamProvider(tmpPath); // Guardando de forma temporal los archivos
+        //    await Request.Content.ReadAsMultipartAsync(provider);
+
+        //    AuditorPutDto itemEditDto = null;
+        //    string newFilename = null;
+
+        //    foreach (var formData in provider.FormData.AllKeys)
+        //    {
+        //        if (formData == "data")
+        //        {
+        //            itemEditDto = JsonConvert.DeserializeObject<AuditorPutDto>(provider.FormData[formData]);
+        //        }
+        //    }
+
+        //    if (itemEditDto == null)
+        //        throw new BusinessException("Can't read data object");
+
+        //    foreach (var file in provider.FileData)
+        //    {
+        //        var originalFilename = file.Headers.ContentDisposition.FileName.Trim('"');
+        //        var extension = originalFilename != null
+        //            ? Path.GetExtension(originalFilename)
+        //            : null;
+        //        var uploadedFilePath = file.LocalFileName;
+        //        var auditorPath = System.Web.Hosting.HostingEnvironment.MapPath($"~/files/auditors/{itemEditDto.ID.ToString()}");
+        //        if (!Directory.Exists(auditorPath))
+        //            Directory.CreateDirectory(auditorPath);
+        //        newFilename = "PhotoProfile" + extension;
+        //        var newFilePath = Path.Combine(auditorPath, newFilename);
+
+        //        if (File.Exists(newFilePath))
+        //            File.Delete(newFilePath);
+
+        //        File.Move(uploadedFilePath, newFilePath);
+        //    }
+
+        //    // Procesando los datos
+        //    var item = await _auditorService.GetAsync(itemEditDto.ID)
+        //            ?? throw new BusinessException("The record to update was not found");
+
+        //    var itemToEdit = AuditorMapping.ItemEditDtoToAuditor(itemEditDto);
+        //    itemToEdit.PhotoFilename = newFilename ?? item.PhotoFilename;
+        //    item = await _auditorService.UpdateAsync(itemToEdit);
+        //    var itemDto = AuditorMapping.AuditorToItemDetailDto(item);
+        //    var response = new ApiResponse<AuditorItemDetailDto>(itemDto);
+
+        //    return Ok(response);
+
+        //} // PutAuditor
+
+        [HttpPut]
         [ResponseType(typeof(ApiResponse<AuditorItemDetailDto>))]
         public async Task<IHttpActionResult> PutAuditor()
         {
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new BusinessException("Unssuported media type");
+            var data = HttpContext.Current.Request.Params["data"];
+            var file = HttpContext.Current.Request.Files.Count > 0
+                ? HttpContext.Current.Request.Files[0]
+                : null;
+            string filename = null;
 
-            // Obteniendo los datos recibidos
+            AuditorPutDto itemEditDto = JsonConvert.DeserializeObject<AuditorPutDto>(data)
+                ?? throw new BusinessException("Can't read data object");
 
-            var tmpPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Files/tmp");
-            if (!Directory.Exists(tmpPath))
-                Directory.CreateDirectory(tmpPath);
-            var provider = new MultipartFormDataStreamProvider(tmpPath); // Guardando de forma temporal los archivos
-            await Request.Content.ReadAsMultipartAsync(provider);
-
-            AuditorPutDto itemEditDto = null;
-            string newFilename = null;
-
-            foreach (var formData in provider.FormData.AllKeys)
-            {
-                if (formData == "data")
-                {
-                    itemEditDto = JsonConvert.DeserializeObject<AuditorPutDto>(provider.FormData[formData]);
-                }
-            }
-
-            if (itemEditDto == null)
-                throw new BusinessException("Can't read data object");
-
-            foreach (var file in provider.FileData)
-            {
-                var originalFilename = file.Headers.ContentDisposition.FileName.Trim('"');
-                var extension = originalFilename != null
-                    ? Path.GetExtension(originalFilename)
-                    : null;
-                var uploadedFilePath = file.LocalFileName;
-                var auditorPath = System.Web.Hosting.HostingEnvironment.MapPath($"~/Files/Auditors/{itemEditDto.ID.ToString()}");
-                if (!Directory.Exists(auditorPath))
-                    Directory.CreateDirectory(auditorPath);
-                newFilename = "PhotoProfile" + extension;
-                var newFilePath = Path.Combine(auditorPath, newFilename);
-
-                if (File.Exists(newFilePath))
-                    File.Delete(newFilePath);
-
-                File.Move(uploadedFilePath, newFilePath);
-            }
-
-            // Procesando los datos
             var item = await _auditorService.GetAsync(itemEditDto.ID)
-                    ?? throw new BusinessException("The record to update was not found");
+                ?? throw new BusinessException("The record to update was not found");
+
+            if (file != null)
+            {
+                filename = FileRepository.UploadFile(
+                    file,
+                    $"~/files/auditors/{item.ID}",
+                    item.ID.ToString()
+                );
+            }
 
             var itemToEdit = AuditorMapping.ItemEditDtoToAuditor(itemEditDto);
-            itemToEdit.PhotoFilename = newFilename ?? item.PhotoFilename;
+            itemToEdit.PhotoFilename = filename ?? item.PhotoFilename;
             item = await _auditorService.UpdateAsync(itemToEdit);
             var itemDto = AuditorMapping.AuditorToItemDetailDto(item);
             var response = new ApiResponse<AuditorItemDetailDto>(itemDto);
 
             return Ok(response);
-
         } // PutAuditor
 
         [HttpDelete]
@@ -165,9 +200,9 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 throw new BusinessException("ID mismatch");
 
             var item = await _auditorService.GetAsync(id)
-                ?? throw new BusinessException("Auditor not found");
+                ?? throw new BusinessException("Record to delete file not found");
 
-            if (FileRepository.DeleteFile($"~/Files/Auditors/{item.ID}", item.PhotoFilename))
+            if (FileRepository.DeleteFile($"~/files/auditors/{item.ID}", item.PhotoFilename))
             {
                 item.PhotoFilename = null;
                 item.UpdatedUser = itemDelDto.UpdatedUser;

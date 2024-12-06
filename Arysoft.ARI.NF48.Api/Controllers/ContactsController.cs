@@ -15,6 +15,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 
@@ -82,128 +83,182 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PostContact
 
-        // PUT: api/Contact/5
-        [ResponseType(typeof(ApiResponse<ContactItemDetailDto>))]
-        public async Task<IHttpActionResult> PutContact(Guid id, [FromBody] ContactPutDto itemEditDto)
-        {
-            if (!ModelState.IsValid)
-                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+        //// PUT: api/Contact/5
+        //[ResponseType(typeof(ApiResponse<ContactItemDetailDto>))]
+        //public async Task<IHttpActionResult> PutContact(Guid id, [FromBody] ContactPutDto itemEditDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            if (id != itemEditDto.ID)
-                throw new BusinessException("ID mismatch");
+        //    if (id != itemEditDto.ID)
+        //        throw new BusinessException("ID mismatch");
+
+        //    var itemToEdit = ContactMapping.ItemEditDtoToContact(itemEditDto);
+        //    var item = await _contactService.UpdateAsync(itemToEdit);
+        //    var itemDto = ContactMapping.ContactToItemDetailDto(item);
+        //    var response = new ApiResponse<ContactItemDetailDto>(itemDto);
+
+        //    return Ok(response);
+        //} // PutContact
+
+        //[HttpPut]
+        //[Route("api/contacts/contact-with-file")]
+        //[ResponseType(typeof(ApiResponse<ContactItemDetailDto>))]
+        //public async Task<IHttpActionResult> PutWithFileContact()
+        //{
+        //    if (!Request.Content.IsMimeMultipartContent())
+        //        throw new BusinessException("Unssuported media type");
+
+        //    try
+        //    {
+        //        string uploadPath = System.Web.Hosting.HostingEnvironment.MapPath("~/files/contacts");
+        //        if (!Directory.Exists(uploadPath))
+        //            Directory.CreateDirectory(uploadPath);
+
+        //        var provider = new MultipartFormDataStreamProvider(uploadPath);
+        //        await Request.Content.ReadAsMultipartAsync(provider);
+
+        //        ContactPutDto itemEditDto = null;
+        //        string newFileName = null;
+
+        //        foreach (var formData in provider.FormData.AllKeys)
+        //        {
+        //            if (formData == "data")
+        //            {
+        //                // Deserializa los datos del DTO desde el campo "data"
+        //                itemEditDto = JsonConvert.DeserializeObject<ContactPutDto>(provider.FormData[formData]);
+        //            }
+        //        }
+
+        //        if (itemEditDto == null)
+        //            throw new BusinessException("Can't read data object");
+
+        //        foreach (var file in provider.FileData)
+        //        {
+        //            var originalFileName = file.Headers.ContentDisposition.FileName.Trim('"');
+        //            var extension = originalFileName != null ? Path.GetExtension(originalFileName) : null;
+        //            var uploadedFilePath = file.LocalFileName;
+
+        //            newFileName = itemEditDto.ID.ToString() + extension;
+
+        //            var newFilePath = Path.Combine(uploadPath, newFileName);
+
+        //            if (File.Exists(newFilePath))
+        //                File.Delete(newFilePath); // Eliminar el archivo destino existente
+
+        //            File.Move(uploadedFilePath, newFilePath);
+        //        }
+
+        //        var item = await _contactService.GetAsync(itemEditDto.ID)
+        //            ?? throw new BusinessException("Item not found");
+
+        //        var itemToEdit = ContactMapping.ItemEditDtoToContact(itemEditDto);
+        //        itemToEdit.PhotoFilename = newFileName ?? item.PhotoFilename; // Si no trae un archivo, que deje el que estaba
+        //        item = await _contactService.UpdateAsync(itemToEdit);
+        //        var itemDto = ContactMapping.ContactToItemDetailDto(item);
+        //        var response = new ApiResponse<ContactItemDetailDto>(itemDto);
+
+        //        return Ok(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new BusinessException("Exception: " + ex.Message);
+        //    }
+        //} // PutWithFileContact
+
+        [HttpPut]
+        [ResponseType(typeof(ApiResponse<ContactItemDetailDto>))]
+        public async Task<IHttpActionResult> PutAuditor()
+        {
+            var data = HttpContext.Current.Request.Params["data"];
+            var file = HttpContext.Current.Request.Files.Count > 0
+                ? HttpContext.Current.Request.Files[0]
+                : null;
+            string filename = null;
+
+            ContactPutDto itemEditDto = JsonConvert.DeserializeObject<ContactPutDto>(data)
+                ?? throw new BusinessException("Can't read data object");
+
+            var item = await _contactService.GetAsync(itemEditDto.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            if (file != null)
+            {
+                filename = FileRepository.UploadFile(
+                    file,
+                    $"~/files/contacts/{item.ID}",
+                    item.ID.ToString()
+                );
+            }
 
             var itemToEdit = ContactMapping.ItemEditDtoToContact(itemEditDto);
-            var item = await _contactService.UpdateAsync(itemToEdit);
+            itemToEdit.PhotoFilename = filename ?? item.PhotoFilename;
+            item = await _contactService.UpdateAsync(itemToEdit);
             var itemDto = ContactMapping.ContactToItemDetailDto(item);
             var response = new ApiResponse<ContactItemDetailDto>(itemDto);
 
             return Ok(response);
-        } // PutContact
-
-        [HttpPut]
-        [Route("api/contacts/contact-with-file")]
-        [ResponseType(typeof(ApiResponse<ContactItemDetailDto>))]
-        public async Task<IHttpActionResult> PutWithFileContact()
-        {
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new BusinessException("Unssuported media type");
-
-            try
-            {
-                string uploadPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Files/Contacts");
-                if (!Directory.Exists(uploadPath))
-                    Directory.CreateDirectory(uploadPath);
-
-                var provider = new MultipartFormDataStreamProvider(uploadPath);
-                await Request.Content.ReadAsMultipartAsync(provider);
-
-                ContactPutDto itemEditDto = null;
-                string newFileName = null;
-
-                foreach (var formData in provider.FormData.AllKeys)
-                {
-                    if (formData == "data")
-                    {
-                        // Deserializa los datos del DTO desde el campo "data"
-                        itemEditDto = JsonConvert.DeserializeObject<ContactPutDto>(provider.FormData[formData]);
-                    }
-                }
-
-                if (itemEditDto == null)
-                    throw new BusinessException("Can't read data object");
-
-                foreach (var file in provider.FileData)
-                {
-                    var originalFileName = file.Headers.ContentDisposition.FileName.Trim('"');
-                    var extension = originalFileName != null ? Path.GetExtension(originalFileName) : null;
-                    var uploadedFilePath = file.LocalFileName;
-
-                    newFileName = itemEditDto.ID.ToString() + extension;
-
-                    var newFilePath = Path.Combine(uploadPath, newFileName);
-
-                    if (File.Exists(newFilePath))
-                        File.Delete(newFilePath); // Eliminar el archivo destino existente
-
-                    File.Move(uploadedFilePath, newFilePath);
-                }
-
-                var item = await _contactService.GetAsync(itemEditDto.ID)
-                    ?? throw new BusinessException("Item not found");
-
-                var itemToEdit = ContactMapping.ItemEditDtoToContact(itemEditDto);
-                itemToEdit.PhotoFilename = newFileName ?? item.PhotoFilename; // Si no trae un archivo, que deje el que estaba
-                item = await _contactService.UpdateAsync(itemToEdit);
-                var itemDto = ContactMapping.ContactToItemDetailDto(item);
-                var response = new ApiResponse<ContactItemDetailDto>(itemDto);
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException("Exception: " + ex.Message);
-            }
-        } // PutWithFileContact
+        } // PutAuditor
 
         [HttpDelete]
-        [Route("api/contacts/delete-file/{id}")]
-        [ResponseType(typeof(ApiResponse<bool>))]
-        public async Task<IHttpActionResult> DeleteFile(Guid id, [FromBody] ContactDeleteDto itemDelDto)
+        [Route("api/Contacts/{id}/Photofile")]
+        public async Task<IHttpActionResult> DeletePhotofile(Guid id, [FromBody] ContactDeleteDto itemDelDto)
         {
-            string deletePath = System.Web.Hosting.HostingEnvironment.MapPath("~/Files/Contacts");
-
             if (id != itemDelDto.ID)
                 throw new BusinessException("ID mismatch");
 
             var item = await _contactService.GetAsync(id)
-                ?? throw new BusinessException("Contact not found");
+                ?? throw new BusinessException("Record to delete file not found");
 
-            try
+            if (FileRepository.DeleteFile($"~/files/contacts/{item.ID}", item.PhotoFilename))
             {
-                if (!string.IsNullOrEmpty(item.PhotoFilename))
-                {
-                    deletePath = Path.Combine(deletePath, item.PhotoFilename);
-
-                    if (File.Exists(deletePath))
-                    {
-                        File.Delete(deletePath);
-
-                        item.PhotoFilename = null;
-                        item.UpdatedUser = itemDelDto.UpdatedUser;
-
-                        await _contactService.UpdateAsync(item);
-
-                        return Ok(new ApiResponse<bool>(true));
-                    }
-                    else throw new BusinessException("The file to delete not exist");
-                }
-                else throw new BusinessException("The contact has no photo file");
+                item.PhotoFilename = null;
+                item.UpdatedUser = itemDelDto.UpdatedUser;
+                await _contactService.UpdateAsync(item);
             }
-            catch (Exception ex)
-            {
-                throw new BusinessException("Exception: " + ex.Message);
-            }
-        } // DeleteFile
+
+            return Ok(new ApiResponse<bool>(true));
+        } // DeletePhotofile
+
+        //[HttpDelete]
+        //[Route("api/contacts/delete-file/{id}")]
+        //[ResponseType(typeof(ApiResponse<bool>))]
+        //public async Task<IHttpActionResult> DeleteFile(Guid id, [FromBody] ContactDeleteDto itemDelDto)
+        //{
+        //    string deletePath = System.Web.Hosting.HostingEnvironment.MapPath("~/files/contacts");
+
+        //    if (id != itemDelDto.ID)
+        //        throw new BusinessException("ID mismatch");
+
+        //    var item = await _contactService.GetAsync(id)
+        //        ?? throw new BusinessException("Contact not found");
+
+        //    try
+        //    {
+        //        if (!string.IsNullOrEmpty(item.PhotoFilename))
+        //        {
+        //            deletePath = Path.Combine(deletePath, item.PhotoFilename);
+
+        //            if (File.Exists(deletePath))
+        //            {
+        //                File.Delete(deletePath);
+
+        //                item.PhotoFilename = null;
+        //                item.UpdatedUser = itemDelDto.UpdatedUser;
+
+        //                await _contactService.UpdateAsync(item);
+
+        //                return Ok(new ApiResponse<bool>(true));
+        //            }
+        //            else throw new BusinessException("The file to delete not exist");
+        //        }
+        //        else throw new BusinessException("The contact has no photo file");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new BusinessException("Exception: " + ex.Message);
+        //    }
+        //} // DeleteFile
 
         // DELETE: api/Contact/5
         [ResponseType(typeof(ApiResponse<bool>))]

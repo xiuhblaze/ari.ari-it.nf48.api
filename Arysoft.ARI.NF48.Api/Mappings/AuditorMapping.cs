@@ -105,30 +105,34 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         private static AuditorDocumentValidityType GetAuditorValidityStatus(Auditor item)
         {
-            var documents = AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents);
             AuditorDocumentValidityType validityStatus = AuditorDocumentValidityType.Nothing;
 
-            if (documents != null && documents.Count() > 0)
-            {
-                validityStatus = AuditorDocumentValidityType.Success;
-
-                foreach (var document in documents)
+            if (item.Documents != null)
+            { 
+                var documents = AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents);
+                
+                if (documents != null && documents.Count() > 0)
                 {
-                    if (document.ValidityStatus == AuditorDocumentValidityType.Danger)
-                    {
-                        validityStatus = AuditorDocumentValidityType.Danger;
-                        break;
-                    }
-                }
+                    validityStatus = AuditorDocumentValidityType.Success;
 
-                if (validityStatus != AuditorDocumentValidityType.Danger)
-                {
                     foreach (var document in documents)
                     {
-                        if (document.ValidityStatus == AuditorDocumentValidityType.Warning)
+                        if (document.ValidityStatus == AuditorDocumentValidityType.Danger)
                         {
-                            validityStatus = AuditorDocumentValidityType.Warning;
+                            validityStatus = AuditorDocumentValidityType.Danger;
                             break;
+                        }
+                    }
+
+                    if (validityStatus != AuditorDocumentValidityType.Danger)
+                    {
+                        foreach (var document in documents)
+                        {
+                            if (document.ValidityStatus == AuditorDocumentValidityType.Warning)
+                            {
+                                validityStatus = AuditorDocumentValidityType.Warning;
+                                break;
+                            }
                         }
                     }
                 }
@@ -140,8 +144,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         private static AuditorDocumentRequiredType GetAuditorRequiredStatus(Auditor item) 
         {
             var catAuditorDocumentRepository = new CatAuditorDocumentRepository();
-
             AuditorDocumentRequiredType requiredStatus = AuditorDocumentRequiredType.Nothing;
+
             var catAuditorDocuments = catAuditorDocumentRepository.Gets()
                 .Where(m => (bool)m.IsRequired && m.Status == StatusType.Active)
                 .ToList();
@@ -152,7 +156,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
                 foreach (var catAuditorDocument in catAuditorDocuments)
                 {
-                    if (!item.Documents
+                    if (item.Documents == null || !item.Documents
                         .Where(d =>
                             d.CatAuditorDocumentID == catAuditorDocument.ID
                             && d.Status == StatusType.Active)

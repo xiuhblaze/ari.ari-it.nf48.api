@@ -99,7 +99,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 filename = FileRepository.UploadFile(
                     file,
-                    "~/Files/Auditors/" + item.AuditorID.ToString(),
+                    $"~/files/auditors/{item.AuditorID}",
                     itemEditDto.ID.ToString()
                 );
             }
@@ -112,6 +112,26 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // PutAuditorDocument
+
+        [HttpDelete]
+        [Route("api/Auditors/{id}/Documentfile")]
+        public async Task<IHttpActionResult> DeletePhotofile(Guid id, [FromBody] AuditorDeleteDto itemDelDto)
+        {
+            if (id != itemDelDto.ID)
+                throw new BusinessException("ID mismatch");
+
+            var item = await _service.GetAsync(id)
+                ?? throw new BusinessException("Record to delete file not found");
+
+            if (FileRepository.DeleteFile($"~/files/auditors/{item.ID}", item.Filename))
+            {
+                item.Filename = null;
+                item.UpdatedUser = itemDelDto.UpdatedUser;
+                await _service.UpdateAsync(item);
+            }
+
+            return Ok(new ApiResponse<bool>(true));
+        } // DeletePhotofile
 
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteAuditorDocument(Guid id, [FromBody] AuditorDocumentDeleteDto itemDelDto)
