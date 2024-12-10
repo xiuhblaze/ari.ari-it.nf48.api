@@ -114,7 +114,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // PutAuditorDocument
 
         [HttpDelete]
-        [Route("api/Auditors/{id}/Documentfile")]
+        [Route("api/AuditorDocuments/{id}/DocumentFile")]
         public async Task<IHttpActionResult> DeletePhotofile(Guid id, [FromBody] AuditorDeleteDto itemDelDto)
         {
             if (id != itemDelDto.ID)
