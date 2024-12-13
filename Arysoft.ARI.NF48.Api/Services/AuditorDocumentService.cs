@@ -95,12 +95,34 @@ namespace Arysoft.ARI.NF48.Api.Services
             var pagedItems = PagedList<AuditorDocument>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
+            //// Valida si ya pasó su fecha de termino, para marcar el documento como inactivo
+            //var hasChanges = false;
+            //foreach (var item in pagedItems) 
+            //{
+            //    if (DateTime.Compare((DateTime)item.DueDate, DateTime.Today) < 0) 
+            //    {
+            //        item.Status = StatusType.Inactive;
+            //        _repository.Update(item);
+            //        hasChanges = true;
+            //    }                
+            //}
+            //if (hasChanges) _repository.SaveChanges();
+
             return pagedItems;
         } // Gets
 
         public async Task<AuditorDocument> GetAsync(Guid id)
         {
-            return await _repository.GetAsync(id);
+            var item = await _repository.GetAsync(id);
+
+            //if (item.DueDate != null && DateTime.Compare((DateTime)item.DueDate, DateTime.Today) < 0)
+            //{ 
+            //    item.Status = StatusType.Inactive;
+            //    _repository.Update(item);
+            //    _repository.SaveChanges();
+            //}
+
+            return item;
         } // GetAsync
 
         public async Task<AuditorDocument> AddAsync(AuditorDocument item)
@@ -138,14 +160,29 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<AuditorDocument> UpdateAsync(AuditorDocument item)
         {
-            // Validations
-
-            // - no validations yet
-
-            // Assigning values
-
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
+
+            // Validations
+
+            // - Que la fecha de inicio (start) no sea mayor que la de termino (due)
+            if (DateTime.Compare((DateTime)item.StartDate, (DateTime)item.DueDate) > 0)
+                throw new BusinessException("Due date can't be before Start date");
+
+            //// - Si la fecha de termino es menor a hoy, automáticamente el Status sea Inactive
+            //if (DateTime.Compare((DateTime)item.DueDate, DateTime.Today) < 0)
+            //{ 
+            //    item.Status = StatusType.Inactive;
+            //    foundItem.Status = StatusType.Inactive;
+            //}
+
+            // - Si el documento es el activo, inactiva los demas
+            if (item.Status == StatusType.Nothing || item.Status == StatusType.Active) {
+                item.Status = StatusType.Active;
+                await _repository.SetToInactiveDocumentsAsync(foundItem.AuditorID, foundItem.CatAuditorDocumentID);
+            }
+
+            // Assigning values
 
             if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
@@ -154,9 +191,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.DueDate = item.DueDate;
             foundItem.Observations = item.Observations;
             foundItem.Type = item.Type;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
-                ? StatusType.Active
-                : item.Status;
+            foundItem.Status = item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
@@ -202,5 +237,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             _repository.SaveChanges();
         } // DeleteAsync
+
+
     }
 }

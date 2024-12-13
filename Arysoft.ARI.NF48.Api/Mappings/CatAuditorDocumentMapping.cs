@@ -1,6 +1,8 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -60,7 +62,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Documents = item.Documents != null
-                    ? AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents)
+                    ? AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents
+                        .Where(d => d.Status != StatusType.Nothing)
+                        .OrderByDescending(d => d.StartDate))
                     : null,
             };
         } // CatAuditorDocumentToItemDetailDto

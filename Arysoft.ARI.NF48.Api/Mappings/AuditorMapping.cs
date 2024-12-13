@@ -61,7 +61,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ValidityStatus = GetAuditorValidityStatus(item),
                 RequiredStatus = GetAuditorRequiredStatus(item),
                 Documents = item.Documents != null
-                    ? AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents)
+                    ? AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents
+                        .Where(d => d.Status != StatusType.Nothing)
+                        .OrderBy(d => d.Status)
+                        .ThenByDescending(d => d.StartDate))
                     : null,
             };
         } // AuditorToItemDetailDto
@@ -117,7 +120,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
                     foreach (var document in documents)
                     {
-                        if (document.ValidityStatus == AuditorDocumentValidityType.Danger)
+                        if (document.ValidityStatus == AuditorDocumentValidityType.Danger && document.Status == StatusType.Active)
                         {
                             validityStatus = AuditorDocumentValidityType.Danger;
                             break;
@@ -128,7 +131,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     {
                         foreach (var document in documents)
                         {
-                            if (document.ValidityStatus == AuditorDocumentValidityType.Warning)
+                            if (document.ValidityStatus == AuditorDocumentValidityType.Warning && document.Status == StatusType.Active)
                             {
                                 validityStatus = AuditorDocumentValidityType.Warning;
                                 break;
@@ -144,7 +147,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         private static AuditorDocumentRequiredType GetAuditorRequiredStatus(Auditor item) 
         {
             var catAuditorDocumentRepository = new CatAuditorDocumentRepository();
-            AuditorDocumentRequiredType requiredStatus = AuditorDocumentRequiredType.Nothing;
+            var requiredStatus = AuditorDocumentRequiredType.Nothing;
 
             var catAuditorDocuments = catAuditorDocumentRepository.Gets()
                 .Where(m => (bool)m.IsRequired && m.Status == StatusType.Active)
