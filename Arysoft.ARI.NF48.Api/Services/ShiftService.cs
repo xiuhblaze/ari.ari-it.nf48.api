@@ -34,7 +34,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
-                items = items.Where(e => e.ActivitiesDescription.ToLower().Contains(filters.Text));
+                items = items.Where(e => 
+                    e.ActivitiesDescription != null && e.ActivitiesDescription.ToLower().Contains(filters.Text)
+                );
             }
 
             if (filters.SiteID != null && filters.SiteID != Guid.Empty)

@@ -33,12 +33,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(e => 
-                    e.FirstName.ToLower().Contains(filters.Text)
-                    || e.MiddleName.ToLower().Contains(filters.Text)
-                    || e.LastName.ToLower().Contains(filters.Text)
-                    || e.Email.ToLower().Contains(filters.Text)
-                    || e.Phone.ToLower().Contains(filters.Text)
-                    || e.Address.ToLower().Contains(filters.Text)
+                    (e.FirstName != null && e.FirstName.ToLower().Contains(filters.Text))
+                    || (e.MiddleName != null && e.MiddleName.ToLower().Contains(filters.Text))
+                    || (e.LastName != null && e.LastName.ToLower().Contains(filters.Text))
+                    || (e.Email != null && e.Email.ToLower().Contains(filters.Text))
+                    || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))
+                    || (e.Address != null && e.Address.ToLower().Contains(filters.Text))
                 );
             }
 

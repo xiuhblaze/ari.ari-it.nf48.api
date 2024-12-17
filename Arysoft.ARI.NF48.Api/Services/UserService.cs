@@ -31,11 +31,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(e =>
-                    e.Username.ToLower().Contains(filters.Text)
-                    || e.Email.ToLower().Contains(filters.Text)
-                    || e.FirstName.ToLower().Contains(filters.Text)
-                    || e.LastName.ToLower().Contains(filters.Text)
-                    || e.UpdatedUser.ToLower().Contains(filters.Text)
+                    (e.Username != null && e.Username.ToLower().Contains(filters.Text))
+                    || (e.Email != null && e.Email.ToLower().Contains(filters.Text))
+                    || (e.FirstName != null && e.FirstName.ToLower().Contains(filters.Text))
+                    || (e.LastName != null && e.LastName.ToLower().Contains(filters.Text))
+                    || (e.UpdatedUser != null && e.UpdatedUser.ToLower().Contains(filters.Text))
                 );
             }
 

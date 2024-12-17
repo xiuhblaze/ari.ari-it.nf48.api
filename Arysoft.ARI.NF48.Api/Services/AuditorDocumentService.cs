@@ -43,7 +43,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e => 
-                    e.Observations.ToLower().Contains(filters.Text)
+                    e.Observations != null && e.Observations.ToLower().Contains(filters.Text)
                 );
             }
 
