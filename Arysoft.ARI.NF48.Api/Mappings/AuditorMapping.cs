@@ -150,7 +150,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             var requiredStatus = AuditorDocumentRequiredType.Nothing;
 
             var catAuditorDocuments = catAuditorDocumentRepository.Gets()
-                .Where(m => (bool)m.IsRequired && m.Status == StatusType.Active)
+                .Where(m => m.Status == StatusType.Active && m.IsRequired != null && (bool)m.IsRequired)
                 .ToList();
 
             if (catAuditorDocuments != null)
