@@ -56,12 +56,32 @@ namespace Arysoft.ARI.NF48.Api.IO
                 }
                 catch (Exception ex)
                 {
-                    throw new BusinessException($"File.Repository.DeleteFile: {ex.Message}");
+                    throw new BusinessException($"FileRepository.DeleteFile: {ex.Message}");
                 }
             }
             else throw new BusinessException($"The file '{filename}' to delete not exist in route '{deletePath}'.");
             
             return true;
         } // DeleteFile
+
+        public static bool DeleteDirectory(string virtualPath)
+        {
+            string deletePath = HostingEnvironment.MapPath(virtualPath);
+
+            if (Directory.Exists(deletePath))
+            {
+                try
+                {
+                    Directory.Delete(deletePath, true);
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"FileRepository.DeleteDirectory: {ex.Message}");
+                }
+            }
+            // else throw new BusinessException($"The directory trying to delete does not exist '{deletePath}'");
+
+            return true;
+        } // DeleteDirectory
     }
 }

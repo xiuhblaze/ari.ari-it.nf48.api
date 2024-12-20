@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using System;
 using System.Data.Entity;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var items = await _model
                 .Where(m =>
                     m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
-                    && m.Status == Enumerations.StatusType.Nothing)
+                    && m.Status == StatusType.Nothing)
                 .ToListAsync();
 
             foreach(var item in items)

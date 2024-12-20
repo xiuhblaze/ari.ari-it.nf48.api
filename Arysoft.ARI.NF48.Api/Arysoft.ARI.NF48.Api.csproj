@@ -417,6 +417,7 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
     <None Include="Properties\PublishProfiles\ari-api Produccion FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\ari.im-prove.com.mx.pubxml" />
     <None Include="Properties\PublishProfiles\Publicar en local.pubxml" />
     <None Include="Scripts\jquery-3.6.3.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.3.js" />

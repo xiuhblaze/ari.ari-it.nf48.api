@@ -1,7 +1,4 @@
 ﻿using Microsoft.Owin.Security.OAuth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -17,11 +14,10 @@ namespace Arysoft.ARI.NF48.Api
             // Configuración y servicios de Web API
 
             // CORS
-            var cors = new EnableCorsAttribute("http://localhost:5173,http://localhost:3000", "*", "*");
-            //var cors = new EnableCorsAttribute("http://ari.arysoft.com.mx", "*", "*");
-            //var corsProduccion = new EnableCorsAttribute("https://aarrin.com", "*", "*");
+            //var cors = new EnableCorsAttribute("http://localhost:5173,http://localhost:3000", "*", "*");            
+            var corsProduccion = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,http://localhost:5173,http://cortana.im-prove.com.mx", "*", "*");
 
-            config.EnableCors(cors);
+            config.EnableCors(corsProduccion);
 
             // Rutas de Web API
             config.MapHttpAttributeRoutes();

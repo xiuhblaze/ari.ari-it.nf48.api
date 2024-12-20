@@ -3,6 +3,8 @@
     public enum AuditorDocumentType
     {
         Nothing,
+        Certificate,
+        Course,
         Exam,
         Other
     }

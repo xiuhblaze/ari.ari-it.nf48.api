@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -112,9 +113,18 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validations
 
-            if (string.IsNullOrEmpty(item.UpdatedUser))
-            {
+            if (string.IsNullOrEmpty(item.UpdatedUser))            
                 throw new BusinessException("Must specify a username");
+
+
+            // - Eliminando archivos de registros temporales
+            var items = _auditorRepository.Gets();
+            items = items.Where(e => e.Status == StatusType.Nothing
+                && e.UpdatedUser.ToUpper() == item.UpdatedUser.Trim().ToUpper());
+
+            foreach (var itemFound in items)
+            {
+                FileRepository.DeleteDirectory($"~/files/auditors/{itemFound.ID}");
             }
 
             // Assigning values
@@ -185,10 +195,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            // ( no hay validaciones por el momento )
-
             if (foundItem.Status == StatusType.Deleted)
             {
+                FileRepository.DeleteDirectory($"~/files/auditors/{foundItem.ID}");
                 _auditorRepository.Delete(foundItem);
             }
             else

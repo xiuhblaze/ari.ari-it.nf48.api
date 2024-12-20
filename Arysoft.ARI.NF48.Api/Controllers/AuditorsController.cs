@@ -79,85 +79,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PostAuditor
 
-        //// PUT: api/Auditorss
-        //[ResponseType(typeof(ApiResponse<AuditorItemDetailDto>))]
-        //public async Task<IHttpActionResult> PutAuditor(Guid id, [FromBody] AuditorPutDto itemEditDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
-
-        //    if (id != itemEditDto.ID)
-        //        throw new BusinessException("ID mismatch");
-
-        //    var item = AuditorMapping.ItemEditDtoToAuditor(itemEditDto);
-        //    item = await _auditorService.UpdateAsync(item);
-        //    var itemDto = AuditorMapping.AuditorToItemDetailDto(item);
-        //    var response = new ApiResponse<AuditorItemDetailDto>(itemDto);
-
-        //    return Ok(response);
-        //} // PutAuditor
-
-        //[ResponseType(typeof(ApiResponse<AuditorItemDetailDto>))]
-        //public async Task<IHttpActionResult> PutAuditor()
-        //{
-        //    if (!Request.Content.IsMimeMultipartContent())
-        //        throw new BusinessException("Unssuported media type");
-
-        //    // Obteniendo los datos recibidos
-
-        //    var tmpPath = System.Web.Hosting.HostingEnvironment.MapPath("~/files/tmp");
-        //    if (!Directory.Exists(tmpPath))
-        //        Directory.CreateDirectory(tmpPath);
-        //    var provider = new MultipartFormDataStreamProvider(tmpPath); // Guardando de forma temporal los archivos
-        //    await Request.Content.ReadAsMultipartAsync(provider);
-
-        //    AuditorPutDto itemEditDto = null;
-        //    string newFilename = null;
-
-        //    foreach (var formData in provider.FormData.AllKeys)
-        //    {
-        //        if (formData == "data")
-        //        {
-        //            itemEditDto = JsonConvert.DeserializeObject<AuditorPutDto>(provider.FormData[formData]);
-        //        }
-        //    }
-
-        //    if (itemEditDto == null)
-        //        throw new BusinessException("Can't read data object");
-
-        //    foreach (var file in provider.FileData)
-        //    {
-        //        var originalFilename = file.Headers.ContentDisposition.FileName.Trim('"');
-        //        var extension = originalFilename != null
-        //            ? Path.GetExtension(originalFilename)
-        //            : null;
-        //        var uploadedFilePath = file.LocalFileName;
-        //        var auditorPath = System.Web.Hosting.HostingEnvironment.MapPath($"~/files/auditors/{itemEditDto.ID.ToString()}");
-        //        if (!Directory.Exists(auditorPath))
-        //            Directory.CreateDirectory(auditorPath);
-        //        newFilename = "PhotoProfile" + extension;
-        //        var newFilePath = Path.Combine(auditorPath, newFilename);
-
-        //        if (File.Exists(newFilePath))
-        //            File.Delete(newFilePath);
-
-        //        File.Move(uploadedFilePath, newFilePath);
-        //    }
-
-        //    // Procesando los datos
-        //    var item = await _auditorService.GetAsync(itemEditDto.ID)
-        //            ?? throw new BusinessException("The record to update was not found");
-
-        //    var itemToEdit = AuditorMapping.ItemEditDtoToAuditor(itemEditDto);
-        //    itemToEdit.PhotoFilename = newFilename ?? item.PhotoFilename;
-        //    item = await _auditorService.UpdateAsync(itemToEdit);
-        //    var itemDto = AuditorMapping.AuditorToItemDetailDto(item);
-        //    var response = new ApiResponse<AuditorItemDetailDto>(itemDto);
-
-        //    return Ok(response);
-
-        //} // PutAuditor
-
+        // PUT: api/Auditors
         [HttpPut]
         [ResponseType(typeof(ApiResponse<AuditorItemDetailDto>))]
         public async Task<IHttpActionResult> PutAuditor()
@@ -221,8 +143,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             if (id != itemDelDto.ID)
                 throw new BusinessException("ID mismatch");
-
-            //TODO: Si va en status de Eliminar, borrar el archivo fisico
 
             var item = AuditorMapping.ItemDeleteDtoToAuditor(itemDelDto);
             await _auditorService.DeleteAsync(item);

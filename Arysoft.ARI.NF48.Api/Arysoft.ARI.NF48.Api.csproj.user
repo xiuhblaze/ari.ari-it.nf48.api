@@ -18,7 +18,7 @@
     <WebStackScaffolding_LayoutPageFile />
     <WebStackScaffolding_DbContextTypeFullName>Arysoft.ARI.NF48.Api.AriContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsAsyncSelected>True</WebStackScaffolding_IsAsyncSelected>
-    <NameOfLastUsedPublishProfile>C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\Properties\PublishProfiles\Publicar en local.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\xiuhb\source\repos\ARI\Arysoft.ARI.NF48.Api\Arysoft.ARI.NF48.Api\Properties\PublishProfiles\ari.im-prove.com.mx.pubxml</NameOfLastUsedPublishProfile>
     <WebStackScaffolding_IsViewGenerationSelected>False</WebStackScaffolding_IsViewGenerationSelected>
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
