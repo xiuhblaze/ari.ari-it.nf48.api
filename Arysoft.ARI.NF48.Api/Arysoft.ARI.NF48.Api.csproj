@@ -234,6 +234,8 @@
     <Compile Include="Controllers\Categories22KController.cs" />
     <Compile Include="Controllers\DayCalculationConceptApplicationsController.cs" />
     <Compile Include="Controllers\DayCalculationConceptsController.cs" />
+    <Compile Include="Controllers\NSSCCategoriesController.cs" />
+    <Compile Include="Controllers\NSSCSubCategoriesController.cs" />
     <Compile Include="Data\AriContext.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
@@ -256,6 +258,9 @@
     <Compile Include="Data\Configurations\DayCalculationConceptApplicationConfiguration.cs" />
     <Compile Include="Data\Configurations\DayCalculationConceptConfiguration.cs" />
     <Compile Include="Data\Configurations\NaceCodeConfiguration.cs" />
+    <Compile Include="Data\Configurations\NSSCActivityConfiguration.cs" />
+    <Compile Include="Data\Configurations\NSSCCategoryConfiguration.cs" />
+    <Compile Include="Data\Configurations\NSSCSubCategoryConfiguration.cs" />
     <Compile Include="Data\Configurations\OrganizationConfiguration.cs" />
     <Compile Include="Data\Configurations\RoleConfiguration.cs" />
     <Compile Include="Data\Configurations\ShiftConfiguration.cs" />
@@ -271,6 +276,8 @@
     <Compile Include="Enumerations\DayCalculationConceptApplicationEnums.cs" />
     <Compile Include="Enumerations\DayCalculationConceptEnums.cs" />
     <Compile Include="Enumerations\NaceCodeEnums.cs" />
+    <Compile Include="Enumerations\NSSCCategoryEnums.cs" />
+    <Compile Include="Enumerations\NSSCSubCategoryEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
     <Compile Include="Enumerations\RoleEnums.cs" />
     <Compile Include="Enumerations\ShiftEnums.cs" />
@@ -294,6 +301,8 @@
     <Compile Include="Mappings\DayCalculationConceptApplicationMapping.cs" />
     <Compile Include="Mappings\DayCalculationConceptMapping.cs" />
     <Compile Include="Mappings\NaceCodeMapping.cs" />
+    <Compile Include="Mappings\NSSCCategoryMapping.cs" />
+    <Compile Include="Mappings\NSSCSubCategoryMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
     <Compile Include="Mappings\ShiftMapping.cs" />
@@ -319,6 +328,8 @@
     <Compile Include="Models\DTOs\DayCalculationConceptApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\DayCalculationConceptDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
+    <Compile Include="Models\DTOs\NSSCCategoryDTOs.cs" />
+    <Compile Include="Models\DTOs\NSSCSubCategoryDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
     <Compile Include="Models\DTOs\RoleDTOs.cs" />
     <Compile Include="Models\DTOs\ShiftDTOs.cs" />
@@ -326,6 +337,9 @@
     <Compile Include="Models\DTOs\StandardDTOs.cs" />
     <Compile Include="Models\DTOs\UserDTOs.cs" />
     <Compile Include="Models\NaceCode.cs" />
+    <Compile Include="Models\NSSCActivity.cs" />
+    <Compile Include="Models\NSSCCategory.cs" />
+    <Compile Include="Models\NSSCSubCategory.cs" />
     <Compile Include="Models\Organization.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Shift.cs" />
@@ -343,6 +357,8 @@
     <Compile Include="QueryFilters\DayCalculationConceptApplicationQueryFilters.cs" />
     <Compile Include="QueryFilters\DayCalculationConceptQueryFilters.cs" />
     <Compile Include="QueryFilters\NaceCodeQueryFilters.cs" />
+    <Compile Include="QueryFilters\NSSCCategoryQueryFilters.cs" />
+    <Compile Include="QueryFilters\NSSCSubCategoryQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
     <Compile Include="QueryFilters\RoleQueryFilters.cs" />
     <Compile Include="QueryFilters\ShiftQueryFilters.cs" />
@@ -359,6 +375,8 @@
     <Compile Include="Repositories\DayCalculationConceptApplicationRepository.cs" />
     <Compile Include="Repositories\DayCalculationConceptRepository.cs" />
     <Compile Include="Repositories\NaceCodeRepository.cs" />
+    <Compile Include="Repositories\NSSCCategoryRepository.cs" />
+    <Compile Include="Repositories\NSSCSubCategoryRepository.cs" />
     <Compile Include="Repositories\OrganizationRepository.cs" />
     <Compile Include="Repositories\RoleRepository.cs" />
     <Compile Include="Repositories\ShiftRepository.cs" />
@@ -375,6 +393,8 @@
     <Compile Include="Services\DayCalculationConceptApplicationService.cs" />
     <Compile Include="Services\DayCalculationConceptService.cs" />
     <Compile Include="Services\NaceCodeService.cs" />
+    <Compile Include="Services\NSSCCategoryService.cs" />
+    <Compile Include="Services\NSSCSubCategoryService.cs" />
     <Compile Include="Services\OrganizationService.cs" />
     <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\ShiftService.cs" />

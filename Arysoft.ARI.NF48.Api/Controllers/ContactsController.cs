@@ -2,7 +2,6 @@
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
-using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
@@ -11,9 +10,6 @@ using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;

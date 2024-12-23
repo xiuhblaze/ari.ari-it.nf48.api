@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class CatAuditorDocumentService
+    public class NSSCCategoryService
     {
-        private readonly CatAuditorDocumentRepository _repository;
+        private readonly NSSCCategoryRepository _repository;
 
         // CONSTRUCTOR
 
-        public CatAuditorDocumentService()
+        public NSSCCategoryService()
         {
-            _repository = new CatAuditorDocumentRepository();
-        }
+            _repository = new NSSCCategoryRepository();
+        } // NSSCCategoryService
 
         // METHODS
 
-        public PagedList<CatAuditorDocument> Gets(CatAuditorDocumentQueryFilters filters)
+        public PagedList<NSSCCategory> Gets(NSSCCategoryQueryFilters filters)
         {
             var items = _repository.Gets();
 
@@ -36,16 +36,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     (e.Name != null && e.Name.ToLower().Contains(filters.Text))
                     || (e.Description != null && e.Description.ToLower().Contains(filters.Text))
                 );
-            }
-
-            if (filters.DocumentType != null && filters.DocumentType != CatAuditorDocumentType.Nothing)
-            {
-                items = items.Where(e => e.DocumentType == filters.DocumentType);
-            }
-
-            if (filters.SubCategory != null && filters.SubCategory != CatAuditorDocumentSubCategoryType.Nothing)
-            {
-                items = items.Where(e => e.SubCategory == filters.SubCategory);
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
@@ -62,47 +52,46 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Order
 
-            switch (filters.Order)
-            {
-                case CatAuditorDocumentOrderType.DocumentType:
-                    items = items.OrderBy(e => e.DocumentType)
-                        .ThenBy(e => e.Order);
+            switch (filters.Order) {
+                case NSSCCategoryOrderType.Name:
+                    items = items.OrderBy(e => e.Name);
                     break;
-                case CatAuditorDocumentOrderType.Order:
-                    items = items.OrderBy(e => e.Order);
-                    break;
-                case CatAuditorDocumentOrderType.Updated:
+                case NSSCCategoryOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
-                case CatAuditorDocumentOrderType.DocumentTypeDesc:
-                    items = items.OrderByDescending(e => e.DocumentType)
-                        .ThenByDescending(e => e.Order);
+                case NSSCCategoryOrderType.NameDesc:
+                    items = items.OrderByDescending(e => e.Name);
                     break;
-                case CatAuditorDocumentOrderType.OrderDesc:
-                    items = items.OrderByDescending(e => e.Order);
-                    break;
-                case CatAuditorDocumentOrderType.UpdatedDesc:
+                case NSSCCategoryOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
-            }
+                default:
+                    items = items.OrderBy(e => e.Name);
+                    break;
+            } // order
 
             // Paging
 
-            var pagedItems = PagedList<CatAuditorDocument>
+            var pagedItems = PagedList<NSSCCategory>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
             return pagedItems;
         } // Gets
 
-        public async Task<CatAuditorDocument> GetAsync(Guid id)
+        public async Task<NSSCCategory> GetAsync(Guid id)
         {
             return await _repository.GetAsync(id);
         } // GetAsync
 
-        public async Task<CatAuditorDocument> AddAsync(CatAuditorDocument item)
+        public async Task<NSSCCategory> AddAsync(NSSCCategory item)
         {
+            // Validations
+
+            if (string.IsNullOrEmpty(item.UpdatedUser))
+                throw new BusinessException("Must specify a username");
+
             // Assigning values
-            
+
             item.ID = Guid.NewGuid();
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
@@ -110,71 +99,59 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            await _repository.DeleteTmpByUser(item.UpdatedUser);
-            _repository.Add(item);
-            _repository.SaveChanges();
+            try
+            {
+                await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _repository.Add(item);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"NSSCCategoryService.AddAsync: {ex.Message}");
+            }
 
             return item;
         } // AddAsync
 
-        public async Task<CatAuditorDocument> UpdateAsync(CatAuditorDocument item)
-        {
-            // Validations
-
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-
+        public async Task<NSSCCategory> UpdateAsync(NSSCCategory item)
+        { 
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.DocumentType == CatAuditorDocumentType.Nothing)
-                throw new BusinessException("Must specify the document type");
+            // Validations
 
-            if (item.UpdateEvery < 0)
-                throw new BusinessException("Update every cannot be negative");
+            item.Status = item.Status == StatusType.Nothing 
+                ? StatusType.Active
+                : item.Status;
 
-            if (item.UpdatePeriodicity == CatAuditorDocumentPeriodicityType.Nothing)
-                throw new BusinessException("Must select the update periodicity");
-
-            if (item.WarningEvery < 0)
-                throw new BusinessException("Warning every cannot be negative");
-
-            if (item.WarningPeriodicity == CatAuditorDocumentPeriodicityType.Nothing)
-                throw new BusinessException("Must select the warning periodicity");
+            // - Que no exista ese nombre en categorias
 
             // Assigning values
 
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
-            foundItem.DocumentType = item.DocumentType;
-            foundItem.SubCategory = item.SubCategory;
-            foundItem.UpdateEvery = item.UpdateEvery;
-            foundItem.UpdatePeriodicity = item.UpdatePeriodicity;
-            foundItem.WarningEvery = item.WarningEvery;
-            foundItem.WarningPeriodicity = item.WarningPeriodicity;
-            foundItem.IsRequired = item.IsRequired;
-            foundItem.Order = item.Order;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
+            foundItem.Created = DateTime.UtcNow;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
-            // Execute queries
+            // Excecute queries
 
             try
             {
                 _repository.Update(foundItem);
                 await _repository.SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"CatAuditorDocumentService.UpdateAsync: {ex.Message}");
+            catch (Exception ex) {
+                throw new BusinessException($"NSSCCategoryService.UpdateAsync: {ex.Message}");
             }
 
-            return foundItem;
+            return foundItem;            
         } // UpdateAsync
 
-        public async Task DeleteAsync(CatAuditorDocument item)
+        public async Task DeleteAsync(NSSCCategory item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
@@ -183,10 +160,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - no validations yet
 
+
             // Execute queries
 
             if (foundItem.Status == StatusType.Deleted)
             {
+                // Validar que no tenga subcategories asociadas
                 _repository.Delete(foundItem);
             }
             else
@@ -200,7 +179,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _repository.Update(foundItem);
             }
 
-            _repository.SaveChanges();
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"NSSCCategoryService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
-    }
+    } 
 }

@@ -15,20 +15,27 @@ namespace Arysoft.ARI.NF48.Api.Data
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
             ApplicationConfiguration.Configure(modelBuilder);
+            DayCalculationConceptConfiguration.Configure(modelBuilder);
+            DayCalculationConceptApplicationConfiguration.Configure(modelBuilder);
+            
             AuditorConfiguration.Configure(modelBuilder);
             AuditorDocumentConfiguration.Configure(modelBuilder);
             CatAuditorDocumentConfiguration.Configure(modelBuilder);
-            Category22KConfiguration.Configure(modelBuilder);
-            ContactConfiguration.Configure(modelBuilder);
-            DayCalculationConceptConfiguration.Configure(modelBuilder);
-            DayCalculationConceptApplicationConfiguration.Configure(modelBuilder);
+            NSSCCategoryConfiguration.Configure(modelBuilder);
+            NSSCSubCategoryConfiguration.Configure(modelBuilder);
+            NSSCActivityConfiguration.Configure(modelBuilder);
+            
             OrganizationConfiguration.Configure(modelBuilder);
-            NaceCodeConfiguration.Configure(modelBuilder);
-            RoleConfiguration.Configure(modelBuilder);
+            ContactConfiguration.Configure(modelBuilder);
             ShiftConfiguration.Configure(modelBuilder);
             SiteConfiguration.Configure(modelBuilder);
+            
+            Category22KConfiguration.Configure(modelBuilder);
+            NaceCodeConfiguration.Configure(modelBuilder);
             StandardConfiguration.Configure(modelBuilder);
+            
             UserConfiguration.Configure(modelBuilder);
+            RoleConfiguration.Configure(modelBuilder);
         }
     }
 }

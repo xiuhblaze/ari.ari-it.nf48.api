@@ -117,7 +117,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("Must specify a username");
 
 
-            // - Eliminando archivos de registros temporales
+            // - Eliminando las carpetas de los registros temporales
             var items = _auditorRepository.Gets();
             items = items.Where(e => e.Status == StatusType.Nothing
                 && e.UpdatedUser.ToUpper() == item.UpdatedUser.Trim().ToUpper());

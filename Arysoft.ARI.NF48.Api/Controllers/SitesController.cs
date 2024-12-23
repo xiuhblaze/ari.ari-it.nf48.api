@@ -60,7 +60,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetShift
 
         // POST: api/Site
-        [ResponseType(typeof(ApiResponse<Site>))]
+        [ResponseType(typeof(ApiResponse<SiteItemDetailDto>))]
         public async Task<IHttpActionResult> PostSite([FromBody] SitePostDto siteDto)
         {
             if (!ModelState.IsValid)
@@ -75,7 +75,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // PostSite
 
         // PUT: api/Site/5
-        [ResponseType(typeof(ApiResponse<Site>))]
+        [ResponseType(typeof(ApiResponse<SiteItemDetailDto>))]
         public async Task<IHttpActionResult> PutSite(Guid id, [FromBody] SitePutDto itemEditDto)
         {
             if (!ModelState.IsValid)
