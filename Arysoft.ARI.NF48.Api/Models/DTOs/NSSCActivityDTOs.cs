@@ -1,15 +1,14 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
-    public class NSSCSubCategoryItemListDto
+    public class NSSCActivityItemListDto
     {
         public Guid ID { get; set; }
 
-        public Guid NSSCCategoryID { get; set; }
+        public Guid NSSCSubCategoryID { get; set; }
 
         public string Name { get; set; }
 
@@ -17,16 +16,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StatusType Status { get; set; }
 
-        public string NSSCCategoryName { get; set; }
+        public string NSSCSubCategoryName { get; set; }
 
-        public int ActivitiesCount { get; set; }
-    } // NSSCSubCategoryItemListDto
+        // public int ActivitiesCount { get; set; }
+    } // NSSCActivityItemListDto
 
-    public class NSSCSubCategoryItemDetailDto
+    public class NSSCActivityItemDetailDto
     {
         public Guid ID { get; set; }
 
-        public Guid NSSCCategoryID { get; set; }
+        public Guid NSSCSubCategoryID { get; set; }
 
         public string Name { get; set; }
 
@@ -42,31 +41,31 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public NSSCCategoryItemListDto NSSCCategory { get; set; }
+        public NSSCSubCategoryItemListDto NSSCSubCategory { get; set; }
 
-        public IEnumerable<NSSCActivityItemListDto> NSSCActivities { get; set; }
+        // public IEnumerable<NSSCActivityItemListDto> NSSCActivities { get; set; }
     } // NSSCCategoryItemDetailDto
 
-    public class NSSCSubCategoryPostDto
+    public class NSSCActivityPostDto
     {
         [Required]
-        public Guid NSSCCategoryID { get; set; }
+        public Guid NSSCSubCategoryID { get; set; }
 
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    } // NSSCSubCategoryPostDto
+    } // NSSCActivityPostDto
 
-    public class NSSCSubCategoryPutDto
+    public class NSSCActivityPutDto
     {
         [Required]
         public Guid ID { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(100)]
         public string Name { get; set; }
 
-        [StringLength(500)]
+        [StringLength(1000)]
         public string Description { get; set; }
 
         [Required]
@@ -75,9 +74,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    } // NSSCSubCategoryPutDto
+    } // NSSCActivityPutDto
 
-    public class NSSCSubCategoryDeleteDto
+    public class NSSCActivityDeleteDto
     {
         [Required]
         public Guid ID { get; set; }
@@ -85,5 +84,5 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    } // NSSCSubCategoryDeleteDto
+    } // NSSCActivityDeleteDto
 }

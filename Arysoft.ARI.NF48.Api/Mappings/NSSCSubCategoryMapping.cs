@@ -1,9 +1,8 @@
-﻿using Arysoft.ARI.NF48.Api.Models.DTOs;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
-using System;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -54,10 +53,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 NSSCCategory = item.NSSCCategory != null
                     ? NSSCCategoryMapping.NSSCCategoryToItemListDto(item.NSSCCategory) 
                     : null,
-                //NSSCActivities = item.NSSCActivities != null
-                //    ? NSSCActivityMapping.NSSCActivityToListDto(item.NSSCActivities)
-                //        .Where(s => s.Status != StatusType.Nothing)
-                //    : null
+                NSSCActivities = item.NSSCActivities != null
+                    ? NSSCActivityMapping.NSSCActivityToListDto(item.NSSCActivities)
+                        .Where(s => s.Status != StatusType.Nothing)
+                    : null
             };
         } // NSSCSubCategoryToItemDetailDto
 

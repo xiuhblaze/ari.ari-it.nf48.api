@@ -5,41 +5,43 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class NSSCSubCategoryService
+    public class NSSCActivityService
     {
-        private readonly NSSCSubCategoryRepository _repository;
+        private readonly NSSCActivityRepository _repository;
 
         // CONSTRUCTOR
 
-        public NSSCSubCategoryService()
-        {
-            _repository = new NSSCSubCategoryRepository();
-        } // NSSCSubCategoryService
+        public NSSCActivityService()
+        { 
+            _repository = new NSSCActivityRepository();
+        } // NSSCActivityService
 
         // METHODS
 
-        public PagedList<NSSCSubCategory> Gets(NSSCSubCategoryQueryFilters filters)
+        public PagedList<NSSCActivity> Gets(NSSCActivityQueryFilters filters) 
         {
             var items = _repository.Gets();
 
             // Filters
 
-            if (filters.NSSCCategoryID != null) 
+            if (filters.NSSCSubCategoryID != null)
             {
-                items = items.Where(e => e.NSSCCategoryID == filters.NSSCCategoryID);
+                items = items.Where(e => e.NSSCSubCategoryID == filters.NSSCSubCategoryID);
             }
 
             if (!string.IsNullOrEmpty(filters.Text))
-            {
+            { 
                 filters.Text = filters.Text.ToLower().Trim();
-                items = items.Where(e =>
+                items = items.Where(e => 
                     (e.Name != null && e.Name.ToLower().Contains(filters.Text))
-                    || (e.Description != null && e.Description.ToLower().Contains(filters.Text))
+                    && (e.Description != null && e.Description.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -59,46 +61,42 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
-                case NSSCSubCategoryOrderType.Category:
-                    items = items.OrderBy(e => e.NSSCCategory.Name)
+                case NSSCActivityOrderType.SubCategory:
+                    items = items.OrderBy(e => e.NSSCSubCategory.Name)
                         .ThenBy(e => e.Name);
                     break;
-                case NSSCSubCategoryOrderType.Name:
+                case NSSCActivityOrderType.Name:
                     items = items.OrderBy(e => e.Name);
                     break;
-                case NSSCSubCategoryOrderType.Updated:
+                case NSSCActivityOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
-                case NSSCSubCategoryOrderType.CategoryDesc:
-                    items = items.OrderByDescending(e => e.NSSCCategory.Name)
-                        .ThenByDescending(e => e.NSSCCategory.Name);
+                case NSSCActivityOrderType.SubCategoryDesc:
+                    items = items.OrderByDescending(e => e.NSSCSubCategory.Name)
+                        .ThenByDescending(e => e.Name);
                     break;
-                case NSSCSubCategoryOrderType.NameDesc:
+                case NSSCActivityOrderType.NameDesc:
                     items = items.OrderByDescending(e => e.Name);
                     break;
-                case NSSCSubCategoryOrderType.UpdatedDesc:
+                case NSSCActivityOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
-                default:
-                    items = items.OrderBy(e => e.NSSCCategory.Name)
-                        .ThenBy(e => e.Name);
-                    break;
-            } // order
+            }
 
             // Paging
 
-            var pagedItems = PagedList<NSSCSubCategory>
+            var pagedItems = PagedList<NSSCActivity>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
             return pagedItems;
         } // Gets
 
-        public async Task<NSSCSubCategory> GetAsync(Guid id)
+        public async Task<NSSCActivity> GetAsync(Guid id)
         {
             return await _repository.GetAsync(id);
         } // GetAsync
 
-        public async Task<NSSCSubCategory> AddAsync(NSSCSubCategory item)
+        public async Task<NSSCActivity> AddAsync(NSSCActivity item)
         {
             // Validations
 
@@ -122,13 +120,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"NSSCSubCategoryService.AddAsync: {ex.Message}");
+                throw new BusinessException($"NSSCActivityService.AddAsync: {ex.Message}");
             }
 
             return item;
         } // AddAsync
 
-        public async Task<NSSCSubCategory> UpdateAsync(NSSCSubCategory item)
+        public async Task<NSSCActivity> UpdateAsync(NSSCActivity item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
@@ -139,7 +137,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ? StatusType.Active
                 : item.Status;
 
-            // - Que no exista ese nombre en la categoria asociada
+            // - Que no exista ese nombre en la sub categoria asociada
 
             // Assigning values
 
@@ -160,13 +158,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"NSSCSubCategoryService.UpdateAsync: {ex.Message}");
+                throw new BusinessException($"NSSCActivityService.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
         } // UpdateAsync
 
-        public async Task DeleteAsync(NSSCSubCategory item)
+        public async Task DeleteAsync(NSSCActivity item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
@@ -174,7 +172,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - no validations yet
-
 
             // Execute queries
 
@@ -200,7 +197,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"NSSCSubCategoryService.DeleteAsync: {ex.Message}");
+                throw new BusinessException($"NSSCActivityService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
     }

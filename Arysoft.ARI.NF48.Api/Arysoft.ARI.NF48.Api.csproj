@@ -234,6 +234,7 @@
     <Compile Include="Controllers\Categories22KController.cs" />
     <Compile Include="Controllers\DayCalculationConceptApplicationsController.cs" />
     <Compile Include="Controllers\DayCalculationConceptsController.cs" />
+    <Compile Include="Controllers\NSSCActivitiesController.cs" />
     <Compile Include="Controllers\NSSCCategoriesController.cs" />
     <Compile Include="Controllers\NSSCSubCategoriesController.cs" />
     <Compile Include="Data\AriContext.cs" />
@@ -276,6 +277,7 @@
     <Compile Include="Enumerations\DayCalculationConceptApplicationEnums.cs" />
     <Compile Include="Enumerations\DayCalculationConceptEnums.cs" />
     <Compile Include="Enumerations\NaceCodeEnums.cs" />
+    <Compile Include="Enumerations\NSSCActivityEnums.cs" />
     <Compile Include="Enumerations\NSSCCategoryEnums.cs" />
     <Compile Include="Enumerations\NSSCSubCategoryEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
@@ -301,6 +303,7 @@
     <Compile Include="Mappings\DayCalculationConceptApplicationMapping.cs" />
     <Compile Include="Mappings\DayCalculationConceptMapping.cs" />
     <Compile Include="Mappings\NaceCodeMapping.cs" />
+    <Compile Include="Mappings\NSSCActivityMapping.cs" />
     <Compile Include="Mappings\NSSCCategoryMapping.cs" />
     <Compile Include="Mappings\NSSCSubCategoryMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
@@ -328,6 +331,7 @@
     <Compile Include="Models\DTOs\DayCalculationConceptApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\DayCalculationConceptDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
+    <Compile Include="Models\DTOs\NSSCActivityDTOs.cs" />
     <Compile Include="Models\DTOs\NSSCCategoryDTOs.cs" />
     <Compile Include="Models\DTOs\NSSCSubCategoryDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
@@ -357,6 +361,7 @@
     <Compile Include="QueryFilters\DayCalculationConceptApplicationQueryFilters.cs" />
     <Compile Include="QueryFilters\DayCalculationConceptQueryFilters.cs" />
     <Compile Include="QueryFilters\NaceCodeQueryFilters.cs" />
+    <Compile Include="QueryFilters\NSSCActivityQueryFilters.cs" />
     <Compile Include="QueryFilters\NSSCCategoryQueryFilters.cs" />
     <Compile Include="QueryFilters\NSSCSubCategoryQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
@@ -375,6 +380,7 @@
     <Compile Include="Repositories\DayCalculationConceptApplicationRepository.cs" />
     <Compile Include="Repositories\DayCalculationConceptRepository.cs" />
     <Compile Include="Repositories\NaceCodeRepository.cs" />
+    <Compile Include="Repositories\NSSCActivityRepository.cs" />
     <Compile Include="Repositories\NSSCCategoryRepository.cs" />
     <Compile Include="Repositories\NSSCSubCategoryRepository.cs" />
     <Compile Include="Repositories\OrganizationRepository.cs" />
@@ -393,6 +399,7 @@
     <Compile Include="Services\DayCalculationConceptApplicationService.cs" />
     <Compile Include="Services\DayCalculationConceptService.cs" />
     <Compile Include="Services\NaceCodeService.cs" />
+    <Compile Include="Services\NSSCActivityService.cs" />
     <Compile Include="Services\NSSCCategoryService.cs" />
     <Compile Include="Services\NSSCSubCategoryService.cs" />
     <Compile Include="Services\OrganizationService.cs" />
@@ -462,8 +469,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\DayCalculationConcepts\" />
-    <Folder Include="Views\NaceCodes\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
