@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -16,5 +17,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         // RELATIONS
 
         public virtual NSSCSubCategory NSSCSubCategory { get; set; }
+
+        public virtual ICollection<NSSCAuditorActivity> NSSCAuditorActivities { get; set; }
     }
 }

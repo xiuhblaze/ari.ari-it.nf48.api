@@ -135,10 +135,15 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Updated = DateTime.UtcNow;
 
             // Execute queries
-
-            await _auditorRepository.DeleteTmpByUser(item.UpdatedUser);
-            _auditorRepository.Add(item);
-            _auditorRepository.SaveChanges();
+            try { 
+                await _auditorRepository.DeleteTmpByUser(item.UpdatedUser);
+                _auditorRepository.Add(item);
+                await _auditorRepository.SaveChangesAsync();
+            }
+            catch (Exception ex) 
+            {
+                throw new BusinessException($"AuditorService.AddAsync: {ex.Message}");
+            }
 
             return item;
         } // AddAsync
@@ -178,11 +183,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             try
             {
                 _auditorRepository.Update(foundItem);
-                _auditorRepository.SaveChanges();
+                await _auditorRepository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                throw new BusinessException(ex.Message);
+                //throw new BusinessException(ex.Message);
+                throw new BusinessException($"AuditorService.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
@@ -211,7 +217,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _auditorRepository.Update(foundItem);
             }
 
-            _auditorRepository.SaveChanges();
+            try
+            {
+                await _auditorRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditorService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }

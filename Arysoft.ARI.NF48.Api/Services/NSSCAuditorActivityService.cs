@@ -10,36 +10,33 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class NSSCSubCategoryService
+    public class NSSCAuditorActivityService
     {
-        private readonly NSSCSubCategoryRepository _repository;
+        private readonly NSSCAuditorActivityRepository _repository;
 
         // CONSTRUCTOR
 
-        public NSSCSubCategoryService()
-        {
-            _repository = new NSSCSubCategoryRepository();
-        } // NSSCSubCategoryService
+        public NSSCAuditorActivityService()
+        { 
+            _repository = new NSSCAuditorActivityRepository();
+        } // NSSCAuditorActivityService
 
         // METHODS
 
-        public PagedList<NSSCSubCategory> Gets(NSSCSubCategoryQueryFilters filters)
+        public PagedList<NSSCAuditorActivity> Gets(NSSCAuditorActivityQueryFilters filters)
         {
             var items = _repository.Gets();
 
             // Filters
 
-            if (filters.NSSCCategoryID != null) 
-            {
-                items = items.Where(e => e.NSSCCategoryID == filters.NSSCCategoryID);
-            }
-
             if (!string.IsNullOrEmpty(filters.Text))
             {
-                filters.Text = filters.Text.ToLower().Trim();
-                items = items.Where(e =>
-                    (e.Name != null && e.Name.ToLower().Contains(filters.Text))
-                    || (e.Description != null && e.Description.ToLower().Contains(filters.Text))
+                filters.Text = filters.Text.Trim().ToLower();
+                items = items.Where(e => 
+                    (e.Education != null && e.Education.ToLower().Contains(filters.Text))
+                    || (e.LegalRequirements != null && e.LegalRequirements.ToLower().Contains(filters.Text))
+                    || (e.SpecificTraining != null && e.SpecificTraining.ToLower().Contains(filters.Text))
+                    || (e.Comments != null && e.Comments.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -59,53 +56,30 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
-                case NSSCSubCategoryOrderType.Category:
-                    items = items.OrderBy(e => e.NSSCCategory.Name)
-                        .ThenBy(e => e.Name);
-                    break;
-                case NSSCSubCategoryOrderType.Name:
-                    items = items.OrderBy(e => e.Name);
-                    break;
-                case NSSCSubCategoryOrderType.Updated:
+                case NSSCAuditorActivityOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
-                case NSSCSubCategoryOrderType.CategoryDesc:
-                    items = items.OrderByDescending(e => e.NSSCCategory.Name)
-                        .ThenByDescending(e => e.NSSCCategory.Name);
+                case NSSCAuditorActivityOrderType.UpdatedDesc:
+                    items = items.OrderByDescending(e => e.Updated); 
                     break;
-                case NSSCSubCategoryOrderType.NameDesc:
-                    items = items.OrderByDescending(e => e.Name);
-                    break;
-                case NSSCSubCategoryOrderType.UpdatedDesc:
-                    items = items.OrderByDescending(e => e.Updated);
-                    break;
-                default:
-                    items = items.OrderBy(e => e.NSSCCategory.Name)
-                        .ThenBy(e => e.Name);
-                    break;
-            } // order
+            }
 
             // Paging
 
-            var pagedItems = PagedList<NSSCSubCategory>
+            var pagedItems = PagedList<NSSCAuditorActivity>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
             return pagedItems;
         } // Gets
 
-        public async Task<NSSCSubCategory> GetAsync(Guid id)
-        {
+        public async Task<NSSCAuditorActivity> GetAsync(Guid id)
+        { 
             return await _repository.GetAsync(id);
         } // GetAsync
 
-        public async Task<NSSCSubCategory> AddAsync(NSSCSubCategory item)
+        public async Task<NSSCAuditorActivity> AddAsync(NSSCAuditorActivity item)
         {
-            // Validations
-
-            if (string.IsNullOrEmpty(item.UpdatedUser))
-                throw new BusinessException("Must specify a username");
-
-            // Assigning values
+            // Assinging values
 
             item.ID = Guid.NewGuid();
             item.Status = StatusType.Nothing;
@@ -119,54 +93,55 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
+
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                throw new BusinessException($"NSSCSubCategoryService.AddAsync: {ex.Message}");
+                throw new BusinessException($"NSSCAuditorActivityService.AddAsync: {ex.Message}");
             }
 
             return item;
         } // AddAsync
 
-        public async Task<NSSCSubCategory> UpdateAsync(NSSCSubCategory item)
+        public async Task<NSSCAuditorActivity> UpdateAsync(NSSCAuditorActivity item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             // Validations
 
-            item.Status = item.Status == StatusType.Nothing
-                ? StatusType.Active
-                : item.Status;
-
-            // - Que no exista ese nombre en la categoria asociada
+            // - no validations yet
 
             // Assigning values
 
-            foundItem.Name = item.Name;
-            foundItem.Description = item.Description;
+            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+
+            foundItem.Education = item.Education;
+            foundItem.LegalRequirements = item.LegalRequirements;
+            foundItem.SpecificTraining = item.SpecificTraining;
+            foundItem.Comments = item.Comments;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
-            // Excecute queries
+            // Execute queries
 
             try
             {
                 _repository.Update(foundItem);
                 await _repository.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception ex)            
             {
-                throw new BusinessException($"NSSCSubCategoryService.UpdateAsync: {ex.Message}");
+                throw new BusinessException($"NSSCAuditorActivityService.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
         } // UpdateAsync
 
-        public async Task DeleteAsync(NSSCSubCategory item)
+        public async Task DeleteAsync(NSSCAuditorActivity item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
@@ -179,7 +154,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == StatusType.Deleted)
             {
-                // - validar que no tenga activities asociadas
+                // - validar que no tenga "job o audits experiences" asociadas
                 _repository.Delete(foundItem);
             }
             else
@@ -199,8 +174,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"NSSCSubCategoryService.DeleteAsync: {ex.Message}");
+                throw new BusinessException($"NSSCAuditorActivityService.DeleteAsync: {ex.Message}");
             }
-        } // DeleteAsync
+        }
     }
 }

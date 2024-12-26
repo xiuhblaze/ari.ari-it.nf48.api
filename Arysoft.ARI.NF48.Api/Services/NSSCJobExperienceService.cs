@@ -10,36 +10,30 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class NSSCSubCategoryService
+    public class NSSCJobExperienceService
     {
-        private readonly NSSCSubCategoryRepository _repository;
+        private readonly NSSCJobExperienceRepository _repository;
 
         // CONSTRUCTOR
 
-        public NSSCSubCategoryService()
+        public NSSCJobExperienceService()
         {
-            _repository = new NSSCSubCategoryRepository();
-        } // NSSCSubCategoryService
+            _repository = new NSSCJobExperienceRepository();
+        } // NSSCJobExperienceService
 
         // METHODS
 
-        public PagedList<NSSCSubCategory> Gets(NSSCSubCategoryQueryFilters filters)
+        public PagedList<NSSCJobExperience> Gets(NSSCJobExperienceQueryFilters filters)
         {
             var items = _repository.Gets();
 
             // Filters
 
-            if (filters.NSSCCategoryID != null) 
-            {
-                items = items.Where(e => e.NSSCCategoryID == filters.NSSCCategoryID);
-            }
-
             if (!string.IsNullOrEmpty(filters.Text))
             {
-                filters.Text = filters.Text.ToLower().Trim();
+                filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(e =>
-                    (e.Name != null && e.Name.ToLower().Contains(filters.Text))
-                    || (e.Description != null && e.Description.ToLower().Contains(filters.Text))
+                    e.Description != null && e.Description.ToLower().Contains(filters.Text)
                 );
             }
 
@@ -59,53 +53,36 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
-                case NSSCSubCategoryOrderType.Category:
-                    items = items.OrderBy(e => e.NSSCCategory.Name)
-                        .ThenBy(e => e.Name);
+                case NSSCJobExperienceOrderType.Description:
+                    items = items.OrderBy(e => e.Description);
                     break;
-                case NSSCSubCategoryOrderType.Name:
-                    items = items.OrderBy(e => e.Name);
-                    break;
-                case NSSCSubCategoryOrderType.Updated:
+                case NSSCJobExperienceOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
-                case NSSCSubCategoryOrderType.CategoryDesc:
-                    items = items.OrderByDescending(e => e.NSSCCategory.Name)
-                        .ThenByDescending(e => e.NSSCCategory.Name);
+                case NSSCJobExperienceOrderType.DescriptionDesc:
+                    items = items.OrderByDescending(e => e.Description);
                     break;
-                case NSSCSubCategoryOrderType.NameDesc:
-                    items = items.OrderByDescending(e => e.Name);
-                    break;
-                case NSSCSubCategoryOrderType.UpdatedDesc:
+                case NSSCJobExperienceOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
-                default:
-                    items = items.OrderBy(e => e.NSSCCategory.Name)
-                        .ThenBy(e => e.Name);
-                    break;
-            } // order
+            }
 
             // Paging
 
-            var pagedItems = PagedList<NSSCSubCategory>
+            var pagedItems = PagedList<NSSCJobExperience>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
             return pagedItems;
         } // Gets
 
-        public async Task<NSSCSubCategory> GetAsync(Guid id)
+        public async Task<NSSCJobExperience> GetAsync(Guid id)
         {
             return await _repository.GetAsync(id);
         } // GetAsync
 
-        public async Task<NSSCSubCategory> AddAsync(NSSCSubCategory item)
-        {
-            // Validations
-
-            if (string.IsNullOrEmpty(item.UpdatedUser))
-                throw new BusinessException("Must specify a username");
-
-            // Assigning values
+        public async Task<NSSCJobExperience> AddAsync(NSSCJobExperience item)
+        { 
+            // Asigning values
 
             item.ID = Guid.NewGuid();
             item.Status = StatusType.Nothing;
@@ -120,30 +97,26 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"NSSCSubCategoryService.AddAsync: {ex.Message}");
+            catch (Exception ex) {
+                throw new BusinessException($"NSSCJobExperienceService.AddAsync: {ex.Message}");
             }
 
             return item;
         } // AddAsync
 
-        public async Task<NSSCSubCategory> UpdateAsync(NSSCSubCategory item)
+        public async Task<NSSCJobExperience> UpdateAsync(NSSCJobExperience item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             // Validations
 
-            item.Status = item.Status == StatusType.Nothing
-                ? StatusType.Active
-                : item.Status;
-
-            // - Que no exista ese nombre en la categoria asociada
+            // - no validations yet
 
             // Assigning values
 
-            foundItem.Name = item.Name;
+            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+
             foundItem.Description = item.Description;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
@@ -151,7 +124,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
-            // Excecute queries
+            // Execute queries
 
             try
             {
@@ -160,13 +133,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"NSSCSubCategoryService.UpdateAsync: {ex.Message}");
+                throw new BusinessException($"NSSCJobExperienceService.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
         } // UpdateAsync
 
-        public async Task DeleteAsync(NSSCSubCategory item)
+        public async Task DeleteAsync(NSSCJobExperience item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
@@ -179,7 +152,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == StatusType.Deleted)
             {
-                // - validar que no tenga activities asociadas
                 _repository.Delete(foundItem);
             }
             else
@@ -199,7 +171,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"NSSCSubCategoryService.DeleteAsync: {ex.Message}");
+                throw new BusinessException($"NSSCJobExperienceService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
     }

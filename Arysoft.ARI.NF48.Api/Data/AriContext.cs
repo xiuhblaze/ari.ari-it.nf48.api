@@ -24,6 +24,9 @@ namespace Arysoft.ARI.NF48.Api.Data
             NSSCCategoryConfiguration.Configure(modelBuilder);
             NSSCSubCategoryConfiguration.Configure(modelBuilder);
             NSSCActivityConfiguration.Configure(modelBuilder);
+            NSSCAuditorActivityConfiguration.Configure(modelBuilder);
+            NSSCJobExperienceConfiguration.Configure(modelBuilder);
+            NSSCAuditExperienceConfiguration.Configure(modelBuilder);
             
             OrganizationConfiguration.Configure(modelBuilder);
             ContactConfiguration.Configure(modelBuilder);
