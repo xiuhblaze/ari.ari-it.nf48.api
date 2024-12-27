@@ -235,6 +235,7 @@
     <Compile Include="Controllers\DayCalculationConceptApplicationsController.cs" />
     <Compile Include="Controllers\DayCalculationConceptsController.cs" />
     <Compile Include="Controllers\NSSCActivitiesController.cs" />
+    <Compile Include="Controllers\NSSCAuditExperiencesController.cs" />
     <Compile Include="Controllers\NSSCAuditorActivitiesController.cs" />
     <Compile Include="Controllers\NSSCCategoriesController.cs" />
     <Compile Include="Controllers\NSSCJobExperiencesController.cs" />
@@ -283,6 +284,7 @@
     <Compile Include="Enumerations\DayCalculationConceptEnums.cs" />
     <Compile Include="Enumerations\NaceCodeEnums.cs" />
     <Compile Include="Enumerations\NSSCActivityEnums.cs" />
+    <Compile Include="Enumerations\NSSCAuditExperienceEnums.cs" />
     <Compile Include="Enumerations\NSSCAuditorActivityEnums.cs" />
     <Compile Include="Enumerations\NSSCCategoryEnums.cs" />
     <Compile Include="Enumerations\NSSCJobExperienceEnums.cs" />
@@ -311,6 +313,7 @@
     <Compile Include="Mappings\DayCalculationConceptMapping.cs" />
     <Compile Include="Mappings\NaceCodeMapping.cs" />
     <Compile Include="Mappings\NSSCActivityMapping.cs" />
+    <Compile Include="Mappings\NSSCAuditExperienceMapping.cs" />
     <Compile Include="Mappings\NSSCAuditorActivityMapping.cs" />
     <Compile Include="Mappings\NSSCCategoryMapping.cs" />
     <Compile Include="Mappings\NSSCJobExperienceMapping.cs" />
@@ -341,6 +344,7 @@
     <Compile Include="Models\DTOs\DayCalculationConceptDTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
     <Compile Include="Models\DTOs\NSSCActivityDTOs.cs" />
+    <Compile Include="Models\DTOs\NSSCAuditExperienceDTOs.cs" />
     <Compile Include="Models\DTOs\NSSCAuditorActivityDTOs.cs" />
     <Compile Include="Models\DTOs\NSSCCategoryDTOs.cs" />
     <Compile Include="Models\DTOs\NSSCJobExperienceDTOs.cs" />
@@ -376,6 +380,7 @@
     <Compile Include="QueryFilters\DayCalculationConceptQueryFilters.cs" />
     <Compile Include="QueryFilters\NaceCodeQueryFilters.cs" />
     <Compile Include="QueryFilters\NSSCActivityQueryFilters.cs" />
+    <Compile Include="QueryFilters\NSSCAuditExperienceQueryFilters.cs" />
     <Compile Include="QueryFilters\NSSCAuditorActivityQueryFilters.cs" />
     <Compile Include="QueryFilters\NSSCCategoryQueryFilters.cs" />
     <Compile Include="QueryFilters\NSSCJobExperienceQueryFilters.cs" />
@@ -397,6 +402,7 @@
     <Compile Include="Repositories\DayCalculationConceptRepository.cs" />
     <Compile Include="Repositories\NaceCodeRepository.cs" />
     <Compile Include="Repositories\NSSCActivityRepository.cs" />
+    <Compile Include="Repositories\NSSCAuditExperienceRepository.cs" />
     <Compile Include="Repositories\NSSCAuditorActivityRepository.cs" />
     <Compile Include="Repositories\NSSCCategoryRepository.cs" />
     <Compile Include="Repositories\NSSCJobExperienceRepository.cs" />
@@ -418,6 +424,7 @@
     <Compile Include="Services\DayCalculationConceptService.cs" />
     <Compile Include="Services\NaceCodeService.cs" />
     <Compile Include="Services\NSSCActivityService.cs" />
+    <Compile Include="Services\NSSCAuditExperienceService.cs" />
     <Compile Include="Services\NSSCAuditorActivityService.cs" />
     <Compile Include="Services\NSSCCategoryService.cs" />
     <Compile Include="Services\NSSCJobExperienceService.cs" />

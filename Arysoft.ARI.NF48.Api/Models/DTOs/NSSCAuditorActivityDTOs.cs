@@ -66,9 +66,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public NSSCActivityItemListDto NSSCActivity { get; set; }
 
-        //public IEnumerable<NSSCJobExperienceItemListDto> NSSCJobExperiences { get; set; }
+        public IEnumerable<NSSCJobExperienceItemListDto> NSSCJobExperiences { get; set; }
 
-        //public IEnumerable<NSSCAuditExperienceItemListDto> NSSCAuditExperiences { get; set; }
+        public IEnumerable<NSSCAuditExperienceItemListDto> NSSCAuditExperiences { get; set; }
     } // NSSCAuditorActivityItemDetailDto
 
     public class NSSCAuditorActivityPostDto

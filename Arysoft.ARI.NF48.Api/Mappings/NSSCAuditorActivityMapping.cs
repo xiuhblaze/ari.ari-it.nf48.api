@@ -77,6 +77,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 NSSCActivity = item.NSSCActivity != null
                     ? NSSCActivityMapping.NSSCActivityToItemListDto(item.NSSCActivity)
+                    : null,
+                NSSCJobExperiences = item.NSSCJobExperiences != null
+                    ? NSSCJobExperienceMapping.NSSCJobExperienceToListDto(item.NSSCJobExperiences)
+                    : null,
+                NSSCAuditExperiences = item.NSSCAuditExperiences != null
+                    ? NSSCAuditExperienceMapping.NSSCAuditExperienceToListDto(item.NSSCAuditExperiences)
                     : null
             };
         } // NSSCAuditorActivityToItemDetailDto
