@@ -15,13 +15,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 {
     public class NaceCodeService
     {
-        private readonly NaceCodeRepository _naceCodeRepository;
+        private readonly BaseRepository<NaceCode> _naceCodeRepository;
 
         // CONSTRUCTOR
 
         public NaceCodeService()
         {
-            _naceCodeRepository = new NaceCodeRepository();
+            _naceCodeRepository = new BaseRepository<NaceCode>();
         }
 
         // METHODS
@@ -106,7 +106,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            await _naceCodeRepository.DeleteTmpByUser(item.UpdatedUser);
+            await _naceCodeRepository.DeleteTmpByUserAsync(item.UpdatedUser);
             _naceCodeRepository.Add(item);
             await _naceCodeRepository.SaveChangesAsync();
 

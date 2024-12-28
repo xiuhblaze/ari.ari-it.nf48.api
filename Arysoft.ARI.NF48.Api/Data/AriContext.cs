@@ -20,13 +20,15 @@ namespace Arysoft.ARI.NF48.Api.Data
             
             AuditorConfiguration.Configure(modelBuilder);
             AuditorDocumentConfiguration.Configure(modelBuilder);
+            AuditorStandardConfiguration.Configure(modelBuilder);
             CatAuditorDocumentConfiguration.Configure(modelBuilder);
-            NSSCCategoryConfiguration.Configure(modelBuilder);
-            NSSCSubCategoryConfiguration.Configure(modelBuilder);
-            NSSCActivityConfiguration.Configure(modelBuilder);
-            NSSCAuditorActivityConfiguration.Configure(modelBuilder);
-            NSSCJobExperienceConfiguration.Configure(modelBuilder);
-            NSSCAuditExperienceConfiguration.Configure(modelBuilder);
+
+            FSSCCategoryConfiguration.Configure(modelBuilder);
+            FSSCSubCategoryConfiguration.Configure(modelBuilder);
+            FSSCActivityConfiguration.Configure(modelBuilder);
+            FSSCAuditorActivityConfiguration.Configure(modelBuilder);
+            FSSCJobExperienceConfiguration.Configure(modelBuilder);
+            FSSCAuditExperienceConfiguration.Configure(modelBuilder);
             
             OrganizationConfiguration.Configure(modelBuilder);
             ContactConfiguration.Configure(modelBuilder);

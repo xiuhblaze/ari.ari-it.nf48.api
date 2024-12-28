@@ -15,7 +15,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public DayCalculationConceptUnitType Unit { get; set; }
 
-        public StatusType Status { get; set; }
+        //public StatusType Status { get; set; }
 
         // Relations
 

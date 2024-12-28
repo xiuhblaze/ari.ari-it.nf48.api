@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -13,5 +14,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
+
+        public virtual StatusType Status { get; set; }
     }
 }

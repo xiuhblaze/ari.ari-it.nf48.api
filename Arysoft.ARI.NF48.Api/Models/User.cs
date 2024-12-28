@@ -20,7 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public UserType? Type { get; set; }
 
-        public StatusType Status { get; set; }
+        //public StatusType Status { get; set; }
 
         // RELATIONS
 

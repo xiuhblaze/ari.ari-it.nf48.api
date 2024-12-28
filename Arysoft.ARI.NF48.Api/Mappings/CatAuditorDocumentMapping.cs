@@ -25,6 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new CatAuditorDocumentItemListDto
             {
                 ID = item.ID,
+                StandardID = item.StandardID,
                 Name = item.Name,
                 Description = item.Description,
                 DocumentType = item.DocumentType,
@@ -36,6 +37,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsRequired = item.IsRequired,
                 Order = item.Order,
                 Status = item.Status,
+                StandardName = item.Standard != null
+                    ? item.Standard.Name 
+                    : string.Empty,
                 DocumentsCount = item.Documents != null 
                     ? item.Documents.Count 
                     : 0
@@ -47,6 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new CatAuditorDocumentItemDetailDto
             {
                 ID = item.ID,
+                StandardID = item.StandardID,
                 Name = item.Name,
                 Description = item.Description,
                 DocumentType = item.DocumentType,
@@ -66,6 +71,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(d => d.Status != StatusType.Nothing)
                         .OrderByDescending(d => d.StartDate))
                     : null,
+                Standard = item.Standard != null
+                    ? StandardMapping.StandardToItemListDto(item.Standard) 
+                    : null,
             };
         } // CatAuditorDocumentToItemDetailDto
 
@@ -82,6 +90,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new CatAuditorDocument
             {
                 ID = itemDto.ID,
+                StandardID = itemDto.StandardID,
                 Name = itemDto.Name,
                 Description = itemDto.Description,
                 DocumentType = itemDto.DocumentType,

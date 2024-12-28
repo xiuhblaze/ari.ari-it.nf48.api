@@ -23,13 +23,14 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public bool IsLeadAuditor { get; set; }
 
-        public StatusType Status { get; set; }
+        //public StatusType Status { get; set; }
 
         // RELATIONS
 
+        public virtual ICollection<AuditorStandard> AuditorStandards { get; set; }
+
         public virtual ICollection<AuditorDocument> Documents { get; set;  }
 
-        public virtual ICollection<NSSCAuditorActivity> NSSCAuditorActivities { get; set; }
-
+        public virtual ICollection<FSSCAuditorActivity> FSSCAuditorActivities { get; set; }
     }
 }

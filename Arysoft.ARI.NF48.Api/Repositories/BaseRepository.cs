@@ -63,5 +63,23 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Elimina todos los registros temporales creados por el usuario
+        /// </summary>
+        /// <param name="username">Nombre del usuario</param>
+        /// <returns></returns>
+        public virtual async Task DeleteTmpByUserAsync(string username)
+        {
+            var items = await _model
+                .Where(m =>
+                    m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
+                    && m.Status == StatusType.Nothing
+                ).ToListAsync();
+
+            foreach (var item in items)
+            {
+                _model.Remove(item);
+            }
+        } // DeleteTmpByUser
     }
 }

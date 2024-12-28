@@ -108,7 +108,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
-            await _category22KRepository.DeleteTmpByUser(item.UpdatedUser);
+            await _category22KRepository.DeleteTmpByUserAsync(item.UpdatedUser);
             _category22KRepository.Add(item);
             await _category22KRepository.SaveChangesAsync();
 

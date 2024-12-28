@@ -61,18 +61,18 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             else throw new BusinessException("The role already was assigned to the user");
         } // AddRoleAsync
 
-        public async Task DeleteTmpByUser(string username)
-        { 
-            var items = await _model
-                .Where(m => 
-                    m.UpdatedUser.ToUpper() == username.ToUpper() 
-                    && m.Status == StatusType.Nothing
-                ).ToListAsync();
+        //public async Task DeleteTmpByUser(string username)
+        //{ 
+        //    var items = await _model
+        //        .Where(m => 
+        //            m.UpdatedUser.ToUpper() == username.ToUpper() 
+        //            && m.Status == StatusType.Nothing
+        //        ).ToListAsync();
 
-            foreach(var item in items)
-            {
-                _model.Remove(item);
-            }
-        } // DeleteTmpByUser
+        //    foreach(var item in items)
+        //    {
+        //        _model.Remove(item);
+        //    }
+        //} // DeleteTmpByUser
     }
 }

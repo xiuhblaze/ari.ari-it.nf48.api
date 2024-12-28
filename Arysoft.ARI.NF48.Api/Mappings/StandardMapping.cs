@@ -30,7 +30,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                NoApplications = item.Applications != null ? item.Applications.Count : 0
+                NoApplications = item.Applications != null 
+                    ? item.Applications.Count 
+                    : 0,
+                CatAuditorDocumentsCount = item.CatAuditorDocuments != null
+                    ? item.CatAuditorDocuments.Count 
+                    : 0
             };
         } // StandardToItemListDto
 
@@ -49,6 +54,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser,
                 Applications = item.Applications != null
                     ? ApplicationMapping.ApplicationsToListDto(item.Applications)
+                    : null,
+                CatAuditorDocuments = item.CatAuditorDocuments != null
+                    ? CatAuditorDocumentMapping.CatAuditorDocumentToListDto(item.CatAuditorDocuments)
                     : null
             };
         } // StandardToItemDetailDto

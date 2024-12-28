@@ -69,7 +69,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string ReviewComments { get; set; }
 
-        public ApplicationStatusType Status { get; set; }
+        public new ApplicationStatusType Status { get; set; } //TODO: Esto lo tengo en duda
 
         // RELATIONS
 

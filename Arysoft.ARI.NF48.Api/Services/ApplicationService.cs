@@ -5,10 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -147,7 +145,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Excecute queries
 
-            await _applicationRepository.DeleteTmpByUser(item.UpdatedUser);
+            await _applicationRepository.DeleteTmpByUserAsync(item.UpdatedUser);
             _applicationRepository.Add(item);
             await _applicationRepository.SaveChangesAsync();
 

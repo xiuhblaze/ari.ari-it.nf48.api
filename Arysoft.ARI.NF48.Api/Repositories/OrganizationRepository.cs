@@ -9,10 +9,10 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class OrganizationRepository : BaseRepository<Organization>
     {
-        public async Task DeleteTmpByUser(string username)
+        public new async Task DeleteTmpByUserAsync(string username)
         {
             var items = await _model
-                .Where(m => 
+                .Where(m =>
                     m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
                     && m.Status == OrganizationStatusType.Nothing
                 ).ToListAsync();

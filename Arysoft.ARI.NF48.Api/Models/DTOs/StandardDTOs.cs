@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -20,11 +19,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StatusType Status { get; set; }
 
-        public int NoApplications { get; set; }
-
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
+
+        public int NoApplications { get; set; }
+
+        public int CatAuditorDocumentsCount { get; set; }
+
     } // StandardItemListDto
 
     public class StandardItemDetailDto
@@ -50,6 +52,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // RELATIONS
 
         public IEnumerable<ApplicationItemListDto> Applications { get; set; }
+
+        public IEnumerable<CatAuditorDocumentItemListDto> CatAuditorDocuments { get; set; }
     } // StandardItemDetailDto
 
     public class StandardPostDto

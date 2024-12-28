@@ -9,34 +9,34 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class RoleRepository : BaseRepository<Role>
     {
-        public async Task<Role> UpdateAsync(Role item)
-        {
-            var foundItem = await _model.FindAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found");
+        //public async Task<Role> UpdateAsync(Role item)
+        //{
+        //    var foundItem = await _model.FindAsync(item.ID)
+        //        ?? throw new BusinessException("The record to update was not found");
 
-            foundItem.Name = item.Name;
-            foundItem.Description = item.Description;
-            foundItem.Status = item.Status;
-            foundItem.Updated = item.Updated;
-            foundItem.UpdatedUser = item.UpdatedUser;
+        //    foundItem.Name = item.Name;
+        //    foundItem.Description = item.Description;
+        //    foundItem.Status = item.Status;
+        //    foundItem.Updated = item.Updated;
+        //    foundItem.UpdatedUser = item.UpdatedUser;
 
-            Update(foundItem);
+        //    Update(foundItem);
 
-            return foundItem;
-        } // UpdateAsync
+        //    return foundItem;
+        //} // UpdateAsync
 
-        public async Task DeleteTmpByUser(string username)
-        {
-            var items = await _model
-                .Where(m => 
-                    m.UpdatedUser.ToUpper() == username.ToUpper() 
-                    && m.Status == StatusType.Nothing
-                ).ToListAsync();
+    //    public async Task DeleteTmpByUser(string username)
+    //    {
+    //        var items = await _model
+    //            .Where(m => 
+    //                m.UpdatedUser.ToUpper() == username.ToUpper() 
+    //                && m.Status == StatusType.Nothing
+    //            ).ToListAsync();
 
-            foreach (var item in items)
-            {
-                _model.Remove(item);
-            }
-        } // DeleteTmpByUser
+    //        foreach (var item in items)
+    //        {
+    //            _model.Remove(item);
+    //        }
+    //    } // DeleteTmpByUser
     }
 }

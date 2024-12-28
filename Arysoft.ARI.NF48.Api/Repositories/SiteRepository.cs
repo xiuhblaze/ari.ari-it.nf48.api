@@ -22,23 +22,23 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             }
         } // SetToNotSiteMainAsync
 
-        /// <summary>
-        /// Elimina todos los registros temporales generados por el usuario
-        /// </summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
-        public async Task DeleteTmpByUser(string username)
-        {
-            var items = await _model
-                .Where(m => 
-                    m.UpdatedUser.ToUpper() == username.ToUpper()
-                    && m.Status == StatusType.Nothing
-                ).ToListAsync();
+        ///// <summary>
+        ///// Elimina todos los registros temporales generados por el usuario
+        ///// </summary>
+        ///// <param name="username"></param>
+        ///// <returns></returns>
+        //public async Task DeleteTmpByUser(string username)
+        //{
+        //    var items = await _model
+        //        .Where(m => 
+        //            m.UpdatedUser.ToUpper() == username.ToUpper()
+        //            && m.Status == StatusType.Nothing
+        //        ).ToListAsync();
 
-            foreach(var item in items ) 
-            {
-                _model.Remove(item);
-            }
-        } // DeleteTmpByUser
+        //    foreach(var item in items ) 
+        //    {
+        //        _model.Remove(item);
+        //    }
+        //} // DeleteTmpByUser
     }
 }

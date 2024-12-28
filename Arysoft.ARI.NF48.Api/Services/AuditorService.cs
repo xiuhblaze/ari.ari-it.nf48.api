@@ -136,7 +136,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
             try { 
-                await _auditorRepository.DeleteTmpByUser(item.UpdatedUser);
+                await _auditorRepository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _auditorRepository.Add(item);
                 await _auditorRepository.SaveChangesAsync();
             }

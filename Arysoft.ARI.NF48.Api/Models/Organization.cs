@@ -15,7 +15,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Phone { get; set; }
 
-        public OrganizationStatusType Status { get; set; }
+        public new OrganizationStatusType Status { get; set; } //TODO: Esto lo tengo en duda
 
         // RELATIONS
 

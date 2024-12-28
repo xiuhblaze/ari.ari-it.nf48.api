@@ -14,13 +14,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 {
     public class ShiftService
     {
-        private readonly ShiftRepository _shiftRepository;
+        private readonly BaseRepository<Shift> _shiftRepository;
 
         // CONSTRUCTOR
 
         public ShiftService()
         {
-            _shiftRepository = new ShiftRepository();
+            _shiftRepository = new BaseRepository<Shift>();
         }
 
         // METHODS
@@ -137,7 +137,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            await _shiftRepository.DeleteTmpByUser(item.UpdatedUser);
+            await _shiftRepository.DeleteTmpByUserAsync(item.UpdatedUser);
             _shiftRepository.Add(item);
             await _shiftRepository.SaveChangesAsync();
 

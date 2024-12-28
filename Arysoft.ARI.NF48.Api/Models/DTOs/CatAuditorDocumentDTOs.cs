@@ -11,6 +11,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public Guid? StandardID { get; set; }
+
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -33,12 +35,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StatusType Status { get; set; }
 
+        public string StandardName { get; set; }
+
         public int DocumentsCount { get; set; }
     }
 
     public class CatAuditorDocumentItemDetailDto
     {
         public Guid ID { get; set; }
+
+        public Guid? StandardID { get; set; }
 
         public string Name { get; set; }
 
@@ -70,6 +76,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
+        public StandardItemListDto Standard { get; set; }
+
         public IEnumerable<AuditorDocumentItemListDto> Documents { get; set; }
     } // CatAuditorDocumentItemDetailDto
 
@@ -83,6 +91,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class CatAuditorDocumentPutDto
     {
         public Guid ID { get; set; }
+
+        public Guid? StandardID { get; set; }
 
         [StringLength(50)]
         public string Name { get; set; }

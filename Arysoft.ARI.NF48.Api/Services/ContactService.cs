@@ -128,7 +128,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            await _contactRepository.DeleteTmpByUser(item.UpdatedUser);
+            await _contactRepository.DeleteTmpByUserAsync(item.UpdatedUser);
             _contactRepository.Add(item);
             await _contactRepository.SaveChangesAsync();
 

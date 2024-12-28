@@ -19,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public AuditorDocumentType? Type { get; set; }
 
-        public StatusType Status { get; set; }
+        //public StatusType Status { get; set; }
 
         // RELATIONS
 

@@ -14,6 +14,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
          public string Description { get; set; }
 
-        public StatusType Status { get; set; }
+        //public StatusType Status { get; set; }
     }
 }

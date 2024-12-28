@@ -12,13 +12,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 {
     public class CatAuditorDocumentService
     {
-        private readonly CatAuditorDocumentRepository _repository;
+        //private readonly CatAuditorDocumentRepository _repository;
+        private readonly BaseRepository<CatAuditorDocument> _repository;
 
         // CONSTRUCTOR
 
         public CatAuditorDocumentService()
         {
-            _repository = new CatAuditorDocumentRepository();
+            //_repository = new CatAuditorDocumentRepository();
+            _repository = new BaseRepository<CatAuditorDocument>();
         }
 
         // METHODS
@@ -28,6 +30,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             var items = _repository.Gets();
 
             // Filters
+
+            if (filters.StandardID != null)
+            { 
+                items = items.Where(e => e.StandardID == filters.StandardID);
+            }
 
             if (!string.IsNullOrEmpty(filters.Text))
             {
@@ -110,7 +117,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            await _repository.DeleteTmpByUser(item.UpdatedUser);
+            await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
             _repository.Add(item);
             _repository.SaveChanges();
 
@@ -143,6 +150,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
+            foundItem.StandardID = item.StandardID;
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
             foundItem.DocumentType = item.DocumentType;

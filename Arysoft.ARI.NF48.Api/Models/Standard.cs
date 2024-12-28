@@ -13,11 +13,15 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public int? SalesMaxReductionDays { get; set; }
 
-        public StatusType Status { get; set; }
+        //public StatusType Status { get; set; }
 
         // RELATIONS
 
         public virtual ICollection<Application> Applications { get; set; }
+
+        public virtual ICollection<AuditorStandard> AuditorStandards { get; set; }
+
+        public virtual ICollection<CatAuditorDocument> CatAuditorDocuments { get; set; }
 
         public virtual ICollection<DayCalculationConcept> DayCalculationConcepts { get; set; }
     }

@@ -18,6 +18,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public bool IsAccredited { get; set; }
 
-        public StatusType Status { get; set; }
+        //public StatusType Status { get; set; }
     }
 }
