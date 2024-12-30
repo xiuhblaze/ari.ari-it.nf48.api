@@ -230,6 +230,7 @@
     <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Controllers\AuditorDocumentsController.cs" />
     <Compile Include="Controllers\AuditorsController.cs" />
+    <Compile Include="Controllers\AuditorStandardsController.cs" />
     <Compile Include="Controllers\CatAuditorDocumentsController.cs" />
     <Compile Include="Controllers\Categories22KController.cs" />
     <Compile Include="Controllers\DayCalculationConceptApplicationsController.cs" />
@@ -307,6 +308,7 @@
     <Compile Include="IO\FileRepository.cs" />
     <Compile Include="Mappings\ApplicationMapping.cs" />
     <Compile Include="Mappings\AuditorDocumentMapping.cs" />
+    <Compile Include="Mappings\AuditorStandardMapping.cs" />
     <Compile Include="Mappings\CatAuditorDocumentMapping.cs" />
     <Compile Include="Mappings\Category22KMapping.cs" />
     <Compile Include="Mappings\AuditorMapping.cs" />
@@ -339,6 +341,7 @@
     <Compile Include="Models\DTOs\ApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\AuditorDocumentDTOs.cs" />
     <Compile Include="Models\DTOs\AuditorDTOs.cs" />
+    <Compile Include="Models\DTOs\AuditorStandardDTOs.cs" />
     <Compile Include="Models\DTOs\AuthDTOs.cs" />
     <Compile Include="Models\DTOs\CatAuditorDocumentDTOs.cs" />
     <Compile Include="Models\DTOs\Category22KDTOs.cs" />

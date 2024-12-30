@@ -36,7 +36,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsLeadAuditor = item.IsLeadAuditor,
                 Status = item.Status,
                 ValidityStatus = GetAuditorValidityStatus(item),
-                RequiredStatus = GetAuditorRequiredStatus(item)
+                RequiredStatus = GetAuditorRequiredStatus(item),
+                DocumentsCount = item.Documents != null
+                    ? item.Documents.Count
+                    : 0,
+                StandardsCount = item.AuditorStandards != null
+                    ? item.AuditorStandards.Count
+                    : 0,
             };
         } // AuditorToItemListDto
 
@@ -63,9 +69,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Documents = item.Documents != null
                     ? AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents
                         .Where(d => d.Status != StatusType.Nothing)
-                        .OrderBy(d => d.Status)
-                        .ThenByDescending(d => d.StartDate))
+                        .OrderBy(d => d.CatAuditorDocument.DocumentType)
+                        .ThenBy(d => d.CatAuditorDocument.Order))
                     : null,
+                Standards = item.AuditorStandards != null
+                    ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards
+                        .Where(a => a.Status != StatusType.Nothing))
+                    : null
             };
         } // AuditorToItemDetailDto
 

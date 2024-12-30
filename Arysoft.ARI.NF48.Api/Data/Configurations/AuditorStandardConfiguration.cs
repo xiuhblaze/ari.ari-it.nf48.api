@@ -19,9 +19,9 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.AuditorID)
                 .IsRequired();
 
-            modelBuilder.Entity<AuditorStandard>()
-                .Property(m => m.StandardID)
-                .IsRequired();
+            //modelBuilder.Entity<AuditorStandard>()
+            //    .Property(m => m.StandardID)
+            //    .IsRequired();
 
             modelBuilder.Entity<AuditorStandard>()
                 .Property(m => m.Comments)

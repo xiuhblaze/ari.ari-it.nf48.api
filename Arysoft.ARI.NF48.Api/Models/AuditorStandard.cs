@@ -7,7 +7,7 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid AuditorID { get; set; }
 
-        public Guid StandardID { get; set; }
+        public Guid? StandardID { get; set; }
 
         public string Comments { get; set; }
 

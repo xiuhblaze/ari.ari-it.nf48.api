@@ -15,9 +15,11 @@ namespace Arysoft.ARI.NF48.Api
 
             // CORS
             //var cors = new EnableCorsAttribute("http://localhost:5173,http://localhost:3000", "*", "*");            
-            var corsProduccion = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,http://localhost:5173,http://cortana.im-prove.com.mx", "*", "*");
+            var corsDev = new EnableCorsAttribute("http://localhost:5173", "*", "*");
+            //var corsProduction = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,http://localhost:5173,http://cortana.im-prove.com.mx", "*", "*");
 
-            config.EnableCors(corsProduccion);
+            config.EnableCors(corsDev);
+            //config.EnableCors(corsProduction);
 
             // Rutas de Web API
             config.MapHttpAttributeRoutes();

@@ -49,7 +49,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ValidityStatus = GetValidityStatus(item),
                 AuditorFullName = auditorFullName,
                 CatDescription = item.CatAuditorDocument != null
-                    ? item.CatAuditorDocument.Description
+                    ? $"{item.CatAuditorDocument.Name ?? ""} {item.CatAuditorDocument.Description ?? ""}".Trim()
                     : string.Empty
             };
         } // AuditorDocumentToItemListDto

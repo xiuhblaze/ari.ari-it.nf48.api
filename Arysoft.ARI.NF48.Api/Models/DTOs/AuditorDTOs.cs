@@ -30,6 +30,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditorDocumentValidityType ValidityStatus { get; set; }
 
         public AuditorDocumentRequiredType RequiredStatus { get; set; }
+
+        // RELATIONS
+
+        public int StandardsCount { get; set; }
+
+        public int DocumentsCount { get; set; }
     } // AuditorItemListDto
 
     public class AuditorItemDetailDto
@@ -71,6 +77,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // RELATIONS
 
         public IEnumerable<AuditorDocumentItemListDto> Documents { get; set; }
+
+        public IEnumerable<AuditorStandardItemListDto> Standards { get; set; }
     } // AuditorItemDetailDto
 
     public class AuditorPostDto

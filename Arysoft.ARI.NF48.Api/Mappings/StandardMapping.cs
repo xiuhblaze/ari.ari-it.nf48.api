@@ -30,8 +30,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                NoApplications = item.Applications != null 
+                ApplicationsCount = item.Applications != null 
                     ? item.Applications.Count 
+                    : 0,
+                AuditorsCount = item.AuditorStandards != null
+                    ? item.AuditorStandards.Count
                     : 0,
                 CatAuditorDocumentsCount = item.CatAuditorDocuments != null
                     ? item.CatAuditorDocuments.Count 
@@ -54,6 +57,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser,
                 Applications = item.Applications != null
                     ? ApplicationMapping.ApplicationsToListDto(item.Applications)
+                    : null,
+                Auditors = item.AuditorStandards != null
+                    ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards)
                     : null,
                 CatAuditorDocuments = item.CatAuditorDocuments != null
                     ? CatAuditorDocumentMapping.CatAuditorDocumentToListDto(item.CatAuditorDocuments)

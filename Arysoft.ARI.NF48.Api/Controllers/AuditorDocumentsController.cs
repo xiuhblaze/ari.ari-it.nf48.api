@@ -53,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetAuditorDocuments
 
         [ResponseType(typeof(ApiResponse<AuditorDocumentItemDetailDto>))]
-        public async Task<IHttpActionResult> GetAuditor(Guid id)
+        public async Task<IHttpActionResult> GetAuditorDocument(Guid id)
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
@@ -61,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var response = new ApiResponse<AuditorDocumentItemDetailDto>(itemDto);
 
             return Ok(response);
-        } // GetAuditor 
+        } // GetAuditorDocument 
 
         [ResponseType(typeof(ApiResponse<AuditorDocumentItemDetailDto>))]
         public async Task<IHttpActionResult> PostAuditorDocument([FromBody] AuditorDocumentPostDto itemPostDto)

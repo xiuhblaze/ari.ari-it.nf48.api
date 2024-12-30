@@ -23,7 +23,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
-        public int NoApplications { get; set; }
+        public int ApplicationsCount { get; set; }
+
+        public int AuditorsCount { get; set; }
 
         public int CatAuditorDocumentsCount { get; set; }
 
@@ -52,6 +54,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // RELATIONS
 
         public IEnumerable<ApplicationItemListDto> Applications { get; set; }
+
+        public IEnumerable<AuditorStandardItemListDto> Auditors { get; set; }
 
         public IEnumerable<CatAuditorDocumentItemListDto> CatAuditorDocuments { get; set; }
     } // StandardItemDetailDto
