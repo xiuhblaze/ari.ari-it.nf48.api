@@ -26,5 +26,9 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual Auditor Auditor { get; set; }
 
         public virtual CatAuditorDocument CatAuditorDocument { get; set; }
+
+        // NOT MAPPED
+
+        public AuditorDocumentValidityType? ValidityStatus { get; set; }
     }
 }

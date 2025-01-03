@@ -47,6 +47,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            // Not Mapped
+
+            modelBuilder.Entity<AuditorDocument>()
+                .Ignore(m => m.ValidityStatus);
         }
     }
 }

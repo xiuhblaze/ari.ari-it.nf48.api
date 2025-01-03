@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
+using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -68,6 +69,34 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
 
+            foreach (var item in items) // Generando los valores calculados
+            { 
+                item.ValidityStatus = GetValidityStatus(item);
+                item.RequiredStatus = GetRequiredStatus(item);
+            }
+
+            if (filters.DocumentStatus != null && filters.DocumentStatus != AuditorDocumentStatusType.Nothing)
+            {
+                switch (filters.DocumentStatus)
+                {
+                    case AuditorDocumentStatusType.Success:
+                        items = items.Where(e => 
+                            e.ValidityStatus == AuditorDocumentValidityType.Success
+                            && e.RequiredStatus == AuditorDocumentRequiredType.Success
+                        );
+                        break;
+                    case AuditorDocumentStatusType.Warning:
+                        items = items.Where(e => e.ValidityStatus == AuditorDocumentValidityType.Warning);
+                        break;
+                    case AuditorDocumentStatusType.Danger:
+                        items = items.Where(e =>
+                            e.ValidityStatus == AuditorDocumentValidityType.Danger
+                            || e.RequiredStatus == AuditorDocumentRequiredType.Danger
+                        );
+                        break;
+                }
+            }
+
             // Order
 
             switch (filters.Order)
@@ -106,7 +135,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Auditor> GetAsync(Guid id)
         {
-            return await _auditorRepository.GetAsync(id);
+            var item = await _auditorRepository.GetAsync(id);
+
+            item.ValidityStatus = GetValidityStatus(item);
+            item.RequiredStatus = GetRequiredStatus(item);
+
+            return item;
         } // GetAsync
 
         public async Task<Auditor> AddAsync(Auditor item)
@@ -191,6 +225,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditorService.UpdateAsync: {ex.Message}");
             }
 
+            item.ValidityStatus = GetValidityStatus(item);
+            item.RequiredStatus = GetRequiredStatus(item);
+
             return foundItem;
         } // UpdateAsync
 
@@ -226,5 +263,108 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditorService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // PRIVATE
+
+        private AuditorDocumentValidityType GetValidityStatus(Auditor item)
+        {
+            AuditorDocumentValidityType validityStatus = AuditorDocumentValidityType.Nothing;
+            //var _auditorDocumentService = new AuditorDocumentService();
+
+            if (item.Documents != null)
+            {
+                if (item.Documents != null && item.Documents.Count() > 0)
+                {
+                    validityStatus = AuditorDocumentValidityType.Success;
+
+                    // Generar los status
+                    foreach (var document in item.Documents)
+                    {
+                        document.ValidityStatus = AuditorDocumentService.GetValidityStatus(document);
+                    }
+
+                    // Buscar alguno Vencido
+                    foreach (var document in item.Documents)
+                    {                    
+                        if (document.ValidityStatus == AuditorDocumentValidityType.Danger && document.Status == StatusType.Active)
+                        {
+                            validityStatus = AuditorDocumentValidityType.Danger;
+                            break;
+                        }
+                    }
+
+                    // Si no hay vencidos, buscar uno Por Vencer
+                    if (validityStatus != AuditorDocumentValidityType.Danger)
+                    {
+                        foreach (var document in item.Documents)
+                        {
+                            if (document.ValidityStatus == AuditorDocumentValidityType.Warning && document.Status == StatusType.Active)
+                            {
+                                validityStatus = AuditorDocumentValidityType.Warning;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return validityStatus;
+        } // GetValidityStatus
+
+        private AuditorDocumentRequiredType GetRequiredStatus(Auditor item)
+        {
+            var catAuditorDocumentRepository = new CatAuditorDocumentRepository();
+            var requiredStatus = AuditorDocumentRequiredType.Success;
+
+            var catAuditorDocuments = catAuditorDocumentRepository.Gets()
+                .Where(m => m.Status == StatusType.Active && m.IsRequired != null && (bool)m.IsRequired)
+                .ToList();
+
+            if (catAuditorDocuments != null)
+            {
+                //requiredStatus = AuditorDocumentRequiredType.Success;
+
+                // Hiring
+                foreach (var catAuditorDocument in catAuditorDocuments
+                    .Where(cad => cad.StandardID == null || cad.StandardID == System.Guid.Empty))
+                {
+                    if (item.Documents == null || !item.Documents
+                        .Where(d =>
+                            d.CatAuditorDocumentID == catAuditorDocument.ID
+                            && d.Status == StatusType.Active)
+                        .Any())
+                    {
+                        requiredStatus = AuditorDocumentRequiredType.Danger;
+                        break;
+                    }
+                }
+
+                // Revisar por cada standard asociado al usuario
+                if (item.AuditorStandards != null && requiredStatus != AuditorDocumentRequiredType.Danger)
+                {
+                    foreach (var auditorStandard in item.AuditorStandards
+                        .Where(aus => aus.Status == StatusType.Active))
+                    {
+                        foreach (var catAuditorDocument in catAuditorDocuments
+                            .Where(cad => cad.StandardID == auditorStandard.StandardID))
+                        {
+                            if (item.Documents == null || !item.Documents
+                                .Where(d =>
+                                    d.CatAuditorDocumentID == catAuditorDocument.ID
+                                    && d.Status == StatusType.Active)
+                                .Any())
+                            {
+                                requiredStatus = AuditorDocumentRequiredType.Danger;
+                                break;
+                            }
+                        }
+
+                        if (requiredStatus == AuditorDocumentRequiredType.Danger) break;
+                    }
+                }
+            }
+
+            return requiredStatus;
+        } // GetRequiredStatus
     }
 }

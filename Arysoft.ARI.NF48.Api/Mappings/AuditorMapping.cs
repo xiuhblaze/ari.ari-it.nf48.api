@@ -35,14 +35,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 FeePayment = item.FeePayment,
                 IsLeadAuditor = item.IsLeadAuditor,
                 Status = item.Status,
-                ValidityStatus = GetAuditorValidityStatus(item),
-                RequiredStatus = GetAuditorRequiredStatus(item),
+                ValidityStatus = item.ValidityStatus ?? AuditorDocumentValidityType.Nothing, // GetAuditorValidityStatus(item),
+                RequiredStatus = item.RequiredStatus ?? AuditorDocumentRequiredType.Nothing, // GetAuditorRequiredStatus(item),
                 DocumentsCount = item.Documents != null
                     ? item.Documents.Count
                     : 0,
-                StandardsCount = item.AuditorStandards != null
-                    ? item.AuditorStandards.Count
-                    : 0,
+                Standards = item.AuditorStandards != null
+                    ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards
+                        .Where(a => a.Status != StatusType.Nothing))
+                    : null
             };
         } // AuditorToItemListDto
 
@@ -64,8 +65,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                ValidityStatus = GetAuditorValidityStatus(item),
-                RequiredStatus = GetAuditorRequiredStatus(item),
+                ValidityStatus = item.ValidityStatus ?? AuditorDocumentValidityType.Nothing, // GetAuditorValidityStatus(item),
+                RequiredStatus = item.RequiredStatus ?? AuditorDocumentRequiredType.Nothing, // GetAuditorRequiredStatus(item),
                 Documents = item.Documents != null
                     ? AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents
                         .Where(d => d.Status != StatusType.Nothing)
@@ -116,72 +117,98 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         // PRIVATE
 
-        private static AuditorDocumentValidityType GetAuditorValidityStatus(Auditor item)
-        {
-            AuditorDocumentValidityType validityStatus = AuditorDocumentValidityType.Nothing;
+        //private static AuditorDocumentValidityType GetAuditorValidityStatus(Auditor item)
+        //{
+        //    AuditorDocumentValidityType validityStatus = AuditorDocumentValidityType.Nothing;
 
-            if (item.Documents != null)
-            { 
-                var documents = AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents);
+        //    if (item.Documents != null)
+        //    { 
+        //        var documents = AuditorDocumentMapping.AuditorDocumentToListDto(item.Documents);
                 
-                if (documents != null && documents.Count() > 0)
-                {
-                    validityStatus = AuditorDocumentValidityType.Success;
+        //        if (documents != null && documents.Count() > 0)
+        //        {
+        //            validityStatus = AuditorDocumentValidityType.Success;
 
-                    foreach (var document in documents)
-                    {
-                        if (document.ValidityStatus == AuditorDocumentValidityType.Danger && document.Status == StatusType.Active)
-                        {
-                            validityStatus = AuditorDocumentValidityType.Danger;
-                            break;
-                        }
-                    }
+        //            foreach (var document in documents)
+        //            {
+        //                if (document.ValidityStatus == AuditorDocumentValidityType.Danger && document.Status == StatusType.Active)
+        //                {
+        //                    validityStatus = AuditorDocumentValidityType.Danger;
+        //                    break;
+        //                }
+        //            }
 
-                    if (validityStatus != AuditorDocumentValidityType.Danger)
-                    {
-                        foreach (var document in documents)
-                        {
-                            if (document.ValidityStatus == AuditorDocumentValidityType.Warning && document.Status == StatusType.Active)
-                            {
-                                validityStatus = AuditorDocumentValidityType.Warning;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+        //            if (validityStatus != AuditorDocumentValidityType.Danger)
+        //            {
+        //                foreach (var document in documents)
+        //                {
+        //                    if (document.ValidityStatus == AuditorDocumentValidityType.Warning && document.Status == StatusType.Active)
+        //                    {
+        //                        validityStatus = AuditorDocumentValidityType.Warning;
+        //                        break;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
 
-            return validityStatus;
-        } // GetAuditorValidityStatus
+        //    return validityStatus;
+        //} // GetAuditorValidityStatus
 
-        private static AuditorDocumentRequiredType GetAuditorRequiredStatus(Auditor item) 
-        {
-            var catAuditorDocumentRepository = new CatAuditorDocumentRepository();
-            var requiredStatus = AuditorDocumentRequiredType.Nothing;
+        //private static AuditorDocumentRequiredType GetAuditorRequiredStatus(Auditor item) 
+        //{
+        //    var catAuditorDocumentRepository = new CatAuditorDocumentRepository();
+        //    var requiredStatus = AuditorDocumentRequiredType.Success;
 
-            var catAuditorDocuments = catAuditorDocumentRepository.Gets()
-                .Where(m => m.Status == StatusType.Active && m.IsRequired != null && (bool)m.IsRequired)
-                .ToList();
+        //    var catAuditorDocuments = catAuditorDocumentRepository.Gets()
+        //        .Where(m => m.Status == StatusType.Active && m.IsRequired != null && (bool)m.IsRequired)
+        //        .ToList();
 
-            if (catAuditorDocuments != null)
-            {
-                requiredStatus = AuditorDocumentRequiredType.Success;
+        //    if (catAuditorDocuments != null)
+        //    {
+        //        //requiredStatus = AuditorDocumentRequiredType.Success;
 
-                foreach (var catAuditorDocument in catAuditorDocuments)
-                {
-                    if (item.Documents == null || !item.Documents
-                        .Where(d =>
-                            d.CatAuditorDocumentID == catAuditorDocument.ID
-                            && d.Status == StatusType.Active)
-                        .Any())
-                    { 
-                        requiredStatus = AuditorDocumentRequiredType.Danger;
-                        break;
-                    }
-                }
-            }
+        //        // Hiring
+        //        foreach (var catAuditorDocument in catAuditorDocuments
+        //            .Where(cad => cad.StandardID == null || cad.StandardID == System.Guid.Empty))
+        //        {
+        //            if (item.Documents == null || !item.Documents
+        //                .Where(d =>
+        //                    d.CatAuditorDocumentID == catAuditorDocument.ID
+        //                    && d.Status == StatusType.Active)
+        //                .Any())
+        //            { 
+        //                requiredStatus = AuditorDocumentRequiredType.Danger;
+        //                break;
+        //            }
+        //        }
 
-            return requiredStatus;
-        } // GetAuditorRequiredStatus
+        //        // Revisar por cada standard asociado al usuario
+        //        if (item.AuditorStandards != null && requiredStatus != AuditorDocumentRequiredType.Danger)
+        //        {
+        //            foreach (var auditorStandard in item.AuditorStandards
+        //                .Where(aus => aus.Status == StatusType.Active))
+        //            {
+        //                foreach (var catAuditorDocument in catAuditorDocuments
+        //                    .Where(cad => cad.StandardID == auditorStandard.StandardID))
+        //                {
+        //                    if (item.Documents == null || !item.Documents
+        //                        .Where(d =>
+        //                            d.CatAuditorDocumentID == catAuditorDocument.ID
+        //                            && d.Status == StatusType.Active)
+        //                        .Any())
+        //                            {
+        //                                requiredStatus = AuditorDocumentRequiredType.Danger;
+        //                                break;
+        //                            }
+        //                }
+
+        //                if (requiredStatus == AuditorDocumentRequiredType.Danger) break;
+        //            }
+        //        }
+        //    }
+
+        //    return requiredStatus;
+        //} // GetAuditorRequiredStatus
     }
 }

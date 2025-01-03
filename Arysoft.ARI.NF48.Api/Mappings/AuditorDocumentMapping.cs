@@ -46,7 +46,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Observations = item.Observations,
                 Type = item.Type,
                 Status = item.Status,
-                ValidityStatus = GetValidityStatus(item),
+                ValidityStatus = item.ValidityStatus ?? AuditorDocumentValidityType.Nothing, //  GetValidityStatus(item),
                 AuditorFullName = auditorFullName,
                 CatDescription = item.CatAuditorDocument != null
                     ? $"{item.CatAuditorDocument.Name ?? ""} {item.CatAuditorDocument.Description ?? ""}".Trim()
@@ -67,7 +67,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Observations = item.Observations,
                 Type = item.Type,
                 Status = item.Status,
-                ValidityStatus = GetValidityStatus(item),
+                ValidityStatus = item.ValidityStatus ?? AuditorDocumentValidityType.Nothing, //  GetValidityStatus(item),
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
@@ -113,60 +113,60 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemDeleteDtoToAuditorDocument
 
-        public static AuditorDocumentValidityType GetValidityStatus(AuditorDocument document)
-        {
-            DateTime? dueDate = document.DueDate;
-            AuditorDocumentValidityType validityStatus = AuditorDocumentValidityType.Nothing;
+        //public static AuditorDocumentValidityType GetValidityStatus(AuditorDocument document)
+        //{
+        //    DateTime? dueDate = document.DueDate;
+        //    AuditorDocumentValidityType validityStatus = AuditorDocumentValidityType.Nothing;
 
-            if (dueDate != null)
-            {
-                DateTime currentDate = DateTime.Today;
-                DateTime? warningDate = GetWarningDate(document);
+        //    if (dueDate != null)
+        //    {
+        //        DateTime currentDate = DateTime.Today;
+        //        DateTime? warningDate = GetWarningDate(document);
 
-                if (currentDate >= dueDate)
-                {
-                    validityStatus = AuditorDocumentValidityType.Danger;
-                }
-                else if (warningDate != null && currentDate >= warningDate)
-                {
-                    validityStatus = AuditorDocumentValidityType.Warning;
-                }
-                else 
-                {
-                    validityStatus = AuditorDocumentValidityType.Success;
-                }
-            }
+        //        if (currentDate >= dueDate)
+        //        {
+        //            validityStatus = AuditorDocumentValidityType.Danger;
+        //        }
+        //        else if (warningDate != null && currentDate >= warningDate)
+        //        {
+        //            validityStatus = AuditorDocumentValidityType.Warning;
+        //        }
+        //        else 
+        //        {
+        //            validityStatus = AuditorDocumentValidityType.Success;
+        //        }
+        //    }
 
-            return validityStatus;
-        } // GetValidityStatus
+        //    return validityStatus;
+        //} // GetValidityStatus
 
-        private static DateTime? GetWarningDate(AuditorDocument document)
-        {
-            if (document.CatAuditorDocument == null
-                || document.CatAuditorDocument.WarningEvery == null
-                || document.DueDate == null)
-            {
-                return null;
-            }
+        //private static DateTime? GetWarningDate(AuditorDocument document)
+        //{
+        //    if (document.CatAuditorDocument == null
+        //        || document.CatAuditorDocument.WarningEvery == null
+        //        || document.DueDate == null)
+        //    {
+        //        return null;
+        //    }
 
-            DateTime? warningDate = null;
-            DateTime dueDate = document.DueDate ?? new DateTime();
-            int every = document.CatAuditorDocument.WarningEvery ?? 0;
+        //    DateTime? warningDate = null;
+        //    DateTime dueDate = document.DueDate ?? new DateTime();
+        //    int every = document.CatAuditorDocument.WarningEvery ?? 0;
 
-            switch (document.CatAuditorDocument.WarningPeriodicity)
-            {
-                case CatAuditorDocumentPeriodicityType.Days:
-                    warningDate = dueDate.AddDays(every * -1);
-                    break;
-                case CatAuditorDocumentPeriodicityType.Months:
-                    warningDate = dueDate.AddMonths(every * -1);
-                    break;
-                case CatAuditorDocumentPeriodicityType.Years:
-                    warningDate = dueDate.AddYears(every * -1);
-                    break;
-            }
+        //    switch (document.CatAuditorDocument.WarningPeriodicity)
+        //    {
+        //        case CatAuditorDocumentPeriodicityType.Days:
+        //            warningDate = dueDate.AddDays(every * -1);
+        //            break;
+        //        case CatAuditorDocumentPeriodicityType.Months:
+        //            warningDate = dueDate.AddMonths(every * -1);
+        //            break;
+        //        case CatAuditorDocumentPeriodicityType.Years:
+        //            warningDate = dueDate.AddYears(every * -1);
+        //            break;
+        //    }
 
-            return warningDate;
-        } // GetWarningDate
+        //    return warningDate;
+        //} // GetWarningDate
     }
 }

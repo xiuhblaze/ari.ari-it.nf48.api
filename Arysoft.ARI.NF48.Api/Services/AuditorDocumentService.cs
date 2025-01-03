@@ -7,6 +7,7 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -90,23 +91,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
             }
 
+            // Obtiene el estatus actual de cada documento de acuerdo a su fecha de vencimiento (DueDate)
+            foreach (var item in items) 
+            {
+                item.ValidityStatus = GetValidityStatus(item);
+            }
+
             // Paging
 
             var pagedItems = PagedList<AuditorDocument>
                 .Create(items, filters.PageNumber, filters.PageSize);
-
-            //// Valida si ya pasó su fecha de termino, para marcar el documento como inactivo
-            //var hasChanges = false;
-            //foreach (var item in pagedItems) 
-            //{
-            //    if (DateTime.Compare((DateTime)item.DueDate, DateTime.Today) < 0) 
-            //    {
-            //        item.Status = StatusType.Inactive;
-            //        _repository.Update(item);
-            //        hasChanges = true;
-            //    }                
-            //}
-            //if (hasChanges) _repository.SaveChanges();
 
             return pagedItems;
         } // Gets
@@ -115,12 +109,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var item = await _repository.GetAsync(id);
 
-            //if (item.DueDate != null && DateTime.Compare((DateTime)item.DueDate, DateTime.Today) < 0)
-            //{ 
-            //    item.Status = StatusType.Inactive;
-            //    _repository.Update(item);
-            //    _repository.SaveChanges();
-            //}
+            item.ValidityStatus = GetValidityStatus(item);
 
             return item;
         } // GetAsync
@@ -207,6 +196,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditorDocumentService.UpdateAsync: {ex.Message}");
             }
 
+            foundItem.ValidityStatus = GetValidityStatus(foundItem);
+
             return foundItem;
         } // UpdateAsync
 
@@ -238,6 +229,60 @@ namespace Arysoft.ARI.NF48.Api.Services
             _repository.SaveChanges();
         } // DeleteAsync
 
+        public static AuditorDocumentValidityType GetValidityStatus(AuditorDocument item)
+        {
+            DateTime? dueDate = item.DueDate;
+            AuditorDocumentValidityType validityStatus = AuditorDocumentValidityType.Nothing;
 
+            if (dueDate != null)
+            {
+                DateTime currentDate = DateTime.Today;
+                DateTime? warningDate = GetWarningDate(item);
+
+                if (currentDate >= dueDate)
+                {
+                    validityStatus = AuditorDocumentValidityType.Danger;
+                }
+                else if (warningDate != null && currentDate >= warningDate)
+                {
+                    validityStatus = AuditorDocumentValidityType.Warning;
+                }
+                else
+                {
+                    validityStatus = AuditorDocumentValidityType.Success;
+                }
+            }
+
+            return validityStatus;
+        } // GetValidityStatus
+
+        private static DateTime? GetWarningDate(AuditorDocument item)
+        {
+            if (item.CatAuditorDocument == null
+                || item.CatAuditorDocument.WarningEvery == null
+                || item.DueDate == null)
+            {
+                return null;
+            }
+
+            DateTime? warningDate = null;
+            DateTime dueDate = item.DueDate ?? new DateTime();
+            int every = item.CatAuditorDocument.WarningEvery ?? 0;
+
+            switch (item.CatAuditorDocument.WarningPeriodicity)
+            {
+                case CatAuditorDocumentPeriodicityType.Days:
+                    warningDate = dueDate.AddDays(every * -1);
+                    break;
+                case CatAuditorDocumentPeriodicityType.Months:
+                    warningDate = dueDate.AddMonths(every * -1);
+                    break;
+                case CatAuditorDocumentPeriodicityType.Years:
+                    warningDate = dueDate.AddYears(every * -1);
+                    break;
+            }
+
+            return warningDate;
+        } // GetWarningDate
     }
 }

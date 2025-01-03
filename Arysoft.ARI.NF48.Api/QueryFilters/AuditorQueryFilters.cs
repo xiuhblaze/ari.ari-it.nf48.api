@@ -8,6 +8,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public AuditorLeaderType? IsLeader { get; set; }
 
+        public AuditorDocumentStatusType? DocumentStatus { get; set; }
+
         public StatusType? Status { get; set; }
 
         public AuditorOrderType? Order { get; set; }

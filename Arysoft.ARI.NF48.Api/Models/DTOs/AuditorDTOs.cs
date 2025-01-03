@@ -33,7 +33,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public int StandardsCount { get; set; }
+        public IEnumerable<AuditorStandardItemListDto> Standards { get; set; }
 
         public int DocumentsCount { get; set; }
     } // AuditorItemListDto

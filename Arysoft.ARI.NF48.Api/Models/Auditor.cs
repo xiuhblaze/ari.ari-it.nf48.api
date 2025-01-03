@@ -23,8 +23,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public bool IsLeadAuditor { get; set; }
 
-        //public StatusType Status { get; set; }
-
         // RELATIONS
 
         public virtual ICollection<AuditorStandard> AuditorStandards { get; set; }
@@ -32,5 +30,11 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<AuditorDocument> Documents { get; set;  }
 
         public virtual ICollection<FSSCAuditorActivity> FSSCAuditorActivities { get; set; }
+
+        // NOT MAPPED
+
+        public AuditorDocumentValidityType? ValidityStatus { get; set; }
+
+        public AuditorDocumentRequiredType? RequiredStatus { get; set; }
     }
 }
