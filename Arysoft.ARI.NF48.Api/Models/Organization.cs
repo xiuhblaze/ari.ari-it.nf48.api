@@ -19,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string COID { get; set; }
 
-        public new OrganizationStatusType Status { get; set; } //TODO: Esto lo tengo en duda
+        public new OrganizationStatusType Status { get; set; }
 
         // RELATIONS
 
@@ -30,5 +30,5 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<Site> Sites { get; set; }
 
         public virtual ICollection<AuditCycle> AuditCycles { get; set; }
-    }
+    } // Organization
 }

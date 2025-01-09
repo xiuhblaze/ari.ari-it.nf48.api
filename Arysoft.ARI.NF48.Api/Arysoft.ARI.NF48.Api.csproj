@@ -277,6 +277,8 @@
     <Compile Include="Data\Configurations\StandardConfiguration.cs" />
     <Compile Include="Data\Configurations\UserConfiguration.cs" />
     <Compile Include="Enumerations\ApplicationEnum.cs" />
+    <Compile Include="Enumerations\AuditCycleDocumentEnum.cs" />
+    <Compile Include="Enumerations\AuditCycleEnum.cs" />
     <Compile Include="Enumerations\AuditCycleStandardEnum.cs" />
     <Compile Include="Enumerations\AuditEnum.cs" />
     <Compile Include="Enumerations\AuditorDocumentEnums.cs" />
@@ -331,11 +333,14 @@
     <Compile Include="Mappings\StandardMapping.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Models\Application.cs" />
+    <Compile Include="Models\Audit.cs" />
     <Compile Include="Models\AuditCycle.cs" />
+    <Compile Include="Models\AuditCycleDocument.cs" />
     <Compile Include="Models\AuditCycleStandard.cs" />
     <Compile Include="Models\Auditor.cs" />
     <Compile Include="Models\AuditorDocument.cs" />
     <Compile Include="Models\AuditorStandard.cs" />
+    <Compile Include="Models\AuditStandard.cs" />
     <Compile Include="Models\BaseModel.cs" />
     <Compile Include="Models\CatAuditorDocument.cs" />
     <Compile Include="Models\Category22K.cs" />

@@ -3,20 +3,26 @@ using System;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
-    public class AuditCycleStandard : BaseModel
+    public class AuditCycleDocument : BaseModel
     {
         public Guid AuditCycleID { get; set; }
 
         public Guid? StandardID { get; set; }
 
-        public AuditStepType InitialStep { get; set; }
+        public string Filename { get; set; }
 
-        public AuditCycleType CycleType { get; set; }
+        public string Version { get; set; }
+
+        public string Comments { get; set; }
+
+        public AuditCycleDocumentType DocumentType { get; set; }
+
+        public string OtherDescription { get; set; }
 
         // RELATIONS
 
         public virtual AuditCycle AuditCycle { get; set; }
 
         public virtual Standard Standard { get; set; }
-    } // AuditCycleStandard
+    } // AuditCycleDocument
 }
