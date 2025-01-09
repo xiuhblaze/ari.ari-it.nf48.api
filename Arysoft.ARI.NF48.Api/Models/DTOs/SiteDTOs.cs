@@ -13,9 +13,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
+        public bool IsMainSite { get; set; }
+
         public string Address { get; set; }
 
-        public bool IsMainSite { get; set; }
+        public double? UbicacionLat { get; set; }
+
+        public double? UbicacionLong { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -33,9 +37,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
+        public bool IsMainSite { get; set; }
+
         public string Address { get; set; }
 
-        public bool IsMainSite { get; set; }
+        public double? UbicacionLat { get; set; }
+
+        public double? UbicacionLong { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -70,11 +78,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(500)]
         public string Description { get; set; }
 
+        [Required]
+        public bool IsMainSite { get; set; }
+
         [StringLength(500)]
         public string Address { get; set; }
 
-        [Required]
-        public bool IsMainSite { get; set; }
+        public double? UbicacionLat { get; set; }
+
+        public double? UbicacionLong { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

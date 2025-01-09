@@ -20,12 +20,16 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Site>()
+                .Property(m => m.IsMainSite)
+                .IsRequired();
+
+            modelBuilder.Entity<Site>()
                 .Property(m => m.Address)
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Site>()
-                .Property(m => m.IsMainSite)
-                .IsRequired();
+                .Property(m => m.LocationGPS)
+                .HasColumnType("geography");
 
             modelBuilder.Entity<Site>()
                 .Property(m => m.Status)

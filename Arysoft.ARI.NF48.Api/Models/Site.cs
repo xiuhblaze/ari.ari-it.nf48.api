@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.Spatial;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -11,11 +12,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Description { get; set; }
 
-        public string Address { get; set; }
-
         public bool IsMainSite { get; set; }
 
-        //public StatusType Status { get; set; }
+        public string Address { get; set; }
+
+        public DbGeography LocationGPS { get; set; }
 
         // RELATIONS
 

@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Spatial;
 using System.Linq;
 using System.Web;
 
@@ -28,8 +29,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationName = item.Organization.Name,
                 Description = item.Description,
-                Address = item.Address,
                 IsMainSite = item.IsMainSite,
+                Address = item.Address,
+                UbicacionLat = item.LocationGPS.Latitude.Value,
+                UbicacionLong = item.LocationGPS.Longitude.Value,
                 Status = item.Status,
                 NoShifts = item.Shifts != null ? item.Shifts.Count() : 0,
                 NoEmployees = item.Shifts != null ? item.Shifts.Sum(s => s.NoEmployees) ?? 0 : 0,
@@ -43,8 +46,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 Description = item.Description,
-                Address = item.Address,
                 IsMainSite = item.IsMainSite,
+                Address = item.Address,
+                UbicacionLat = item.LocationGPS.Latitude.Value,
+                UbicacionLong = item.LocationGPS.Longitude.Value,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -70,15 +75,22 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static Site ItemEditDtoToSite(SitePutDto itemDto)
         {
-            return new Site
+            var item = new Site
             { 
                 ID = itemDto.ID,
                 Description = itemDto.Description,
-                Address = itemDto.Address,
                 IsMainSite = itemDto.IsMainSite,
+                Address = itemDto.Address,                
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };
+
+            if (itemDto.UbicacionLat != null && itemDto.UbicacionLong != null)
+            {
+                item.LocationGPS = DbGeography.FromText($"POINT({itemDto.UbicacionLong} {itemDto.UbicacionLat})");
+            }
+
+            return item;
         } // ItemEditDtoToSite
 
         public static Site ItemDeleteDtoToSite(SiteDeleteDto itemDto)

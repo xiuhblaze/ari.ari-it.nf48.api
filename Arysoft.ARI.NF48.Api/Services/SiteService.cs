@@ -5,8 +5,13 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
+using System.Data.Entity.Spatial;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
+using System.Web.Mvc;
+using System.Web.Optimization;
+using System.Web.UI.WebControls.WebParts;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -152,8 +157,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             foundItem.Description = item.Description;
-            foundItem.Address = item.Address;
             foundItem.IsMainSite = item.IsMainSite;
+            foundItem.Address = item.Address;
+            foundItem.LocationGPS = item.LocationGPS;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
@@ -198,8 +204,65 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 _siteRepository.Update(foundItem);
             }
-
             _siteRepository.SaveChanges();
         } // DeleteAsync
+
+//        Y para hacer consultas filtrando por ese campo, que opciones hay?
+//Para realizar consultas filtrando por datos geoespaciales(GEOGRAPHY) en SQL Server a través de Entity Framework, tienes varias opciones útiles.Estas son algunas de las más comunes:
+
+//Filtro de proximidad(distancia) : Puedes realizar consultas para encontrar ubicaciones dentro de un cierto radio de un punto específico utilizando el método Distance.
+
+//csharp
+//using (var contexto = new MiContexto())
+//{
+//    var latitud = 40.7128;
+//    var longitud = -74.0060;
+//    var puntoReferencia = DbGeography.FromText($"POINT({longitud} {latitud})");
+//    var radioEnMetros = 1000;  // 1 km de radio
+
+//    var lugaresCercanos = contexto.Lugares
+//        .Where(l => l.Ubicacion.Distance(puntoReferencia) <= radioEnMetros)
+//        .ToList();
+
+//    foreach (var lugar in lugaresCercanos)
+//    {
+//        Console.WriteLine($"{lugar.Nombre}: {lugar.Ubicacion.Latitude}, {lugar.Ubicacion.Longitude}");
+//    }
+//}
+//Filtro por intersección de áreas: Puedes buscar ubicaciones que caigan dentro de una área geográfica específica utilizando el método Intersects.
+
+//csharp
+//using (var contexto = new MiContexto())
+//{
+//    var poligono = DbGeography.FromText("POLYGON((-74.0060 40.7128, -74.0010 40.7128, -74.0010 40.7188, -74.0060 40.7188, -74.0060 40.7128))");
+
+//    var lugaresDentroDelArea = contexto.Lugares
+//        .Where(l => poligono.Intersects(l.Ubicacion))
+//        .ToList();
+
+//    foreach (var lugar in lugaresDentroDelArea)
+//    {
+//        Console.WriteLine($"{lugar.Nombre}: {lugar.Ubicacion.Latitude}, {lugar.Ubicacion.Longitude}");
+//    }
+//}
+//Consultas de ordenamiento por distancia: Puedes ordenar los resultados de tu consulta por distancia a un punto específico.
+
+//csharp
+//using (var contexto = new MiContexto())
+//{
+//    var latitud = 40.7128;
+//    var longitud = -74.0060;
+//    var puntoReferencia = DbGeography.FromText($"POINT({longitud} {latitud})");
+
+//    var lugaresOrdenadosPorDistancia = contexto.Lugares
+//        .OrderBy(l => l.Ubicacion.Distance(puntoReferencia))
+//        .ToList();
+
+//    foreach (var lugar in lugaresOrdenadosPorDistancia)
+//    {
+//        Console.WriteLine($"{lugar.Nombre}: {lugar.Ubicacion.Latitude}, {lugar.Ubicacion.Longitude}");
+//    }
+//}
+//Estas son algunas formas comunes de filtrar y ordenar tus datos geoespaciales. Dependiendo de tus necesidades específicas, puedes ajustar estos ejemplos para realizar consultas más avanzadas y personalizadas.
     }
 }

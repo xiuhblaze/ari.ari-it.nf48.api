@@ -11,9 +11,13 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string LogoFile { get; set; }
 
+        public string QRFile { get; set; }
+
         public string Website { get; set; }
 
         public string Phone { get; set; }
+
+        public string COID { get; set; }
 
         public new OrganizationStatusType Status { get; set; } //TODO: Esto lo tengo en duda
 
@@ -25,5 +29,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<Site> Sites { get; set; }
 
+        public virtual ICollection<AuditCycle> AuditCycles { get; set; }
     }
 }
