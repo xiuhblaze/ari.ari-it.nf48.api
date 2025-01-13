@@ -12,4 +12,13 @@ namespace Arysoft.ARI.NF48.Api.Enumerations
         Recertificacion,
         Transfer
     } // AuditCycleType
+
+    public enum AuditCycleOrderType
+    {
+        Nothing,
+        Date,
+        Status,
+        DateDesc,
+        StatusDesc
+    } // AuditCycleOrderType
 }

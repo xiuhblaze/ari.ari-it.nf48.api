@@ -23,6 +23,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             }
         } // DeleteTmpByUser
 
+        /// <summary>
+        /// Permite eliminar los registros temporales que tengan más de un 
+        /// día de antigüedad
+        /// </summary>
+        /// <returns></returns>
         private async Task DeleteTmpByPublicFromADay()
         {
             var items = await _model

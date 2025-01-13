@@ -15,7 +15,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Comments { get; set; }
 
-        public AuditCycleDocumentType DocumentType { get; set; }
+        public AuditCycleDocumentType? DocumentType { get; set; }
 
         public string OtherDescription { get; set; }
 

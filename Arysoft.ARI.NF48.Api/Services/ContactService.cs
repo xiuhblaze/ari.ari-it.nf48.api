@@ -127,11 +127,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Updated = DateTime.UtcNow;
 
             // Execute queries
-
-            await _contactRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-            _contactRepository.Add(item);
-            await _contactRepository.SaveChangesAsync();
-
+            try
+            {
+                await _contactRepository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _contactRepository.Add(item);
+                await _contactRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Contact.AddAsync: {ex.Message}");
+            }
             return item;
         } // AddAsync
 
@@ -179,7 +184,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException(ex.Message);
+                throw new BusinessException($"Contact.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
@@ -211,7 +216,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _contactRepository.Update(foundItem);
             }
 
-            _contactRepository.SaveChanges();
+            try
+            {
+                await _contactRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Contact.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }

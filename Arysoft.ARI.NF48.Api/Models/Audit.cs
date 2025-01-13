@@ -10,9 +10,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Description { get; set; }
 
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public new AuditStatusType Status { get; set; }
 
@@ -20,9 +20,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual AuditCycle AuditCycle { get; set; }
 
+        public virtual ICollection<AuditAuditor> AuditAuditors { get; set; }
+
         public virtual ICollection<AuditStandard> AuditStandards { get; set; }
 
-        // public virtual ICollection<AuditDocument> AuditDocuments { get; set; }
+        public virtual ICollection<AuditDocument> AuditDocuments { get; set; }
 
         public virtual ICollection<Note> Notes { get; set; }
     } // Audit

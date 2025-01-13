@@ -38,8 +38,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
+                QRFile = item.QRFile,
                 Website = item.Website,
                 Phone = item.Phone,
+                COID = item.COID,
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
@@ -53,9 +55,18 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ContactPhone = mainContact != null
                     ? mainContact.Phone 
                     : string.Empty,
-                NoSites = item.Sites != null ? item.Sites.Count() : 0,
-                SiteDescription = mainSite != null ? mainSite.Description : string.Empty,
-                SiteLocation = mainSite != null ? mainSite.Address : string.Empty,
+                NoSites = item.Sites != null 
+                    ? item.Sites.Count() 
+                    : 0,
+                SiteDescription = mainSite != null 
+                    ? mainSite.Description 
+                    : string.Empty,
+                SiteLocation = mainSite != null 
+                    ? mainSite.Address 
+                    : string.Empty,
+                NoAuditCycles = item.AuditCycles != null 
+                    ? item.AuditCycles.Count() 
+                    : 0
             };
         } // OrganizationToItemListDto
 
@@ -67,8 +78,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
+                QRFile = item.QRFile,
                 Website = item.Website,
                 Phone = item.Phone,
+                COID = item.COID,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -81,7 +94,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : new List<ContactItemListDto>(),
                 Sites = item.Sites != null
                     ? SiteMapping.SiteToListDto(item.Sites)
-                    : new List<SiteItemListDto>()
+                    : new List<SiteItemListDto>(),
+                AuditCycles = item.AuditCycles != null
+                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles.OrderByDescending(ac => ac.StartDate))
+                    : new List<AuditCycleItemListDto>()
             };
         } // OrganizationToItemDetailDto
 
@@ -100,9 +116,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Name = itemDto.Name,
                 LegalEntity = itemDto.LegalEntity,
-                LogoFile = itemDto.LogoFile,
                 Website = itemDto.Website,
                 Phone= itemDto.Phone,
+                COID = itemDto.COID,
                 Status = itemDto.Status,
                 UpdatedUser= itemDto.UpdatedUser
             };

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -15,7 +13,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Comments { get; set; }
 
-        public AuditDocumentType DocumentType { get; set; }
+        public AuditDocumentType? DocumentType { get; set; }
 
         public string OtherDescription { get; set; }
 
@@ -25,4 +23,4 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual Standard Standard { get; set; }
     }
-}
+} 

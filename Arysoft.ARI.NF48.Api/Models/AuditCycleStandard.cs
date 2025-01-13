@@ -9,9 +9,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? StandardID { get; set; }
 
-        public AuditStepType InitialStep { get; set; }
+        public AuditStepType? InitialStep { get; set; }
 
-        public AuditCycleType CycleType { get; set; }
+        public AuditCycleType? CycleType { get; set; }
 
         // RELATIONS
 

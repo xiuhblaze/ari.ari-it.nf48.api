@@ -27,6 +27,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<AuditorStandard> AuditorStandards { get; set; }
 
+        public virtual ICollection<AuditAuditor> AuditAuditors { get; set; }
+
         public virtual ICollection<AuditorDocument> Documents { get; set;  }
 
         public virtual ICollection<FSSCAuditorActivity> FSSCAuditorActivities { get; set; }

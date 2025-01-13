@@ -10,8 +10,6 @@ using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
