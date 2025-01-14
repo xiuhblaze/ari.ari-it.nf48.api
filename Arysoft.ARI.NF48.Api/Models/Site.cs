@@ -1,7 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Spatial;
 
 namespace Arysoft.ARI.NF48.Api.Models

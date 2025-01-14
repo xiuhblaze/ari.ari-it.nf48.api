@@ -5,10 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -149,13 +147,19 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.DocumentType == AuditCycleDocumentType.Other && string.IsNullOrEmpty(item.OtherDescription))
                 throw new BusinessException("Other description is required");
 
+            // - validar que el documento sea de alguno de los standares activos en el ciclo
+
             // Assigning values
 
+            foundItem.StandardID = item.StandardID;
+            foundItem.Filename = item.Filename;
             foundItem.Version = item.Version;
             foundItem.DocumentType = item.DocumentType;
             foundItem.Comments = item.Comments;
             foundItem.OtherDescription = item.OtherDescription;
+            foundItem.Status = item.Status;
             foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
 

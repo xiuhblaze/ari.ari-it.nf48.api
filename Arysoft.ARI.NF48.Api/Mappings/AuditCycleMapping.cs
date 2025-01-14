@@ -32,13 +32,22 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? item.Organization.Name
                     : string.Empty,
                 AuditsCount = item.Audits != null
-                    ? item.Audits.Count
+                    ? item.Audits.Where(a => 
+                        a.Status != AuditStatusType.Nothing
+                        && a.Status != AuditStatusType.Deleted)
+                        .Count()
                     : 0,
-                //AuditCycleStandards = item.AuditCycleStandards != null
-                //    ? AuditCycleStandardMapping.AuditCycleStandardToListDto(item.AuditCycleStandards)
-                //    : null,
+                AuditCycleStandards = item.AuditCycleStandards != null
+                    ? AuditCycleStandardMapping.AuditCycleStandardsToListDto(
+                        item.AuditCycleStandards.Where(acs => 
+                            acs.Status != StatusType.Nothing
+                            && acs.Status != StatusType.Deleted))
+                    : null,
                 DocumentsCount = item.AuditCycleDocuments != null
-                    ? item.AuditCycleDocuments.Count
+                    ? item.AuditCycleDocuments.Where(acd => 
+                        acd.Status != StatusType.Nothing
+                        && acd.Status != StatusType.Deleted)
+                        .Count()
                     : 0
             };
         } // AuditCycleToItemListDto
@@ -63,11 +72,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 //    : null,
                 AuditCycleStandards = item.AuditCycleStandards != null
                     ? AuditCycleStandardMapping.AuditCycleStandardsToListDto(
-                        item.AuditCycleStandards.Where(acs => acs.Status != StatusType.Nothing))
+                        item.AuditCycleStandards.Where(acs => 
+                            acs.Status != StatusType.Nothing
+                            && acs.Status != StatusType.Deleted))
                     : null,
-                //AuditCycleDocuments = item.AuditCycleDocuments != null
-                //    ? AuditCycleDocumentMapping.AuditCycleDocumentToListDto(item.AuditCycleDocuments)
-                //    : null,
+                AuditCycleDocuments = item.AuditCycleDocuments != null
+                    ? AuditCycleDocumentMapping.AuditCycleDocumentsToListDto(
+                        item.AuditCycleDocuments.Where(acd => acd.Status != StatusType.Nothing 
+                            && acd.Status != StatusType.Deleted))
+                    : null,
             };
         } // AuditCycleToItemDetailDto
 
