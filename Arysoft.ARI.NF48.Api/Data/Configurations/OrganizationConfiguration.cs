@@ -60,6 +60,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
+            // Not Mapped
+
+            modelBuilder.Entity<Organization>()
+                .Ignore(m => m.CertificatesStatus);
         } // Configure
     }
 }

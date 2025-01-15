@@ -38,6 +38,7 @@ namespace Arysoft.ARI.NF48.Api.Data
             ContactConfiguration.Configure(modelBuilder);
             ShiftConfiguration.Configure(modelBuilder);
             SiteConfiguration.Configure(modelBuilder);
+            CertificateConfiguration.Configure(modelBuilder);
 
             // Módulo de documentación para auditorias
             AuditCycleConfiguration.Configure(modelBuilder);

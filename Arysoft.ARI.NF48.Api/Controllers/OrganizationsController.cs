@@ -1,14 +1,18 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
 using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 
@@ -16,6 +20,9 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 {
     public class OrganizationsController : ApiController
     {
+        private const string LOGO_FILENAME = "logotype";
+        private const string QR_FILENAME = "qrcode";
+
         private readonly OrganizationService _organizationService;
 
         // CONSTRUCTOR 
@@ -77,21 +84,83 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         // PUT: api/Organization/5
         [ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
-        public async Task<IHttpActionResult> PutOrganization(Guid id, [FromBody] OrganizationPutDto itemEditDto)
+        public async Task<IHttpActionResult> PutOrganization()
         {
-            if (!ModelState.IsValid)
-                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+            var data = HttpContext.Current.Request.Params["data"];
+            var files = HttpContext.Current.Request.Files.Count > 0
+                ? HttpContext.Current.Request.Files
+                : null;
 
-            if (id != itemEditDto.ID)
-                throw new BusinessException("ID mismatch");
+            OrganizationPutDto itemEditDto = JsonConvert.DeserializeObject<OrganizationPutDto>(data)
+                ?? throw new BusinessException("Can't read data object");
+
+            var item = await _organizationService.GetAsync(itemEditDto.ID)
+                ?? throw new BusinessException("The record to update was not found");
 
             var itemToEdit = OrganizationMapping.ItemEditDtoToOrganization(itemEditDto);
-            var item = await _organizationService.UpdateAsync(itemToEdit);
+
+            if (files != null)
+            {
+                HttpPostedFile logoFile = null;
+                HttpPostedFile qrFile = null;
+
+                for (int i = 0; i < files.Count; i++)
+                {
+                    HttpPostedFile file = files[i];
+                    string fileNameWithoutExtension = Path
+                        .GetFileNameWithoutExtension(file.FileName);
+
+                    if (fileNameWithoutExtension == LOGO_FILENAME) logoFile = file;
+                    if (fileNameWithoutExtension == QR_FILENAME) qrFile = file;
+                }
+
+                if (logoFile != null)
+                {
+                    itemToEdit.LogoFile = FileRepository.UploadFile(
+                        logoFile,
+                        $"~/files/organizations/{itemEditDto.ID}",
+                        LOGO_FILENAME,
+                        new string[] { ".jpg", ".png" }
+                    );
+                }
+                else itemToEdit.LogoFile = item.LogoFile;
+
+                if (qrFile != null)
+                {
+                    itemToEdit.QRFile = FileRepository.UploadFile(
+                        qrFile,
+                        $"~/files/organizations/{itemEditDto.ID}",
+                        QR_FILENAME,
+                        new string[] { ".jpg", ".png" }
+                    );
+                }
+                else itemToEdit.QRFile = item.QRFile;
+            }
+
+            item = await _organizationService.UpdateAsync(itemToEdit);
             var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
             var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
 
             return Ok(response);
         } // PutOrganization
+
+        //// PUT: api/Organization/5
+        //[ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
+        //public async Task<IHttpActionResult> PutOrganization(Guid id, [FromBody] OrganizationPutDto itemEditDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+        //    if (id != itemEditDto.ID)
+        //        throw new BusinessException("ID mismatch");
+
+        //    var itemToEdit = OrganizationMapping.ItemEditDtoToOrganization(itemEditDto);
+        //    var item = await _organizationService.UpdateAsync(itemToEdit);
+        //    var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
+        //    var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
+
+        //    return Ok(response);
+        //} // PutOrganization
 
         // DELETE: api/Organization/5
         public async Task<IHttpActionResult> DeleteOrganization(Guid id, [FromBody] OrganizationDeleteDto itemDelDto)

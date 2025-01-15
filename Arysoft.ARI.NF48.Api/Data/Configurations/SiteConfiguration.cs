@@ -32,6 +32,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnType("geography");
 
             modelBuilder.Entity<Site>()
+                .Property(m => m.LocationURL)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<Site>()
                 .Property(m => m.Status)
                 .IsRequired();
 

@@ -52,6 +52,22 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : items.Where(e => e.Status != OrganizationStatusType.Nothing && e.Status != OrganizationStatusType.Deleted);
             }
 
+            // Generando los valores calculados
+
+            foreach (var item in items)
+            {
+                item.CertificatesStatus = GetCertificatesStatus(item);
+            }
+
+
+
+            // Calculated filters
+
+            if (filters.CertificatesStatus != null && filters.CertificatesStatus != OrganizationCertificatesStatusType.Nothing)
+            {
+                items = items.Where(e => e.CertificatesStatus == filters.CertificatesStatus);
+            }
+
             // Order
 
             switch (filters.Order)
@@ -66,6 +82,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Status)
                         .ThenBy(e => e.Name);
                     break;
+                case OrganizationOrderType.CertificatesStatus:
+                    items = items.OrderBy(e => e.CertificatesStatus)
+                        .ThenBy(e => e.Name);
+                    break;
+                case OrganizationOrderType.Updated:
+                    items = items.OrderBy(e => e.Updated);
+                    break;
                 case OrganizationOrderType.NameDesc:
                     items = items.OrderByDescending(e => e.Name);
                     break;
@@ -75,6 +98,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case OrganizationOrderType.StatusDesc:
                     items = items.OrderByDescending(e => e.Status)
                         .ThenByDescending(e => e.Name);
+                    break;
+                case OrganizationOrderType.CertificatesStatusDesc:
+                    items = items.OrderByDescending(e => e.CertificatesStatus)
+                        .ThenByDescending(e => e.Name);
+                    break;
+                case OrganizationOrderType.UpdatedDesc:
+                    items = items.OrderByDescending(e => e.Updated);
                     break;
                 default:
                     items = items.OrderBy(e => e.Name);
@@ -91,7 +121,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Organization> GetAsync(Guid id)
         { 
-            return await _organizationRepository.GetAsync(id);
+            var item = await _organizationRepository.GetAsync(id);
+
+            item.CertificatesStatus = GetCertificatesStatus(item);
+
+            return item;
         } // GetAsync
 
         public async Task<Organization> AddAsync(Organization item)
@@ -104,10 +138,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Updated = DateTime.UtcNow;
 
             // Execute queries
-
-            await _organizationRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-            _organizationRepository.Add(item);
-            await _organizationRepository.SaveChangesAsync();
+            try
+            {
+                await _organizationRepository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _organizationRepository.Add(item);
+                await _organizationRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"OrganizationService.AddAsync: {ex.Message}");
+            }
 
             return item;
         } // AddAsync
@@ -126,8 +166,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Name = item.Name;
             foundItem.LegalEntity = item.LegalEntity;
             foundItem.LogoFile = item.LogoFile;
+            foundItem.QRFile = item.QRFile;
             foundItem.Website = item.Website;
             foundItem.Phone = item.Phone;
+            foundItem.COID = item.COID;
             foundItem.Status = item.Status == OrganizationStatusType.Nothing 
                 ? OrganizationStatusType.New 
                 : item.Status;
@@ -136,9 +178,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            _organizationRepository.Update(foundItem);
-            await _organizationRepository.SaveChangesAsync();
-
+            try
+            {
+                _organizationRepository.Update(foundItem);
+                await _organizationRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"OrganizationService.UpdateAsync: {ex.Message}");
+            }
             return foundItem;
         } // UpdateAsync
 
@@ -168,7 +216,43 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _organizationRepository.Update(foundItem);
             }
 
-            _organizationRepository.SaveChanges();
+            try
+            {
+                await _organizationRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"OrganizationService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
+
+        // PRIVATE
+
+        private static OrganizationCertificatesStatusType GetCertificatesStatus(Organization item)
+        {
+            if (item.Certificates != null)
+            {
+                var anyInDanger = item.Certificates
+                    .Where(c =>
+                        c.Status == StatusType.Active
+                        && c.ValidityStatus == CertificateValidityStatusType.Danger)
+                    .Any();
+
+                if (anyInDanger) return OrganizationCertificatesStatusType.Danger;
+                else {
+                    var anyInWarning = item.Certificates
+                        .Where(c =>
+                            c.Status == StatusType.Active
+                            && c.ValidityStatus == CertificateValidityStatusType.Warning)
+                        .Any();
+
+                    if (anyInWarning) return OrganizationCertificatesStatusType.Warning;
+                }
+
+                return OrganizationCertificatesStatusType.Success;
+            }
+
+            return OrganizationCertificatesStatusType.Nothing;
+        } // GetCertificatesStatus
     }
 }

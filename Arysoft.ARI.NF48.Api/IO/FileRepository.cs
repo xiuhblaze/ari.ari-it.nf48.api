@@ -1,11 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Exceptions;
-using Microsoft.Ajax.Utilities;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 
@@ -13,10 +9,17 @@ namespace Arysoft.ARI.NF48.Api.IO
 {
     public class FileRepository
     {
-        public static string UploadFile(HttpPostedFile file, string virtualPath, string newFilename)
+        public static string UploadFile(HttpPostedFile file, string virtualPath, string newFilename, string[] allowedExtensions = null)
         {
             if (file == null || file.ContentLength == 0)
                 throw new BusinessException("The file to upload is empty");
+
+            if (allowedExtensions != null)
+            {
+                var extension = Path.GetExtension(file.FileName);
+                if (!allowedExtensions.Contains(extension))
+                    throw new BusinessException($"The file extension '{extension}' is not allowed");
+            }
 
             string uploadPath = HostingEnvironment.MapPath(virtualPath);
 

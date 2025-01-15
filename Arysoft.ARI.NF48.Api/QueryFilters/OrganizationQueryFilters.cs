@@ -8,6 +8,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         //public Guid? StandardID { get; set; } // Para saber cuales certificados tiene la org, no aplicable aun
 
+        public OrganizationCertificatesStatusType? CertificatesStatus { get; set; }
+
         public OrganizationStatusType? Status { get; set; }
 
         public OrganizationOrderType Order { get; set; }

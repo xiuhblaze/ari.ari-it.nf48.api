@@ -25,9 +25,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             var mainContact = item.Contacts?
                 .Where(c => c.IsMainContact && c.Status == StatusType.Active)
                 .FirstOrDefault();
-            var mainSite = item.Sites.OrderBy(s => s.IsMainSite).FirstOrDefault();
+            var mainSite = item.Sites?
+                .Where(s => s.IsMainSite)
+                .FirstOrDefault();
 
-            // Si no hay un contacto principal, pon el que sea
+            // Si no hay un contacto principal, pone el que sea
             if (mainContact == null) mainContact = item.Contacts?
                 .Where(c => c.Status == StatusType.Active)
                 .FirstOrDefault();
@@ -45,7 +47,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                NoContacts = item.Contacts != null ? item.Contacts.Count() : 0,
+                CertificatesCount = item.Certificates != null
+                    ? item.Certificates.Count()
+                    : 0,
+                ContactsCount = item.Contacts != null 
+                    ? item.Contacts.Count() 
+                    : 0,
                 ContactName = mainContact != null  
                     ? mainContact.FirstName 
                     : string.Empty,
@@ -55,7 +62,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ContactPhone = mainContact != null
                     ? mainContact.Phone 
                     : string.Empty,
-                NoSites = item.Sites != null 
+                SitesCount = item.Sites != null 
                     ? item.Sites.Count() 
                     : 0,
                 SiteDescription = mainSite != null 
@@ -64,9 +71,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteLocation = mainSite != null 
                     ? mainSite.Address 
                     : string.Empty,
-                NoAuditCycles = item.AuditCycles != null 
+                AuditCyclesCount = item.AuditCycles != null 
                     ? item.AuditCycles.Count() 
-                    : 0
+                    : 0,
+                CertificatesStatus = item.CertificatesStatus 
+                    ?? OrganizationCertificatesStatusType.Nothing
             };
         } // OrganizationToItemListDto
 
@@ -89,15 +98,20 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Applications = item.Applications != null
                     ? ApplicationMapping.ApplicationsToListDto(item.Applications)
                     : new List<ApplicationItemListDto>(),
+                AuditCycles = item.AuditCycles != null
+                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles.OrderByDescending(ac => ac.StartDate))
+                    : new List<AuditCycleItemListDto>(),
+                //Certificates = item.Certificates != null
+                //    ? CertificateMapping.CertificateToListDto(item.Certificates)
+                //    : new List<CertificateItemListDto>(),
                 Contacts = item.Contacts != null
                     ? ContactMapping.ContactToListDto(item.Contacts)
                     : new List<ContactItemListDto>(),
                 Sites = item.Sites != null
                     ? SiteMapping.SiteToListDto(item.Sites)
                     : new List<SiteItemListDto>(),
-                AuditCycles = item.AuditCycles != null
-                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles.OrderByDescending(ac => ac.StartDate))
-                    : new List<AuditCycleItemListDto>()
+                CertificatesStatus = item.CertificatesStatus
+                    ?? OrganizationCertificatesStatusType.Nothing
             };
         } // OrganizationToItemDetailDto
 

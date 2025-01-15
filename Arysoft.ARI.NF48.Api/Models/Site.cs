@@ -16,6 +16,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public DbGeography LocationGPS { get; set; }
 
+        public string LocationURL { get; set; }
+
         // RELATIONS
 
         public virtual Organization Organization { get; set; }

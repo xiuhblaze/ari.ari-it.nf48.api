@@ -137,7 +137,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
-                _repository.SaveChanges();
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -189,7 +189,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             try
             {
                 _repository.Update(foundItem);
-                _repository.SaveChanges();
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -226,7 +226,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _repository.Update(foundItem);
             }
 
-            _repository.SaveChanges();
+            await _repository.SaveChangesAsync();
         } // DeleteAsync
 
         public static AuditorDocumentValidityType GetValidityStatus(AuditorDocument item)

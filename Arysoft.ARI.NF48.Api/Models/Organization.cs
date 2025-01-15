@@ -32,5 +32,10 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<Contact> Contacts { get; set; }
 
         public virtual ICollection<Site> Sites { get; set; }
+
+        // NOT MAPPED
+
+        public OrganizationCertificatesStatusType? CertificatesStatus { get; set; }
+
     } // Organization
 }

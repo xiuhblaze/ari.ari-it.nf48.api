@@ -31,8 +31,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
-                UbicacionLat = item.LocationGPS.Latitude.Value,
-                UbicacionLong = item.LocationGPS.Longitude.Value,
+                LocationLat = item.LocationGPS.Latitude.Value,
+                LocationLong = item.LocationGPS.Longitude.Value,
+                LocationURL = item.LocationURL,
                 Status = item.Status,
                 NoShifts = item.Shifts != null ? item.Shifts.Count() : 0,
                 NoEmployees = item.Shifts != null ? item.Shifts.Sum(s => s.NoEmployees) ?? 0 : 0,
@@ -48,8 +49,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
-                UbicacionLat = item.LocationGPS.Latitude.Value,
-                UbicacionLong = item.LocationGPS.Longitude.Value,
+                LocationLat = item.LocationGPS.Latitude.Value,
+                LocationLong = item.LocationGPS.Longitude.Value,
+                LocationURL = item.LocationURL,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -80,14 +82,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Description = itemDto.Description,
                 IsMainSite = itemDto.IsMainSite,
-                Address = itemDto.Address,                
+                Address = itemDto.Address,
+                LocationURL = itemDto.LocationURL,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };
 
-            if (itemDto.UbicacionLat != null && itemDto.UbicacionLong != null)
+            if (itemDto.LocationLat != null && itemDto.LocationLong != null)
             {
-                item.LocationGPS = DbGeography.FromText($"POINT({itemDto.UbicacionLong} {itemDto.UbicacionLat})");
+                item.LocationGPS = DbGeography.FromText($"POINT({itemDto.LocationLong} {itemDto.LocationLat})");
             }
 
             return item;

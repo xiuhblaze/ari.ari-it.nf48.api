@@ -20,6 +20,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<CatAuditorDocument> CatAuditorDocuments { get; set; }
 
+        public virtual ICollection<Certificate> Certificates { get; set; }
+
         public virtual ICollection<DayCalculationConcept> DayCalculationConcepts { get; set; }
     }
 }
