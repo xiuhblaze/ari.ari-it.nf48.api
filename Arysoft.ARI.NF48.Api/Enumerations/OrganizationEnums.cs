@@ -10,26 +10,18 @@
         Deleted
     }
 
-    public enum OrganizationCertificatesStatusType
-    {
-        Nothing,
-        Success,
-        Warning,
-        Danger
-    }
-
     public enum OrganizationOrderType
     { 
         Nothing,
         Name,
         LegalEntity,
         Status,
-        CertificatesStatus,
+        CertificatesValidityStatus,
         Updated,
         NameDesc,
         LegalEntityDesc,
         StatusDesc,
-        CertificatesStatusDesc,
+        CertificatesValidityStatusDesc,
         UpdatedDesc
     }
 }

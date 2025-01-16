@@ -421,6 +421,7 @@
     <Compile Include="QueryFilters\CatAuditorDocumentQueryFilters.cs" />
     <Compile Include="QueryFilters\Category22KQueryFilters.cs" />
     <Compile Include="QueryFilters\CertificateQueryFilters.cs" />
+    <Compile Include="QueryFilters\CertificatesValidityStatus.cs" />
     <Compile Include="QueryFilters\ContactQueryFilters.cs" />
     <Compile Include="QueryFilters\DayCalculationConceptApplicationQueryFilters.cs" />
     <Compile Include="QueryFilters\DayCalculationConceptQueryFilters.cs" />

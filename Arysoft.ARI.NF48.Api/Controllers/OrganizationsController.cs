@@ -136,6 +136,11 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 }
                 else itemToEdit.QRFile = item.QRFile;
             }
+            else
+            {
+                itemToEdit.LogoFile = item.LogoFile;
+                itemToEdit.QRFile = item.QRFile;
+            }
 
             item = await _organizationService.UpdateAsync(itemToEdit);
             var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);

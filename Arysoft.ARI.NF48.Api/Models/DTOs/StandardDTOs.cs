@@ -29,6 +29,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int CatAuditorDocumentsCount { get; set; }
 
+        public int CertificatesCount { get; set; }
+
     } // StandardItemListDto
 
     public class StandardItemDetailDto
@@ -58,6 +60,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public IEnumerable<AuditorStandardItemListDto> Auditors { get; set; }
 
         public IEnumerable<CatAuditorDocumentItemListDto> CatAuditorDocuments { get; set; }
+
+        public IEnumerable<CertificateItemListDto> Certificates { get; set; }
     } // StandardItemDetailDto
 
     public class StandardPostDto

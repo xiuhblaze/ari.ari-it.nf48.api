@@ -45,13 +45,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SiteLocation { get; set; }
 
+        public string SiteLocationURL { get; set; }
+
         public int AuditCyclesCount { get; set; }
 
         public int CertificatesCount { get; set; }
 
         // CALCULATED
 
-        public OrganizationCertificatesStatusType CertificatesStatus { get; set; }
+        public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
 
     } // OrganizationItemListDto
 
@@ -87,7 +89,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
 
-        // public IEnumerable<CertificateItemListDto> Certificates { get; set; }
+        public IEnumerable<CertificateItemListDto> Certificates { get; set; }
 
         public IEnumerable<ContactItemListDto> Contacts { get; set; }
 
@@ -95,7 +97,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // CALCULATED
 
-        public OrganizationCertificatesStatusType CertificatesStatus { get; set; }
+        public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
     }
 
     public class OrganizationPostDto

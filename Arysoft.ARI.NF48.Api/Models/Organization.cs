@@ -35,7 +35,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // NOT MAPPED
 
-        public OrganizationCertificatesStatusType? CertificatesStatus { get; set; }
+        public CertificateValidityStatusType? CertificatesValidityStatus { get; set; }
 
     } // Organization
 }

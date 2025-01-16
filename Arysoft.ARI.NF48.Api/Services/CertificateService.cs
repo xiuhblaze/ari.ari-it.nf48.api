@@ -128,7 +128,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Status);
                     break;
                 case CertificateOrderType.ExpireStatus:
-                    items = items.OrderBy(e => e.DueDate);
+                    items = items.OrderBy(e => e.ValidityStatus);
                     break;
                 case CertificateOrderType.DateDesc:
                     items = items.OrderByDescending(e => e.StartDate);
@@ -137,7 +137,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Status);
                     break;
                 case CertificateOrderType.ExpireStatusDesc:
-                    items = items.OrderByDescending(e => e.DueDate);
+                    items = items.OrderByDescending(e => e.ValidityStatus);
                     break;
             } // Switch
 
@@ -232,7 +232,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"CertificateService.UpdateAsync: {ex.Message}");
             }
 
-            return item;
+            foundItem.ValidityStatus = GetValidityStatus(foundItem);
+
+            return foundItem;
         } // UpdateAsync
 
         public async Task DeleteAsync(Certificate item)

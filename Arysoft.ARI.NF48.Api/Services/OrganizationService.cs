@@ -56,16 +56,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foreach (var item in items)
             {
-                item.CertificatesStatus = GetCertificatesStatus(item);
+                item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
             }
-
-
 
             // Calculated filters
 
-            if (filters.CertificatesStatus != null && filters.CertificatesStatus != OrganizationCertificatesStatusType.Nothing)
+            if (filters.CertificatesValidityStatus != null && filters.CertificatesValidityStatus != CertificateValidityStatusType.Nothing)
             {
-                items = items.Where(e => e.CertificatesStatus == filters.CertificatesStatus);
+                items = items.Where(e => e.CertificatesValidityStatus == filters.CertificatesValidityStatus);
             }
 
             // Order
@@ -82,8 +80,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Status)
                         .ThenBy(e => e.Name);
                     break;
-                case OrganizationOrderType.CertificatesStatus:
-                    items = items.OrderBy(e => e.CertificatesStatus)
+                case OrganizationOrderType.CertificatesValidityStatus:
+                    items = items.OrderBy(e => e.CertificatesValidityStatus)
                         .ThenBy(e => e.Name);
                     break;
                 case OrganizationOrderType.Updated:
@@ -99,8 +97,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Status)
                         .ThenByDescending(e => e.Name);
                     break;
-                case OrganizationOrderType.CertificatesStatusDesc:
-                    items = items.OrderByDescending(e => e.CertificatesStatus)
+                case OrganizationOrderType.CertificatesValidityStatusDesc:
+                    items = items.OrderByDescending(e => e.CertificatesValidityStatus)
                         .ThenByDescending(e => e.Name);
                     break;
                 case OrganizationOrderType.UpdatedDesc:
@@ -121,9 +119,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Organization> GetAsync(Guid id)
         { 
-            var item = await _organizationRepository.GetAsync(id);
+            var item = await _organizationRepository.GetAsync(id)
+                ?? throw new BusinessException("Item not found");
 
-            item.CertificatesStatus = GetCertificatesStatus(item);
+            item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
 
             return item;
         } // GetAsync
@@ -187,6 +186,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 throw new BusinessException($"OrganizationService.UpdateAsync: {ex.Message}");
             }
+
+            foundItem.CertificatesValidityStatus = GetCertificatesValidityStatus(foundItem);
+
             return foundItem;
         } // UpdateAsync
 
@@ -228,17 +230,27 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
-        private static OrganizationCertificatesStatusType GetCertificatesStatus(Organization item)
+        private static CertificateValidityStatusType GetCertificatesValidityStatus(Organization item)
         {
-            if (item.Certificates != null)
+            if (item != null 
+                && item.Certificates != null 
+                && item.Certificates
+                    .Where(i => i.Status != StatusType.Nothing)
+                    .Count() > 0
+            )
             {
+                foreach (var certificate in item.Certificates)
+                {
+                    certificate.ValidityStatus = CertificateService.GetValidityStatus(certificate);
+                }
+
                 var anyInDanger = item.Certificates
                     .Where(c =>
                         c.Status == StatusType.Active
                         && c.ValidityStatus == CertificateValidityStatusType.Danger)
                     .Any();
 
-                if (anyInDanger) return OrganizationCertificatesStatusType.Danger;
+                if (anyInDanger) return CertificateValidityStatusType.Danger;
                 else {
                     var anyInWarning = item.Certificates
                         .Where(c =>
@@ -246,13 +258,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                             && c.ValidityStatus == CertificateValidityStatusType.Warning)
                         .Any();
 
-                    if (anyInWarning) return OrganizationCertificatesStatusType.Warning;
+                    if (anyInWarning) return CertificateValidityStatusType.Warning;
                 }
 
-                return OrganizationCertificatesStatusType.Success;
+                return CertificateValidityStatusType.Success;
             }
 
-            return OrganizationCertificatesStatusType.Nothing;
+            return CertificateValidityStatusType.Nothing;
         } // GetCertificatesStatus
     }
 }

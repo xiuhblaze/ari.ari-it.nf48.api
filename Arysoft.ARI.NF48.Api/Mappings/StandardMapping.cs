@@ -1,6 +1,8 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -38,6 +40,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : 0,
                 CatAuditorDocumentsCount = item.CatAuditorDocuments != null
                     ? item.CatAuditorDocuments.Count 
+                    : 0,
+                CertificatesCount = item.Certificates != null
+                    ? item.Certificates.Count
                     : 0
             };
         } // StandardToItemListDto
@@ -56,13 +61,20 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Applications = item.Applications != null
-                    ? ApplicationMapping.ApplicationsToListDto(item.Applications)
+                    ? ApplicationMapping.ApplicationsToListDto(item.Applications
+                        .Where(a => a.Status != ApplicationStatusType.Nothing))
                     : null,
                 Auditors = item.AuditorStandards != null
-                    ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards)
+                    ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards
+                        .Where(aus => aus.Status >= StatusType.Nothing))
                     : null,
                 CatAuditorDocuments = item.CatAuditorDocuments != null
-                    ? CatAuditorDocumentMapping.CatAuditorDocumentToListDto(item.CatAuditorDocuments)
+                    ? CatAuditorDocumentMapping.CatAuditorDocumentToListDto(item.CatAuditorDocuments
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : null,
+                Certificates = item.Certificates != null
+                    ? CertificateMapping.CertificatesToListDto(item.Certificates
+                        .Where(c => c.Status != StatusType.Nothing))
                     : null
             };
         } // StandardToItemDetailDto

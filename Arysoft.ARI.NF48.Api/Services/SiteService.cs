@@ -160,6 +160,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.IsMainSite = item.IsMainSite;
             foundItem.Address = item.Address;
             foundItem.LocationGPS = item.LocationGPS;
+            foundItem.LocationURL = item.LocationURL;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;

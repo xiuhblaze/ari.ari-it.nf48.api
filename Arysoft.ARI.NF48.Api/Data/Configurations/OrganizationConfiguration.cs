@@ -63,7 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             // Not Mapped
 
             modelBuilder.Entity<Organization>()
-                .Ignore(m => m.CertificatesStatus);
+                .Ignore(m => m.CertificatesValidityStatus);
         } // Configure
     }
 }

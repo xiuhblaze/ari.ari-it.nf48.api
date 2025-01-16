@@ -48,10 +48,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 CertificatesCount = item.Certificates != null
-                    ? item.Certificates.Count()
+                    ? item.Certificates.Where(i => i.Status != StatusType.Nothing).Count()
                     : 0,
                 ContactsCount = item.Contacts != null 
-                    ? item.Contacts.Count() 
+                    ? item.Contacts.Where(i => i.Status != StatusType.Nothing).Count() 
                     : 0,
                 ContactName = mainContact != null  
                     ? mainContact.FirstName 
@@ -63,7 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? mainContact.Phone 
                     : string.Empty,
                 SitesCount = item.Sites != null 
-                    ? item.Sites.Count() 
+                    ? item.Sites.Where(i => i.Status != StatusType.Nothing).Count() 
                     : 0,
                 SiteDescription = mainSite != null 
                     ? mainSite.Description 
@@ -71,11 +71,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteLocation = mainSite != null 
                     ? mainSite.Address 
                     : string.Empty,
+                SiteLocationURL = mainSite != null
+                    ? mainSite.LocationURL
+                    : string.Empty,
                 AuditCyclesCount = item.AuditCycles != null 
-                    ? item.AuditCycles.Count() 
+                    ? item.AuditCycles.Where(i => i.Status != StatusType.Nothing).Count() 
                     : 0,
-                CertificatesStatus = item.CertificatesStatus 
-                    ?? OrganizationCertificatesStatusType.Nothing
+                CertificatesValidityStatus = item.CertificatesValidityStatus
+                    ?? CertificateValidityStatusType.Nothing
             };
         } // OrganizationToItemListDto
 
@@ -96,22 +99,28 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Applications = item.Applications != null
-                    ? ApplicationMapping.ApplicationsToListDto(item.Applications)
+                    ? ApplicationMapping.ApplicationsToListDto(item.Applications
+                        .Where(i => i.Status != ApplicationStatusType.Nothing))
                     : new List<ApplicationItemListDto>(),
                 AuditCycles = item.AuditCycles != null
-                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles.OrderByDescending(ac => ac.StartDate))
+                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
+                        .Where(i => i.Status != StatusType.Nothing)
+                        .OrderByDescending(ac => ac.StartDate))
                     : new List<AuditCycleItemListDto>(),
-                //Certificates = item.Certificates != null
-                //    ? CertificateMapping.CertificateToListDto(item.Certificates)
-                //    : new List<CertificateItemListDto>(),
+                Certificates = item.Certificates != null
+                    ? CertificateMapping.CertificatesToListDto(item.Certificates
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : new List<CertificateItemListDto>(),
                 Contacts = item.Contacts != null
-                    ? ContactMapping.ContactToListDto(item.Contacts)
+                    ? ContactMapping.ContactToListDto(item.Contacts
+                        .Where(i => i.Status != StatusType.Nothing))
                     : new List<ContactItemListDto>(),
                 Sites = item.Sites != null
-                    ? SiteMapping.SiteToListDto(item.Sites)
+                    ? SiteMapping.SiteToListDto(item.Sites
+                        .Where(i => i.Status != StatusType.Nothing))
                     : new List<SiteItemListDto>(),
-                CertificatesStatus = item.CertificatesStatus
-                    ?? OrganizationCertificatesStatusType.Nothing
+                CertificatesValidityStatus = item.CertificatesValidityStatus
+                    ?? CertificateValidityStatusType.Nothing
             };
         } // OrganizationToItemDetailDto
 

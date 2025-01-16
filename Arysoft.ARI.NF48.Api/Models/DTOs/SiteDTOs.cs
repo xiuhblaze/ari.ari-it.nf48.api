@@ -25,9 +25,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StatusType Status { get; set; }
 
-        public int NoShifts { get; set; }
+        public int ShiftsCount { get; set; }
 
-        public int NoEmployees { get; set; }
+        public int EmployeesCount { get; set; }
 
     } // SiteItemListDto
 

@@ -4,8 +4,8 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 -->
 <Project>
   <PropertyGroup>
-    <_PublishTargetUrl>C:\Users\xiuhb\compiled\ari\backend</_PublishTargetUrl>
-    <History>True|2025-01-03T17:21:02.9247171Z||;True|2025-01-02T12:15:42.6326319-06:00||;True|2024-12-31T09:08:03.7984582-06:00||;True|2024-12-17T10:28:57.8146296-06:00||;True|2024-12-16T13:21:53.3024578-06:00||;True|2024-12-13T12:22:48.8866852-06:00||;True|2024-12-12T12:14:20.1545417-06:00||;True|2024-12-12T09:23:57.7572746-06:00||;True|2024-12-11T15:48:53.9336718-06:00||;True|2024-12-10T11:41:00.1302522-06:00||;True|2024-12-06T09:24:58.4549372-06:00||;True|2024-12-05T10:56:50.0465126-06:00||;True|2024-12-04T15:28:58.6332167-06:00||;True|2024-12-03T13:56:24.2152146-06:00||;True|2024-12-03T11:08:32.9001404-06:00||;True|2024-12-03T11:07:33.5868721-06:00||;True|2024-12-02T17:20:58.6625814-06:00||;True|2024-11-27T16:53:32.2893019-06:00||;True|2024-11-26T12:29:05.2946962-06:00||;True|2024-11-26T12:04:53.4940883-06:00||;True|2024-11-25T13:59:43.4158899-06:00||;True|2024-11-22T08:54:35.3639861-06:00||;True|2024-11-21T17:38:02.4868141-06:00||;True|2024-11-21T13:21:39.1086163-06:00||;True|2024-11-20T16:41:30.2071155-06:00||;True|2024-11-19T13:01:48.7170805-06:00||;True|2024-09-24T17:25:05.0088898-06:00||;True|2024-08-09T21:49:37.8089178-06:00||;True|2024-07-02T19:51:51.5248732-06:00||;True|2024-06-25T22:44:12.5872989-06:00||;True|2024-06-11T19:58:14.7552378-06:00||;True|2024-06-11T19:29:54.6459005-06:00||;True|2024-06-10T20:30:30.6424543-06:00||;True|2024-04-08T17:47:26.0983000-06:00||;True|2024-03-22T21:08:46.3333178-06:00||;True|2024-03-22T19:13:40.6873423-06:00||;True|2024-03-22T18:54:22.3650701-06:00||;True|2024-03-22T18:17:38.4231309-06:00||;True|2023-09-15T19:18:52.8737138-06:00||;True|2023-09-13T21:16:53.2252910-06:00||;True|2023-08-28T20:15:18.9642059-06:00||;True|2023-08-19T20:50:43.5358993-06:00||;True|2023-05-02T22:18:44.6856683-06:00||;True|2023-04-03T20:22:28.6862894-06:00||;True|2023-04-03T20:17:15.9000935-06:00||;True|2023-03-30T22:23:08.9419762-06:00||;True|2023-03-29T22:46:01.5337517-06:00||;True|2023-03-29T22:26:47.5288083-06:00||;True|2023-03-28T23:19:52.0020982-06:00||;True|2023-03-01T19:18:00.2294338-06:00||;True|2023-01-26T00:08:47.6842119-06:00||;True|2023-01-24T18:46:04.8188676-06:00||;True|2023-01-19T23:05:00.2997893-06:00||;</History>
+    <_PublishTargetUrl>C:\comun\compiled\ari\backend</_PublishTargetUrl>
+    <History>True|2025-01-16T15:25:36.8789391Z||;True|2025-01-15T09:46:04.6419396-06:00||;True|2025-01-03T11:21:02.9247171-06:00||;True|2025-01-02T12:15:42.6326319-06:00||;True|2024-12-31T09:08:03.7984582-06:00||;True|2024-12-17T10:28:57.8146296-06:00||;True|2024-12-16T13:21:53.3024578-06:00||;True|2024-12-13T12:22:48.8866852-06:00||;True|2024-12-12T12:14:20.1545417-06:00||;True|2024-12-12T09:23:57.7572746-06:00||;True|2024-12-11T15:48:53.9336718-06:00||;True|2024-12-10T11:41:00.1302522-06:00||;True|2024-12-06T09:24:58.4549372-06:00||;True|2024-12-05T10:56:50.0465126-06:00||;True|2024-12-04T15:28:58.6332167-06:00||;True|2024-12-03T13:56:24.2152146-06:00||;True|2024-12-03T11:08:32.9001404-06:00||;True|2024-12-03T11:07:33.5868721-06:00||;True|2024-12-02T17:20:58.6625814-06:00||;True|2024-11-27T16:53:32.2893019-06:00||;True|2024-11-26T12:29:05.2946962-06:00||;True|2024-11-26T12:04:53.4940883-06:00||;True|2024-11-25T13:59:43.4158899-06:00||;True|2024-11-22T08:54:35.3639861-06:00||;True|2024-11-21T17:38:02.4868141-06:00||;True|2024-11-21T13:21:39.1086163-06:00||;True|2024-11-20T16:41:30.2071155-06:00||;True|2024-11-19T13:01:48.7170805-06:00||;True|2024-09-24T17:25:05.0088898-06:00||;True|2024-08-09T21:49:37.8089178-06:00||;True|2024-07-02T19:51:51.5248732-06:00||;True|2024-06-25T22:44:12.5872989-06:00||;True|2024-06-11T19:58:14.7552378-06:00||;True|2024-06-11T19:29:54.6459005-06:00||;True|2024-06-10T20:30:30.6424543-06:00||;True|2024-04-08T17:47:26.0983000-06:00||;True|2024-03-22T21:08:46.3333178-06:00||;True|2024-03-22T19:13:40.6873423-06:00||;True|2024-03-22T18:54:22.3650701-06:00||;True|2024-03-22T18:17:38.4231309-06:00||;True|2023-09-15T19:18:52.8737138-06:00||;True|2023-09-13T21:16:53.2252910-06:00||;True|2023-08-28T20:15:18.9642059-06:00||;True|2023-08-19T20:50:43.5358993-06:00||;True|2023-05-02T22:18:44.6856683-06:00||;True|2023-04-03T20:22:28.6862894-06:00||;True|2023-04-03T20:17:15.9000935-06:00||;True|2023-03-30T22:23:08.9419762-06:00||;True|2023-03-29T22:46:01.5337517-06:00||;True|2023-03-29T22:26:47.5288083-06:00||;True|2023-03-28T23:19:52.0020982-06:00||;True|2023-03-01T19:18:00.2294338-06:00||;True|2023-01-26T00:08:47.6842119-06:00||;True|2023-01-24T18:46:04.8188676-06:00||;True|2023-01-19T23:05:00.2997893-06:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -73,16 +73,16 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>01/09/2024 18:25:11</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.dll">
-      <publishTime>10/09/2013 10:29:20</publishTime>
+      <publishTime>09/10/2013 10:29:20</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.pdb">
-      <publishTime>10/09/2013 10:29:20</publishTime>
+      <publishTime>09/10/2013 10:29:20</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.dll">
-      <publishTime>01/03/2025 11:21:01</publishTime>
+      <publishTime>01/16/2025 09:25:34</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.pdb">
-      <publishTime>01/03/2025 11:21:01</publishTime>
+      <publishTime>01/16/2025 09:25:34</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>04/16/2020 14:38:42</publishTime>
@@ -106,7 +106,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>10/20/2023 14:35:08</publishTime>
     </File>
     <File Include="bin/es/System.Web.Optimization.resources.dll">
-      <publishTime>11/02/2014 09:28:40</publishTime>
+      <publishTime>02/11/2014 09:28:40</publishTime>
     </File>
     <File Include="bin/es/System.Web.Razor.resources.dll">
       <publishTime>10/20/2023 14:35:08</publishTime>
@@ -124,7 +124,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>11/15/2019 02:38:12</publishTime>
     </File>
     <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
-      <publishTime>08/07/2020 15:52:58</publishTime>
+      <publishTime>07/08/2020 15:52:58</publishTime>
     </File>
     <File Include="bin/Microsoft.IdentityModel.Abstractions.dll">
       <publishTime>11/20/2023 19:53:42</publishTime>
@@ -139,19 +139,19 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>11/20/2023 19:23:16</publishTime>
     </File>
     <File Include="bin/Microsoft.Owin.dll">
-      <publishTime>10/05/2022 17:31:20</publishTime>
+      <publishTime>05/10/2022 17:31:20</publishTime>
     </File>
     <File Include="bin/Microsoft.Owin.Host.SystemWeb.dll">
-      <publishTime>10/05/2022 17:31:40</publishTime>
+      <publishTime>05/10/2022 17:31:40</publishTime>
     </File>
     <File Include="bin/Microsoft.Owin.Security.dll">
-      <publishTime>10/05/2022 17:31:38</publishTime>
+      <publishTime>05/10/2022 17:31:38</publishTime>
     </File>
     <File Include="bin/Microsoft.Owin.Security.Jwt.dll">
-      <publishTime>10/05/2022 17:31:54</publishTime>
+      <publishTime>05/10/2022 17:31:54</publishTime>
     </File>
     <File Include="bin/Microsoft.Owin.Security.OAuth.dll">
-      <publishTime>10/05/2022 17:31:50</publishTime>
+      <publishTime>05/10/2022 17:31:50</publishTime>
     </File>
     <File Include="bin/Microsoft.Web.Infrastructure.dll">
       <publishTime>05/27/2022 17:39:10</publishTime>
@@ -208,10 +208,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/18/2020 19:40:20</publishTime>
     </File>
     <File Include="bin/roslyn/Microsoft.DiaSymReader.Native.amd64.dll">
-      <publishTime>04/12/2017 19:36:44</publishTime>
+      <publishTime>12/04/2017 19:36:44</publishTime>
     </File>
     <File Include="bin/roslyn/Microsoft.DiaSymReader.Native.x86.dll">
-      <publishTime>04/12/2017 19:36:44</publishTime>
+      <publishTime>12/04/2017 19:36:44</publishTime>
     </File>
     <File Include="bin/roslyn/Microsoft.Managed.Core.targets">
       <publishTime>05/18/2020 19:40:20</publishTime>
@@ -265,7 +265,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>11/20/2023 19:09:40</publishTime>
     </File>
     <File Include="bin/System.Memory.dll">
-      <publishTime>07/05/2022 21:31:02</publishTime>
+      <publishTime>05/07/2022 21:31:02</publishTime>
     </File>
     <File Include="bin/System.Net.Http.Formatting.dll">
       <publishTime>10/20/2023 14:33:52</publishTime>
@@ -310,7 +310,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="bin/System.Web.Optimization.dll">
-      <publishTime>11/02/2014 09:26:04</publishTime>
+      <publishTime>02/11/2014 09:26:04</publishTime>
     </File>
     <File Include="bin/System.Web.Razor.dll">
       <publishTime>10/20/2023 14:33:48</publishTime>
@@ -418,7 +418,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>01/17/2023 23:16:07</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>01/03/2025 11:21:02</publishTime>
+      <publishTime>01/15/2025 09:46:03</publishTime>
     </File>
   </ItemGroup>
 </Project>
