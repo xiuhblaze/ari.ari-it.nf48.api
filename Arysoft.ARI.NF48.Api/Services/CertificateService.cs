@@ -200,7 +200,16 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+            // - Solo cuando es nuevo, se guarda el standard
+            if (foundItem.Status == StatusType.Nothing)
+            { 
+                foundItem.StandardID = item.StandardID;
+            }
+
+            if (item.Status == StatusType.Nothing)
+            {
+                item.Status = StatusType.Active;
+            }
 
             if (item.Status == StatusType.Active && foundItem.Status != StatusType.Active)
             {
@@ -212,6 +221,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.StartDate = item.StartDate;
             foundItem.DueDate = item.DueDate;
             foundItem.Comments = item.Comments;
+            foundItem.Filename = item.Filename;
             foundItem.PrevAuditDate = item.PrevAuditDate;
             foundItem.PrevAuditNote = item.PrevAuditNote;
             foundItem.NextAuditDate = item.NextAuditDate;
