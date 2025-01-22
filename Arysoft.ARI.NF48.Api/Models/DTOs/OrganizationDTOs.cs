@@ -9,6 +9,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public int? Folio { get; set; }
+
         public string Name { get; set; }
 
         public string LegalEntity { get; set; }
@@ -47,6 +49,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SiteLocationURL { get; set; }
 
+        public int SitesEmployeesCount { get; set; }
+
         public int AuditCyclesCount { get; set; }
 
         public int CertificatesCount { get; set; }
@@ -60,6 +64,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class OrganizationItemDetailDto
     {
         public Guid ID { get; set; }
+
+        public int? Folio { get; set; }
 
         public string Name { get; set; }
 

@@ -24,7 +24,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string NextAuditNote { get; set; }
 
-        public StatusType Status { get; set; }
+        public CertificateStatusType Status { get; set; }
 
         // RELATIONS
 
@@ -62,7 +62,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string NextAuditNote { get; set; }
 
-        public StatusType Status { get; set; }
+        public CertificateStatusType Status { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -120,7 +120,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string NextAuditNote { get; set; }
 
         [Required]
-        public StatusType Status { get; set; }
+        public CertificateStatusType Status { get; set; }
 
         [Required]
         [StringLength(50)]

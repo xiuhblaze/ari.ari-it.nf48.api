@@ -15,12 +15,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var items = await _model
                 .Where(m => m.OrganizationID == organizationID
                     && m.StandardID == standardID
-                    && m.Status == StatusType.Active)
+                    && m.Status == CertificateStatusType.Active)
                 .ToListAsync();
 
             foreach (var item in items)
             {
-                item.Status = StatusType.Inactive;
+                item.Status = CertificateStatusType.Expired;
                 Update(item);
             }
         } // SetInactiveByOrganizationAndStandardAsync

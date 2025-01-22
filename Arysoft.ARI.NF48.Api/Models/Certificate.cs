@@ -25,6 +25,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string NextAuditNote { get; set; }
 
+        public new CertificateStatusType Status { get; set; }
+
         // RELATIONS
 
         public virtual Organization Organization { get; set; }

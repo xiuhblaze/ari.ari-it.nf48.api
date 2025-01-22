@@ -41,7 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : 0,
                 EmployeesCount = item.Shifts != null 
                     ? item.Shifts
-                        .Where(i => i.Status != StatusType.Nothing)
+                        .Where(i => i.Status == StatusType.Active)
                         .Sum(i => i.NoEmployees) ?? 0 
                     : 0,
             };

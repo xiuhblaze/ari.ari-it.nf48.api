@@ -29,6 +29,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Filters
 
+            if (filters.Folio != null) 
+            {
+                items = items.Where(e => e.Folio == filters.Folio);
+            }
+
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
@@ -37,6 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (e.LegalEntity != null && e.LegalEntity.ToLower().Contains(filters.Text))
                     || (e.Website != null && e.Website.ToLower().Contains(filters.Text))
                     || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))
+                    || (e.COID != null && e.COID.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -70,6 +76,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
+                case OrganizationOrderType.Folio:
+                    items = items.OrderBy(e => e.Folio);
+                    break;
                 case OrganizationOrderType.Name:
                     items = items.OrderBy(e => e.Name);
                     break;
@@ -86,6 +95,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
                 case OrganizationOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
+                    break;
+                case OrganizationOrderType.FolioDesc:
+                    items = items.OrderByDescending(e => e.Folio);
                     break;
                 case OrganizationOrderType.NameDesc:
                     items = items.OrderByDescending(e => e.Name);
@@ -105,7 +117,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Updated);
                     break;
                 default:
-                    items = items.OrderBy(e => e.Name);
+                    items = items.OrderByDescending(e => e.Folio);
                     break;
             }
 
@@ -120,6 +132,16 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<Organization> GetAsync(Guid id)
         { 
             var item = await _organizationRepository.GetAsync(id)
+                ?? throw new BusinessException("Item not found");
+
+            item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
+
+            return item;
+        } // GetAsync
+
+        public async Task<Organization> GetAsync(int folio)
+        {
+            var item = await _organizationRepository.GetAsync(folio)
                 ?? throw new BusinessException("Item not found");
 
             item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
@@ -161,6 +183,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The record to update was not found");
 
             // Assigning values
+
+            // Si es nuevo
+            if (foundItem.Status == OrganizationStatusType.Nothing)
+            {   
+                // Generar el folio
+                foundItem.Folio = await _organizationRepository.GetNextFolioAsync();
+            }
 
             foundItem.Name = item.Name;
             foundItem.LegalEntity = item.LegalEntity;
@@ -235,7 +264,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item != null 
                 && item.Certificates != null 
                 && item.Certificates
-                    .Where(i => i.Status != StatusType.Nothing)
+                    .Where(i => i.Status != CertificateStatusType.Nothing)
                     .Count() > 0
             )
             {
@@ -246,7 +275,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 var anyInDanger = item.Certificates
                     .Where(c =>
-                        c.Status == StatusType.Active
+                        c.Status == CertificateStatusType.Active
                         && c.ValidityStatus == CertificateValidityStatusType.Danger)
                     .Any();
 
@@ -254,7 +283,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 else {
                     var anyInWarning = item.Certificates
                         .Where(c =>
-                            c.Status == StatusType.Active
+                            c.Status == CertificateStatusType.Active
                             && c.ValidityStatus == CertificateValidityStatusType.Warning)
                         .Any();
 

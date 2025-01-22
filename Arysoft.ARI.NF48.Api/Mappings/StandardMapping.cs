@@ -74,7 +74,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 Certificates = item.Certificates != null
                     ? CertificateMapping.CertificatesToListDto(item.Certificates
-                        .Where(c => c.Status != StatusType.Nothing))
+                        .Where(c => c.Status != CertificateStatusType.Nothing))
                     : null
             };
         } // StandardToItemDetailDto

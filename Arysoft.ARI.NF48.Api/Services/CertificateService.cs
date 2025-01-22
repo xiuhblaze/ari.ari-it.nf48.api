@@ -93,7 +93,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
-            if (filters.Status != null && filters.Status != StatusType.Nothing)
+            if (filters.Status != null && filters.Status != CertificateStatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);
             }
@@ -101,8 +101,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
                 items = (bool)filters.IncludeDeleted
-                    ? items.Where(e => e.Status != StatusType.Nothing)
-                    : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
+                    ? items.Where(e => e.Status != CertificateStatusType.Nothing)
+                    : items.Where(e => e.Status != CertificateStatusType.Nothing && e.Status != CertificateStatusType.Deleted);
             }
 
             // - Generando valores calculados
@@ -168,7 +168,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             item.ID = Guid.NewGuid();
-            item.Status = StatusType.Nothing;
+            item.Status = CertificateStatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
@@ -198,20 +198,23 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.StandardID == null)
                 throw new BusinessException("Must specify a standard");
 
+            // - Falta validar cambios de estado y de cual a cual puede cambiar o regresar
+
             // Assigning values
 
             // - Solo cuando es nuevo, se guarda el standard
-            if (foundItem.Status == StatusType.Nothing)
+            if (foundItem.Status == CertificateStatusType.Nothing)
             { 
                 foundItem.StandardID = item.StandardID;
             }
 
-            if (item.Status == StatusType.Nothing)
+            if (item.Status == CertificateStatusType.Nothing)
             {
-                item.Status = StatusType.Active;
+                item.Status = CertificateStatusType.Active;
             }
 
-            if (item.Status == StatusType.Active && foundItem.Status != StatusType.Active)
+            if (item.Status == CertificateStatusType.Active 
+                && foundItem.Status != CertificateStatusType.Active)
             {
                 await _repository.SetInactiveByOrganizationAndStandardAsync(
                     foundItem.OrganizationID, 
@@ -257,15 +260,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Excecute queries
 
-            if (foundItem.Status == StatusType.Deleted)
+            if (foundItem.Status == CertificateStatusType.Deleted)
             {   
                 _repository.Delete(foundItem);
             }
             else
             {
-                foundItem.Status = foundItem.Status == StatusType.Active
-                    ? StatusType.Inactive
-                    : StatusType.Deleted;
+                foundItem.Status = foundItem.Status == CertificateStatusType.Active
+                    ? CertificateStatusType.Expired
+                    : CertificateStatusType.Deleted;
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 

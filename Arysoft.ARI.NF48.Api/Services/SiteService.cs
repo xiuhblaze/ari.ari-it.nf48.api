@@ -5,13 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Data.Entity.Spatial;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
-using System.Web.Mvc;
-using System.Web.Optimization;
-using System.Web.UI.WebControls.WebParts;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -128,6 +123,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             
             // Execute queries
 
+            // TODO: Ver si se generaron Shifts para este site, si es asi, borrarlos primero
             await _siteRepository.DeleteTmpByUserAsync(item.UpdatedUser);
             _siteRepository.Add(item);
             await _siteRepository.SaveChangesAsync();

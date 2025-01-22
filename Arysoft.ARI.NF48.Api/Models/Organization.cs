@@ -4,7 +4,9 @@ using System.Collections.Generic;
 namespace Arysoft.ARI.NF48.Api.Models
 {
     public class Organization : BaseModel
-    {   
+    {
+        public int? Folio { get; set; }
+
         public string Name { get; set; }
 
         public string LegalEntity { get; set; }

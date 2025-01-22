@@ -13,11 +13,13 @@
     public enum OrganizationOrderType
     { 
         Nothing,
+        Folio,
         Name,
         LegalEntity,
         Status,
         CertificatesValidityStatus,
         Updated,
+        FolioDesc,
         NameDesc,
         LegalEntityDesc,
         StatusDesc,

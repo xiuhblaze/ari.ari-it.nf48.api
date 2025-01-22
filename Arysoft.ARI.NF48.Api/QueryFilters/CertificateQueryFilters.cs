@@ -1,8 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.QueryFilters
 {
@@ -22,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public CertificateValidityStatusType? ValidityStatus { get; set; }
 
-        public StatusType? Status { get; set; }
+        public CertificateStatusType? Status { get; set; }
 
         public CertificateOrderType? Order { get; set; }
     }

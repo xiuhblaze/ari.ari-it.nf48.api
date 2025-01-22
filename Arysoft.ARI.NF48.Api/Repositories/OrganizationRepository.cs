@@ -9,6 +9,23 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class OrganizationRepository : BaseRepository<Organization>
     {
+        public async Task<Organization> GetAsync(int folio)
+        {
+            return await _model
+                .FirstOrDefaultAsync(o => o.Folio == folio);
+        } // GetAsync
+
+        public async Task<int> GetNextFolioAsync()
+        {
+            var folio = await _model
+                .Where(o => 
+                    o.Status != OrganizationStatusType.Nothing
+                )
+                .MaxAsync(o => o.Folio);
+
+            return folio.HasValue ? folio.Value + 1 : 1;
+        } // GetNextFolio
+
         public new async Task DeleteTmpByUserAsync(string username)
         {
             var items = await _model

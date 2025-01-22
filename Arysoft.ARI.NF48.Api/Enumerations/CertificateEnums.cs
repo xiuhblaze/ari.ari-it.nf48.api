@@ -27,4 +27,15 @@
         PrevAuditDate,
         NextAuditDate
     } // CertificateFilterDateType
+
+    public enum CertificateStatusType
+    { 
+        Nothing,
+        Active,
+        Suspended,
+        Expired,
+        Canceled,
+        Deleted
+    } // CertificateStatusType
+
 }

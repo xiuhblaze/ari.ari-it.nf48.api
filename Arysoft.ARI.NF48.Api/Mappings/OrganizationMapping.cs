@@ -34,9 +34,18 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 .Where(c => c.Status == StatusType.Active)
                 .FirstOrDefault();
 
+            var employeesCount = item.Sites != null
+                ? item.Sites
+                    .Where((Site i) => i.Status == StatusType.Active)
+                    .Sum((Site i) => i.Shifts
+                        .Where((Shift s) => s.Status == StatusType.Active)
+                        .Sum((Shift s) => s.NoEmployees)) ?? 0
+                : 0;
+
             return new OrganizationItemListDto
             {
                 ID = item.ID,
+                Folio = item.Folio,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
@@ -48,7 +57,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 CertificatesCount = item.Certificates != null
-                    ? item.Certificates.Where(i => i.Status != StatusType.Nothing).Count()
+                    ? item.Certificates.Where(i => i.Status != CertificateStatusType.Nothing).Count()
                     : 0,
                 ContactsCount = item.Contacts != null 
                     ? item.Contacts.Where(i => i.Status != StatusType.Nothing).Count() 
@@ -63,7 +72,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? mainContact.Phone 
                     : string.Empty,
                 SitesCount = item.Sites != null 
-                    ? item.Sites.Where(i => i.Status != StatusType.Nothing).Count() 
+                    ? item.Sites.Where(i => i.Status != StatusType.Active).Count() 
                     : 0,
                 SiteDescription = mainSite != null 
                     ? mainSite.Description 
@@ -74,6 +83,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteLocationURL = mainSite != null
                     ? mainSite.LocationURL
                     : string.Empty,
+                SitesEmployeesCount = employeesCount,
                 AuditCyclesCount = item.AuditCycles != null 
                     ? item.AuditCycles.Where(i => i.Status != StatusType.Nothing).Count() 
                     : 0,
@@ -87,6 +97,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new OrganizationItemDetailDto
             {
                 ID = item.ID,
+                Folio = item.Folio,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
@@ -109,7 +120,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : new List<AuditCycleItemListDto>(),
                 Certificates = item.Certificates != null
                     ? CertificateMapping.CertificatesToListDto(item.Certificates
-                        .Where(i => i.Status != StatusType.Nothing))
+                        .Where(i => i.Status != CertificateStatusType.Nothing))
                     : new List<CertificateItemListDto>(),
                 Contacts = item.Contacts != null
                     ? ContactMapping.ContactToListDto(item.Contacts

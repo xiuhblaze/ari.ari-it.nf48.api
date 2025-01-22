@@ -67,6 +67,17 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetOrganization
 
+        //[ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
+        //public async Task<IHttpActionResult> GetOrganization(int folio)
+        //{ 
+        //    var item = await _organizationService.GetAsync(folio)
+        //        ?? throw new BusinessException("Item not found");
+        //    var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
+        //    var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
+
+        //    return Ok(response);
+        //} // GetOrganization
+
         // POST: api/Organization
         [ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
         public async Task<IHttpActionResult> PostOrganization([FromBody] OrganizationPostDto itemAddDto)
