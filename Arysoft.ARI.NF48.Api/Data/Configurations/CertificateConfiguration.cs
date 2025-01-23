@@ -52,10 +52,20 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
+            // Relations
+
+            modelBuilder.Entity<Certificate>()
+                .HasMany(m => m.Notes)
+                .WithOptional()
+                .HasForeignKey(m => m.OwnerID);
+
             // Not Mapped
 
             modelBuilder.Entity<Certificate>()
                 .Ignore(m => m.ValidityStatus);
+
+            modelBuilder.Entity<Certificate>()
+                .Ignore(m => m.AuditPlanValidityStatus);
 
         } // Configure
     }    

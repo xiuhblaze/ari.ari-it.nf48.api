@@ -10,6 +10,10 @@
         Deleted
     }
 
+    // Estatus que deben de llevar las Organizaciones
+    // Prospecto,
+    // Cliente, -> Active
+
     public enum OrganizationOrderType
     { 
         Nothing,

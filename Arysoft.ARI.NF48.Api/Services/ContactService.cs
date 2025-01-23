@@ -147,6 +147,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
             // HACK: - Que el nombre no se repita
+            // - Que al menos traiga el First name y el Last name
+            // - Que el correo sea válido y requerido
 
             var foundItem = await _contactRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");

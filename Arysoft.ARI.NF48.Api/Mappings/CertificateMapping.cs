@@ -1,9 +1,8 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -34,6 +33,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 PrevAuditNote = item.PrevAuditNote,
                 NextAuditDate = item.NextAuditDate,
                 NextAuditNote = item.NextAuditNote,
+                HasNCsMinor = item.HasNCsMinor,
+                HasNCsMajor = item.HasNCsMajor,
+                HasNCsCritical = item.HasNCsCritical,
+                ActionPlanDate = item.ActionPlanDate,
+                ActionPlanDelivered = item.ActionPlanDelivered,
                 Status = item.Status,
                 OrganizationName = item.Organization != null
                     ? item.Organization.Name
@@ -41,7 +45,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardName = item.Standard != null
                     ? item.Standard.Name
                     : string.Empty,
-                ValidityStatus = item.ValidityStatus
+                NotesCount = item.Notes != null
+                    ? item.Notes
+                        .Where(n => n.Status != StatusType.Nothing)
+                        .Count()
+                    : 0,
+                ValidityStatus = item.ValidityStatus,
+                AuditPlanValidityStatus = item.AuditPlanValidityStatus
             };
         } // CertificateToItemListDto
 
@@ -60,6 +70,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 PrevAuditNote = item.PrevAuditNote,
                 NextAuditDate = item.NextAuditDate,
                 NextAuditNote = item.NextAuditNote,
+                HasNCsMinor = item.HasNCsMinor,
+                HasNCsMajor = item.HasNCsMajor,
+                HasNCsCritical = item.HasNCsCritical,
+                ActionPlanDate = item.ActionPlanDate,
+                ActionPlanDelivered = item.ActionPlanDelivered,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -70,7 +85,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Standard = item.Standard != null
                     ? StandardMapping.StandardToItemListDto(item.Standard)
                     : null,
-                ValidityStatus = item.ValidityStatus
+                Notes = item.Notes != null
+                    ? NoteMapping.NotesToListDto(item.Notes
+                        .Where(n => n.Status != StatusType.Nothing)
+                        .OrderByDescending(n => n.Updated))
+                    : null,
+                ValidityStatus = item.ValidityStatus,
+                AuditPlanValidityStatus = item.AuditPlanValidityStatus
             };
         } // CertificateToItemDetailDto
 
@@ -96,6 +117,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 PrevAuditNote = itemDto.PrevAuditNote,
                 NextAuditDate = itemDto.NextAuditDate,
                 NextAuditNote = itemDto.NextAuditNote,
+                HasNCsMinor = itemDto.HasNCsMinor,
+                HasNCsMajor = itemDto.HasNCsMajor,
+                HasNCsCritical = itemDto.HasNCsCritical,
+                ActionPlanDate = itemDto.ActionPlanDate,
+                ActionPlanDelivered = itemDto.ActionPlanDelivered,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

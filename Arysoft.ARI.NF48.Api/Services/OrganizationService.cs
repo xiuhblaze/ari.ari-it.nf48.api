@@ -184,10 +184,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            // Si es nuevo
-            if (foundItem.Status == OrganizationStatusType.Nothing)
+            // Si cambió a estatus activo, generar el folio
+            if (foundItem.Status < OrganizationStatusType.Active 
+                && item.Status == OrganizationStatusType.Active
+                && item.Folio != null)
             {   
-                // Generar el folio
                 foundItem.Folio = await _organizationRepository.GetNextFolioAsync();
             }
 

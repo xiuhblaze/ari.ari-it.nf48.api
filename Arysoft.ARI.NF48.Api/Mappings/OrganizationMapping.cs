@@ -63,7 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? item.Contacts.Where(i => i.Status != StatusType.Nothing).Count() 
                     : 0,
                 ContactName = mainContact != null  
-                    ? mainContact.FirstName 
+                    ? Tools.Strings.FullName(mainContact.FirstName, mainContact.MiddleName, mainContact.LastName)
                     : string.Empty,
                 ContactEmail = mainContact != null 
                     ? mainContact.Email 

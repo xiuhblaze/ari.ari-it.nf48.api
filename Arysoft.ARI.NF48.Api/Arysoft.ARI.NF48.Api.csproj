@@ -245,6 +245,7 @@
     <Compile Include="Controllers\FSSCCategoriesController.cs" />
     <Compile Include="Controllers\FSSCJobExperiencesController.cs" />
     <Compile Include="Controllers\FSSCSubCategoriesController.cs" />
+    <Compile Include="Controllers\NotesController.cs" />
     <Compile Include="Data\AriContext.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
@@ -282,6 +283,7 @@
     <Compile Include="Data\Configurations\FSSCCategoryConfiguration.cs" />
     <Compile Include="Data\Configurations\FSSCJobExperienceConfiguration.cs" />
     <Compile Include="Data\Configurations\FSSCSubCategoryConfiguration.cs" />
+    <Compile Include="Data\Configurations\NoteConfiguration.cs" />
     <Compile Include="Data\Configurations\OrganizationConfiguration.cs" />
     <Compile Include="Data\Configurations\RoleConfiguration.cs" />
     <Compile Include="Data\Configurations\ShiftConfiguration.cs" />
@@ -310,6 +312,7 @@
     <Compile Include="Enumerations\FSSCCategoryEnums.cs" />
     <Compile Include="Enumerations\FSSCJobExperienceEnums.cs" />
     <Compile Include="Enumerations\FSSCSubCategoryEnums.cs" />
+    <Compile Include="Enumerations\NoteEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
     <Compile Include="Enumerations\RoleEnums.cs" />
     <Compile Include="Enumerations\ShiftEnums.cs" />
@@ -344,6 +347,7 @@
     <Compile Include="Mappings\FSSCCategoryMapping.cs" />
     <Compile Include="Mappings\FSSCJobExperienceMapping.cs" />
     <Compile Include="Mappings\FSSCSubCategoryMapping.cs" />
+    <Compile Include="Mappings\NoteMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
     <Compile Include="Mappings\ShiftMapping.cs" />
@@ -389,6 +393,7 @@
     <Compile Include="Models\DTOs\FSSCCategoryDTOs.cs" />
     <Compile Include="Models\DTOs\FSSCJobExperienceDTOs.cs" />
     <Compile Include="Models\DTOs\FSSCSubCategoryDTOs.cs" />
+    <Compile Include="Models\DTOs\NoteDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
     <Compile Include="Models\DTOs\RoleDTOs.cs" />
     <Compile Include="Models\DTOs\ShiftDTOs.cs" />
@@ -432,6 +437,7 @@
     <Compile Include="QueryFilters\FSSCCategoryQueryFilters.cs" />
     <Compile Include="QueryFilters\FSSCJobExperienceQueryFilters.cs" />
     <Compile Include="QueryFilters\FSSCSubCategoryQueryFilters.cs" />
+    <Compile Include="QueryFilters\NoteQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
     <Compile Include="QueryFilters\RoleQueryFilters.cs" />
     <Compile Include="QueryFilters\ShiftQueryFilters.cs" />
@@ -487,6 +493,7 @@
     <Compile Include="Services\FSSCCategoryService.cs" />
     <Compile Include="Services\FSSCJobExperienceService.cs" />
     <Compile Include="Services\FSSCSubCategoryService.cs" />
+    <Compile Include="Services\NoteService.cs" />
     <Compile Include="Services\OrganizationService.cs" />
     <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\ShiftService.cs" />

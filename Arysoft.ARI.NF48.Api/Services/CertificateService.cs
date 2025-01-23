@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Microsoft.Owin.Security.DataHandler.Encoder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,6 +111,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foreach (var item in items)
             {
                 item.ValidityStatus = GetValidityStatus(item);
+                item.AuditPlanValidityStatus = GetAuditPlanValidityStatus(item);
             }
 
             if (filters.ValidityStatus != null && filters.ValidityStatus != CertificateValidityStatusType.Nothing)
@@ -154,6 +156,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var item = await _repository.GetAsync(id);
 
             item.ValidityStatus = GetValidityStatus(item);
+            item.AuditPlanValidityStatus = GetAuditPlanValidityStatus(item);
 
             return item;
         } // GetAsync
@@ -213,6 +216,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.Status = CertificateStatusType.Active;
             }
 
+            // - Si hay alguna NC es necesario la fecha del plan de acción
+            if ((item.HasNCsCritical ?? false) 
+                || (item.HasNCsMajor ?? false) 
+                || (item.HasNCsMinor ?? false))
+            {
+                if (item.ActionPlanDate == null)
+                    throw new BusinessException("Must specify an action plan date");
+            }
+
             if (item.Status == CertificateStatusType.Active 
                 && foundItem.Status != CertificateStatusType.Active)
             {
@@ -229,6 +241,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.PrevAuditNote = item.PrevAuditNote;
             foundItem.NextAuditDate = item.NextAuditDate;
             foundItem.NextAuditNote = item.NextAuditNote;
+            foundItem.HasNCsMinor = item.HasNCsMinor;
+            foundItem.HasNCsMajor = item.HasNCsMajor;
+            foundItem.HasNCsCritical = item.HasNCsCritical;
+            foundItem.ActionPlanDate = item.ActionPlanDate;
+            foundItem.ActionPlanDelivered = item.ActionPlanDelivered;
             foundItem.Status = item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
@@ -246,6 +263,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             foundItem.ValidityStatus = GetValidityStatus(foundItem);
+            foundItem.AuditPlanValidityStatus = GetAuditPlanValidityStatus(foundItem);
 
             return foundItem;
         } // UpdateAsync
@@ -293,7 +311,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 return CertificateValidityStatusType.Nothing;
 
             DateTime currentDate = DateTime.Today;
-            DateTime warningDate = item.DueDate.Value.AddMonths(-3);
+            DateTime warningDate = item.DueDate.Value.AddMonths(-4); // Cuatro meses antes de la fecha de vencimiento
 
             if (currentDate >= item.DueDate)
                 status = CertificateValidityStatusType.Danger;
@@ -304,5 +322,37 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return status;
         } // GetValidityStatus
+
+        public static DefaultValidityStatusType GetAuditPlanValidityStatus(Certificate item) 
+        {
+            DefaultValidityStatusType status = DefaultValidityStatusType.Nothing;
+
+            // Si no tiene la fecha previa de auditoria, no validar nada
+            if (item.PrevAuditDate is null)
+                return status;
+
+            // Si ya fué entregado el plan de acción, no validar nada
+            if (item.ActionPlanDelivered ?? false) 
+                return DefaultValidityStatusType.Success;
+
+            // Si hay NCs validar si hay plan de acción
+            if ((item.HasNCsCritical ?? false) 
+                || (item.HasNCsMajor ?? false)
+                || (item.HasNCsMinor ?? false))
+            {
+                DateTime currentDate = DateTime.Today;
+                DateTime warningDate = item.PrevAuditDate.Value.AddDays(10); // Advertir sobre la entrega del plande acción
+                DateTime dangerDate = item.PrevAuditDate.Value.AddDays(28); // Es la fecha limite para entregar el plan de acción
+
+                if (currentDate >= dangerDate)
+                    status = DefaultValidityStatusType.Danger;
+                else if (currentDate >= warningDate)
+                    status = DefaultValidityStatusType.Warning;
+                //else
+                //    status = DefaultValidityStatusType.Success;
+            }
+
+            return status;
+        } // GetAuditPlanValidityStatus
     }
 }

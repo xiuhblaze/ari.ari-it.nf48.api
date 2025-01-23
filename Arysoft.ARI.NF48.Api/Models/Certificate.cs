@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -25,6 +26,16 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string NextAuditNote { get; set; }
 
+        public bool? HasNCsMinor { get; set; }
+
+        public bool? HasNCsMajor { get; set; }
+
+        public bool? HasNCsCritical { get; set; }
+
+        public DateTime? ActionPlanDate { get; set; }
+
+        public bool? ActionPlanDelivered { get; set; }
+
         public new CertificateStatusType Status { get; set; }
 
         // RELATIONS
@@ -33,9 +44,13 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual Standard Standard { get; set; }
 
+        public virtual ICollection<Note> Notes { get; set; }
+
         // NOT MAPPED
 
         public CertificateValidityStatusType ValidityStatus { get; set; }
+
+        public DefaultValidityStatusType AuditPlanValidityStatus { get; set; }
 
     } // Certificate
 }

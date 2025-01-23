@@ -52,6 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Data
             // Catálogos
             Category22KConfiguration.Configure(modelBuilder);
             NaceCodeConfiguration.Configure(modelBuilder);
+            NoteConfiguration.Configure(modelBuilder);
             StandardConfiguration.Configure(modelBuilder);
 
             // Módulo de usuarios

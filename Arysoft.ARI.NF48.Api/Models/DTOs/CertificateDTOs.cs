@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -24,6 +25,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string NextAuditNote { get; set; }
 
+        public bool? HasNCsMinor { get; set; }
+
+        public bool? HasNCsMajor { get; set; }
+
+        public bool? HasNCsCritical { get; set; }
+
+        public DateTime? ActionPlanDate { get; set; }
+
+        public bool? ActionPlanDelivered { get; set; }
+
         public CertificateStatusType Status { get; set; }
 
         // RELATIONS
@@ -32,9 +43,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string StandardName { get; set; }
 
+        public int NotesCount { get; set; }
+
         // CALCULATED
 
         public CertificateValidityStatusType ValidityStatus { get; set; }
+
+        public DefaultValidityStatusType AuditPlanValidityStatus { get; set; }
 
     } // CertificateItemListDto
 
@@ -62,6 +77,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string NextAuditNote { get; set; }
 
+        public bool? HasNCsMinor { get; set; }
+
+        public bool? HasNCsMajor { get; set; }
+
+        public bool? HasNCsCritical { get; set; }
+
+        public DateTime? ActionPlanDate { get; set; }
+
+        public bool? ActionPlanDelivered { get; set; }
+
         public CertificateStatusType Status { get; set; }
 
         public DateTime Created { get; set; }
@@ -76,9 +101,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StandardItemListDto Standard { get; set; }
 
+        public IEnumerable<NoteItemDto> Notes { get; set; }
+
         // CALCULATED
 
         public CertificateValidityStatusType ValidityStatus { get; set; }
+
+        public DefaultValidityStatusType AuditPlanValidityStatus { get; set; }
 
     } // CertificateItemDetailDto 
 
@@ -118,6 +147,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(100)]
         public string NextAuditNote { get; set; }
+
+        public bool? HasNCsMinor { get; set; }
+
+        public bool? HasNCsMajor { get; set; }
+
+        public bool? HasNCsCritical { get; set; }
+
+        public DateTime? ActionPlanDate { get; set; }
+
+        public bool? ActionPlanDelivered { get; set; }
 
         [Required]
         public CertificateStatusType Status { get; set; }
