@@ -56,6 +56,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<Contact>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<Contact>()
                 .Property(m => m.Status)
                 .IsRequired();
 

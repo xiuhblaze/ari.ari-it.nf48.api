@@ -3,8 +3,7 @@
     public enum OrganizationStatusType
     {
         Nothing,
-        New,
-        Approved,
+        Prospect,
         Active,
         Inactive,
         Deleted

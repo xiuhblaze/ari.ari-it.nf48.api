@@ -2,7 +2,7 @@
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
-using System.Data.Entity.Spatial;
+// using System.Data.Entity.Spatial;
 using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
@@ -30,8 +30,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
-                LocationLat = item.LocationGPS?.Latitude.Value,
-                LocationLong = item.LocationGPS?.Longitude.Value,
+                //LocationLat = item.LocationGPS?.Latitude.Value,
+                //LocationLong = item.LocationGPS?.Longitude.Value,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 ShiftsCount = item.Shifts != null 
@@ -56,8 +56,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
-                LocationLat = item.LocationGPS?.Latitude.Value,
-                LocationLong = item.LocationGPS?.Longitude.Value,
+                //LocationLat = item.LocationGPS?.Latitude.Value,
+                //LocationLong = item.LocationGPS?.Longitude.Value,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 Created = item.Created,
@@ -95,10 +95,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
 
-            if (itemDto.LocationLat != null && itemDto.LocationLong != null)
-            {
-                item.LocationGPS = DbGeography.FromText($"POINT({itemDto.LocationLong} {itemDto.LocationLat})");
-            }
+            //if (itemDto.LocationLat != null && itemDto.LocationLong != null)
+            //{
+            //    item.LocationGPS = DbGeography.FromText($"POINT({itemDto.LocationLong} {itemDto.LocationLat})");
+            //}
 
             return item;
         } // ItemEditDtoToSite

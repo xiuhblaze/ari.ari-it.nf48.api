@@ -35,6 +35,7 @@ namespace Arysoft.ARI.NF48.Api.Data
             
             // Módulo de organizaciones
             OrganizationConfiguration.Configure(modelBuilder);
+            OrganizationStandardConfiguration.Configure(modelBuilder);
             ContactConfiguration.Configure(modelBuilder);
             ShiftConfiguration.Configure(modelBuilder);
             SiteConfiguration.Configure(modelBuilder);

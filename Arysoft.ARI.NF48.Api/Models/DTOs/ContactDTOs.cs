@@ -26,6 +26,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public bool IsMainContact { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         public StatusType Status { get; set; }
 
     } // ContactItemListDto
@@ -55,6 +57,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string PhotoFilename { get; set; }
 
         public bool IsMainContact { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -111,6 +115,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [Required]
         public bool IsMainContact { get; set; }
+
+        [StringLength(1000)]
+        public string ExtraInfo { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

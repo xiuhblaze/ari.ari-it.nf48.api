@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Spatial;
+//using System.Data.Entity.Spatial;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -14,7 +14,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Address { get; set; }
 
-        public DbGeography LocationGPS { get; set; }
+        // public DbGeography LocationGPS { get; set; }
 
         public string LocationURL { get; set; }
 

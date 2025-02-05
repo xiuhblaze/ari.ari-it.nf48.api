@@ -44,6 +44,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(20);
 
             modelBuilder.Entity<Organization>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<Organization>()
                 .Property(m => m.Status)
                 .IsRequired();
 
@@ -59,6 +63,31 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            // Relations
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(m => m.Notes)
+                .WithOptional()
+                .HasForeignKey(m => m.OwnerID);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(o => o.Contacts)
+                .WithRequired(c => c.Organization)
+                .HasForeignKey(c => c.OrganizationID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(o => o.Sites)
+                .WithRequired(s => s.Organization)
+                .HasForeignKey(s => s.OrganizationID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(o => o.Certificates)
+                .WithRequired(c => c.Organization)
+                .HasForeignKey(c => c.OrganizationID)
+                .WillCascadeOnDelete(true);
 
             // Not Mapped
 

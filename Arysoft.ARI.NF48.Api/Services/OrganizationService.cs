@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -29,6 +30,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Filters
 
+            if (filters.StandardID != null && filters.StandardID != Guid.Empty)
+            {
+                items = items.Where(e => e.OrganizationStandards
+                    .Any(os => os.StandardID == filters.StandardID
+                        && os.Status != StatusType.Nothing
+                    ));
+            }
+
             if (filters.Folio != null) 
             {
                 items = items.Where(e => e.Folio == filters.Folio);
@@ -43,6 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (e.Website != null && e.Website.ToLower().Contains(filters.Text))
                     || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))
                     || (e.COID != null && e.COID.ToLower().Contains(filters.Text))
+                    || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -161,6 +171,20 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
             try
             {
+                
+                var items = _organizationRepository.Gets()
+                    .Where(o =>
+                        o.UpdatedUser.ToUpper() == item.UpdatedUser.ToUpper() &&
+                        o.Status == OrganizationStatusType.Nothing)
+                    .ToList();
+                if (items != null && items.Count > 0) 
+                {
+                    foreach (var i in items)
+                    {
+                        FileRepository.DeleteDirectory($"~/files/organizations/{i.ID}");
+                    }
+                }
+
                 await _organizationRepository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _organizationRepository.Add(item);
                 await _organizationRepository.SaveChangesAsync();
@@ -187,7 +211,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Si cambió a estatus activo, generar el folio
             if (foundItem.Status < OrganizationStatusType.Active 
                 && item.Status == OrganizationStatusType.Active
-                && item.Folio != null)
+                && foundItem.Folio == null)
             {   
                 foundItem.Folio = await _organizationRepository.GetNextFolioAsync();
             }
@@ -199,8 +223,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Website = item.Website;
             foundItem.Phone = item.Phone;
             foundItem.COID = item.COID;
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status == OrganizationStatusType.Nothing 
-                ? OrganizationStatusType.New 
+                ? OrganizationStatusType.Prospect 
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;

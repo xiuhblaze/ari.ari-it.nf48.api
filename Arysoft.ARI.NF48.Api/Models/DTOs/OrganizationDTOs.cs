@@ -25,6 +25,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string COID { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         public OrganizationStatusType Status { get; set; }
 
         public DateTime Updated { get; set; }
@@ -55,6 +57,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int CertificatesCount { get; set; }
 
+        public int NotesCount { get; set; }
+
+        public IEnumerable<OrganizationStandardItemListDto> Standards { get; set; }
+
         // CALCULATED
 
         public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
@@ -81,6 +87,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string COID { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         public OrganizationStatusType Status { get; set; }
 
         public DateTime Created { get; set; }
@@ -99,7 +107,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public IEnumerable<ContactItemListDto> Contacts { get; set; }
 
+        public IEnumerable<NoteItemDto> Notes { get; set; }
+
         public IEnumerable<SiteItemListDto> Sites { get; set; }
+
+        public IEnumerable<OrganizationStandardItemListDto> Standards { get; set; }
 
         // CALCULATED
 
@@ -134,6 +146,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(20)]
         public string COID { get; set; }
+
+        [StringLength(1000)]
+        public string ExtraInfo { get; set; }
 
         [Required]
         public OrganizationStatusType Status { get; set; }

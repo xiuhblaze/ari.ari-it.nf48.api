@@ -27,9 +27,9 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.Address)
                 .HasMaxLength(500);
 
-            modelBuilder.Entity<Site>()
-                .Property(m => m.LocationGPS)
-                .HasColumnType("geography");
+            //modelBuilder.Entity<Site>()
+            //    .Property(m => m.LocationGPS)
+            //    .HasColumnType("geography");
 
             modelBuilder.Entity<Site>()
                 .Property(m => m.LocationURL)
@@ -53,10 +53,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            //modelBuilder.Entity<Site>()
-            //    .HasMany(s => s.Shifts)                
-            //    .WithOptional(s => s.Site)
-            //    .HasForeignKey(s => s.SiteID);
+            modelBuilder.Entity<Site>()
+                .HasMany(s => s.Shifts)
+                .WithRequired(s => s.Site)
+                .HasForeignKey(s => s.SiteID)
+                .WillCascadeOnDelete(true);
 
         } // Configure
     }

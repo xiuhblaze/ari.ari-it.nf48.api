@@ -5,11 +5,11 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 {
     public class OrganizationQueryFilters : BaseQueryFilters
     {
+        public Guid? StandardID { get; set; }
+
         public int? Folio { get; set; }
 
         public string Text { get; set; }
-
-        //public Guid? StandardID { get; set; } // Para saber cuales certificados tiene la org, no aplicable aun
 
         public CertificateValidityStatusType? CertificatesValidityStatus { get; set; }
 

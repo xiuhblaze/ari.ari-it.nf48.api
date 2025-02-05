@@ -31,6 +31,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int CertificatesCount { get; set; }
 
+        public int OrganizationsCount { get; set; }
+
     } // StandardItemListDto
 
     public class StandardItemDetailDto
@@ -62,6 +64,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public IEnumerable<CatAuditorDocumentItemListDto> CatAuditorDocuments { get; set; }
 
         public IEnumerable<CertificateItemListDto> Certificates { get; set; }
+
+        public IEnumerable<OrganizationStandardItemListDto> Organizations { get; set; }
     } // StandardItemDetailDto
 
     public class StandardPostDto
@@ -69,7 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    }
+    } // StandardPostDto
 
     public class StandardPutDto
     {
@@ -95,7 +99,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    }
+    } // StandardPutDto
 
     public class StandardDeleteDto
     {
@@ -105,5 +109,5 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    }
+    } // StandardDeleteDto 
 }

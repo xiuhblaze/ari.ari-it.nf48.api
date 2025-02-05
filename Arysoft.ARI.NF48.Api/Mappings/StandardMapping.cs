@@ -33,17 +33,25 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 ApplicationsCount = item.Applications != null 
-                    ? item.Applications.Count 
+                    ? item.Applications
+                        .Where(app => app.Status != ApplicationStatusType.Nothing).Count()
                     : 0,
                 AuditorsCount = item.AuditorStandards != null
-                    ? item.AuditorStandards.Count
+                    ? item.AuditorStandards
+                        .Where(aus => aus.Status == StatusType.Active).Count()
                     : 0,
                 CatAuditorDocumentsCount = item.CatAuditorDocuments != null
-                    ? item.CatAuditorDocuments.Count 
+                    ? item.CatAuditorDocuments
+                        .Where(cad => cad.Status != StatusType.Nothing).Count()
                     : 0,
                 CertificatesCount = item.Certificates != null
-                    ? item.Certificates.Count
-                    : 0
+                    ? item.Certificates
+                        .Where(c => c.Status != CertificateStatusType.Nothing).Count()
+                    : 0,
+                OrganizationsCount = item.OrganizationStandards != null
+                    ? item.OrganizationStandards
+                        .Where(os => os.Status == StatusType.Active).Count()
+                    : 0,
             };
         } // StandardToItemListDto
 
@@ -75,7 +83,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Certificates = item.Certificates != null
                     ? CertificateMapping.CertificatesToListDto(item.Certificates
                         .Where(c => c.Status != CertificateStatusType.Nothing))
-                    : null
+                    : null,
+                Organizations = item.OrganizationStandards != null
+                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                        .Where(os => os.Status >= StatusType.Nothing))
+                    : null,
             };
         } // StandardToItemDetailDto
 

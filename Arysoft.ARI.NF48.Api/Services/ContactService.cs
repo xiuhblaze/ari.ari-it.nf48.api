@@ -41,6 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (e.Email != null && e.Email.ToLower().Contains(filters.Text))
                     || (e.Address != null && e.Address.ToLower().Contains(filters.Text))
                     || (e.Position != null && e.Position.ToLower().Contains(filters.Text))
+                    || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text))
                     || (e.Organization != null && e.Organization.Name.ToLower().Contains(filters.Text))
                 );
             }
@@ -171,6 +172,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Position = item.Position;
             foundItem.PhotoFilename = item.PhotoFilename;
             foundItem.IsMainContact = item.IsMainContact;
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;

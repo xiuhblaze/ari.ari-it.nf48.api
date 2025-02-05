@@ -23,5 +23,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<Certificate> Certificates { get; set; }
 
         public virtual ICollection<DayCalculationConcept> DayCalculationConcepts { get; set; }
+
+        public virtual ICollection<OrganizationStandard> OrganizationStandards { get; set; }
     }
 }

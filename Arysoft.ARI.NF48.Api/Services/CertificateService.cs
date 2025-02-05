@@ -201,6 +201,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.StandardID == null)
                 throw new BusinessException("Must specify a standard");
 
+            if (item.PrevAuditDate == null)
+                throw new BusinessException("Must specify the previous audit date");
+
             // - Falta validar cambios de estado y de cual a cual puede cambiar o regresar
 
             // Assigning values
@@ -340,11 +343,19 @@ namespace Arysoft.ARI.NF48.Api.Services
                 || (item.HasNCsMajor ?? false)
                 || (item.HasNCsMinor ?? false))
             {
-                DateTime currentDate = DateTime.Today;
-                DateTime warningDate = item.PrevAuditDate.Value.AddDays(10); // Advertir sobre la entrega del plande acción
-                DateTime dangerDate = item.PrevAuditDate.Value.AddDays(28); // Es la fecha limite para entregar el plan de acción
+                int days = (item.HasNCsMajor ?? false) || (item.HasNCsCritical ?? false)
+                    ? 15
+                    : (item.HasNCsMinor ?? false)
+                        ? 28
+                        : 0;
+                DateTime actionPlanDeliveredDate = item.ActionPlanDate ?? 
+                    item.PrevAuditDate.Value.AddDays(-days);
 
-                if (currentDate >= dangerDate)
+                DateTime currentDate = DateTime.Today;
+                DateTime warningDate = actionPlanDeliveredDate.AddDays(-10); // item.PrevAuditDate.Value.AddDays(10); // Advertir sobre la entrega del plande acción
+                // DateTime dangerDate = item.PrevAuditDate.Value.AddDays(28); // Es la fecha limite para entregar el plan de acción
+
+                if (currentDate >= actionPlanDeliveredDate)
                     status = DefaultValidityStatusType.Danger;
                 else if (currentDate >= warningDate)
                     status = DefaultValidityStatusType.Warning;

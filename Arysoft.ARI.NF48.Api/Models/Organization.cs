@@ -21,6 +21,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string COID { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         public new OrganizationStatusType Status { get; set; }
 
         // RELATIONS
@@ -34,6 +36,10 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<Contact> Contacts { get; set; }
 
         public virtual ICollection<Site> Sites { get; set; }
+
+        public virtual ICollection<Note> Notes { get; set; }
+
+        public virtual ICollection<OrganizationStandard> OrganizationStandards { get; set; }
 
         // NOT MAPPED
 
