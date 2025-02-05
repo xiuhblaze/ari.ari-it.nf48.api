@@ -17,15 +17,17 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Address { get; set; }
 
-        public double? UbicacionLat { get; set; }
+        //public double? LocationLat { get; set; }
 
-        public double? UbicacionLong { get; set; }
+        //public double? LocationLong { get; set; }
+
+        public string LocationURL { get; set; }
 
         public StatusType Status { get; set; }
 
-        public int NoShifts { get; set; }
+        public int ShiftsCount { get; set; }
 
-        public int NoEmployees { get; set; }
+        public int EmployeesCount { get; set; }
 
     } // SiteItemListDto
 
@@ -41,9 +43,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Address { get; set; }
 
-        public double? UbicacionLat { get; set; }
+        //public double? LocationLat { get; set; }
 
-        public double? UbicacionLong { get; set; }
+        //public double? LocationLong { get; set; }
+
+        public string LocationURL { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -84,9 +88,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(500)]
         public string Address { get; set; }
 
-        public double? UbicacionLat { get; set; }
+        //public double? LocationLat { get; set; }
 
-        public double? UbicacionLong { get; set; }
+        //public double? LocationLong { get; set; }
+
+        [StringLength(250)]
+        public string LocationURL { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

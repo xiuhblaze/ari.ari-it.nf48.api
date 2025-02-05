@@ -104,6 +104,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _userRepository.GetUserByLoginAsync(username, passwordHash)
                 ?? throw new BusinessException("The username or password is not valid");
 
+            try // Actualizar la fecha del último acceso
+            {
+                foundItem.LastAccess = DateTime.UtcNow;
+
+                _userRepository.Update(foundItem);
+                await _userRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
+
             return foundItem;
         } // LoginAsync
 
@@ -194,6 +206,31 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
+
+        public async Task UpdatePasswordAsync(Guid id, string newPassword)
+        {
+            var foundItem = await _userRepository.GetAsync(id)
+                ?? throw new BusinessException("The record to update was not found");
+
+            if (string.IsNullOrEmpty(newPassword))
+                throw new BusinessException("Must specify new password");
+
+            foundItem.PasswordHash = Tools.Encrypt.GetSHA256(newPassword);
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = foundItem.Username;
+
+            // Execute queries
+
+            try
+            {
+                _userRepository.Update(foundItem);
+                await _userRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"UserService.UpdatePasswordAsync: {ex.Message}");
+            }
+        } // UpdatePasswordAsync 
 
         /// <summary>
         /// Add a role to a user according to IDs

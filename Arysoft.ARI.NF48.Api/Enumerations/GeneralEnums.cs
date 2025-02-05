@@ -6,7 +6,15 @@
         Active,
         Inactive,
         Deleted
-    }
+    } // StatusType
+
+    public enum DefaultValidityStatusType
+    {
+        Nothing,
+        Success,
+        Warning,
+        Danger
+    } // DefaultValidityStatusType
 
     public enum LanguageType
     {

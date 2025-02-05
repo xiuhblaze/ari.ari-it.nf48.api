@@ -28,12 +28,24 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Organization>()
+                .Property(m => m.QRFile)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<Organization>()
                 .Property(m => m.Website)
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Organization>()
                 .Property(m => m.Phone)
                 .HasMaxLength(25);
+
+            modelBuilder.Entity<Organization>()
+                .Property(m => m.COID)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Organization>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
 
             modelBuilder.Entity<Organization>()
                 .Property(m => m.Status)
@@ -52,6 +64,35 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
+            // Relations
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(m => m.Notes)
+                .WithOptional()
+                .HasForeignKey(m => m.OwnerID);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(o => o.Contacts)
+                .WithRequired(c => c.Organization)
+                .HasForeignKey(c => c.OrganizationID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(o => o.Sites)
+                .WithRequired(s => s.Organization)
+                .HasForeignKey(s => s.OrganizationID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(o => o.Certificates)
+                .WithRequired(c => c.Organization)
+                .HasForeignKey(c => c.OrganizationID)
+                .WillCascadeOnDelete(true);
+
+            // Not Mapped
+
+            modelBuilder.Entity<Organization>()
+                .Ignore(m => m.CertificatesValidityStatus);
         } // Configure
     }
 }

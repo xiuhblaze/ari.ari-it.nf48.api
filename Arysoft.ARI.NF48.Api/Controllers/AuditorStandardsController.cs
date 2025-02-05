@@ -33,7 +33,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<AuditorStandardItemListDto>>))]
-        public IHttpActionResult GetAuditorStandardDocuments([FromUri] AuditorStandardQueryFilters filters)
+        public IHttpActionResult GetAuditorStandards([FromUri] AuditorStandardQueryFilters filters)
         {
             var items = _service.Gets(filters);
             var itemsDto = AuditorStandardMapping.AuditorStandardToListDto(items);
@@ -51,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             };
 
             return Ok(response);
-        } // GetAuditorStandardDocuments
+        } // GetAuditorStandards
 
         [ResponseType(typeof(ApiResponse<AuditorStandardItemDetailDto>))]
         public async Task<IHttpActionResult> GetAuditorStandard(Guid id)

@@ -182,7 +182,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 filename = FileRepository.UploadFile(
                     file,
-                    $"~/files/contacts/{item.ID}",
+                    $"~/files/organizations/{item.OrganizationID}/contacts/{item.ID}",
                     item.ID.ToString()
                 );
             }
@@ -206,7 +206,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var item = await _contactService.GetAsync(id)
                 ?? throw new BusinessException("Record to delete file not found");
 
-            if (FileRepository.DeleteFile($"~/files/contacts/{item.ID}", item.PhotoFilename))
+            if (FileRepository.DeleteFile($"~/files/organizations/{item.OrganizationID}/contacts/{item.ID}", item.PhotoFilename))
             {
                 item.PhotoFilename = null;
                 item.UpdatedUser = itemDelDto.UpdatedUser;

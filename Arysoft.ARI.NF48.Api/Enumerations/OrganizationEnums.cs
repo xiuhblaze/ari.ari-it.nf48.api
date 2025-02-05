@@ -3,23 +3,30 @@
     public enum OrganizationStatusType
     {
         Nothing,
-        New,
-        Approved,
+        Prospect,
         Active,
         Inactive,
         Deleted
     }
 
+    // Estatus que deben de llevar las Organizaciones
+    // Prospecto,
+    // Cliente, -> Active
+
     public enum OrganizationOrderType
     { 
         Nothing,
+        Folio,
         Name,
         LegalEntity,
         Status,
+        CertificatesValidityStatus,
         Updated,
+        FolioDesc,
         NameDesc,
         LegalEntityDesc,
         StatusDesc,
+        CertificatesValidityStatusDesc,
         UpdatedDesc
     }
 }

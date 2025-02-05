@@ -41,6 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (e.Email != null && e.Email.ToLower().Contains(filters.Text))
                     || (e.Address != null && e.Address.ToLower().Contains(filters.Text))
                     || (e.Position != null && e.Position.ToLower().Contains(filters.Text))
+                    || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text))
                     || (e.Organization != null && e.Organization.Name.ToLower().Contains(filters.Text))
                 );
             }
@@ -127,11 +128,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Updated = DateTime.UtcNow;
 
             // Execute queries
-
-            await _contactRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-            _contactRepository.Add(item);
-            await _contactRepository.SaveChangesAsync();
-
+            try
+            {
+                await _contactRepository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _contactRepository.Add(item);
+                await _contactRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Contact.AddAsync: {ex.Message}");
+            }
             return item;
         } // AddAsync
 
@@ -142,6 +148,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
             // HACK: - Que el nombre no se repita
+            // - Que al menos traiga el First name y el Last name
+            // - Que el correo sea válido y requerido
 
             var foundItem = await _contactRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
@@ -164,6 +172,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Position = item.Position;
             foundItem.PhotoFilename = item.PhotoFilename;
             foundItem.IsMainContact = item.IsMainContact;
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
@@ -179,7 +188,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException(ex.Message);
+                throw new BusinessException($"Contact.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
@@ -211,7 +220,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _contactRepository.Update(foundItem);
             }
 
-            _contactRepository.SaveChanges();
+            try
+            {
+                await _contactRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Contact.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }

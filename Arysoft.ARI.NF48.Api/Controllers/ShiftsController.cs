@@ -85,8 +85,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (id != itemEditDto.ID)
                 throw new BusinessException("ID mismatch");
 
-            var itemToEdit = ShiftMapping.ItemEditDtoToShift(itemEditDto);
-            var item = await _shiftService.UpdateAsync(itemToEdit);
+            var item = ShiftMapping.ItemEditDtoToShift(itemEditDto);
+            item = await _shiftService.UpdateAsync(item);
             var itemDto = ShiftMapping.ShiftToItemDetailDto(item);
             var response = new ApiResponse<ShiftItemDetailDto>(itemDto);
 
@@ -97,8 +97,11 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteShift(Guid id, [FromBody] ShiftDeleteDto itemDeleteDto)
         {
-            if (!ModelState.IsValid) throw new BusinessException(Strings.GetModelStateErrors(ModelState));
-            if (id != itemDeleteDto.ID) throw new BusinessException("ID mismatch");
+            if (!ModelState.IsValid) 
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDeleteDto.ID) 
+                throw new BusinessException("ID mismatch");
 
             var item = ShiftMapping.ItemDeleteDtoToShift(itemDeleteDto);
             await _shiftService.DeleteAsync(item);

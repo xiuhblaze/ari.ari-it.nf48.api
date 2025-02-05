@@ -9,20 +9,45 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class OrganizationRepository : BaseRepository<Organization>
     {
+        public async Task<Organization> GetAsync(int folio)
+        {
+            return await _model
+                .FirstOrDefaultAsync(o => o.Folio == folio);
+        } // GetAsync
+
+        public async Task<int> GetNextFolioAsync()
+        {
+            var folio = await _model
+                .Where(o => 
+                    o.Status > OrganizationStatusType.Prospect
+                )
+                .MaxAsync(o => o.Folio);
+
+            return folio.HasValue ? folio.Value + 1 : 1;
+        } // GetNextFolio
+
         public new async Task DeleteTmpByUserAsync(string username)
         {
             var items = await _model
+                .Include(o => o.Contacts)
+                .Include(o => o.Sites.Select(s => s.Shifts))
+                .Include(o => o.Certificates)
                 .Where(m =>
                     m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
                     && m.Status == OrganizationStatusType.Nothing
                 ).ToListAsync();
 
             foreach (var item in items)
-            {
+            {   
                 _model.Remove(item);
             }
         } // DeleteTmpByUser
 
+        /// <summary>
+        /// Permite eliminar los registros temporales que tengan más de un 
+        /// día de antigüedad
+        /// </summary>
+        /// <returns></returns>
         private async Task DeleteTmpByPublicFromADay()
         {
             var items = await _model

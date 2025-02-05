@@ -25,27 +25,46 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             var mainContact = item.Contacts?
                 .Where(c => c.IsMainContact && c.Status == StatusType.Active)
                 .FirstOrDefault();
-            var mainSite = item.Sites.OrderBy(s => s.IsMainSite).FirstOrDefault();
+            var mainSite = item.Sites?
+                .Where(s => s.IsMainSite)
+                .FirstOrDefault();
 
-            // Si no hay un contacto principal, pon el que sea
+            // Si no hay un contacto principal, pone el que sea
             if (mainContact == null) mainContact = item.Contacts?
                 .Where(c => c.Status == StatusType.Active)
                 .FirstOrDefault();
 
+            var employeesCount = item.Sites != null
+                ? item.Sites
+                    .Where((Site i) => i.Status == StatusType.Active)
+                    .Sum((Site i) => i.Shifts
+                        .Where((Shift s) => s.Status == StatusType.Active)
+                        .Sum((Shift s) => s.NoEmployees)) ?? 0
+                : 0;
+
             return new OrganizationItemListDto
             {
                 ID = item.ID,
+                Folio = item.Folio,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
+                QRFile = item.QRFile,
                 Website = item.Website,
                 Phone = item.Phone,
+                COID = item.COID,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                NoContacts = item.Contacts != null ? item.Contacts.Count() : 0,
+                CertificatesCount = item.Certificates != null
+                    ? item.Certificates.Where(i => i.Status != CertificateStatusType.Nothing).Count()
+                    : 0,
+                ContactsCount = item.Contacts != null 
+                    ? item.Contacts.Where(i => i.Status == StatusType.Active).Count() 
+                    : 0,
                 ContactName = mainContact != null  
-                    ? mainContact.FirstName 
+                    ? Tools.Strings.FullName(mainContact.FirstName, mainContact.MiddleName, mainContact.LastName)
                     : string.Empty,
                 ContactEmail = mainContact != null 
                     ? mainContact.Email 
@@ -53,9 +72,31 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ContactPhone = mainContact != null
                     ? mainContact.Phone 
                     : string.Empty,
-                NoSites = item.Sites != null ? item.Sites.Count() : 0,
-                SiteDescription = mainSite != null ? mainSite.Description : string.Empty,
-                SiteLocation = mainSite != null ? mainSite.Address : string.Empty,
+                NotesCount = item.Notes != null 
+                    ? item.Notes.Count() 
+                    : 0,
+                SitesCount = item.Sites != null 
+                    ? item.Sites.Where(i => i.Status == StatusType.Active).Count() 
+                    : 0,
+                SiteDescription = mainSite != null 
+                    ? mainSite.Description 
+                    : string.Empty,
+                SiteLocation = mainSite != null 
+                    ? mainSite.Address 
+                    : string.Empty,
+                SiteLocationURL = mainSite != null
+                    ? mainSite.LocationURL
+                    : string.Empty,
+                SitesEmployeesCount = employeesCount,
+                Standards = item.OrganizationStandards != null
+                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                        .Where(os => os.Status != StatusType.Nothing))
+                    : null,
+                AuditCyclesCount = item.AuditCycles != null 
+                    ? item.AuditCycles.Where(i => i.Status != StatusType.Nothing).Count() 
+                    : 0,
+                CertificatesValidityStatus = item.CertificatesValidityStatus
+                    ?? CertificateValidityStatusType.Nothing
             };
         } // OrganizationToItemListDto
 
@@ -64,24 +105,50 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new OrganizationItemDetailDto
             {
                 ID = item.ID,
+                Folio = item.Folio,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
+                QRFile = item.QRFile,
                 Website = item.Website,
                 Phone = item.Phone,
+                COID = item.COID,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Applications = item.Applications != null
-                    ? ApplicationMapping.ApplicationsToListDto(item.Applications)
+                    ? ApplicationMapping.ApplicationsToListDto(item.Applications
+                        .Where(i => i.Status != ApplicationStatusType.Nothing))
                     : new List<ApplicationItemListDto>(),
+                AuditCycles = item.AuditCycles != null
+                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
+                        .Where(i => i.Status != StatusType.Nothing)
+                        .OrderByDescending(ac => ac.StartDate))
+                    : new List<AuditCycleItemListDto>(),
+                Certificates = item.Certificates != null
+                    ? CertificateMapping.CertificatesToListDto(item.Certificates
+                        .Where(i => i.Status != CertificateStatusType.Nothing))
+                    : new List<CertificateItemListDto>(),
                 Contacts = item.Contacts != null
-                    ? ContactMapping.ContactToListDto(item.Contacts)
+                    ? ContactMapping.ContactToListDto(item.Contacts
+                        .Where(i => i.Status != StatusType.Nothing))
                     : new List<ContactItemListDto>(),
+                Notes = item.Notes != null
+                    ? NoteMapping.NotesToListDto(item.Notes
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : new List<NoteItemDto>(),
                 Sites = item.Sites != null
-                    ? SiteMapping.SiteToListDto(item.Sites)
-                    : new List<SiteItemListDto>()
+                    ? SiteMapping.SiteToListDto(item.Sites
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : new List<SiteItemListDto>(),
+                Standards = item.OrganizationStandards != null
+                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                        .Where(os => os.Status != StatusType.Nothing))
+                    : null,
+                CertificatesValidityStatus = item.CertificatesValidityStatus
+                    ?? CertificateValidityStatusType.Nothing
             };
         } // OrganizationToItemDetailDto
 
@@ -100,9 +167,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Name = itemDto.Name,
                 LegalEntity = itemDto.LegalEntity,
-                LogoFile = itemDto.LogoFile,
                 Website = itemDto.Website,
                 Phone= itemDto.Phone,
+                COID = itemDto.COID,
+                ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser= itemDto.UpdatedUser
             };

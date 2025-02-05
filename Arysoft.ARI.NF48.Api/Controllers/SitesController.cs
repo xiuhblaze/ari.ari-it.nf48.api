@@ -105,21 +105,5 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // DeleteSite
-
-        // PRIVATE
-
-        //private async Task DeleteTmpByUserAsync(string username)
-        //{
-        //    var items = await db.Sites
-        //        .Where(o =>
-        //            o.UpdatedUser == username
-        //            && o.Status == StatusType.Nothing)
-        //        .ToListAsync();
-
-        //    foreach (var item in items)
-        //    {
-        //        db.Entry(item).State = EntityState.Deleted;
-        //    }
-        //}
     }
 }

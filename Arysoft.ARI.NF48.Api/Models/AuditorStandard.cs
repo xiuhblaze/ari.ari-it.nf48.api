@@ -1,5 +1,4 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using System;
+﻿using System;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {

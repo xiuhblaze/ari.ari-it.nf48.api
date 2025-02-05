@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -9,8 +7,16 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid AuditCycleID { get; set; }
 
-        public Guid StandardID { get; set; }
+        public Guid? StandardID { get; set; }
 
+        public AuditStepType? InitialStep { get; set; }
 
-    }
+        public AuditCycleType? CycleType { get; set; }
+
+        // RELATIONS
+
+        public virtual AuditCycle AuditCycle { get; set; }
+
+        public virtual Standard Standard { get; set; }
+    } // AuditCycleStandard
 }

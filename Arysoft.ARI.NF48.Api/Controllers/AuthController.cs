@@ -34,6 +34,18 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // Login
 
+        [HttpPut]
+        [Route("api/Auth/change-password")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> ChangePassword([FromBody] AuthChangePasswordDto itemDto)
+        {
+            await _userService.UpdatePasswordAsync(itemDto.ID, itemDto.NewPassword);
+
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // ChangePassword
+
         /// <summary>
         /// Basado en: https://www.linkedin.com/pulse/tutorial-jwt-token-aspnet-48-webapi-mohamed-ebrahim
         /// </summary>

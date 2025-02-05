@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Arysoft.ARI.NF48.Api.Enumerations
+﻿namespace Arysoft.ARI.NF48.Api.Enumerations
 {
     public enum AuditStepType
     {
@@ -16,4 +11,17 @@ namespace Arysoft.ARI.NF48.Api.Enumerations
         Transfer,
         Especial
     }
+
+    public enum AuditStatusType
+    { 
+        Nothing,
+        Scheduled,  // Agendada - Aun no llega su fecha de ejecución, permite subir documentos
+        Confirmed,  // Confirmada - El cliente ya confirmo la fecha y los auditores, estan en linea los documentos requeridos
+        InProcess,  // En proceso - La auditoria esta dentro de las fechas de ejecución
+        Finished,   // Terminado - Posterior a la fecha de auditoria, es necesario subir la documentación requerida
+        Completed,  // Completed - Indica que toda la documentación ha sido cubierta
+        Closed,     // Closed - Audioria terminada, ya no se puede actualizar información
+        Canceled,   // Cancelada - En cualquier Status la auditoria puede ser cancelada, es necesario indicar la razón
+        Deleted     // Eliminada - Registro eliminado logicamente, solo para administradores
+    } // AuditStatusType
 }

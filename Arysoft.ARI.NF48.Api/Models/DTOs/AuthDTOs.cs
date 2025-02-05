@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -15,5 +12,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(32)]
         public string Password { get; set; }
+    }
+
+    public class AuthChangePasswordDto
+    {
+        [Required]
+        public Guid ID { get; set; }
+
+        [Required]
+        [StringLength(32)]
+        public string NewPassword { get; set; }
     }
 }
