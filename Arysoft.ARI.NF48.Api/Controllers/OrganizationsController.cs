@@ -21,7 +21,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
     public class OrganizationsController : ApiController
     {
         private const string LOGO_FILENAME = "logotype";
-        private const string QR_FILENAME = "qrcode";
+        // private const string QR_FILENAME = "qrcode";
 
         private readonly OrganizationService _organizationService;
 
@@ -67,17 +67,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetOrganization
 
-        //[ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
-        //public async Task<IHttpActionResult> GetOrganization(int folio)
-        //{ 
-        //    var item = await _organizationService.GetAsync(folio)
-        //        ?? throw new BusinessException("Item not found");
-        //    var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
-        //    var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
-
-        //    return Ok(response);
-        //} // GetOrganization
-
         // POST: api/Organization
         [ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
         public async Task<IHttpActionResult> PostOrganization([FromBody] OrganizationPostDto itemAddDto)
@@ -113,7 +102,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (files != null)
             {
                 HttpPostedFile logoFile = null;
-                HttpPostedFile qrFile = null;
+                // HttpPostedFile qrFile = null;
 
                 for (int i = 0; i < files.Count; i++)
                 {
@@ -122,7 +111,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                         .GetFileNameWithoutExtension(file.FileName);
 
                     if (fileNameWithoutExtension == LOGO_FILENAME) logoFile = file;
-                    if (fileNameWithoutExtension == QR_FILENAME) qrFile = file;
+                    // if (fileNameWithoutExtension == QR_FILENAME) qrFile = file;
                 }
 
                 if (logoFile != null)
@@ -136,21 +125,21 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 }
                 else itemToEdit.LogoFile = item.LogoFile;
 
-                if (qrFile != null)
-                {
-                    itemToEdit.QRFile = FileRepository.UploadFile(
-                        qrFile,
-                        $"~/files/organizations/{itemEditDto.ID}",
-                        QR_FILENAME,
-                        new string[] { ".jpg", ".png" }
-                    );
-                }
-                else itemToEdit.QRFile = item.QRFile;
+                //if (qrFile != null)
+                //{
+                //    itemToEdit.QRFile = FileRepository.UploadFile(
+                //        qrFile,
+                //        $"~/files/organizations/{itemEditDto.ID}",
+                //        QR_FILENAME,
+                //        new string[] { ".jpg", ".png" }
+                //    );
+                //}
+                //else itemToEdit.QRFile = item.QRFile;
             }
             else
             {
                 itemToEdit.LogoFile = item.LogoFile;
-                itemToEdit.QRFile = item.QRFile;
+                // itemToEdit.QRFile = item.QRFile;
             }
 
             item = await _organizationService.UpdateAsync(itemToEdit);

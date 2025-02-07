@@ -35,7 +35,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e => 
-                    e.ActivitiesDescription != null && e.ActivitiesDescription.ToLower().Contains(filters.Text)
+                    (e.ActivitiesDescription != null && e.ActivitiesDescription.ToLower().Contains(filters.Text))
+                    || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -133,7 +134,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
-            item.UpdatedUser = item.UpdatedUser;
+            // item.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
 
@@ -157,9 +158,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Type = item.Type;
             foundItem.NoEmployees = item.NoEmployees;
+            foundItem.ActivitiesDescription = item.ActivitiesDescription;
             foundItem.ShiftStart = item.ShiftStart;
             foundItem.ShiftEnd = item.ShiftEnd;
-            foundItem.ActivitiesDescription = item.ActivitiesDescription;
+            foundItem.ShiftStart2 = item.ShiftStart2;
+            foundItem.ShiftEnd2 = item.ShiftEnd2;
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing 
                 ? StatusType.Active 
                 : item.Status;
@@ -201,7 +205,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _shiftRepository.Update(foundItem);
             }
 
-            _shiftRepository.SaveChanges();
+            try 
+            { 
+                _shiftRepository.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ShiftService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }

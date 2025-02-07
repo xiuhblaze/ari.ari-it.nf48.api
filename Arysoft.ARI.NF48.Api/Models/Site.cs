@@ -14,6 +14,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Address { get; set; }
 
+        public string Country { get; set; }
+
         // public DbGeography LocationGPS { get; set; }
 
         public string LocationURL { get; set; }

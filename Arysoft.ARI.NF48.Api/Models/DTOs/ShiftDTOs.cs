@@ -14,11 +14,17 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? NoEmployees { get; set; }
 
+        public string ActivitiesDescription { get; set; }
+
         public TimeSpan? ShiftStart { get; set; }
 
         public TimeSpan? ShiftEnd { get; set; }
 
-        public string ActivitiesDescription { get; set; }
+        public TimeSpan? ShiftStart2 { get; set; }
+
+        public TimeSpan? ShiftEnd2 { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
     }
@@ -33,11 +39,17 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? NoEmployees { get; set; }
 
+        public string ActivitiesDescription { get; set; }
+
         public TimeSpan? ShiftStart { get; set; }
 
         public TimeSpan? ShiftEnd { get; set; }
 
-        public string ActivitiesDescription { get; set; }
+        public TimeSpan? ShiftStart2 { get; set; }
+
+        public TimeSpan? ShiftEnd2 { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -71,14 +83,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public int NoEmployees { get; set; }
 
+        [StringLength(500)]
+        public string ActivitiesDescription { get; set; }
+
         [Required]
         public TimeSpan? ShiftStart { get; set; }
 
         [Required]
         public TimeSpan? ShiftEnd { get; set; }
 
-        [StringLength(500)]
-        public string ActivitiesDescription { get; set; }
+        public TimeSpan? ShiftStart2 { get; set; }
+
+        public TimeSpan? ShiftEnd2 { get; set; }
+
+        [StringLength(1000)]
+        public string ExtraInfo { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

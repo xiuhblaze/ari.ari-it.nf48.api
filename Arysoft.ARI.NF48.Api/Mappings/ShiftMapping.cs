@@ -28,9 +28,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : string.Empty,
                 Type = item.Type,
                 NoEmployees = item.NoEmployees,
+                ActivitiesDescription = item.ActivitiesDescription,
                 ShiftStart = item.ShiftStart,
                 ShiftEnd = item.ShiftEnd,
-                ActivitiesDescription = item.ActivitiesDescription,
+                ShiftStart2 = item.ShiftStart2,
+                ShiftEnd2 = item.ShiftEnd2,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status
             };
         } // ShiftToItemListDto
@@ -43,9 +46,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteID = item.SiteID,
                 Type = item.Type,
                 NoEmployees = item.NoEmployees,
+                ActivitiesDescription = item.ActivitiesDescription,
                 ShiftStart = item.ShiftStart,
                 ShiftEnd = item.ShiftEnd,
-                ActivitiesDescription = item.ActivitiesDescription,
+                ShiftStart2 = item.ShiftStart2,
+                ShiftEnd2 = item.ShiftEnd2,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -75,9 +81,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Type = itemDto.Type,
                 NoEmployees = itemDto.NoEmployees,
+                ActivitiesDescription = itemDto.ActivitiesDescription,
                 ShiftStart = itemDto.ShiftStart,
                 ShiftEnd = itemDto.ShiftEnd,
-                ActivitiesDescription = itemDto.ActivitiesDescription,
+                ShiftStart2 = itemDto.ShiftStart2,
+                ShiftEnd2 = itemDto.ShiftEnd2,
+                ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

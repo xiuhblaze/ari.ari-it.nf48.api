@@ -45,14 +45,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new OrganizationItemListDto
             {
                 ID = item.ID,
+                // OrganizationFamilyID = item.OrganizationFamilyID,
                 Folio = item.Folio,
                 Name = item.Name,
-                LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
-                QRFile = item.QRFile,
                 Website = item.Website,
                 Phone = item.Phone,
-                COID = item.COID,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Updated = item.Updated,
@@ -60,6 +58,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 CertificatesCount = item.Certificates != null
                     ? item.Certificates.Where(i => i.Status != CertificateStatusType.Nothing).Count()
                     : 0,
+                //Companies = item.Companies != null
+                //    ? CompanyMapping.CompanyToListDto(item.Companies)
+                //    : null,
                 ContactsCount = item.Contacts != null 
                     ? item.Contacts.Where(i => i.Status == StatusType.Active).Count() 
                     : 0,
@@ -91,10 +92,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Standards = item.OrganizationStandards != null
                     ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))
-                    : null,
-                AuditCyclesCount = item.AuditCycles != null 
-                    ? item.AuditCycles.Where(i => i.Status != StatusType.Nothing).Count() 
-                    : 0,
+                    : null,                
                 CertificatesValidityStatus = item.CertificatesValidityStatus
                     ?? CertificateValidityStatusType.Nothing
             };
@@ -107,30 +105,25 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 Folio = item.Folio,
                 Name = item.Name,
-                LegalEntity = item.LegalEntity,
                 LogoFile = item.LogoFile,
-                QRFile = item.QRFile,
                 Website = item.Website,
                 Phone = item.Phone,
-                COID = item.COID,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                Applications = item.Applications != null
-                    ? ApplicationMapping.ApplicationsToListDto(item.Applications
-                        .Where(i => i.Status != ApplicationStatusType.Nothing))
-                    : new List<ApplicationItemListDto>(),
-                AuditCycles = item.AuditCycles != null
-                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
-                        .Where(i => i.Status != StatusType.Nothing)
-                        .OrderByDescending(ac => ac.StartDate))
-                    : new List<AuditCycleItemListDto>(),
+                //Applications = item.Applications != null
+                //    ? ApplicationMapping.ApplicationsToListDto(item.Applications
+                //        .Where(i => i.Status != ApplicationStatusType.Nothing))
+                //    : new List<ApplicationItemListDto>(),
                 Certificates = item.Certificates != null
                     ? CertificateMapping.CertificatesToListDto(item.Certificates
                         .Where(i => i.Status != CertificateStatusType.Nothing))
                     : new List<CertificateItemListDto>(),
+                //Companies = item.Companies != null
+                //    ? CompanyMapping.CompanyToListDto(item.Companies)
+                //    : null,
                 Contacts = item.Contacts != null
                     ? ContactMapping.ContactToListDto(item.Contacts
                         .Where(i => i.Status != StatusType.Nothing))
@@ -146,9 +139,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Standards = item.OrganizationStandards != null
                     ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))
-                    : null,
+                    : null,                
                 CertificatesValidityStatus = item.CertificatesValidityStatus
-                    ?? CertificateValidityStatusType.Nothing
+                    ?? CertificateValidityStatusType.Nothing,
             };
         } // OrganizationToItemDetailDto
 
@@ -166,10 +159,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = itemDto.ID,
                 Name = itemDto.Name,
-                LegalEntity = itemDto.LegalEntity,
                 Website = itemDto.Website,
                 Phone= itemDto.Phone,
-                COID = itemDto.COID,
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser= itemDto.UpdatedUser

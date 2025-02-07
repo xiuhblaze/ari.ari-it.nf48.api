@@ -11,13 +11,17 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public int? NoEmployees { get; set; }
 
+        public string ActivitiesDescription { get; set; }
+
         public TimeSpan? ShiftStart { get; set; }
 
         public TimeSpan? ShiftEnd { get; set; }
 
-        public string ActivitiesDescription { get; set; }
+        public TimeSpan? ShiftStart2 { get; set; }
 
-        //public StatusType Status { get; set; }
+        public TimeSpan? ShiftEnd2 { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         // RELATIONS
 

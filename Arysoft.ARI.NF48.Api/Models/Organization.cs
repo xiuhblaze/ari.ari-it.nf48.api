@@ -9,17 +9,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Name { get; set; }
 
-        public string LegalEntity { get; set; }
-
         public string LogoFile { get; set; }
-
-        public string QRFile { get; set; }
 
         public string Website { get; set; }
 
         public string Phone { get; set; }
-
-        public string COID { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -29,9 +23,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<Application> Applications { get; set; }
 
-        public virtual ICollection<AuditCycle> AuditCycles { get; set; }
+        // public virtual ICollection<AuditCycle> AuditCycles { get; set; }
 
         public virtual ICollection<Certificate> Certificates { get; set; }
+
+        public virtual ICollection<Company> Companies { get; set; }
 
         public virtual ICollection<Contact> Contacts { get; set; }
 

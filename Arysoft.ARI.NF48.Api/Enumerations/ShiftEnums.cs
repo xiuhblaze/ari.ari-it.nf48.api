@@ -5,7 +5,8 @@
         Nothing,
         Morning,
         Evening,
-        Night
+        Night,
+        Mixed,
     }
 
     public enum ShiftOrderType

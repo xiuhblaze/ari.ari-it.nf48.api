@@ -17,6 +17,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Address { get; set; }
 
+        public string Country { get; set; }
+
         //public double? LocationLat { get; set; }
 
         //public double? LocationLong { get; set; }
@@ -42,6 +44,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public bool IsMainSite { get; set; }
 
         public string Address { get; set; }
+
+        public string Country { get; set; }
 
         //public double? LocationLat { get; set; }
 
@@ -87,6 +91,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(500)]
         public string Address { get; set; }
+
+        [StringLength(50)]
+        public string Country { get; set; }
 
         //public double? LocationLat { get; set; }
 

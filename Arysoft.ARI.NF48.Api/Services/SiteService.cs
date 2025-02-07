@@ -35,6 +35,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 items = items.Where(e =>
                     (e.Description != null && e.Description.ToLower().Contains(filters.Text))
                     || (e.Address != null && e.Address.ToLower().Contains(filters.Text))
+                    || (e.Country != null && e.Country.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -155,6 +156,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Description = item.Description;
             foundItem.IsMainSite = item.IsMainSite;
             foundItem.Address = item.Address;
+            foundItem.Country = item.Country;
             //foundItem.LocationGPS = item.LocationGPS;
             foundItem.LocationURL = item.LocationURL;
             foundItem.Status = foundItem.Status == StatusType.Nothing

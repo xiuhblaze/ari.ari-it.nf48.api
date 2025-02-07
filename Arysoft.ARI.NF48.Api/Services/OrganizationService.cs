@@ -7,6 +7,7 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -48,10 +49,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e =>
                     (e.Name != null && e.Name.ToLower().Contains(filters.Text))
-                    || (e.LegalEntity != null && e.LegalEntity.ToLower().Contains(filters.Text))
+                    || (e.Companies != null && e.Companies.Any(c => 
+                        (c.Name != null && c.Name.ToLower().Contains(filters.Text))
+                        || (c.LegalEntity != null && c.LegalEntity.ToLower().Contains(filters.Text))
+                        || (c.COID != null && c.COID.ToLower().Contains(filters.Text))
+                    ))
                     || (e.Website != null && e.Website.ToLower().Contains(filters.Text))
-                    || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))
-                    || (e.COID != null && e.COID.ToLower().Contains(filters.Text))
+                    || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))                    
                     || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text))
                 );
             }
@@ -91,10 +95,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
                 case OrganizationOrderType.Name:
                     items = items.OrderBy(e => e.Name);
-                    break;
-                case OrganizationOrderType.LegalEntity:
-                    items = items.OrderBy(e => e.LegalEntity);
-                    break;
+                    break;                
                 case OrganizationOrderType.Status:
                     items = items.OrderBy(e => e.Status)
                         .ThenBy(e => e.Name);
@@ -111,10 +112,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
                 case OrganizationOrderType.NameDesc:
                     items = items.OrderByDescending(e => e.Name);
-                    break;
-                case OrganizationOrderType.LegalEntityDesc:
-                    items = items.OrderByDescending(e => e.LegalEntity);
-                    break;
+                    break;                
                 case OrganizationOrderType.StatusDesc:
                     items = items.OrderByDescending(e => e.Status)
                         .ThenByDescending(e => e.Name);
@@ -171,7 +169,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
             try
             {
-                
+                // Borrando carpetas de registros temporales
                 var items = _organizationRepository.Gets()
                     .Where(o =>
                         o.UpdatedUser.ToUpper() == item.UpdatedUser.ToUpper() &&
@@ -199,12 +197,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Organization> UpdateAsync(Organization item)
         {
-            // Validations
-
-            // - Que el nombre no exista
-
             var foundItem = await _organizationRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
+
+            // Validations
+
+            if (await _organizationRepository.ExistOrganizationNameAsync(item.Name, foundItem.ID))
+                throw new BusinessException("The organization name already exist");
 
             // Assigning values
 
@@ -217,12 +216,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             foundItem.Name = item.Name;
-            foundItem.LegalEntity = item.LegalEntity;
+            // foundItem.LegalEntity = item.LegalEntity;
             foundItem.LogoFile = item.LogoFile;
-            foundItem.QRFile = item.QRFile;
+            // foundItem.QRFile = item.QRFile;
             foundItem.Website = item.Website;
             foundItem.Phone = item.Phone;
-            foundItem.COID = item.COID;
+            // foundItem.COID = item.COID;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status == OrganizationStatusType.Nothing 
                 ? OrganizationStatusType.Prospect 
@@ -259,7 +258,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (foundItem.Status == OrganizationStatusType.Deleted)
             {
                 //! Considerar eliminar todas las asociaciones al registro antes de su eliminación tales como
-                //  contacts, applications, sites, shifts, ...
+                //  contacts, applications, sites, shifts, ... DONE! Se eliminan en cascada
                 _organizationRepository.Delete(foundItem);
             }
             else

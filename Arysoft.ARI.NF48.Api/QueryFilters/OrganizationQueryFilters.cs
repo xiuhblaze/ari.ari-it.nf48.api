@@ -15,6 +15,6 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public OrganizationStatusType? Status { get; set; }
 
-        public OrganizationOrderType Order { get; set; }
+        public OrganizationOrderType? Order { get; set; }
     }
 }

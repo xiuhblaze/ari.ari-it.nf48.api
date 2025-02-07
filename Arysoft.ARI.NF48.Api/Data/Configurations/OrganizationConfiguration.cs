@@ -20,15 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Organization>()
-                .Property(m => m.LegalEntity)
-                .HasMaxLength(250);
-
-            modelBuilder.Entity<Organization>()
                 .Property(m => m.LogoFile)
-                .HasMaxLength(250);
-
-            modelBuilder.Entity<Organization>()
-                .Property(m => m.QRFile)
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Organization>()
@@ -38,10 +30,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             modelBuilder.Entity<Organization>()
                 .Property(m => m.Phone)
                 .HasMaxLength(25);
-
-            modelBuilder.Entity<Organization>()
-                .Property(m => m.COID)
-                .HasMaxLength(20);
 
             modelBuilder.Entity<Organization>()
                 .Property(m => m.ExtraInfo)
@@ -64,12 +52,18 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
-            // Relations
+            // RELATIONS
 
             modelBuilder.Entity<Organization>()
                 .HasMany(m => m.Notes)
                 .WithOptional()
                 .HasForeignKey(m => m.OwnerID);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(o => o.LegalEntites)
+                .WithRequired(l => l.Organization)
+                .HasForeignKey(l => l.OrganizationID)
+                .WillCascadeOnDelete(true); // Para que los temporales se borren en cascada
 
             modelBuilder.Entity<Organization>()
                 .HasMany(o => o.Contacts)

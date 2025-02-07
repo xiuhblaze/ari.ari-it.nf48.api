@@ -30,6 +30,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
+                Country = item.Country,
                 //LocationLat = item.LocationGPS?.Latitude.Value,
                 //LocationLong = item.LocationGPS?.Longitude.Value,
                 LocationURL = item.LocationURL,
@@ -56,6 +57,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
+                Country = item.Country,
                 //LocationLat = item.LocationGPS?.Latitude.Value,
                 //LocationLong = item.LocationGPS?.Longitude.Value,
                 LocationURL = item.LocationURL,
@@ -90,6 +92,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = itemDto.Description,
                 IsMainSite = itemDto.IsMainSite,
                 Address = itemDto.Address,
+                Country = itemDto.Country,
                 LocationURL = itemDto.LocationURL,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

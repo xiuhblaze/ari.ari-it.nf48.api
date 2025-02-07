@@ -13,7 +13,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public virtual Organization Organization { get; set; }
+        // public virtual Organization Organization { get; set; }
 
         public virtual ICollection<Audit> Audits { get; set; }
 

@@ -53,11 +53,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int SitesEmployeesCount { get; set; }
 
-        public int AuditCyclesCount { get; set; }
-
         public int CertificatesCount { get; set; }
 
         public int NotesCount { get; set; }
+
+        // public IEnumerable<CompanyItemListDto> Companies { get; set; }
 
         public IEnumerable<OrganizationStandardItemListDto> Standards { get; set; }
 
@@ -70,6 +70,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class OrganizationItemDetailDto
     {
         public Guid ID { get; set; }
+
+        public Guid? OrganizationFamilyID { get; set; }
 
         public int? Folio { get; set; }
 
@@ -98,10 +100,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
 
         // RELATIONS
-        
-        public IEnumerable<ApplicationItemListDto> Applications { get; set; }
 
-        public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
+        // public IEnumerable<CompanyItemListDto> Companies { get; set; }
+
+        public IEnumerable<ApplicationItemListDto> Applications { get; set; }
 
         public IEnumerable<CertificateItemListDto> Certificates { get; set; }
 
@@ -134,18 +136,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string Name { get; set; }
 
-        [Required]
-        [StringLength(250)]
-        public string LegalEntity { get; set; }
-
         [StringLength(250)]
         public string Website { get; set; }
 
         [StringLength(10)]
         public string Phone { get; set; }
-
-        [StringLength(20)]
-        public string COID { get; set; }
 
         [StringLength(1000)]
         public string ExtraInfo { get; set; }

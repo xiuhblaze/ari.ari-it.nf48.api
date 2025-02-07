@@ -26,9 +26,23 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return folio.HasValue ? folio.Value + 1 : 1;
         } // GetNextFolio
 
+        public async Task<bool> ExistOrganizationNameAsync(string name, Guid? exceptionID)
+        {
+            name = name.ToLower().Trim();
+            var response = _model.Where(o => o.Name.ToLower() == name);
+
+            if (exceptionID != null && exceptionID != Guid.Empty) 
+            {
+                response = response.Where(o => o.ID != exceptionID);
+            }
+
+            return await response.AnyAsync();
+        } // ExistOrganizationNameAsync
+
         public new async Task DeleteTmpByUserAsync(string username)
         {
             var items = await _model
+                .Include(o => o.Companies)
                 .Include(o => o.Contacts)
                 .Include(o => o.Sites.Select(s => s.Shifts))
                 .Include(o => o.Certificates)
@@ -42,26 +56,5 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 _model.Remove(item);
             }
         } // DeleteTmpByUser
-
-        /// <summary>
-        /// Permite eliminar los registros temporales que tengan más de un 
-        /// día de antigüedad
-        /// </summary>
-        /// <returns></returns>
-        private async Task DeleteTmpByPublicFromADay()
-        {
-            var items = await _model
-                .Where(o =>
-                    o.UpdatedUser == "public" // Considerar que este nombre sea un correo y elimine por el mismo
-                    && o.Status == OrganizationStatusType.Nothing
-                    && o.Updated > DateTime.Now.AddDays(-1))
-                .ToListAsync();
-
-            foreach (var item in items)
-            {
-                //db.Entry(item).State = EntityState.Deleted;
-                _model.Remove(item);
-            }
-        } // DeleteTmpByPublicFromADay
     }
 }

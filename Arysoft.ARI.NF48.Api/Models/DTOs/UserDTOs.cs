@@ -21,6 +21,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public UserType Type { get; set; }
 
+        public DateTime? LastAccess { get; set; }
+
         public StatusType Status { get; set; }
 
         public ICollection<RoleItemListDto> Roles { get; set; }
@@ -43,6 +45,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string LastName { get; set; }
 
         public UserType Type { get; set; }
+
+        public DateTime? LastAccess { get; set; }
 
         public StatusType Status { get; set; }
 

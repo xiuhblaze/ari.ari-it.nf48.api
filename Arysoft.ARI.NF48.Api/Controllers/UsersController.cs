@@ -28,10 +28,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<UserListItemDto>>))]
-        public IHttpActionResult GetUsers([FromUri] UserQueryFilters filters)
+        public async Task<IHttpActionResult> GetUsers([FromUri] UserQueryFilters filters)
         {
             var items = _userService.Gets(filters);
-            var itemsDto = UserMapping.UsersToListDto(items);
+            var itemsDto = await UserMapping.UsersToListDto(items);
 
             var response = new ApiResponse<IEnumerable<UserListItemDto>>(itemsDto);
             var metadata = new Metadata
@@ -54,7 +54,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             try
             {
                 var item = await _userService.GetAsync(id);
-                var itemDto = UserMapping.UserToDetailDto(item);
+                var itemDto = await UserMapping.UserToDetailDto(item);
                 var response = new ApiResponse<UserDetailDto>(itemDto);
 
                 return Ok(response);
@@ -72,7 +72,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = await _userService
                 .AddAsync(new User { UpdatedUser = itemAddDto.UpdatedUser });
-            var itemDto = UserMapping.UserToDetailDto(item);
+            var itemDto = await UserMapping.UserToDetailDto(item);
             var response = new ApiResponse<UserDetailDto>(itemDto);
 
             return Ok(response);
@@ -87,7 +87,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToEdit = UserMapping.ItemEditDtoToUser(itemEditDto);
             var item = await _userService.UpdateAsync(itemToEdit);
-            var itemDto = UserMapping.UserToDetailDto(item);
+            var itemDto = await UserMapping.UserToDetailDto(item);
             var response = new ApiResponse<UserDetailDto>(itemDto);
 
             return Ok(response);

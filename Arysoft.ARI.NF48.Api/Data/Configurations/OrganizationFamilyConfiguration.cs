@@ -3,42 +3,38 @@ using System.Data.Entity;
 
 namespace Arysoft.ARI.NF48.Api.Data.Configurations
 {
-    public class ShiftConfiguration
+    public class OrganizationFamilyConfiguration
     {
         public static void Configure(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Shift>()
-                .ToTable("Shifts")
+            modelBuilder.Entity<OrganizationFamily>()
+                .ToTable("OrganizationsFamilies")
                 .HasKey(m => m.ID);
 
-            modelBuilder.Entity<Shift>()
+            modelBuilder.Entity<OrganizationFamily>()
                 .Property(m => m.ID)
-                .HasColumnName("ShiftID");
+                .HasColumnName("OrganizationFamilyID");
 
-            modelBuilder.Entity<Shift>()
-                .Property(m => m.ActivitiesDescription)
-                .HasMaxLength(500);
-
-            modelBuilder.Entity<Shift>()
-                .Property(m => m.ExtraInfo)
+            modelBuilder.Entity<OrganizationFamily>()
+                .Property(m => m.Description)
                 .HasMaxLength(1000);
 
-            modelBuilder.Entity<Shift>()
+            modelBuilder.Entity<OrganizationFamily>()
                 .Property(m => m.Status)
                 .IsRequired();
 
-            modelBuilder.Entity<Shift>()
+            modelBuilder.Entity<OrganizationFamily>()
                 .Property(m => m.Created)
                 .IsRequired();
 
-            modelBuilder.Entity<Shift>()
+            modelBuilder.Entity<OrganizationFamily>()
                 .Property(m => m.Updated)
                 .IsRequired();
 
-            modelBuilder.Entity<Shift>()
+            modelBuilder.Entity<OrganizationFamily>()
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
-        } // Configure
+        }
     }
 }
