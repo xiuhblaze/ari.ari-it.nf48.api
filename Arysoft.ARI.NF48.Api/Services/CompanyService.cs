@@ -5,22 +5,20 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
     public class CompanyService
     {
-        public readonly BaseRepository<Company> _repository;
+        public readonly CompanyRepository _repository;
 
         // CONSTRUCTOR 
 
         public CompanyService()
         {
-            _repository = new BaseRepository<Company>();
+            _repository = new CompanyRepository();
         }
 
         // METHODS
@@ -143,7 +141,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - No duplicar el nombre de la compañia en la misma organización
+            if (await _repository.ExistCompanyNameAsync(item.Name, item.OrganizationID, item.ID))
+                throw new BusinessException("The name already exists");
+
             // - No duplicar el Legal Entity en cualquier organización
+            if (await _repository.ExistLegalEntityAsync(item.LegalEntity, item.ID))
+                throw new BusinessException("The Legal Entity already exists");
 
             // Assigning values
 
@@ -164,5 +167,35 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
+
+        public async Task DeleteAsync(Company item)
+        {
+            var foundItem = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            if (foundItem.Status == StatusType.Deleted)
+            {
+                _repository.Delete(foundItem);
+            }
+            else
+            {
+                foundItem.Status = foundItem.Status == StatusType.Active
+                    ? StatusType.Inactive
+                    : StatusType.Deleted;
+                foundItem.Updated = DateTime.UtcNow;
+                foundItem.UpdatedUser = item.UpdatedUser;
+
+                _repository.Update(foundItem);
+            }
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"CompanyService.DeleteAsync: {ex.Message}");
+            }
+        } // DeleteAsync
     }
 }

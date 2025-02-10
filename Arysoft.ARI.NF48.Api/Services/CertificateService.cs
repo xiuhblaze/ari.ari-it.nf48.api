@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -15,6 +16,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 {
     public class CertificateService
     {
+        private const string CERTIFICATE_FILENAME = "certificate";
+        private const string QR_FILENAME = "qrcode";
+
         private readonly CertificateRepository _repository;
 
         // CONSTRUCTOR
@@ -155,8 +159,11 @@ namespace Arysoft.ARI.NF48.Api.Services
         { 
             var item = await _repository.GetAsync(id);
 
-            item.ValidityStatus = GetValidityStatus(item);
-            item.AuditPlanValidityStatus = GetAuditPlanValidityStatus(item);
+            if (item != null)
+            { 
+                item.ValidityStatus = GetValidityStatus(item);
+                item.AuditPlanValidityStatus = GetAuditPlanValidityStatus(item);
+            }
 
             return item;
         } // GetAsync
@@ -179,6 +186,25 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             try
             {
+                var items = _repository.Gets()
+                    .Where(c => c.UpdatedUser.ToUpper() == item.UpdatedUser.ToUpper()
+                        && c.Status == CertificateStatusType.Nothing)
+                    .ToList();
+                if (items != null && items.Count > 0)
+                {
+                    foreach (var i in items)
+                    {
+                        FileRepository.DeleteFile(
+                            $"~/files/organizations/{i.OrganizationID}/certificates",
+                            $"{i.ID}_{CERTIFICATE_FILENAME}"
+                        );
+                        FileRepository.DeleteFile(
+                            $"~/files/organizations/{i.OrganizationID}/certificates",
+                            $"{i.ID}_{QR_FILENAME}"
+                        );
+                    }
+                }
+
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
@@ -240,6 +266,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.DueDate = item.DueDate;
             foundItem.Comments = item.Comments;
             foundItem.Filename = item.Filename;
+            foundItem.QRFile = item.QRFile;
             foundItem.PrevAuditDate = item.PrevAuditDate;
             foundItem.PrevAuditNote = item.PrevAuditNote;
             foundItem.NextAuditDate = item.NextAuditDate;
@@ -282,7 +309,15 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Excecute queries
 
             if (foundItem.Status == CertificateStatusType.Deleted)
-            {   
+            {
+                FileRepository.DeleteFile(
+                            $"~/files/organizations/{foundItem.OrganizationID}/certificates",
+                            $"{foundItem.ID}_{CERTIFICATE_FILENAME}"
+                        );
+                FileRepository.DeleteFile(
+                    $"~/files/organizations/{foundItem.OrganizationID}/certificates",
+                    $"{foundItem.ID}_{QR_FILENAME}"
+                );
                 _repository.Delete(foundItem);
             }
             else

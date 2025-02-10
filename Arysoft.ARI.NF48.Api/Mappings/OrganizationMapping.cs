@@ -58,9 +58,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 CertificatesCount = item.Certificates != null
                     ? item.Certificates.Where(i => i.Status != CertificateStatusType.Nothing).Count()
                     : 0,
-                //Companies = item.Companies != null
-                //    ? CompanyMapping.CompanyToListDto(item.Companies)
-                //    : null,
+                Companies = item.Companies != null
+                    ? CompanyMapping.CompanyToListDto(item.Companies
+                        .Where(c => c.Status != StatusType.Nothing))
+                    : null,
                 ContactsCount = item.Contacts != null 
                     ? item.Contacts.Where(i => i.Status == StatusType.Active).Count() 
                     : 0,
@@ -121,9 +122,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? CertificateMapping.CertificatesToListDto(item.Certificates
                         .Where(i => i.Status != CertificateStatusType.Nothing))
                     : new List<CertificateItemListDto>(),
-                //Companies = item.Companies != null
-                //    ? CompanyMapping.CompanyToListDto(item.Companies)
-                //    : null,
+                Companies = item.Companies != null
+                    ? CompanyMapping.CompanyToListDto(item.Companies)
+                    : null,
                 Contacts = item.Contacts != null
                     ? ContactMapping.ContactToListDto(item.Contacts
                         .Where(i => i.Status != StatusType.Nothing))

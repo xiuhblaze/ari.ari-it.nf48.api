@@ -60,7 +60,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasForeignKey(m => m.OwnerID);
 
             modelBuilder.Entity<Organization>()
-                .HasMany(o => o.LegalEntites)
+                .HasMany(o => o.Companies)
                 .WithRequired(l => l.Organization)
                 .HasForeignKey(l => l.OrganizationID)
                 .WillCascadeOnDelete(true); // Para que los temporales se borren en cascada

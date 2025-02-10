@@ -174,7 +174,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException(ex.Message);
+                throw new BusinessException($"SiteService.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
@@ -203,7 +203,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 _siteRepository.Update(foundItem);
             }
-            _siteRepository.SaveChanges();
+
+            try
+            { 
+                _siteRepository.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"SiteService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }

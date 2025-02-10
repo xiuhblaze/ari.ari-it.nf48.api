@@ -27,6 +27,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.Filename)
                 .HasMaxLength(250);
 
+            modelBuilder.Entity<Certificate>()
+                .Property(m => m.QRFile)
+                .HasMaxLength(250);
+
             //modelBuilder.Entity<Certificate>()
             //    .Property(m => m.PrevAuditDate)
             //    .IsRequired();

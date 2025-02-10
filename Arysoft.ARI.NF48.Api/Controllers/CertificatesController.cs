@@ -10,6 +10,7 @@ using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -19,6 +20,9 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 {
     public class CertificatesController : ApiController
     {
+        private const string CERTIFICATE_FILENAME = "certificate";
+        private const string QR_FILENAME = "qrcode";
+
         private readonly CertificateService _service;
 
         // CONSTRUCTOR
@@ -83,8 +87,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> PutCertificate()
         {
             var data = HttpContext.Current.Request.Params["data"];
-            var file = HttpContext.Current.Request.Files.Count > 0
-                ? HttpContext.Current.Request.Files[0]
+            var files = HttpContext.Current.Request.Files.Count > 0
+                ? HttpContext.Current.Request.Files
                 : null;
 
             CertificatePutDto itemEditDto = JsonConvert.DeserializeObject<CertificatePutDto>(data)
@@ -95,15 +99,54 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToEdit = CertificateMapping.ItemEditDtoToCertificate(itemEditDto);
 
-            if (file != null)
+            if (files != null)
             {
-                itemToEdit.Filename = FileRepository.UploadFile(
-                    file,
-                    $"~/files/organizations/{item.OrganizationID}/certificates",
-                    item.ID.ToString()
-                );
+                HttpPostedFile certificateFile = null;
+                HttpPostedFile qrFile = null;
+
+                for (int i = 0; i < files.Count; i++) // Ver que archivos se subieron
+                {
+                    HttpPostedFile file = files[i];
+                    string fileNameWithoutExtension = Path
+                        .GetFileNameWithoutExtension(file.FileName);
+
+                    if (fileNameWithoutExtension == CERTIFICATE_FILENAME) certificateFile = file;
+                    if (fileNameWithoutExtension == QR_FILENAME) qrFile = file;
+                }
+
+                if (certificateFile != null) // Si se subió un archivo de certificado
+                {
+                    itemToEdit.Filename = FileRepository.UploadFile(
+                        certificateFile,
+                        $"~/files/organizations/{item.OrganizationID}/certificates",
+                        item.ID.ToString() + "_" + CERTIFICATE_FILENAME,
+                        new string[] { ".jpg", ".png", ".pdf" }
+                    );
+                }
+                else itemToEdit.Filename = item.Filename;
+
+                if (qrFile != null) // Si se subió un archivo del código QR
+                {
+                    itemToEdit.QRFile = FileRepository.UploadFile(
+                        qrFile,
+                        $"~/files/organizations/{item.OrganizationID}/certificates",
+                        item.ID.ToString() + "_" + QR_FILENAME,
+                        new string[] { ".jpg", ".png" }
+                    );
+                }
+                else itemToEdit.QRFile = item.QRFile;
+
+                //itemToEdit.Filename = FileRepository.UploadFile(
+                //    file,
+                //    $"~/files/organizations/{item.OrganizationID}/certificates",
+                //    item.ID.ToString()
+                //);
             }
-            else itemToEdit.Filename = item.Filename;
+            else
+            { 
+                itemToEdit.Filename = item.Filename;
+                itemToEdit.QRFile = item.QRFile;
+            }
 
             itemToEdit = await _service.UpdateAsync(itemToEdit);
             var itemDto = CertificateMapping.CertificateToItemDetailDto(itemToEdit);

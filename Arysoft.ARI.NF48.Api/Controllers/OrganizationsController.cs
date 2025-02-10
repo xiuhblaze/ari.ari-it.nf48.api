@@ -176,6 +176,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (id != itemDelDto.ID)
                 throw new BusinessException("ID mismatch");
 
+            // TODO: Falta eliminar los archivos de la organización
+
             var item = OrganizationMapping.ItemDeleteDtoToOrganization(itemDelDto);
             await _organizationService.DeleteAsync(item);
             var response = new ApiResponse<bool>(true);

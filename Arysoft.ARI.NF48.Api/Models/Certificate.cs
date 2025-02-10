@@ -18,6 +18,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Filename { get; set; }
 
+        public string QRFile { get; set; }
+
         public DateTime? PrevAuditDate { get; set; }
 
         public string PrevAuditNote { get; set; }

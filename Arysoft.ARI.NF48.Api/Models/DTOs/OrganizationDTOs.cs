@@ -57,7 +57,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int NotesCount { get; set; }
 
-        // public IEnumerable<CompanyItemListDto> Companies { get; set; }
+        public IEnumerable<CompanyItemListDto> Companies { get; set; }
 
         public IEnumerable<OrganizationStandardItemListDto> Standards { get; set; }
 
@@ -101,7 +101,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        // public IEnumerable<CompanyItemListDto> Companies { get; set; }
+        public IEnumerable<CompanyItemListDto> Companies { get; set; }
 
         public IEnumerable<ApplicationItemListDto> Applications { get; set; }
 

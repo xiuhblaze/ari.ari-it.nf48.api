@@ -62,7 +62,7 @@ namespace Arysoft.ARI.NF48.Api.IO
                     throw new BusinessException($"FileRepository.DeleteFile: {ex.Message}");
                 }
             }
-            else throw new BusinessException($"The file '{filename}' to delete not exist in route '{deletePath}'.");
+            // else throw new BusinessException($"The file '{filename}' to delete not exist in route '{deletePath}'.");
             
             return true;
         } // DeleteFile

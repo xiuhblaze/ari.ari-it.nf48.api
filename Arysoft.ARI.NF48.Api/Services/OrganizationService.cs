@@ -259,6 +259,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 //! Considerar eliminar todas las asociaciones al registro antes de su eliminación tales como
                 //  contacts, applications, sites, shifts, ... DONE! Se eliminan en cascada
+
+                FileRepository.DeleteDirectory($"~/files/organizations/{foundItem.ID}");
                 _organizationRepository.Delete(foundItem);
             }
             else
