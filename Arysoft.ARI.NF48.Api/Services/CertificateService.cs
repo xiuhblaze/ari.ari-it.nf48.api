@@ -5,12 +5,9 @@ using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
-using Microsoft.Owin.Security.DataHandler.Encoder;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -50,9 +47,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e => 
-                    (e.Comments != null && e.Comments.Contains(filters.Text))
-                    || (e.PrevAuditNote != null && e.PrevAuditNote.Contains(filters.Text))
-                    || (e.NextAuditNote != null && e.NextAuditNote.Contains(filters.Text))
+                    (e.Comments != null && e.Comments.ToLower().Contains(filters.Text))
+                    || (e.CRN != null && e.CRN.ToLower().Contains(filters.Text))
+                    || (e.PrevAuditNote != null && e.PrevAuditNote.ToLower().Contains(filters.Text))
+                    || (e.NextAuditNote != null && e.NextAuditNote.ToLower().Contains(filters.Text))
                     );
             }
 
@@ -267,6 +265,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Comments = item.Comments;
             foundItem.Filename = item.Filename;
             foundItem.QRFile = item.QRFile;
+            foundItem.CRN = item.CRN;
             foundItem.PrevAuditDate = item.PrevAuditDate;
             foundItem.PrevAuditNote = item.PrevAuditNote;
             foundItem.NextAuditDate = item.NextAuditDate;

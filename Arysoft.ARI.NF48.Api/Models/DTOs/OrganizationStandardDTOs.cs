@@ -12,7 +12,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid StandardID { get; set; }
 
-        public string CRN { get; set; }
+        public string ExtraInfo { get; set; }
 
         public string OrganizationName { get; set; }
 
@@ -29,7 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid StandardID { get; set; }
 
-        public string CRN { get; set; }
+        public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -61,8 +61,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid StandardID { get; set; }
 
-        [StringLength(10)]
-        public string CRN { get; set; }
+        [StringLength(1000)]
+        public string ExtraInfo { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

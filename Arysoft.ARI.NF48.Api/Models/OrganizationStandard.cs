@@ -8,7 +8,10 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? StandardID { get; set; }
 
-        public string CRN { get; set; } // Certificate Registration Number
+        // public string CRN { get; set; } // Certificate Registration Number
+
+        public string ExtraInfo { get; set; }
+
 
         // RELATIONS
 

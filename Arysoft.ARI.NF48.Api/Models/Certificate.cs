@@ -20,6 +20,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string QRFile { get; set; }
 
+        public string CRN { get; set; } // Certificate Registration Number
+
         public DateTime? PrevAuditDate { get; set; }
 
         public string PrevAuditNote { get; set; }

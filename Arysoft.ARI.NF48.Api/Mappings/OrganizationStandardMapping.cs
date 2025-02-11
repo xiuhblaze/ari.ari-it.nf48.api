@@ -2,8 +2,6 @@
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -28,7 +26,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 StandardID = item.StandardID ?? Guid.Empty,
-                CRN = item.CRN,
+                ExtraInfo = item.ExtraInfo,
                 OrganizationName = item.Organization != null
                     ? item.Organization.Name 
                     : string.Empty,
@@ -46,7 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 StandardID = item.StandardID ?? Guid.Empty,
-                CRN = item.CRN,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -75,7 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = itemDto.ID,
                 StandardID = itemDto.StandardID,
-                CRN = itemDto.CRN,
+                ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

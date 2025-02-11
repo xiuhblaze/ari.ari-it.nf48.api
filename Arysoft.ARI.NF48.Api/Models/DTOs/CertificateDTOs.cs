@@ -19,6 +19,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string QRFile { get; set; }
 
+        public string CRN { get; set; }
+
         public DateTime? PrevAuditDate { get; set; }
 
         public string PrevAuditNote { get; set; }
@@ -72,6 +74,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string Filename { get; set; }
 
         public string QRFile { get; set; }
+
+        public string CRN { get; set; }
 
         public DateTime? PrevAuditDate { get; set; }
 
@@ -141,6 +145,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(500)]
         public string Comments { get; set; }
+
+        [StringLength(10)]
+        public string CRN { get; set; }
 
         public DateTime? PrevAuditDate { get; set; }
 

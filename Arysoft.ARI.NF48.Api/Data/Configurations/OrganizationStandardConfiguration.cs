@@ -19,9 +19,13 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.OrganizationID)
                 .IsRequired();
 
+            //modelBuilder.Entity<OrganizationStandard>()
+            //    .Property(m => m.CRN)
+            //    .HasMaxLength(10);
+
             modelBuilder.Entity<OrganizationStandard>()
-                .Property(m => m.CRN)
-                .HasMaxLength(10);
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
 
             modelBuilder.Entity<OrganizationStandard>()
                 .Property(m => m.Status)

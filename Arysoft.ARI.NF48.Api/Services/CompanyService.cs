@@ -145,14 +145,20 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The name already exists");
 
             // - No duplicar el Legal Entity en cualquier organización
-            if (await _repository.ExistLegalEntityAsync(item.LegalEntity, item.ID))
-                throw new BusinessException("The Legal Entity already exists");
+            //if (await _repository.ExistLegalEntityAsync(item.LegalEntity, item.ID))
+            //    throw new BusinessException("The Legal Entity already exists");
 
             // Assigning values
+
+            if (item.Status == StatusType.Nothing)
+                item.Status = StatusType.Active;
 
             foundItem.Name = item.Name;
             foundItem.LegalEntity = item.LegalEntity;
             foundItem.COID = item.COID;
+            foundItem.Status = foundItem.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

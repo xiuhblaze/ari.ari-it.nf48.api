@@ -7,7 +7,7 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public int? Folio { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } // El nombre que aparecerá en el certificado
 
         public string LogoFile { get; set; }
 

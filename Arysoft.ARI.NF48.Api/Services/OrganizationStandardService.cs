@@ -45,7 +45,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(e =>
-                    e.CRN != null && e.CRN.ToLower().Contains(filters.Text)
+                    e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text)
                 );
             }
 
@@ -148,7 +148,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            foundItem.CRN = item.CRN;
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
