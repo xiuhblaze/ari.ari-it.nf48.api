@@ -1,25 +1,29 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
-    [Table("Standards")]
     public class Standard : BaseModel
     {
-        [Key]
-        public Guid StandardID { get; set; }
-
-        [StringLength(100)]
         public string Name { get; set; }
 
-        [StringLength(250)]
         public string Description { get; set; }
-                
-        public StatusType Status { get; set; }
+
+        public int? MaxReductionDays { get; set; }
+
+        public int? SalesMaxReductionDays { get; set; }
+
+        // RELATIONS
+
+        public virtual ICollection<Application> Applications { get; set; }
+
+        public virtual ICollection<AuditorStandard> AuditorStandards { get; set; }
+
+        public virtual ICollection<CatAuditorDocument> CatAuditorDocuments { get; set; }
+
+        public virtual ICollection<Certificate> Certificates { get; set; }
+
+        public virtual ICollection<DayCalculationConcept> DayCalculationConcepts { get; set; }
+
+        public virtual ICollection<OrganizationStandard> OrganizationStandards { get; set; }
     }
 }

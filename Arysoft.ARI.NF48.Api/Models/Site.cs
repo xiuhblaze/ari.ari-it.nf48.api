@@ -1,43 +1,29 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
+//using System.Data.Entity.Spatial;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
-    [Table("Sites")]
     public class Site : BaseModel
     {
-        [Key]
-        public Guid SiteID { get; set; }
-
         public Guid OrganizationID { get; set; }
 
-        //public Guid LocationID { get; set; } // próximamente
-
-        [StringLength(500)]
         public string Description { get; set; }
 
-        [StringLength(500)]
-        public string LocationDescription { get; set; }
+        public bool IsMainSite { get; set; }
 
-        /// <summary>
-        /// Order in the organization's hierarchy, 1 is the main site.
-        /// </summary>
-        public int Order { get; set; }
+        public string Address { get; set; }
 
-        public StatusType Status { get; set; }
+        public string Country { get; set; }
+
+        // public DbGeography LocationGPS { get; set; }
+
+        public string LocationURL { get; set; }
 
         // RELATIONS
 
-        public Organization Organization { get; set; }
+        public virtual Organization Organization { get; set; }
 
-        //public Location Location { get; set; } // próximamente
-
-        public ICollection<Shift> Shifts { get; set; }
-
+        public virtual ICollection<Shift> Shifts { get; set; }
     }
 }

@@ -7,15 +7,57 @@ using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
+    public class NaceCodeItemListDto
+    {
+        public Guid ID { get; set; }
+
+        public int? Sector { get; set; }
+
+        public int? Division { get; set; }
+
+        public int? Group { get; set; }
+
+        public int? Class { get; set; }
+
+        public string Description { get; set; }
+
+        public StatusType Status { get; set; }
+    }
+
+    public class NaceCodeItemDetailDto
+    {
+        public Guid ID { get; set; }
+
+        public int? Sector { get; set; }
+
+        public int? Division { get; set; }
+
+        public int? Group { get; set; }
+
+        public int? Class { get; set; }
+
+        public string Description { get; set; }
+
+        public StatusType Status { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime Updated { get; set; }
+
+        public string UpdatedUser { get; set; }
+    } // NaceCodeItemDetailDto
+
     public class NaceCodePostDto
-    {   
+    {
+        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     }
 
     public class NaceCodePutDto
     {
-        public Guid NaceCodeID { get; set; }
+        [Required]
+        public Guid ID { get; set; }
 
         public int? Sector { get; set; }
 
@@ -30,7 +72,18 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StatusType Status { get; set; }
 
+        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    }
+    } // NaceCodePutDto
+
+    public class NaceCodeDeleteDto
+    {
+        [Required]
+        public Guid ID { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string UpdatedUser { get; set; }
+    } // NaceCodeDeleteDto
 }

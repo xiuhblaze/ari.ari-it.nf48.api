@@ -1,9 +1,14 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Data;
 using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
+using Arysoft.ARI.NF48.Api.Services;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,212 +22,100 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 {
     public class NaceCodesController : ApiController
     {
-        private AriContext db = new AriContext();
+        private readonly NaceCodeService _naceCodeService;
+
+        // CONSTRUCTOR
+
+        public NaceCodesController()
+        {
+            _naceCodeService = new NaceCodeService();
+        }
+
+        // ENDPOINTS
 
         // GET: api/NaceCodes
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<NaceCode>>))]
         public IHttpActionResult GetNaceCodes([FromUri]NaceCodeQueryFilters filters)
         {
-            var items = db.NaceCodes.AsEnumerable();
-
-            // Filters
-
-            if(!string.IsNullOrEmpty(filters.Text))
+            var items = _naceCodeService.Gets(filters);
+            var itemsDto = NaceCodeMapping.NaceCodeToListDto(items);
+            var response = new ApiResponse<IEnumerable<NaceCodeItemListDto>>(itemsDto)
             {
-                filters.Text = filters.Text.ToLower().Trim();
-                items = items.Where(e => e.Description != null && e.Description.ToLower().Contains(filters.Text));
-            }
-
-            if (filters.Status != null && filters.Status != StatusType.Nothing)
-            {
-                items = items.Where(e => e.Status == filters.Status);
-            }
-            else 
-            {
-                items = items.Where(e => e.Status != StatusType.Nothing);
-            }
-
-            // Order
-
-            switch (filters.Order)
-            {   
-                case NaceCodeOrderType.Description:
-                    items = items.OrderBy(e => e.Description);
-                    break;
-                case NaceCodeOrderType.Updated:
-                    items = items.OrderBy(e => e.Updated);
-                    break;
-                case NaceCodeOrderType.SectorDesc:
-                    items = items.OrderByDescending(e => e.Sector)
-                        .ThenByDescending(e => e.Division)
-                        .ThenByDescending(e => e.Group)
-                        .ThenByDescending(e => e.Class);
-                    break;
-                case NaceCodeOrderType.DescriptionDesc:
-                    items = items.OrderByDescending(e => e.Description);
-                    break;
-                case NaceCodeOrderType.UpdatedDesc:
-                    items = items.OrderByDescending(e => e.Updated);
-                    break;
-                default: // NaceCodeOrderType.Sector
-                    items = items.OrderBy(e => e.Sector)
-                        .ThenBy(e => e.Division)
-                        .ThenBy(e => e.Group)
-                        .ThenBy(e => e.Class);
-                    break;
-            }
-
-            // Pagination
-
-            var pagedNacecodes = PagedList<NaceCode>.Create(items, filters.PageNumber, filters.PageSize);
-            var response = new ApiResponse<IEnumerable<NaceCode>>(pagedNacecodes);
-            var metadata = new Metadata
-            {
-                TotalCount = pagedNacecodes.TotalCount,
-                PageSize = pagedNacecodes.PageSize,
-                CurrentPage = pagedNacecodes.CurrentPage,
-                TotalPages = pagedNacecodes.TotalPages,
-                HasPreviousPage = pagedNacecodes.HasPreviousPage,
-                HasNextPage = pagedNacecodes.HasNextPage
+                Meta = new Metadata
+                {
+                    TotalCount = items.TotalCount,
+                    PageSize = items.PageSize,
+                    CurrentPage = items.CurrentPage,
+                    TotalPages = items.TotalPages,
+                    HasPreviousPage = items.HasPreviousPage,
+                    HasNextPage = items.HasNextPage
+                }
             };
-            response.Meta = metadata;
 
             return Ok(response);
-        }
+        } // GetNaceCodes
 
         // GET: api/NaceCodes/5
         [ResponseType(typeof(ApiResponse<NaceCode>))]
         public async Task<IHttpActionResult> GetNaceCode(Guid id)
         {
-            var naceCode = await db.NaceCodes.FindAsync(id);
+            var item = await _naceCodeService.GetAsync(id)
+                ?? throw new BusinessException("Item not found");
+            var itemDto = NaceCodeMapping.NaceCodeToItemDetailDto(item);
+            var response = new ApiResponse<NaceCodeItemDetailDto>(itemDto);
             
-            if (naceCode == null) return NotFound();
-            
-            var response = new ApiResponse<NaceCode>(naceCode);
             return Ok(response);
         } // GetNaceCode
 
         // POST: api/NaceCodes
-        [ResponseType(typeof(NaceCode))]
-        public async Task<IHttpActionResult> PostNaceCode(NaceCodePostDto naceCodeDto)
+        [ResponseType(typeof(ApiResponse<NaceCodeItemDetailDto>))]
+        public async Task<IHttpActionResult> PostNaceCode(NaceCodePostDto itemAddDto)
         {
-            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            await DeleteTmpByUserAsync(naceCodeDto.UpdatedUser);
+            var itemToAdd = NaceCodeMapping.ItemAddDtoToNaceCode(itemAddDto);
+            var item = await _naceCodeService.AddAsync(itemToAdd);
+            var itemDto = NaceCodeMapping.NaceCodeToItemDetailDto(item);
+            var response = new ApiResponse<NaceCodeItemDetailDto>(itemDto);
 
-            var item = new NaceCode
-            {
-                NaceCodeID = Guid.NewGuid(),
-                Status = StatusType.Nothing,
-                Created = DateTime.Now,
-                Updated = DateTime.Now,
-                UpdatedUser = naceCodeDto.UpdatedUser
-            };
-
-            db.NaceCodes.Add(item);
-
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            var response = new ApiResponse<NaceCode>(item);
             return Ok(response);
         } // PostNaceCode
 
         // PUT: api/NaceCodes/5
         [ResponseType(typeof(ApiResponse<NaceCode>))]
-        public async Task<IHttpActionResult> PutNaceCode(Guid id, [FromBody] NaceCodePutDto naceCodeDto)
+        public async Task<IHttpActionResult> PutNaceCode(Guid id, [FromBody] NaceCodePutDto itemEditDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (id != naceCodeDto.NaceCodeID) return BadRequest("ID mismatch");
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            var item = await db.NaceCodes.FindAsync(id);
+            if (id != itemEditDto.ID)
+                throw new BusinessException("ID mismatch");
 
-            // Validate if not exist a duplicate item with Sector, Division, Group and Class
+            var itemToEdit = NaceCodeMapping.ItemEditDtoToNaceCode(itemEditDto);
+            var item = await _naceCodeService.UpdateAsync(itemToEdit);
+            var itemDto = NaceCodeMapping.NaceCodeToItemDetailDto(item);
+            var response = new ApiResponse<NaceCodeItemDetailDto>(itemDto);
 
-            item.Sector = naceCodeDto.Sector;
-            item.Division = naceCodeDto.Division;
-            item.Group = naceCodeDto.Group;
-            item.Class = naceCodeDto.Class;
-            item.Description = naceCodeDto.Description;
-
-            item.Status = naceCodeDto.Status == StatusType.Nothing ? StatusType.Active : naceCodeDto.Status;
-            item.Updated = DateTime.Now;
-
-            db.Entry(item).State = EntityState.Modified;
-
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            var response = new ApiResponse<NaceCode>(item);
             return Ok(response);
         } // PutNaceCode
 
         // DELETE: api/NaceCodes/5
         [ResponseType(typeof(NaceCode))]
-        public async Task<IHttpActionResult> DeleteNaceCode(Guid id)
+        public async Task<IHttpActionResult> DeleteNaceCode(Guid id, [FromBody] NaceCodeDeleteDto itemDelDto)
         {
-            NaceCode naceCode = await db.NaceCodes.FindAsync(id);
-            if (naceCode == null)
-            {
-                return NotFound();
-            }
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            if (naceCode.Status == StatusType.Deleted)
-            {
-                db.NaceCodes.Remove(naceCode);
-            }
-            else
-            {
-                naceCode.Status = naceCode.Status == StatusType.Active ? StatusType.Inactive : StatusType.Deleted;
-                db.Entry(naceCode).State = EntityState.Modified;
-            }
+            if (id != itemDelDto.ID)
+                throw new BusinessException("ID mismatch");
 
-            await db.SaveChangesAsync();
+            var itemToDelete = NaceCodeMapping.ItemDeleteDtoToNaceCode(itemDelDto);
+            await _naceCodeService.DeleteAsync(itemToDelete);
+            var response = new ApiResponse<bool>(true);
 
-            var response = new ApiResponse<NaceCode>(naceCode);
             return Ok(response);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        // PRIVATED
-
-        private async Task<bool> NaceCodeExistsAsync(Guid id)
-        {
-            return await db.NaceCodes.AnyAsync(e => e.NaceCodeID == id);
-        }
-
-        private async Task DeleteTmpByUserAsync(string username)
-        {
-            var items = await db.NaceCodes
-                .Where(n => n.UpdatedUser == username && n.Status == StatusType.Nothing)
-                .ToListAsync();
-
-            foreach(var item in items)
-            {
-                db.Entry(item).State = EntityState.Deleted;
-            }
-            //await db.SaveChangesAsync();
-        }
+        } // DeleteNaceCode
     }
 }

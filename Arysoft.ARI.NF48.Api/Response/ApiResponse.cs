@@ -11,5 +11,9 @@ namespace Arysoft.ARI.NF48.Api.Response
         {
             Data = data;
         }
+
+        public ApiResponse()
+        {
+        }
     }
 }

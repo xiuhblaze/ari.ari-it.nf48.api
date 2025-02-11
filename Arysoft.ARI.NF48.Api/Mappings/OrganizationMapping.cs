@@ -1,0 +1,180 @@
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Arysoft.ARI.NF48.Api.Mappings
+{
+    public class OrganizationMapping
+    {
+        public static IEnumerable<OrganizationItemListDto> OrganizationToListDto(IEnumerable<Organization> items)
+        {
+            var itemsDto = new List<OrganizationItemListDto>();
+
+            foreach (var item in items)
+            {
+                itemsDto.Add(OrganizationToItemListDto(item));
+            }
+
+            return itemsDto;
+        } // OrganizationToListDto 
+
+        public static OrganizationItemListDto OrganizationToItemListDto(Organization item)
+        {
+            var mainContact = item.Contacts?
+                .Where(c => c.IsMainContact && c.Status == StatusType.Active)
+                .FirstOrDefault();
+            var mainSite = item.Sites?
+                .Where(s => s.IsMainSite)
+                .FirstOrDefault();
+
+            // Si no hay un contacto principal, pone el que sea
+            if (mainContact == null) mainContact = item.Contacts?
+                .Where(c => c.Status == StatusType.Active)
+                .FirstOrDefault();
+
+            var employeesCount = item.Sites != null
+                ? item.Sites
+                    .Where((Site i) => i.Status == StatusType.Active)
+                    .Sum((Site i) => i.Shifts
+                        .Where((Shift s) => s.Status == StatusType.Active)
+                        .Sum((Shift s) => s.NoEmployees)) ?? 0
+                : 0;
+
+            return new OrganizationItemListDto
+            {
+                ID = item.ID,
+                // OrganizationFamilyID = item.OrganizationFamilyID,
+                Folio = item.Folio,
+                Name = item.Name,
+                LogoFile = item.LogoFile,
+                Website = item.Website,
+                Phone = item.Phone,
+                ExtraInfo = item.ExtraInfo,
+                Status = item.Status,
+                Updated = item.Updated,
+                UpdatedUser = item.UpdatedUser,
+                CertificatesCount = item.Certificates != null
+                    ? item.Certificates.Where(i => i.Status != CertificateStatusType.Nothing).Count()
+                    : 0,
+                Companies = item.Companies != null
+                    ? CompanyMapping.CompanyToListDto(item.Companies
+                        .Where(c => c.Status != StatusType.Nothing))
+                    : null,
+                ContactsCount = item.Contacts != null 
+                    ? item.Contacts.Where(i => i.Status == StatusType.Active).Count() 
+                    : 0,
+                ContactName = mainContact != null  
+                    ? Tools.Strings.FullName(mainContact.FirstName, mainContact.MiddleName, mainContact.LastName)
+                    : string.Empty,
+                ContactEmail = mainContact != null 
+                    ? mainContact.Email 
+                    : string.Empty,
+                ContactPhone = mainContact != null
+                    ? mainContact.Phone 
+                    : string.Empty,
+                NotesCount = item.Notes != null 
+                    ? item.Notes.Count() 
+                    : 0,
+                SitesCount = item.Sites != null 
+                    ? item.Sites.Where(i => i.Status == StatusType.Active).Count() 
+                    : 0,
+                SiteDescription = mainSite != null 
+                    ? mainSite.Description 
+                    : string.Empty,
+                SiteLocation = mainSite != null 
+                    ? mainSite.Address 
+                    : string.Empty,
+                SiteLocationURL = mainSite != null
+                    ? mainSite.LocationURL
+                    : string.Empty,
+                SitesEmployeesCount = employeesCount,
+                Standards = item.OrganizationStandards != null
+                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                        .Where(os => os.Status != StatusType.Nothing))
+                    : null,                
+                CertificatesValidityStatus = item.CertificatesValidityStatus
+                    ?? CertificateValidityStatusType.Nothing
+            };
+        } // OrganizationToItemListDto
+
+        public static OrganizationItemDetailDto OrganizationToItemDetailDto(Organization item)
+        {
+            return new OrganizationItemDetailDto
+            {
+                ID = item.ID,
+                Folio = item.Folio,
+                Name = item.Name,
+                LogoFile = item.LogoFile,
+                Website = item.Website,
+                Phone = item.Phone,
+                ExtraInfo = item.ExtraInfo,
+                Status = item.Status,
+                Created = item.Created,
+                Updated = item.Updated,
+                UpdatedUser = item.UpdatedUser,
+                //Applications = item.Applications != null
+                //    ? ApplicationMapping.ApplicationsToListDto(item.Applications
+                //        .Where(i => i.Status != ApplicationStatusType.Nothing))
+                //    : new List<ApplicationItemListDto>(),
+                Certificates = item.Certificates != null
+                    ? CertificateMapping.CertificatesToListDto(item.Certificates
+                        .Where(i => i.Status != CertificateStatusType.Nothing))
+                    : new List<CertificateItemListDto>(),
+                Companies = item.Companies != null
+                    ? CompanyMapping.CompanyToListDto(item.Companies)
+                    : null,
+                Contacts = item.Contacts != null
+                    ? ContactMapping.ContactToListDto(item.Contacts
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : new List<ContactItemListDto>(),
+                Notes = item.Notes != null
+                    ? NoteMapping.NotesToListDto(item.Notes
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : new List<NoteItemDto>(),
+                Sites = item.Sites != null
+                    ? SiteMapping.SiteToListDto(item.Sites
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : new List<SiteItemListDto>(),
+                Standards = item.OrganizationStandards != null
+                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                        .Where(os => os.Status != StatusType.Nothing))
+                    : null,                
+                CertificatesValidityStatus = item.CertificatesValidityStatus
+                    ?? CertificateValidityStatusType.Nothing,
+            };
+        } // OrganizationToItemDetailDto
+
+        public static Organization ItemAddDtoToOrganization(OrganizationPostDto itemDto)
+        {
+            return new Organization
+            {
+                UpdatedUser = itemDto.UpdatedUser
+            };
+        } // ItemAddDtoToOrganization
+
+        public static Organization ItemEditDtoToOrganization(OrganizationPutDto itemDto)
+        {
+            return new Organization
+            {
+                ID = itemDto.ID,
+                Name = itemDto.Name,
+                Website = itemDto.Website,
+                Phone= itemDto.Phone,
+                ExtraInfo = itemDto.ExtraInfo,
+                Status = itemDto.Status,
+                UpdatedUser= itemDto.UpdatedUser
+            };
+        } // ItemEditDtoToOrganization
+
+        public static Organization ItemDeleteDtoToOrganization(OrganizationDeleteDto itemDto)
+        {
+            return new Organization
+            {
+                ID = itemDto.ID,
+                UpdatedUser = itemDto.UpdatedUser
+            };
+        } // ItemDeleteDtoToOrganization
+    }
+}

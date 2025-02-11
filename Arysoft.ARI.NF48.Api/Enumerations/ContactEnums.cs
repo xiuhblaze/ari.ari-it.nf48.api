@@ -2,12 +2,19 @@
 {
     public enum ContactOrderType
     {
-        Ninguno,
+        Nothing,
         FirstName,
-        LastName,
+        IsMainContact,
         Updated,
         FirstNameDesc,
-        LastNameDesc,
+        IsMainContactDesc,
         UpdatedDesc
+    }
+
+    public enum ContactIsMainType
+    {
+        Nothing,
+        IsMain,
+        IsNotMain
     }
 }
