@@ -36,7 +36,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
-            modelBuilder.Entity<Audit>() // Ver si jala esto
+            modelBuilder.Entity<Audit>() // Ver si jala esto - si jala jajaja
                 .HasMany(a => a.Notes)
                 .WithOptional()
                 .HasForeignKey(n => n.OwnerID);

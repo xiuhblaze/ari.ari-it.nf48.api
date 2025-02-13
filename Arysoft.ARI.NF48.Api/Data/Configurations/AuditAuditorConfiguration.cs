@@ -21,7 +21,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<AuditAuditor>()
                 .Property(m => m.Comments)
-                .HasMaxLength(50);
+                .HasMaxLength(500);
 
             modelBuilder.Entity<AuditAuditor>()
                 .Property(m => m.Status)

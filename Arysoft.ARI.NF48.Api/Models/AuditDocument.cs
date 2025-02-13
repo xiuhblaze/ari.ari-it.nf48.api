@@ -17,6 +17,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string OtherDescription { get; set; }
 
+        public bool? IsWitnessIncluded { get; set; }
+
         // RELATIONS
 
         public virtual Audit Audit { get; set; }

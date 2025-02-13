@@ -16,6 +16,14 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnName("AuditCycleID");
 
             modelBuilder.Entity<AuditCycle>()
+                .Property(m => m.Name)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<AuditCycle>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AuditCycle>()
                 .Property(m => m.Status)
                 .IsRequired();
 

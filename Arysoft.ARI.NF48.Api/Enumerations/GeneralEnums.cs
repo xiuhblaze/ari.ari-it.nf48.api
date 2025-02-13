@@ -23,4 +23,11 @@
         Spanish,
         Other
     }
+
+    public enum BoolType
+    { 
+        Nothing,
+        True,
+        False
+    }
 }

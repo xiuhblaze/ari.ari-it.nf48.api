@@ -11,6 +11,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public AuditStepType? Step { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         // RELATIONS
 
         public virtual Audit Audit { get; set; }

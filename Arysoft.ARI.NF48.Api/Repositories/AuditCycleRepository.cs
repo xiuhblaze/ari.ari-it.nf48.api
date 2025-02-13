@@ -1,7 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -31,8 +30,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             }
         } // SetInactiveByOrganizationID
 
-        // Validar que no exista un ciclo activo entre dos fechas
-
+        /// <summary>
+        /// Validar que no exista un ciclo entre dos fechas
+        /// </summary>
+        /// <param name="organizationID"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         public async Task<bool> IsAnyCycleBetweenDatesByOrganizationAsync(
             Guid organizationID, 
             DateTime startDate,

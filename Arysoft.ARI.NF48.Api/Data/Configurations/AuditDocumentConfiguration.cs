@@ -20,6 +20,18 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<AuditDocument>()
+                .Property(m => m.Filename)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<AuditDocument>()
+                .Property(m => m.Comments)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<AuditDocument>()
+                .Property(m => m.OtherDescription)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<AuditDocument>()
                 .Property(m => m.Status)
                 .IsRequired();
 

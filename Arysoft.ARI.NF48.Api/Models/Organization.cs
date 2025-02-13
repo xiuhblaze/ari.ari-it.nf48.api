@@ -23,7 +23,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<Application> Applications { get; set; }
 
-        // public virtual ICollection<AuditCycle> AuditCycles { get; set; }
+        public virtual ICollection<AuditCycle> AuditCycles { get; set; }
 
         public virtual ICollection<Certificate> Certificates { get; set; }
 

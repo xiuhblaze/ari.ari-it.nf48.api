@@ -124,11 +124,16 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // TODO: Esto se debe de validar al integrar un standard, puede haber más de un
             //       ciclo activo por organización pero con diferente standard
+            // ACTUALIZACION (xb-20250212): Al parecer solo puede haber un ciclo activo por organización, un standard nuevo se agregaria al ciclo
             // - Validar que las fechas de inicio y termino no se superpongan a otro
             //if (await _repository.IsAnyCycleBetweenDatesByOrganizationAsync(item.OrganizationID, (DateTime)item.StartDate, (DateTime)item.EndDate))
             //{
             //    throw new BusinessException("There is already an audit cycle between the dates provided");
             //}
+
+            // - StartDate not must be greater than EndDate
+            if (item.StartDate > item.EndDate)
+                throw new BusinessException("The start date must be less than the end date");
 
             // Assigning values
 
@@ -142,9 +147,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("There is a other active cycle with the same standard");
             }
 
+            foundItem.Name = item.Name;
             foundItem.StartDate = item.StartDate;
-            foundItem.EndDate = item.EndDate;
-            foundItem.Updated = DateTime.UtcNow;
+            foundItem.EndDate = item.EndDate;            
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;

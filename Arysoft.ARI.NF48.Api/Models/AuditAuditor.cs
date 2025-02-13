@@ -10,6 +10,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public bool? IsLeader { get; set; } // Para saber si es el auditor lider de la auditoria
 
+        public bool? IsWitness { get; set; }
+
         public string Comments { get; set; }
 
         // RELATIONS
