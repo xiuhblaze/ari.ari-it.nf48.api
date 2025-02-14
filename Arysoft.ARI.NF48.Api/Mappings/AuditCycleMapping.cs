@@ -25,6 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditCycleItemListDto
             {
                 ID = item.ID,
+                OrganizationID = item.OrganizationID,
                 Name = item.Name,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,

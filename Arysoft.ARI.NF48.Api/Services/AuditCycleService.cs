@@ -29,6 +29,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Filters
 
+            if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
+            {
+                items = items.Where(e => e.OrganizationID == filters.OrganizationID);
+            }   
+
             if (filters.StartDate != null)
             {
                 items = items.Where(e => e.StartDate >= filters.StartDate);

@@ -11,7 +11,6 @@
         CDC,            // Certification decision checklist - TODO: Ver si se va a quedar aquí
         Certificate,
         Survey,
-        Viaticos,
         Other
     } // AuditCycleDocumentType
 

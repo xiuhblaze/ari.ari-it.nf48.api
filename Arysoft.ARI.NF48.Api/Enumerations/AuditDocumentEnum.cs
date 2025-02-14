@@ -13,6 +13,7 @@
         FsscIntegrityLetter,    // Solo para FSSC
         FsscAuditPlanSigned,    // Solo para FSSC
         FsscScreenShot,         // Solo para FSSC
+        TravelExpenses,         // Viaticos
         Other
     } // AuditDocumentType
 
