@@ -24,6 +24,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditCycleStandardItemListDto
             {
                 ID = item.ID,
+                AuditCycleID = item.AuditCycleID,
+                StandardID = item.StandardID ?? Guid.Empty,
                 InitialStep = item.InitialStep,
                 CycleType = item.CycleType,
                 Status = item.Status,

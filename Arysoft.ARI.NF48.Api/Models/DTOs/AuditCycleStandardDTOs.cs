@@ -8,6 +8,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public Guid AuditCycleID { get; set; }
+
+        public Guid StandardID { get; set; }
+
         public AuditStepType? InitialStep { get; set; }
 
         public AuditCycleType? CycleType { get; set; }

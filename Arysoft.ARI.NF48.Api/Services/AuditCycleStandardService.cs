@@ -146,7 +146,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.StandardID = item.StandardID;
             foundItem.InitialStep = item.InitialStep;
             foundItem.CycleType = item.CycleType;
-            foundItem.Status = item.Status;
+            foundItem.Status = foundItem.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
