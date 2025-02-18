@@ -116,6 +116,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
                 throw new BusinessException("Must first assign an audit cycle");
 
+            // - Validar que el ciclo sea el activo o sea en el futuro
+
             // Assigning values
 
             item.ID = Guid.NewGuid();
@@ -155,6 +157,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Description = item.Description;
             foundItem.StartDate = item.StartDate;
             foundItem.EndDate = item.EndDate;
+            foundItem.HasWitness = item.HasWitness;
             foundItem.Status = foundItem.Status == AuditStatusType.Nothing
                 ? AuditStatusType.Scheduled
                 : item.Status;

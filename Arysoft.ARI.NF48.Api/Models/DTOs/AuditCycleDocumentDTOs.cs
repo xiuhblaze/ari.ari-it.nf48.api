@@ -73,8 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid ID { get; set; }
 
-        [Required]
-        public Guid StandardID { get; set; }
+        public Guid? StandardID { get; set; }
 
         [StringLength(10)]
         public string Version { get; set; }
