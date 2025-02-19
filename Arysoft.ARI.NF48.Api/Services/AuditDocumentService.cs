@@ -110,7 +110,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             item.ID = Guid.NewGuid();
-            item.Status = StatusType.Active;
+            item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
