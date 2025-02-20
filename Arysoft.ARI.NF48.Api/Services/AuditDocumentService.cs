@@ -137,16 +137,18 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            // - Si es la primera vez, debe de traer el StandardID
-            if (foundItem.Status == StatusType.Nothing)
-            { 
-                if (item.StandardID == null || item.StandardID == Guid.Empty)
-                    throw new BusinessException("Must first assign a standard");
+            // - Si es la primera vez, debe de traer el StandardID - Debe de aceptar 
+            //if (foundItem.Status == StatusType.Nothing)
+            //{ 
+            //    if (item.StandardID == null || item.StandardID == Guid.Empty)
+            //        throw new BusinessException("Must first assign a standard");
 
-                // - El Standard debe de coincidir con el alguno de la auditoria
+            //    // - El Standard debe de coincidir con el alguno de la auditoria
 
-                foundItem.StandardID = item.StandardID;
-            }
+            //    foundItem.StandardID = item.StandardID;
+            //}
+            if (item.DocumentType == AuditDocumentType.Nothing)
+                throw new BusinessException("Must provide a document type");
 
             if (item.DocumentType == AuditDocumentType.Other)
             {
@@ -162,6 +164,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status == StatusType.Nothing)
                 item.Status = StatusType.Active;
 
+            foundItem.StandardID = item.StandardID;
             foundItem.Filename = item.Filename;
             foundItem.Comments = item.Comments;
             foundItem.DocumentType = item.DocumentType;

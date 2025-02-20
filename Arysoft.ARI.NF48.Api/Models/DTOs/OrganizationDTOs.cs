@@ -101,9 +101,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public IEnumerable<CompanyItemListDto> Companies { get; set; }
-
         public IEnumerable<ApplicationItemListDto> Applications { get; set; }
+
+        //public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
+
+        public IEnumerable<CompanyItemListDto> Companies { get; set; }
 
         public IEnumerable<CertificateItemListDto> Certificates { get; set; }
 

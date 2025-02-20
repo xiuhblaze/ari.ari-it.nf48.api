@@ -97,6 +97,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.OrganizationID == Guid.Empty)
                 throw new BusinessException("Organization is required");
 
+            // - Validar que la organizacion exista
+            // - Validar que el standard exista
+            // - Validar que el standard pertenezca a la organizacion
+            // - Validar que la organización tenga un status de activo
+            // - Validar que el standard tenga un status de activo
+            // - Validar que el usuario exista (no hay que confiarse)
+            // - TODO: Consultar que otro requisito necesita la organización para poder crear un ciclo
+
             // Assigning values
 
             item.ID = Guid.NewGuid();

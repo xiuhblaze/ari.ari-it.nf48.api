@@ -169,8 +169,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             try
-            {
-                await _repository.DeleteTmpByUserAsync(foundItem.UpdatedUser);
+            {   
                 _repository.Update(foundItem);
                 await _repository.SaveChangesAsync(); // Async para esperar aquí a ver si sucede un error
             }

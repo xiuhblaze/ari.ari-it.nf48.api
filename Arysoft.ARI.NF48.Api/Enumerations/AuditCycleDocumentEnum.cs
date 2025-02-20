@@ -8,7 +8,6 @@
         Proposal,
         Contract,
         AuditProgramme, // Confirmation letter
-        CDC,            // Certification decision checklist - TODO: Ver si se va a quedar aquí
         Certificate,
         Survey,
         Other
