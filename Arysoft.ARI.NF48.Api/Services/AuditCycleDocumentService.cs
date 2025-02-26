@@ -151,16 +151,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            if (item.Status == StatusType.Nothing)
-                item.Status = StatusType.Active;
-
             foundItem.StandardID = item.StandardID;
             foundItem.Filename = item.Filename;
             foundItem.Version = item.Version;
             foundItem.DocumentType = item.DocumentType;
             foundItem.Comments = item.Comments;
             foundItem.OtherDescription = item.OtherDescription;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;

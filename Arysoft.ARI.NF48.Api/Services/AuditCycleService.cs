@@ -139,6 +139,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             //       ciclo activo por organización pero con diferente standard
             // ACTUALIZACION (xb-20250212): Al parecer solo puede haber un ciclo activo por organización, un standard nuevo se agregaria al ciclo
             // - Validar que las fechas de inicio y termino no se superpongan a otro
+            // ACTUALIZACION (xb-20250225): Nop puede haber más de un ciclo activo por organización, pero no con el mismo standard
             //if (await _repository.IsAnyCycleBetweenDatesByOrganizationAsync(item.OrganizationID, (DateTime)item.StartDate, (DateTime)item.EndDate))
             //{
             //    throw new BusinessException("There is already an audit cycle between the dates provided");
@@ -156,7 +157,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // con el mismo standard
             if (item.Status == StatusType.Active && foundItem.Status != StatusType.Active)
             {
-                if (await _repository.IsAnyCycleActiveByOrganizationAndStandardAsync(item.OrganizationID, foundItem.AuditCycleStandards))
+                if (_repository.IsAnyCycleActiveByOrganizationAndStandard(foundItem.OrganizationID, foundItem.AuditCycleStandards, foundItem.ID))
                     throw new BusinessException("There is a other active cycle with the same standard");
             }
 

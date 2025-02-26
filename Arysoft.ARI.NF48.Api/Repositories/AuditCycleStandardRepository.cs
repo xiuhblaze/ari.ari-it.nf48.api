@@ -35,7 +35,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return await items.AnyAsync();
         } // IsStandardInCycleAsync
 
-        public async Task<bool> IsStandardInAnyOrganizationActiveCycleAsync(
+        public async Task<bool> IsStandardActiveInOrganizationAnyAuditCycleAsync(
             Guid organizationID,
             Guid standardID,
             Guid? exceptionAuditCycleID
@@ -44,6 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var items = _model
                 .Where(m => 
                     m.AuditCycle.OrganizationID == organizationID
+                    && m.AuditCycle.Status == StatusType.Active
                     && m.StandardID == standardID
                     && m.Status == StatusType.Active
                 );

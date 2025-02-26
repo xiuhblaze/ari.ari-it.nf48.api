@@ -69,16 +69,49 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 );
         }
 
-        public async Task<bool> IsAnyCycleActiveByOrganizationAndStandardAsync(
+        //public async Task<bool> IsAnyCycleActiveByOrganizationAndStandardAsync(
+        //    Guid organizationID,
+        //    ICollection<AuditCycleStandard> standards,
+        //    Guid? exceptionID
+        //)
+        //{
+        //    return await _model
+        //        .AnyAsync(m => m.OrganizationID == organizationID
+        //            && m.AuditCycleStandards.Any(acs => standards.Where(s => s.StandardID == acs.StandardID).Any())
+        //            && m.Status == StatusType.Active
+        //        );
+        //}
+
+        public bool IsAnyCycleActiveByOrganizationAndStandard(
             Guid organizationID,
-            ICollection<AuditCycleStandard> standards
+            ICollection<AuditCycleStandard> standards,
+            Guid? exceptionID
         )
         {
-            return await _model
-                .AnyAsync(m => m.OrganizationID == organizationID
-                    && m.AuditCycleStandards.Any(acs => standards.Where(s => s.StandardID == acs.StandardID).Any())
-                    && m.Status == StatusType.Active
-                );
+            var auditCycles = _model
+                .Where(m => m.OrganizationID == organizationID
+                    && m.Status == StatusType.Active);
+
+            if (exceptionID != null && exceptionID != Guid.Empty)
+            {
+                auditCycles = auditCycles.Where(m => m.ID != exceptionID);
+            }
+
+            foreach (var ac in auditCycles)
+            {
+                foreach (var acs in ac.AuditCycleStandards.Where(acs => acs.Status == StatusType.Active))
+                {
+                    foreach (var s in standards)
+                    {
+                        if (s.StandardID == acs.StandardID)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
