@@ -170,7 +170,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.DocumentType = item.DocumentType;
             foundItem.OtherDescription = item.OtherDescription;
             foundItem.IsWitnessIncluded = item.IsWitnessIncluded;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;

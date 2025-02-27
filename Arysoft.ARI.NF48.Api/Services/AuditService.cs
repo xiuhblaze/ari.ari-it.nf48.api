@@ -151,14 +151,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            if (item.Status == AuditStatusType.Nothing)
-                item.Status = AuditStatusType.Scheduled;
+            //if (item.Status == AuditStatusType.Nothing)
+            //    item.Status = AuditStatusType.Scheduled;
 
             foundItem.Description = item.Description;
             foundItem.StartDate = item.StartDate;
             foundItem.EndDate = item.EndDate;
             foundItem.HasWitness = item.HasWitness;
-            foundItem.Status = foundItem.Status == AuditStatusType.Nothing
+            foundItem.Status = item.Status == AuditStatusType.Nothing
                 ? AuditStatusType.Scheduled
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;
