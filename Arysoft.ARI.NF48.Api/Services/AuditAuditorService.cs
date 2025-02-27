@@ -187,6 +187,20 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateAsync
 
+        public async Task AddAuditStandardAsync(Guid id, Guid auditStandardID)
+        {
+            await _repository.AddAuditStandardAsync(id, auditStandardID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditAuditorService.AddAuditStandardAsync: {ex.Message}");
+            }
+        } // AddAuditStandardAsync
+
         public async Task DeleteAsync(AuditAuditor item)
         {
             var foundItem = await _repository.GetAsync(item.ID)

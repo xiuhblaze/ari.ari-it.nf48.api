@@ -82,6 +82,23 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PostAuditDocument
 
+        [HttpPost]
+        [Route("api/AuditDocuments/{id}/add-audit-standard")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> AddAuditStandard(Guid id, [FromBody] AuditDocumentAddAuditStandardDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AuditDocumentID)
+                throw new BusinessException("ID mismatch");
+
+            await _service.AddAuditStandardAsync(itemDto.AuditDocumentID, itemDto.AuditStandardID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // AddAuditStandard
+
         [HttpPut]
         [ResponseType(typeof(ApiResponse<AuditDocumentItemDetailDto>))]
         public async Task<IHttpActionResult> PutAuditDocument()

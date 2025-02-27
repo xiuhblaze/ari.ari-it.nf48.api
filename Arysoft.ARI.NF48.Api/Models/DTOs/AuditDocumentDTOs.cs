@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -10,7 +11,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid AuditID { get; set; }
 
-        public Guid? StandardID { get; set; }
+        // public Guid? StandardID { get; set; }
 
         public string Filename { get; set; }
 
@@ -19,6 +20,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditDocumentType? DocumentType { get; set; }
 
         public string OtherDescription { get; set; }
+
+        public string UploadedBy { get; set; }
 
         public bool? IsWitnessIncluded { get; set; }
 
@@ -28,7 +31,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string AuditDescription { get; set; }
 
-        public string StandardName { get; set; }
+        // public string StandardName { get; set; }
+
+        public IEnumerable<string> StandardsNames { get; set; }
+
     } // AuditDocumentItemListDto
 
     public class AuditDocumentItemDetailDto
@@ -37,7 +43,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid AuditID { get; set; }
 
-        public Guid? StandardID { get; set; }
+        // public Guid? StandardID { get; set; }
 
         public string Filename { get; set; }
 
@@ -46,6 +52,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditDocumentType? DocumentType { get; set; }
 
         public string OtherDescription { get; set; }
+
+        public string UploadedBy { get; set; }
 
         public bool? IsWitnessIncluded { get; set; }
 
@@ -61,7 +69,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public AuditItemListDto Audit { get; set; }
 
-        public StandardItemListDto Standard { get; set; }
+        // public StandardItemListDto Standard { get; set; }
+
+        public IEnumerable<AuditStandardItemListDto> AuditStandards { get; set; }
     } // AuditDocumentItemDetailDto
 
     public class AuditDocumentPostDto
@@ -73,6 +83,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // AuditDocumentPostDto
+
+    public class AuditDocumentAddAuditStandardDto
+    {
+        [Required]
+        public Guid AuditDocumentID { get; set; }
+
+        [Required]
+        public Guid AuditStandardID { get; set; }        
+    } // AuditDocumentAddAuditStandardDto
 
     public class AuditDocumentPutDto
     {
@@ -89,6 +108,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(100)]
         public string OtherDescription { get; set; }
+
+        [StringLength(50)]
+        public string UploadedBy { get; set; }
 
         public bool? IsWitnessIncluded { get; set; }
 

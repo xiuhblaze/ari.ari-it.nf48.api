@@ -19,6 +19,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string OtherDescription { get; set; }
 
+        public string UploadedBy { get; set; }
+
         // RELATIONS
 
         public virtual AuditCycle AuditCycle { get; set; }

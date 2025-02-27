@@ -73,15 +73,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case AuditDocumentOrderType.DocumentType:
                     items = items.OrderBy(e => e.DocumentType);
                     break;
-                case AuditDocumentOrderType.Standard:
-                    items = items.OrderBy(e => e.Standard.Name);
-                    break;
+                //case AuditDocumentOrderType.Standard:
+                //    items = items.OrderBy(e => e.Standard.Name);
+                //    break;
                 case AuditDocumentOrderType.DocumentTypeDesc:
                     items = items.OrderByDescending(e => e.DocumentType);
                     break;
-                case AuditDocumentOrderType.StandardDesc:
-                    items = items.OrderByDescending(e => e.Standard.Name);
-                    break;
+                //case AuditDocumentOrderType.StandardDesc:
+                //    items = items.OrderByDescending(e => e.Standard.Name);
+                //    break;
                 default:
                     items = items.OrderBy(e => e.DocumentType);
                     break;
@@ -169,6 +169,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Comments = item.Comments;
             foundItem.DocumentType = item.DocumentType;
             foundItem.OtherDescription = item.OtherDescription;
+            foundItem.UploadedBy = item.UploadedBy;
             foundItem.IsWitnessIncluded = item.IsWitnessIncluded;
             foundItem.Status = item.Status == StatusType.Nothing
                 ? StatusType.Active
@@ -190,6 +191,22 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
+
+        public async Task AddAuditStandardAsync(Guid id, Guid auditStandardID)
+        {
+            // Validar que el AuditStandard y el AuditDocument, sean del mismo Audit
+
+            await _repository.AddAuditStandardAsync(id, auditStandardID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditDocumentService.AddAuditStandardAsync: {ex.Message}");
+            }
+        } // AddAuditStandardAsync
 
         public async Task DeleteAsync(AuditDocument item)
         {

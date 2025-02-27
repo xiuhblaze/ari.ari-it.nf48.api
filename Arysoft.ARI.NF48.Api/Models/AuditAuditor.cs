@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -19,5 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual Audit Audit { get; set; }
 
         public virtual Auditor Auditor { get; set; }
+
+        public virtual ICollection<AuditStandard> AuditStandards { get; set; }
     }
 }

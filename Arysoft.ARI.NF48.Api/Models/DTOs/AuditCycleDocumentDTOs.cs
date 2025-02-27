@@ -18,6 +18,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string OtherDescription { get; set; }
 
+        public string UploadedBy { get; set; }
+
         public StatusType Status { get; set; }
 
         // RELATIONS
@@ -42,6 +44,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditCycleDocumentType DocumentType { get; set; }
 
         public string OtherDescription { get; set; }
+
+        public string UploadedBy { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -86,6 +90,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(100)]
         public string OtherDescription { get; set; }
+
+        [StringLength(50)]
+        public string UploadedBy { get; set; }
 
         [Required]
         public StatusType Status { get; set; }
