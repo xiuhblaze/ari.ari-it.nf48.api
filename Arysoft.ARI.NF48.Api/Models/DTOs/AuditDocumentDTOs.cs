@@ -84,14 +84,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
     } // AuditDocumentPostDto
 
-    public class AuditDocumentAddAuditStandardDto
+    public class AuditDocumentEditAuditStandardDto
     {
         [Required]
         public Guid AuditDocumentID { get; set; }
 
         [Required]
         public Guid AuditStandardID { get; set; }        
-    } // AuditDocumentAddAuditStandardDto
+    } // AuditDocumentAuditStandardDto
 
     public class AuditDocumentPutDto
     {

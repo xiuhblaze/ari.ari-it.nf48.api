@@ -162,7 +162,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             if (item.Status == StatusType.Nothing)
+            {
                 item.Status = StatusType.Active;
+            }
 
             foundItem.StandardID = item.StandardID;
             foundItem.Filename = item.Filename;
@@ -191,22 +193,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
-
-        public async Task AddAuditStandardAsync(Guid id, Guid auditStandardID)
-        {
-            // Validar que el AuditStandard y el AuditDocument, sean del mismo Audit
-
-            await _repository.AddAuditStandardAsync(id, auditStandardID);
-
-            try
-            {
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"AuditDocumentService.AddAuditStandardAsync: {ex.Message}");
-            }
-        } // AddAuditStandardAsync
 
         public async Task DeleteAsync(AuditDocument item)
         {
@@ -238,6 +224,38 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 throw new BusinessException($"AuditDocumentService.DeleteAsync: {ex.Message}");
             }
-        }
+        } // DeleteAsync
+
+        // AUDIT STANDARDS
+
+        public async Task AddAuditStandardAsync(Guid id, Guid auditStandardID)
+        {
+            // Validar que el AuditStandard y el AuditDocument, sean del mismo Audit
+
+            await _repository.AddAuditStandardAsync(id, auditStandardID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditDocumentService.AddAuditStandardAsync: {ex.Message}");
+            }
+        } // AddAuditStandardAsync
+
+        public async Task DelAuditStandardAsync(Guid id, Guid auditStandardID)
+        {
+            await _repository.DelAuditStandardAsync(id, auditStandardID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditDocumentService.DelAuditStandardAsync: {ex.Message}");
+            }
+        } // DelAuditStandardAsync
     }
 }

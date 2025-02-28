@@ -8,9 +8,6 @@ using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -97,23 +94,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutAuditAuditor
 
-        [HttpPost]
-        [Route("api/AuditAuditors/{id}/add-audit-standard")]
-        [ResponseType(typeof(ApiResponse<bool>))]
-        public async Task<IHttpActionResult> AddAuditStandard(Guid id, [FromBody] AuditAuditorAddAuditStandardDto itemDto)
-        {
-            if (!ModelState.IsValid)
-                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
-
-            if (id != itemDto.AuditAuditorID)
-                throw new BusinessException("ID mismatch");
-
-            await _service.AddAuditStandardAsync(itemDto.AuditAuditorID, itemDto.AuditStandardID);
-            var response = new ApiResponse<bool>(true);
-            
-            return Ok(response);
-        } // AddAuditStandard
-
         [HttpDelete]
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteAuditAuditor(Guid id, [FromBody] AuditAuditorDeleteDto itemDelDto)
@@ -130,5 +110,40 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // DeleteAuditAuditor
+
+        // AUDIT STANDARDS
+
+        [HttpPost]
+        [Route("api/AuditAuditors/{id}/audit-standard")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> AddAuditStandard(Guid id, [FromBody] AuditAuditorEditAuditStandardDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AuditAuditorID)
+                throw new BusinessException("ID mismatch");
+
+            await _service.AddAuditStandardAsync(itemDto.AuditAuditorID, itemDto.AuditStandardID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // AddAuditStandard
+
+        [HttpDelete]
+        [Route("api/AuditAuditors/{id}/audit-standard")]
+        public async Task<IHttpActionResult> DelAuditStandard(Guid id, [FromBody] AuditAuditorEditAuditStandardDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AuditAuditorID)
+                throw new BusinessException("ID mismatch");
+
+            await _service.DelAuditStandardAsync(itemDto.AuditAuditorID, itemDto.AuditStandardID);
+            var response = new ApiResponse<bool>(true);
+            
+            return Ok(response);
+        } // DelAuditStandard
     }
 }

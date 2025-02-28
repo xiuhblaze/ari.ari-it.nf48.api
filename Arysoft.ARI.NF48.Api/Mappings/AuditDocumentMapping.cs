@@ -59,6 +59,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Comments = item.Comments,
                 DocumentType = item.DocumentType,
                 OtherDescription = item.OtherDescription,
+                UploadedBy = item.UploadedBy,
                 IsWitnessIncluded = item.IsWitnessIncluded,
                 Status = item.Status,
                 Created = item.Created,
