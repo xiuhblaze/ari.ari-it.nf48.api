@@ -166,7 +166,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.Status = StatusType.Active;
             }
 
-            foundItem.StandardID = item.StandardID;
+            //foundItem.StandardID = item.StandardID;
             foundItem.Filename = item.Filename;
             foundItem.Comments = item.Comments;
             foundItem.DocumentType = item.DocumentType;
