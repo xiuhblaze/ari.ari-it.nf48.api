@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -128,6 +129,17 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             try {
+
+                // Borrando carpetas de registros temporales
+                var items = _repository.Gets()
+                    .Where(e => e.UpdatedUser.ToUpper() == item.UpdatedUser.ToUpper().Trim()
+                        && e.Status == AuditStatusType.Nothing);
+
+                foreach (var i in items)
+                { 
+                    FileRepository.DeleteDirectory($"~/files/organizations/{i.AuditCycle.OrganizationID}/Cycles/{i.AuditCycle.ID}/{i.ID}");
+                }
+
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();

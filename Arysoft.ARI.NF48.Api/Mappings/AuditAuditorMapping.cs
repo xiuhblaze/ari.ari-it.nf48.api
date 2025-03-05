@@ -1,12 +1,8 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Security.Policy;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {

@@ -7,7 +7,6 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -66,6 +65,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             else
             {
+                // Un listado general omitiendo los registros de tipo Applicant
+                items = items.Where(e => e.Status != OrganizationStatusType.Applicant);
+
                 if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
                 items = (bool)filters.IncludeDeleted
                     ? items.Where(e => e.Status != OrganizationStatusType.Nothing)
@@ -224,7 +226,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // foundItem.COID = item.COID;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status == OrganizationStatusType.Nothing 
-                ? OrganizationStatusType.Prospect 
+                ? OrganizationStatusType.Applicant 
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;

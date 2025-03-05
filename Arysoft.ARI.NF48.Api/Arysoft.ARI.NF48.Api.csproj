@@ -244,6 +244,7 @@
     <Compile Include="Controllers\CompaniesController.cs" />
     <Compile Include="Controllers\DayCalculationConceptApplicationsController.cs" />
     <Compile Include="Controllers\DayCalculationConceptsController.cs" />
+    <Compile Include="Controllers\DisclaimerController.cs" />
     <Compile Include="Controllers\FSSCActivitiesController.cs" />
     <Compile Include="Controllers\FSSCAuditExperiencesController.cs" />
     <Compile Include="Controllers\FSSCAuditorActivitiesController.cs" />
@@ -601,6 +602,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Disclaimer\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
