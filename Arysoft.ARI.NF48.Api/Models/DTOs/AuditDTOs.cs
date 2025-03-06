@@ -23,9 +23,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
+        public string OrganizationName { get; set; }
+
         public string AuditCycleName { get; set; }
 
         public int AuditorsCount { get; set; }
+
+        public IEnumerable<AuditAuditorItemListDto> Auditors { get; set; }
 
         public IEnumerable<AuditStandardItemListDto> Standards { get; set; }
 

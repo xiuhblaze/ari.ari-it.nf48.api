@@ -45,12 +45,41 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Where(e => e.AuditCycleID == filters.AuditCycleID);
             }
 
+            if (filters.AuditorID != null && filters.AuditorID != Guid.Empty)
+            {
+                items = items
+                    .Where(e => e.AuditAuditors != null && e.AuditAuditors
+                        .Where(aa => aa.AuditorID == filters.AuditorID)
+                        .Any()
+                    );
+            }
+
+            if (filters.StandardID != null && filters.StandardID != Guid.Empty)
+            {
+                items = items
+                    .Where(e => e.AuditStandards != null && e.AuditStandards
+                        .Where(ads => ads.StandardID == filters.StandardID)
+                        .Any()
+                    );
+            }
+
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items
                     .Where(e =>
                         (e.Description != null && e.Description.ToLower().Contains(filters.Text))
+                        || (e.AuditAuditors != null && e.AuditAuditors
+                            .Where(aa => 
+                                (aa.Auditor.FirstName != null && aa.Auditor.FirstName.ToLower().Contains(filters.Text))
+                                || (aa.Auditor.MiddleName != null && aa.Auditor.MiddleName.ToLower().Contains(filters.Text))
+                                || (aa.Auditor.LastName != null && aa.Auditor.LastName.ToLower().Contains(filters.Text))
+                            ).Any())
+                        || (e.AuditStandards != null && e.AuditStandards
+                            .Where(ads => 
+                                (ads.Standard.Name != null && ads.Standard.Name.ToLower().Contains(filters.Text))
+                                || (ads.Standard.Description != null && ads.Standard.Description.ToLower().Contains(filters.Text))
+                            ).Any())
                     );
             }
 
@@ -117,7 +146,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
                 throw new BusinessException("Must first assign an audit cycle");
 
+            var _auditCycleRepository = new AuditCycleRepository();
+            var auditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID)
+                ?? throw new BusinessException("The audit cycle associated is not found");
+
             // - Validar que el ciclo sea el activo o sea en el futuro
+
+            // - Validar que se tenga la documentación del ciclo hasta Audit Programme
+            CheckMinimalAuditCycleDocumentation(auditCycle);
 
             // Assigning values
 
@@ -220,5 +256,58 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // PRIVATE
+
+        private void CheckMinimalAuditCycleDocumentation(AuditCycle auditCycle)
+        {
+            if (auditCycle.AuditCycleDocuments == null || auditCycle.AuditCycleDocuments.Count == 0)
+                throw new BusinessException("The audit cycle don't have any document");
+
+            bool haveAppForm = false;
+            bool haveADC = false;
+            bool haveProposal = false;
+            bool haveContract = false;
+            bool haveAuditProgramme = false;
+
+            haveAppForm = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.AppForm
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveADC = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.ADC
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveProposal = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Proposal
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveContract = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Contract
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveAuditProgramme = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.AuditProgramme
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            if (!haveAppForm 
+                || !haveADC 
+                || !haveProposal 
+                || !haveContract 
+                || !haveAuditProgramme
+            )
+                throw new BusinessException("Must have at last a App form, an ADC, a Proposal, a Contract and a Confirmation Letter active document");
+
+        } // CheckMinimalAuditCycleDocumentation
     }
 }
