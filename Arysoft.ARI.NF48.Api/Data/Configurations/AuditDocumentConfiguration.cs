@@ -32,6 +32,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(100);
 
             modelBuilder.Entity<AuditDocument>()
+                .Property(m => m.UploadedBy)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<AuditDocument>()
                 .Property(m => m.Status)
                 .IsRequired();
 
@@ -47,6 +51,15 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            // RELATIONS
+
+            modelBuilder.Entity<AuditDocument>()
+                .HasMany(ad => ad.AuditStandards)
+                .WithMany(asd => asd.AuditDocuments)
+                .Map(e => e.MapLeftKey("AuditDocumentID")
+                    .MapRightKey("AuditStandardID")
+                    .ToTable("AuditDocumentsStandards"));
         }
     }
 }

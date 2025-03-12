@@ -7,7 +7,6 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -66,6 +65,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             else
             {
+                // Un listado general omitiendo los registros de tipo Applicant
+                items = items.Where(e => e.Status != OrganizationStatusType.Applicant);
+
                 if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
                 items = (bool)filters.IncludeDeleted
                     ? items.Where(e => e.Status != OrganizationStatusType.Nothing)
@@ -211,20 +213,24 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (foundItem.Status < OrganizationStatusType.Active 
                 && item.Status == OrganizationStatusType.Active
                 && foundItem.Folio == null)
-            {   
+            {
+                // Validar si tiene la documentación minima
+                //if (!HasMinimalDocumentation(foundItem))
+                //    throw new BusinessException("The applicant does not have the minimum required documentation");
+
+                // CheckMinimalDocumentation(foundItem); // xBlaze 20250312: Deshabilitado hasta que se suba información pasada
+
+                // Generando folio
                 foundItem.Folio = await _organizationRepository.GetNextFolioAsync();
             }
 
             foundItem.Name = item.Name;
-            // foundItem.LegalEntity = item.LegalEntity;
             foundItem.LogoFile = item.LogoFile;
-            // foundItem.QRFile = item.QRFile;
             foundItem.Website = item.Website;
-            foundItem.Phone = item.Phone;
-            // foundItem.COID = item.COID;
+            foundItem.Phone = item.Phone;;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status == OrganizationStatusType.Nothing 
-                ? OrganizationStatusType.Prospect 
+                ? OrganizationStatusType.Applicant 
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
@@ -322,5 +328,53 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return CertificateValidityStatusType.Nothing;
         } // GetCertificatesStatus
+
+        private void CheckMinimalDocumentation(Organization item)
+        {
+            if (item.AuditCycles == null || item.AuditCycles.Count == 0)
+                throw new BusinessException("You must create one audit cycle and add the minimal documentation");
+
+            var auditCycle = item.AuditCycles.First(ac => ac.Status == StatusType.Active);
+
+            if (auditCycle == null)
+                throw new BusinessException("Must have at least one active audit cycle");
+
+            if (auditCycle.AuditCycleDocuments == null || auditCycle.AuditCycleDocuments.Count == 0)
+                throw new BusinessException("The audit cycle don't have any document");
+
+            bool haveAppForm = false;
+            bool haveADC = false;
+            bool haveProposal = false;
+            bool haveContract = false;
+
+            haveAppForm = auditCycle.AuditCycleDocuments
+                .Where(acd => 
+                    acd.DocumentType == AuditCycleDocumentType.AppForm
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveADC = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.ADC
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveProposal = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Proposal
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveContract = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Contract
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            if (!haveAppForm || !haveADC || !haveProposal || !haveContract)
+                throw new BusinessException("Must have at last a App form, an ADC, a Proposal and a Contract active document");
+
+            //return true;
+        } // CheckMinimalDocumentation
     }
 }

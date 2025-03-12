@@ -18,6 +18,12 @@ namespace Arysoft.ARI.NF48.Api
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+                name: "Disclaimer",
+                url: "Disclaimer",
+                defaults: new { controller = "Disclaimer", action = "Index" }
+            );
         }
     }
 }

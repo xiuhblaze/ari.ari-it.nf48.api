@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -28,6 +26,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string AuditDescription { get; set; }
 
         public string AuditorName { get; set; }
+
+        public IEnumerable<string> StandardsNames { get; set; }
+
     } // AuditAuditorItemListDto
 
     public class AuditAuditorItemDetailDto
@@ -57,6 +58,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditItemListDto Audit { get; set; }
 
         public AuditorItemListDto Auditor { get; set; }
+
+        public IEnumerable<AuditStandardItemListDto> AuditStandards { get; set; }
     } // AuditAuditorItemDetailDto
 
     public class AuditAuditorPostDto
@@ -91,6 +94,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // AuditAuditorPutDto
+
+    public class AuditAuditorEditAuditStandardDto
+    {
+        [Required]
+        public Guid AuditAuditorID { get; set; }
+
+        [Required]
+        public Guid AuditStandardID { get; set; }
+    } // AuditAuditorAddAuditStandardDto
 
     public class AuditAuditorDeleteDto
     {

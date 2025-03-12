@@ -19,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             var folio = await _model
                 .Where(o => 
-                    o.Status > OrganizationStatusType.Prospect
+                    o.Status > OrganizationStatusType.Applicant
                 )
                 .MaxAsync(o => o.Folio);
 

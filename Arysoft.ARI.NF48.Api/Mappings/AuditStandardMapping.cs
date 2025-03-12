@@ -1,6 +1,8 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -31,7 +33,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : string.Empty,
                 StandardName = item.Standard != null
                     ? item.Standard.Name
-                    : string.Empty
+                    : string.Empty,
+                AuditorsCount = item.AuditAuditors != null
+                    ? item.AuditAuditors.Count
+                    : 0,
+                DocumentsCount = item.AuditDocuments != null
+                    ? item.AuditDocuments.Count
+                    : 0
             };
         } // AuditStandardToItemListDto
 
@@ -53,6 +61,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 Standard = item.Standard != null
                     ? StandardMapping.StandardToItemListDto(item.Standard)
+                    : null,
+                Auditors = item.AuditAuditors != null
+                    ? AuditAuditorMapping.AuditAuditorToListDto(item.AuditAuditors
+                        .Where(aa => aa.Status != StatusType.Nothing))
+                    : null,
+                Documents = item.AuditDocuments != null
+                    ? AuditDocumentMapping.AuditDocumentToListDto(item.AuditDocuments
+                        .Where(ad => ad.Status != StatusType.Nothing))
                     : null
             };
         } // AuditStandardToItemDetailDto

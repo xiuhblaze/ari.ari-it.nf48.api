@@ -157,6 +157,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.DocumentType = item.DocumentType;
             foundItem.Comments = item.Comments;
             foundItem.OtherDescription = item.OtherDescription;
+            foundItem.UploadedBy = item.UploadedBy;
             foundItem.Status = item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;

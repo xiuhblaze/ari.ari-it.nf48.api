@@ -29,6 +29,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 EndDate = item.EndDate,
                 HasWitness = item.HasWitness,
                 Status = item.Status,
+                OrganizationName = item.AuditCycle != null && item.AuditCycle.Organization != null
+                    ? item.AuditCycle.Organization.Name
+                    : string.Empty,
                 AuditCycleName = item.AuditCycle != null
                     ? item.AuditCycle.Name
                     : string.Empty,
@@ -50,6 +53,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         && n.Status != StatusType.Deleted)
                         .Count()
                     : 0,
+                Auditors = item.AuditAuditors != null
+                    ? AuditAuditorMapping.AuditAuditorToListDto(item.AuditAuditors.Where(aa =>
+                        aa.Status != StatusType.Nothing
+                        && aa.Status != StatusType.Deleted))
+                    : null,
                 Standards = item.AuditStandards != null
                     ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
                         asd.Status != StatusType.Nothing

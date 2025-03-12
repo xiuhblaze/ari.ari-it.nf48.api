@@ -149,24 +149,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutOrganization
 
-        //// PUT: api/Organization/5
-        //[ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
-        //public async Task<IHttpActionResult> PutOrganization(Guid id, [FromBody] OrganizationPutDto itemEditDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
-
-        //    if (id != itemEditDto.ID)
-        //        throw new BusinessException("ID mismatch");
-
-        //    var itemToEdit = OrganizationMapping.ItemEditDtoToOrganization(itemEditDto);
-        //    var item = await _organizationService.UpdateAsync(itemToEdit);
-        //    var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
-        //    var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
-
-        //    return Ok(response);
-        //} // PutOrganization
-
         // DELETE: api/Organization/5
         public async Task<IHttpActionResult> DeleteOrganization(Guid id, [FromBody] OrganizationDeleteDto itemDelDto)
         {

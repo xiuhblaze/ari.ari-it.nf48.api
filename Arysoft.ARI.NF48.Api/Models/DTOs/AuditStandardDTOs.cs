@@ -1,5 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -23,6 +25,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string AuditDescription { get; set; }
 
         public string StandardName { get; set; }
+
+        public int AuditorsCount { get; set; }
+
+        public int DocumentsCount { get; set; }
     } // AuditStandardItemListDto
 
     public class AuditStandardItemDetailDto
@@ -50,6 +56,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditItemListDto Audit { get; set; }
 
         public StandardItemListDto Standard { get; set; }
+
+        public IEnumerable<AuditAuditorItemListDto> Auditors { get; set; }
+
+        public IEnumerable<AuditDocumentItemListDto> Documents { get; set; }
     } // AuditStandardItemDetailDto
 
     public class AuditStandardPostDto

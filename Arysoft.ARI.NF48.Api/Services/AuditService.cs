@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -44,12 +45,41 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Where(e => e.AuditCycleID == filters.AuditCycleID);
             }
 
+            if (filters.AuditorID != null && filters.AuditorID != Guid.Empty)
+            {
+                items = items
+                    .Where(e => e.AuditAuditors != null && e.AuditAuditors
+                        .Where(aa => aa.AuditorID == filters.AuditorID)
+                        .Any()
+                    );
+            }
+
+            if (filters.StandardID != null && filters.StandardID != Guid.Empty)
+            {
+                items = items
+                    .Where(e => e.AuditStandards != null && e.AuditStandards
+                        .Where(ads => ads.StandardID == filters.StandardID)
+                        .Any()
+                    );
+            }
+
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items
                     .Where(e =>
                         (e.Description != null && e.Description.ToLower().Contains(filters.Text))
+                        || (e.AuditAuditors != null && e.AuditAuditors
+                            .Where(aa => 
+                                (aa.Auditor.FirstName != null && aa.Auditor.FirstName.ToLower().Contains(filters.Text))
+                                || (aa.Auditor.MiddleName != null && aa.Auditor.MiddleName.ToLower().Contains(filters.Text))
+                                || (aa.Auditor.LastName != null && aa.Auditor.LastName.ToLower().Contains(filters.Text))
+                            ).Any())
+                        || (e.AuditStandards != null && e.AuditStandards
+                            .Where(ads => 
+                                (ads.Standard.Name != null && ads.Standard.Name.ToLower().Contains(filters.Text))
+                                || (ads.Standard.Description != null && ads.Standard.Description.ToLower().Contains(filters.Text))
+                            ).Any())
                     );
             }
 
@@ -97,6 +127,37 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
             }
 
+            // Validar si están en ejecución para ponerlos InProcess o Finished
+
+            var hasChanges = false;
+            foreach (var item in items)
+            {
+                if (item.Status < AuditStatusType.InProcess)
+                {
+                    if (item.StartDate <= DateTime.UtcNow && item.EndDate >= DateTime.UtcNow)
+                    {
+                        item.Status = AuditStatusType.InProcess;
+                        _repository.Update(item);
+                        hasChanges = true;
+                    }
+                }
+
+                if (item.Status == AuditStatusType.InProcess)
+                {
+                    if (item.EndDate < DateTime.UtcNow)
+                    {
+                        item.Status = AuditStatusType.Finished;
+                        _repository.Update(item);
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            if (hasChanges)
+            {
+                _repository.SaveChanges();
+            }   
+
             // Paging
 
             var pagedItems = PagedList<Audit>
@@ -107,7 +168,27 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Audit> GetAsync(Guid id)
         {
-            return await _repository.GetAsync(id);
+            // Validar si está en ejecución para ponerlo InProcess o Finished
+            var item = await _repository.GetAsync(id);
+            var hasChanges = false;
+
+            if (item.Status < AuditStatusType.InProcess && item.StartDate <= DateTime.UtcNow && item.EndDate >= DateTime.UtcNow)
+            {
+                item.Status = AuditStatusType.InProcess;
+                _repository.Update(item);
+                hasChanges = true;
+            }
+
+            if (item.Status == AuditStatusType.InProcess && item.EndDate < DateTime.UtcNow)
+            {
+                item.Status = AuditStatusType.Finished;
+                _repository.Update(item);
+                hasChanges = true;
+            }
+
+            if (hasChanges) _repository.SaveChanges();
+
+            return item;
         } // GetAsync
 
         public async Task<Audit> AddAsync(Audit item)
@@ -116,7 +197,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
                 throw new BusinessException("Must first assign an audit cycle");
 
+            var _auditCycleRepository = new AuditCycleRepository();
+            var auditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID)
+                ?? throw new BusinessException("The audit cycle associated is not found");
+
             // - Validar que el ciclo sea el activo o sea en el futuro
+
+            // - Validar que se tenga la documentación del ciclo hasta Audit Programme
+            // CheckMinimalAuditCycleDocumentation(auditCycle); // xBlaze 20250312: Deshabilitado hasta que se suba información pasada
 
             // Assigning values
 
@@ -128,6 +216,17 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             try {
+
+                // Borrando carpetas de registros temporales
+                var items = _repository.Gets()
+                    .Where(e => e.UpdatedUser.ToUpper() == item.UpdatedUser.ToUpper().Trim()
+                        && e.Status == AuditStatusType.Nothing);
+
+                foreach (var i in items)
+                { 
+                    FileRepository.DeleteDirectory($"~/files/organizations/{i.AuditCycle.OrganizationID}/Cycles/{i.AuditCycle.ID}/{i.ID}");
+                }
+
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
@@ -208,5 +307,58 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // PRIVATE
+
+        private void CheckMinimalAuditCycleDocumentation(AuditCycle auditCycle)
+        {
+            if (auditCycle.AuditCycleDocuments == null || auditCycle.AuditCycleDocuments.Count == 0)
+                throw new BusinessException("The audit cycle don't have any document");
+
+            bool haveAppForm = false;
+            bool haveADC = false;
+            bool haveProposal = false;
+            bool haveContract = false;
+            bool haveAuditProgramme = false;
+
+            haveAppForm = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.AppForm
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveADC = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.ADC
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveProposal = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Proposal
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveContract = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Contract
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveAuditProgramme = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.AuditProgramme
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            if (!haveAppForm 
+                || !haveADC 
+                || !haveProposal 
+                || !haveContract 
+                || !haveAuditProgramme
+            )
+                throw new BusinessException("Must have at last a App form, an ADC, a Proposal, a Contract and a Confirmation Letter active document");
+
+        } // CheckMinimalAuditCycleDocumentation
     }
 }

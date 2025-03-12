@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
@@ -10,9 +11,6 @@ using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -102,7 +100,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 var documentType = item.DocumentType ?? itemEditDto.DocumentType;
 
-                if (documentType == null ||documentType == Enumerations.AuditDocumentType.Nothing)
+                if (documentType == null ||documentType == AuditDocumentType.Nothing)
                     throw new BusinessException("DocumentType is required");
 
                 fileName = FileRepository.UploadFile(
@@ -113,7 +111,13 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
 
             var itemToEdit = AuditDocumentMapping.ItemEditDtoToAuditDocument(itemEditDto);
+            
+            // Si se subió un archivo, se actualizan los siguientes campos
             itemToEdit.Filename = fileName ?? item.Filename;
+            itemToEdit.UploadedBy = !string.IsNullOrEmpty(fileName)
+                ? itemToEdit.UpdatedUser
+                : item.UploadedBy;
+
             item = await _service.UpdateAsync(itemToEdit);
             var itemDto = AuditDocumentMapping.AuditDocumentToItemDetailDto(item);
             var response = new ApiResponse<AuditDocumentItemDetailDto>(itemDto);
@@ -129,11 +133,48 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (id != itemDelDto.ID)
                 throw new BusinessException("ID mismatch");
 
+            // Si se va a eliminar el registro, borrar el archivo físico
+
             var item = AuditDocumentMapping.ItemDeleteDtoToAuditDocument(itemDelDto);
             await _service.DeleteAsync(item);
             var response = new ApiResponse<bool>(true);
 
             return Ok(response);
         } // DeleteAuditDocument
+
+        // AUDIT STANDARDS
+
+        [HttpPost]
+        [Route("api/AuditDocuments/{id}/audit-standard")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> AddAuditStandard(Guid id, [FromBody] AuditDocumentEditAuditStandardDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AuditDocumentID)
+                throw new BusinessException("ID mismatch");
+
+            await _service.AddAuditStandardAsync(itemDto.AuditDocumentID, itemDto.AuditStandardID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // AddAuditStandard
+
+        [HttpDelete]
+        [Route("api/AuditDocuments/{id}/audit-standard")]
+        public async Task<IHttpActionResult> DelAuditStandard(Guid id, [FromBody] AuditDocumentEditAuditStandardDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AuditDocumentID)
+                throw new BusinessException("ID mismatch");
+
+            await _service.DelAuditStandardAsync(itemDto.AuditDocumentID, itemDto.AuditStandardID);
+            var response = new ApiResponse<bool>(true);
+            
+            return Ok(response);
+        } // DelAuditStandard
     }
 }
