@@ -127,6 +127,37 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
             }
 
+            // Validar si están en ejecución para ponerlos InProcess o Finished
+
+            var hasChanges = false;
+            foreach (var item in items)
+            {
+                if (item.Status < AuditStatusType.InProcess)
+                {
+                    if (item.StartDate <= DateTime.UtcNow && item.EndDate >= DateTime.UtcNow)
+                    {
+                        item.Status = AuditStatusType.InProcess;
+                        _repository.Update(item);
+                        hasChanges = true;
+                    }
+                }
+
+                if (item.Status == AuditStatusType.InProcess)
+                {
+                    if (item.EndDate < DateTime.UtcNow)
+                    {
+                        item.Status = AuditStatusType.Finished;
+                        _repository.Update(item);
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            if (hasChanges)
+            {
+                _repository.SaveChanges();
+            }   
+
             // Paging
 
             var pagedItems = PagedList<Audit>
@@ -137,7 +168,27 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Audit> GetAsync(Guid id)
         {
-            return await _repository.GetAsync(id);
+            // Validar si está en ejecución para ponerlo InProcess o Finished
+            var item = await _repository.GetAsync(id);
+            var hasChanges = false;
+
+            if (item.Status < AuditStatusType.InProcess && item.StartDate <= DateTime.UtcNow && item.EndDate >= DateTime.UtcNow)
+            {
+                item.Status = AuditStatusType.InProcess;
+                _repository.Update(item);
+                hasChanges = true;
+            }
+
+            if (item.Status == AuditStatusType.InProcess && item.EndDate < DateTime.UtcNow)
+            {
+                item.Status = AuditStatusType.Finished;
+                _repository.Update(item);
+                hasChanges = true;
+            }
+
+            if (hasChanges) _repository.SaveChanges();
+
+            return item;
         } // GetAsync
 
         public async Task<Audit> AddAsync(Audit item)
@@ -153,7 +204,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Validar que el ciclo sea el activo o sea en el futuro
 
             // - Validar que se tenga la documentación del ciclo hasta Audit Programme
-            CheckMinimalAuditCycleDocumentation(auditCycle);
+            // CheckMinimalAuditCycleDocumentation(auditCycle); // xBlaze 20250312: Deshabilitado hasta que se suba información pasada
 
             // Assigning values
 

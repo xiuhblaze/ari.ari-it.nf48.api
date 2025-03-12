@@ -218,7 +218,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 //if (!HasMinimalDocumentation(foundItem))
                 //    throw new BusinessException("The applicant does not have the minimum required documentation");
 
-                CheckMinimalDocumentation(foundItem);
+                // CheckMinimalDocumentation(foundItem); // xBlaze 20250312: Deshabilitado hasta que se suba información pasada
 
                 // Generando folio
                 foundItem.Folio = await _organizationRepository.GetNextFolioAsync();
