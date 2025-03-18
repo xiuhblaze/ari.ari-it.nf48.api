@@ -132,9 +132,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             var hasChanges = false;
             foreach (var item in items)
             {
+                // Agregando la última hora del día
+                var endDate = item.EndDate.Value.Date.AddDays(1).AddSeconds(-1);
+
                 if (item.Status < AuditStatusType.InProcess)
                 {
-                    if (item.StartDate <= DateTime.UtcNow && item.EndDate >= DateTime.UtcNow)
+                    if (item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
                     {
                         item.Status = AuditStatusType.InProcess;
                         _repository.Update(item);
@@ -144,7 +147,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 if (item.Status == AuditStatusType.InProcess)
                 {
-                    if (item.EndDate < DateTime.UtcNow)
+                    if (endDate < DateTime.UtcNow)
                     {
                         item.Status = AuditStatusType.Finished;
                         _repository.Update(item);
@@ -171,15 +174,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validar si está en ejecución para ponerlo InProcess o Finished
             var item = await _repository.GetAsync(id);
             var hasChanges = false;
+            var endDate = item.EndDate.Value.Date.AddDays(1).AddSeconds(-1);
 
-            if (item.Status < AuditStatusType.InProcess && item.StartDate <= DateTime.UtcNow && item.EndDate >= DateTime.UtcNow)
+            if (item.Status < AuditStatusType.InProcess && item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
             {
                 item.Status = AuditStatusType.InProcess;
                 _repository.Update(item);
                 hasChanges = true;
             }
 
-            if (item.Status == AuditStatusType.InProcess && item.EndDate < DateTime.UtcNow)
+            if (item.Status == AuditStatusType.InProcess && endDate < DateTime.UtcNow)
             {
                 item.Status = AuditStatusType.Finished;
                 _repository.Update(item);
