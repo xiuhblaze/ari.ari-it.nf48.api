@@ -14,7 +14,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public virtual ICollection<Application> Applications { get; set; }
+        // public virtual ICollection<Application> Applications { get; set; }
 
         public virtual ICollection<AuditorStandard> AuditorStandards { get; set; }
 

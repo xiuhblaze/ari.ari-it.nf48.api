@@ -32,10 +32,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                ApplicationsCount = item.Applications != null 
-                    ? item.Applications
-                        .Where(app => app.Status != ApplicationStatusType.Nothing).Count()
-                    : 0,
+                //ApplicationsCount = item.Applications != null 
+                //    ? item.Applications
+                //        .Where(app => app.Status != ApplicationStatusType.Nothing).Count()
+                //    : 0,
                 AuditorsCount = item.AuditorStandards != null
                     ? item.AuditorStandards
                         .Where(aus => aus.Status == StatusType.Active).Count()
@@ -68,10 +68,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                Applications = item.Applications != null
-                    ? ApplicationMapping.ApplicationsToListDto(item.Applications
-                        .Where(a => a.Status != ApplicationStatusType.Nothing))
-                    : null,
+                //Applications = item.Applications != null
+                //    ? ApplicationMapping.ApplicationsToListDto(item.Applications
+                //        .Where(a => a.Status != ApplicationStatusType.Nothing))
+                //    : null,
                 Auditors = item.AuditorStandards != null
                     ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards
                         .Where(aus => aus.Status >= StatusType.Nothing))

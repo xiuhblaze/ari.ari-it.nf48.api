@@ -373,6 +373,7 @@
     <Compile Include="Mappings\SiteMapping.cs" />
     <Compile Include="Mappings\StandardMapping.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
+    <Compile Include="Models\AppForm.cs" />
     <Compile Include="Models\Application.cs" />
     <Compile Include="Models\Audit.cs" />
     <Compile Include="Models\AuditAuditor.cs" />
