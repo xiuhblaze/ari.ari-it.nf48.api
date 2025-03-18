@@ -266,6 +266,7 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomEntities\Metadata.cs" />
     <Compile Include="CustomEntities\PagedList.cs" />
+    <Compile Include="Data\Configurations\AppFormConfiguration.cs" />
     <Compile Include="Data\Configurations\ApplicationConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditAuditorConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditConfiguration.cs" />
@@ -299,6 +300,7 @@
     <Compile Include="Data\Configurations\SiteConfiguration.cs" />
     <Compile Include="Data\Configurations\StandardConfiguration.cs" />
     <Compile Include="Data\Configurations\UserConfiguration.cs" />
+    <Compile Include="Enumerations\AppFormEnums.cs" />
     <Compile Include="Enumerations\ApplicationEnum.cs" />
     <Compile Include="Enumerations\AuditAuditorEnum.cs" />
     <Compile Include="Enumerations\AuditCycleDocumentEnum.cs" />

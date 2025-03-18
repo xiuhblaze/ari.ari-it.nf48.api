@@ -37,6 +37,65 @@ namespace Arysoft.ARI.NF48.Api.Services
                 );
             }
 
+            if (filters.Sector != null)
+            {
+                items = items.Where(e => e.Sector == filters.Sector);
+            }
+
+            if (filters.Division != null)
+            {
+                items = items.Where(e => e.Division == filters.Division);
+            }
+
+            if (filters.Group != null)
+            {
+                items = items.Where(e => e.Group == filters.Group);
+            }
+
+            if (filters.Class != null)
+            {
+                items = items.Where(e => e.Class == filters.Class);
+            }
+
+            if (filters.OnlyOption != null)
+            {
+                switch (filters.OnlyOption)
+                {
+                    case NaceCodeOnlyOptionType.Sectors:
+                        items = items.Where(e => e.Sector != null && e.Division == null && e.Group == null && e.Class == null);
+                        break;
+                    case NaceCodeOnlyOptionType.Divisions:
+                        items = items.Where(e => e.Sector != null && e.Division != null && e.Group == null && e.Class == null);
+                        break;
+                    case NaceCodeOnlyOptionType.Groups:
+                        items = items.Where(e => e.Sector != null && e.Division != null && e.Group != null && e.Class == null);
+                        break;
+                    case NaceCodeOnlyOptionType.Classes:
+                        items = items.Where(e => e.Sector != null && e.Division != null && e.Group != null && e.Class != null);
+                        break;
+                }
+            }
+
+            //if (filters.OnlySectors != null && (bool)filters.OnlySectors)
+            //{
+            //    items = items.Where(e => e.Sector != null && e.Division == null && e.Group == null && e.Class == null);
+            //}
+
+            //if (filters.OnlyDivisions != null && (bool)filters.OnlyDivisions)
+            //{
+            //    items = items.Where(e => e.Sector != null && e.Division != null && e.Group == null && e.Class == null);
+            //}
+
+            //if (filters.OnlyGroups != null && (bool)filters.OnlyGroups)
+            //{
+            //    items = items.Where(e => e.Sector != null && e.Division != null && e.Group != null && e.Class == null);
+            //}
+
+            //if (filters.OnlyClasses != null && (bool)filters.OnlyClasses)
+            //{
+            //    items = items.Where(e => e.Sector != null && e.Division != null && e.Group != null && e.Class != null);
+            //}
+
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);
