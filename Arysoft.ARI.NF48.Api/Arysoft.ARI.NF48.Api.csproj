@@ -445,6 +445,7 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryFilters\AppFormQueryFilters.cs" />
     <Compile Include="QueryFilters\ApplicationQueryFilters.cs" />
     <Compile Include="QueryFilters\AuditAuditorQueryFilters.cs" />
     <Compile Include="QueryFilters\AuditCycleDocumentQueryFilters.cs" />
@@ -480,6 +481,7 @@
     <Compile Include="QueryFilters\SiteQueryFilters.cs" />
     <Compile Include="QueryFilters\StandardQueryFilters.cs" />
     <Compile Include="QueryFilters\UserQueryFilters.cs" />
+    <Compile Include="Repositories\AppFormRepository.cs" />
     <Compile Include="Repositories\ApplicationRepository.cs" />
     <Compile Include="Repositories\AuditAuditorRepository.cs" />
     <Compile Include="Repositories\AuditDocumentRepository.cs" />
@@ -514,6 +516,7 @@
     <Compile Include="Repositories\StandardRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Response\ApiResponse.cs" />
+    <Compile Include="Services\AppFormService.cs" />
     <Compile Include="Services\ApplicationService.cs" />
     <Compile Include="Services\AuditAuditorService.cs" />
     <Compile Include="Services\AuditCycleDocumentService.cs" />
