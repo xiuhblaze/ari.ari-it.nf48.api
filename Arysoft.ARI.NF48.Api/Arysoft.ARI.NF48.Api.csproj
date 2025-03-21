@@ -227,6 +227,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\AppFormsController.cs" />
     <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Controllers\AuditAuditorsController.cs" />
     <Compile Include="Controllers\AuditCyclesController.cs" />
@@ -342,6 +343,7 @@
     </Compile>
     <Compile Include="Invokers\MyApiControllerActionInvoker.cs" />
     <Compile Include="IO\FileRepository.cs" />
+    <Compile Include="Mappings\AppFormMapping.cs" />
     <Compile Include="Mappings\ApplicationMapping.cs" />
     <Compile Include="Mappings\AuditAuditorMapping.cs" />
     <Compile Include="Mappings\AuditCycleDocumentMapping.cs" />
@@ -394,6 +396,7 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\DayCalculationConcept.cs" />
     <Compile Include="Models\DayCalculationConceptApplication.cs" />
+    <Compile Include="Models\DTOs\AppFormDTOs.cs" />
     <Compile Include="Models\DTOs\ApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\AuditAuditorDTOs.cs" />
     <Compile Include="Models\DTOs\AuditCycleDocumentDTOs.cs" />

@@ -8,7 +8,7 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid OrganizationID { get; set; }
 
-        public Guid? AuditCycleID { get; set; }
+        public Guid AuditCycleID { get; set; }
 
         public Guid? StandardID { get; set; }
 
@@ -16,13 +16,13 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? UserReviewerID { get; set; }
 
-        // ISO 9001
+        // ISO 9K
 
         public string ActivitiesScope { get; set; }
 
-        public int? ProcessServiceCount { get; set; }
+        public int? ProcessServicesCount { get; set; }
 
-        public string ProcessServiceDescription { get; set; }
+        public string ProcessServicesDescription { get; set; }
 
         public string LegalRequirements { get; set; }
 
@@ -67,6 +67,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         // RELATIONS
 
         public virtual Organization Organization { get; set; }
+
+        public virtual AuditCycle AuditCycle { get; set; }
 
         public virtual Standard Standard { get; set; }
 

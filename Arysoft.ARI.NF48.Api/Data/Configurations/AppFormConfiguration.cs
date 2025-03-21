@@ -1,9 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Data.Configurations
 {
@@ -24,7 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
-                .Property(m => m.ProcessServiceDescription)
+                .Property(m => m.ProcessServicesDescription)
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()

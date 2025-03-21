@@ -49,7 +49,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 filters.Text = filters.Text.ToLower();
                 items = items.Where(m => 
                     (m.ActivitiesScope != null && m.ActivitiesScope.ToLower().Contains(filters.Text))
-                    || (m.ProcessServiceDescription != null && m.ProcessServiceDescription.ToLower().Contains(filters.Text))
+                    || (m.ProcessServicesDescription != null && m.ProcessServicesDescription.ToLower().Contains(filters.Text))
                     || (m.LegalRequirements != null && m.LegalRequirements.ToLower().Contains(filters.Text))
                     || (m.CriticalComplaintComments != null && m.CriticalComplaintComments.ToLower().Contains(filters.Text))
                     || (m.AutomationLevel != null && m.AutomationLevel.ToLower().Contains(filters.Text))
@@ -139,9 +139,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (string.IsNullOrEmpty(item.UpdatedUser))
                 throw new BusinessException("UpdatedUser is required");
 
+            // - Validar que la organizacion exista y esté activo
+            // - Validar que el ciclo exista y esté activo
+
             // Set values
 
             item.ID = Guid.NewGuid();
+            item.OrganizationID = item.OrganizationID;
+            item.AuditCycleID = item.AuditCycleID;
             item.Status = AppFormStatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -172,9 +177,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (string.IsNullOrEmpty(item.UpdatedUser))
                 throw new BusinessException("UpdatedUser is required");
 
-            // - No permitir cambiar la organización hasta el status (cual)??
-            // - No permitir cambiar el audit cycle hasta el status ...
-
             // - Validaciones por status
             if (item.Status != foundItem.Status) { // El status cambió
                 switch (item.Status)
@@ -182,21 +184,46 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AppFormStatusType.Nothing:
                         item.Status = AppFormStatusType.New;
                         break;
+
+                    case AppFormStatusType.SalesReview:
+                        item.SalesDate = DateTime.UtcNow;
+                        if (string.IsNullOrEmpty(item.SalesComments))
+                            throw new BusinessException("Sales comments is required");
+                        break;
+
+                    case AppFormStatusType.SalesRejected:
+                        item.SalesDate = DateTime.UtcNow;
+                        if (string.IsNullOrEmpty(item.SalesComments))
+                            throw new BusinessException("Sales comments is required");
+                        break;
+
+                    case AppFormStatusType.ApplicantReview:
+                        item.ReviewDate = DateTime.UtcNow;
+                        if (string.IsNullOrEmpty(item.ReviewJustification))
+                            throw new BusinessException("Review justification is required");
+                        break;
+                    
+                    case AppFormStatusType.ApplicantRejected:
+                        item.ReviewDate = DateTime.UtcNow;
+                        if (string.IsNullOrEmpty(item.ReviewJustification))
+                            throw new BusinessException("Review justification is required");
+                        break;
+                    //TODO: Falta validar cada caso
                 }
             }
 
             // Set values
             
-            foundItem.OrganizationID = item.OrganizationID;
-            foundItem.AuditCycleID = item.AuditCycleID;
+            //foundItem.OrganizationID = item.OrganizationID;
+            //foundItem.AuditCycleID = item.AuditCycleID;
             foundItem.StandardID = item.StandardID;
             foundItem.UserSalesID = item.UserSalesID;
             foundItem.UserReviewerID = item.UserReviewerID;
 
             // ISO 9K
             foundItem.ActivitiesScope = item.ActivitiesScope;
-            foundItem.ProcessServiceCount = item.ProcessServiceCount;
-            foundItem.ProcessServiceDescription = item.ProcessServiceDescription;
+            foundItem.ProcessServicesCount = item.ProcessServicesCount;
+            foundItem.ProcessServicesDescription = item.ProcessServicesDescription;
             foundItem.LegalRequirements = item.LegalRequirements;
             foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
             foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
@@ -270,11 +297,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
-        // NACECODES
+        // NACE CODES
 
         public async Task AddNaceCodeAsync(Guid id, Guid naceCodeID)
         { 
-            await _repository.AddNaceCodeAsync(id, naceCodeID);
 
             // HACK: Posiblemente aquí obtener los dos objetos y validar
             // - Que no se agregue un nace Inactivo
@@ -283,6 +309,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             try
             {
+                await _repository.AddNaceCodeAsync(id, naceCodeID);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -309,6 +336,71 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // CONTACTS
 
+        public async Task AddContactAsync(Guid id, Guid contactID)
+        {
 
+            // Validar
+
+            // - Que el contacto esté activo
+            // - Que el contacto sea de la organización del app form
+
+            try
+            {
+                await _repository.AddContactAsync(id, contactID);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.AddContactAsync: {ex.Message}");
+            }
+        } // AddContactAsync
+
+        public async Task DelContactAsync(Guid id, Guid contactID)
+        {
+            // Ver que validaciones se necesitan
+
+            try
+            {
+                await _repository.DelContactAsync(id, contactID);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.DelContactAsync: {ex.Message}");
+            }
+        } // DelContactAsync
+
+        public async Task AddSiteAsync(Guid id, Guid siteID)
+        {
+            // Validar
+            
+            // - Que el sitio esté activo
+            // - Que el sitio sea de la organización del app form
+
+            try
+            {
+                await _repository.AddSiteAsync(id, siteID);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.AddSiteAsync: {ex.Message}");
+            }
+        } // AddSiteAsync
+
+        public async Task DelSiteAsync(Guid id, Guid siteID)
+        {
+            // Ver que validaciones se necesitan
+
+            try
+            {
+                await _repository.DelSiteAsync(id, siteID);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.DelSiteAsync: {ex.Message}");
+            }
+        } // DelSiteAsync
     }
 }
