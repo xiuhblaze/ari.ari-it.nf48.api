@@ -29,6 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 MaxReductionDays = item.MaxReductionDays,
                 SalesMaxReductionDays = item.SalesMaxReductionDays,
+                StandardBase = item.StandardBase,
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
@@ -64,6 +65,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 MaxReductionDays = item.MaxReductionDays,
                 SalesMaxReductionDays = item.SalesMaxReductionDays,
+                StandardBase = item.StandardBase,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -108,6 +110,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             item.Description = itemDto.Description;
             item.MaxReductionDays = itemDto.MaxReductionDays;
             item.SalesMaxReductionDays = itemDto.SalesMaxReductionDays;
+            item.StandardBase = itemDto.StandardBase;
             item.Status = itemDto.Status;
             item.UpdatedUser = itemDto.UpdatedUser;
 

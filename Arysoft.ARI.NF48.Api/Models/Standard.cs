@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -11,6 +12,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public int? MaxReductionDays { get; set; }
 
         public int? SalesMaxReductionDays { get; set; }
+
+        public StandardBaseType? StandardBase { get; set; }
 
         // RELATIONS
 

@@ -118,12 +118,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (await _standardRepository.ExistNameAsync(item.Name, item.ID))
                 throw new BusinessException("The standard name already exist");
 
+            if (item.StandardBase == null || item.StandardBase == StandardBaseType.Nothing)
+                throw new BusinessException("The standard base is required");
+
             // Assigning values
 
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
             foundItem.MaxReductionDays = item.MaxReductionDays;
             foundItem.SalesMaxReductionDays = item.SalesMaxReductionDays;
+            foundItem.StandardBase = item.StandardBase;
             foundItem.Status = foundItem.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
