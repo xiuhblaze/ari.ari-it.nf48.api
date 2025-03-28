@@ -15,10 +15,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
-        public Guid? UserSalesID { get; set; }
-
-        public Guid? UserReviewerID { get; set; }
-
         // ISO 9K
 
         public string ActivitiesScope { get; set; }
@@ -41,7 +37,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
-        public LanguageType? AuditLanguage { get; set; }
+        public string AuditLanguage { get; set; }
 
         public string CurrentCertificationsExpiration { get; set; }
 
@@ -64,6 +60,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string ReviewJustification { get; set; }
 
         public string ReviewComments { get; set; }
+
+        public string UserSales { get; set; }
+
+        public string UserReviewer { get; set; }
+
+        public string UserOrganization { get; set; }
 
         public AppFormStatusType Status { get; set; }
 
@@ -101,10 +103,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
-        public Guid? UserSalesID { get; set; }
-
-        public Guid? UserReviewerID { get; set; }
-
         // ISO 9K
 
         public string ActivitiesScope { get; set; }
@@ -127,7 +125,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
-        public LanguageType? AuditLanguage { get; set; }
+        public string AuditLanguage { get; set; }
 
         public string CurrentCertificationsExpiration { get; set; }
 
@@ -151,6 +149,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string ReviewComments { get; set; }
 
+        public string UserSales { get; set; }
+
+        public string UserReviewer { get; set; }
+
+        public string UserOrganization { get; set; }
+
         public AppFormStatusType Status { get; set; }
 
         public DateTime Created { get; set; }
@@ -166,10 +170,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditCycleItemListDto AuditCycle { get; set; }
 
         public StandardItemListDto Standard { get; set; }
-
-        public UserListItemDto UserSales { get; set; }
-
-        public UserListItemDto UserReviewer { get; set; }
 
         public ICollection<NaceCodeItemListDto> Nacecodes { get; set; }
 
@@ -200,10 +200,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid StandardID { get; set; }
 
-        public Guid? UserSalesID { get; set; }
-
-        public Guid? UserReviewerID { get; set; }
-
         // ISO 9K
 
         [StringLength(1000)]
@@ -232,7 +228,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
-        public LanguageType? AuditLanguage { get; set; }
+        [StringLength(2)]
+        public string AuditLanguage { get; set; }
 
         [StringLength(100)]
         public string CurrentCertificationsExpiration { get; set; }
@@ -262,6 +259,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(1000)]
         public string ReviewComments { get; set; }
+
+        //[StringLength(50)]    // NO SE VAN A RECIBIR, Se deben calcularc con el UpdateUser y el cambio de Status
+        //public string UserSales { get; set; }
+
+        //[StringLength(50)]
+        //public string UserReviewer { get; set; }
+
+        //[StringLength(50)]
+        //public string UserOrganization { get; set; }
 
         public AppFormStatusType Status { get; set; }
 

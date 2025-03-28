@@ -12,10 +12,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? StandardID { get; set; }
 
-        public Guid? UserSalesID { get; set; }
-
-        public Guid? UserReviewerID { get; set; }
-
         // ISO 9K
 
         public string ActivitiesScope { get; set; }
@@ -38,7 +34,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // GENERAL
 
-        public LanguageType? AuditLanguage { get; set; }
+        public string AuditLanguage { get; set; } // Siglas del idioma en base al ISO 639-1
 
         public string CurrentCertificationsExpiration { get; set; } // Fechas separadas por coma
 
@@ -62,6 +58,12 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string ReviewComments { get; set; }      // 22K: Additonal comments by application reviewer
 
+        public string UserSales { get; set; }
+
+        public string UserReviewer { get; set; }
+
+        public string UserOrganization { get; set; }
+
         public new AppFormStatusType Status { get; set; }
 
         // RELATIONS
@@ -71,10 +73,6 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual AuditCycle AuditCycle { get; set; }
 
         public virtual Standard Standard { get; set; }
-
-        public virtual User UserSales { get; set; }
-
-        public virtual User UserReviewer { get; set; }
 
         public virtual ICollection<Contact> Contacts { get; set; }
 

@@ -72,6 +72,18 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
+                .Property(m => m.UserSales)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.UserReviewer)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.UserOrganization)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<AppForm>()
                 .Property(m => m.Status)
                 .IsRequired();
 
@@ -90,15 +102,15 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            modelBuilder.Entity<AppForm>() // Ver si jala esta madre!
-                .HasOptional(m => m.UserSales)
-                .WithMany()
-                .HasForeignKey(m => m.UserSalesID);
+            //modelBuilder.Entity<AppForm>() // Ver si jala esta madre!
+            //    .HasOptional(m => m.UserSales)
+            //    .WithMany()
+            //    .HasForeignKey(m => m.UserSalesID);
 
-            modelBuilder.Entity<AppForm>() // Esta también
-                .HasOptional(m => m.UserReviewer)
-                .WithMany()
-                .HasForeignKey(m => m.UserReviewerID);
+            //modelBuilder.Entity<AppForm>() // Esta también
+            //    .HasOptional(m => m.UserReviewer)
+            //    .WithMany()
+            //    .HasForeignKey(m => m.UserReviewerID);
 
             modelBuilder.Entity<AppForm>()
                 .HasMany(m => m.Notes)

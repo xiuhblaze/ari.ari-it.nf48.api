@@ -9,14 +9,24 @@ namespace Arysoft.ARI.NF48.Api.IO
 {
     public class FileRepository
     {
+        /// <summary>
+        /// Upload a file to the server
+        /// </summary>
+        /// <param name="file">Binary file</param>
+        /// <param name="virtualPath">Path related to the server location to inside</param>
+        /// <param name="newFilename">Filename for the file</param>
+        /// <param name="allowedExtensions">Array of allowed lowercase extensions</param>
+        /// <returns>String with contains the new file name</returns>
+        /// <exception cref="BusinessException"></exception>
         public static string UploadFile(HttpPostedFile file, string virtualPath, string newFilename, string[] allowedExtensions = null)
         {
             if (file == null || file.ContentLength == 0)
                 throw new BusinessException("The file to upload is empty");
 
+            var extension = Path.GetExtension(file.FileName).ToLower();
+
             if (allowedExtensions != null)
             {
-                var extension = Path.GetExtension(file.FileName);
                 if (!allowedExtensions.Contains(extension))
                     throw new BusinessException($"The file extension '{extension}' is not allowed");
             }
@@ -27,10 +37,9 @@ namespace Arysoft.ARI.NF48.Api.IO
             {
                 if (!Directory.Exists(uploadPath))
                     Directory.CreateDirectory(uploadPath);
-
-                var extension = Path.GetExtension(file.FileName);
+                                
                 newFilename += extension;
-                 var fullPath = Path.Combine(uploadPath, newFilename);
+                var fullPath = Path.Combine(uploadPath, newFilename);
 
                 file.SaveAs(fullPath);
             }

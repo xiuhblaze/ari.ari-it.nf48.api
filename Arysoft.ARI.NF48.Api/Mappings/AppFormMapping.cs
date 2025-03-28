@@ -29,8 +29,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 AuditCycleID = item.AuditCycleID,
                 StandardID = item.StandardID,
-                UserSalesID = item.UserSalesID,
-                UserReviewerID = item.UserReviewerID,
                 // 9K
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
@@ -54,6 +52,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ReviewDate = item.ReviewDate,
                 ReviewJustification = item.ReviewJustification,
                 ReviewComments = item.ReviewComments,
+                UserSales = item.UserSales,
+                UserReviewer = item.UserReviewer,
+                UserOrganization = item.UserOrganization,
                 Status = item.Status,
                 // RELATIONS
                 OrganizationName = item.Organization != null 
@@ -64,12 +65,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : string.Empty,
                 StandardName = item.Standard != null
                     ? item.Standard.Name
-                    : string.Empty,
-                UserSalesName = item.UserSales != null
-                    ? Tools.Strings.FullName(item.UserSales.FirstName, string.Empty ,item.UserSales.LastName)
-                    : string.Empty,
-                UserReviewerName = item.UserReviewer != null
-                    ? Tools.Strings.FullName(item.UserReviewer.FirstName, string.Empty, item.UserReviewer.LastName)
                     : string.Empty,
                 Nacecodes = item.NaceCodes != null
                     ? item.NaceCodes.Select(n => n.Description).ToList()
@@ -94,7 +89,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // AppFormToItemListDto
 
-        public static async Task<AppFormItemDetailDto> AppFormToItemDetailDto(AppForm item)
+        public static AppFormItemDetailDto AppFormToItemDetailDto(AppForm item)
         {
             return new AppFormItemDetailDto
             {
@@ -102,8 +97,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 AuditCycleID = item.AuditCycleID,
                 StandardID = item.StandardID,
-                UserSalesID = item.UserSalesID,
-                UserReviewerID = item.UserReviewerID,
                 // 9K
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
@@ -127,6 +120,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ReviewDate = item.ReviewDate,
                 ReviewJustification = item.ReviewJustification,
                 ReviewComments = item.ReviewComments,
+                UserSales = item.UserSales,
+                UserReviewer = item.UserReviewer,
+                UserOrganization = item.UserOrganization,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -140,12 +136,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 Standard = item.Standard != null
                     ? StandardMapping.StandardToItemListDto(item.Standard)
-                    : null,
-                UserSales = item.UserSales != null
-                    ? await UserMapping.UserToItemListDto(item.UserSales)
-                    : null,
-                UserReviewer = item.UserReviewer != null
-                    ? await UserMapping.UserToItemListDto(item.UserReviewer)
                     : null,
                 Nacecodes = item.NaceCodes != null
                     ? NaceCodeMapping.NaceCodeToListDto(item.NaceCodes).ToList()
@@ -178,8 +168,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = item.ID,                
                 StandardID = item.StandardID,
-                UserSalesID = item.UserSalesID,
-                UserReviewerID = item.UserReviewerID,
                 // 9K
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,

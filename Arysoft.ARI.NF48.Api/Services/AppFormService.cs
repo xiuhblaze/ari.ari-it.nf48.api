@@ -64,16 +64,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
                     || (m.Organization != null && m.Organization.Name.ToLower().Contains(filters.Text))
                     || (m.Standard != null && m.Standard.Name.ToLower().Contains(filters.Text))
-                    || (m.UserSales != null 
-                        && (m.UserSales.Username.ToLower().Contains(filters.Text)
-                            || m.UserSales.FirstName.ToLower().Contains(filters.Text)
-                            || m.UserSales.LastName.ToLower().Contains(filters.Text)
-                       ))
-                    || (m.UserReviewer != null
-                        && (m.UserReviewer.Username.ToLower().Contains(filters.Text)
-                            || m.UserReviewer.FirstName.ToLower().Contains(filters.Text)
-                            || m.UserReviewer.LastName.ToLower().Contains(filters.Text)
-                       ))
+                    || (m.UserSales != null && m.UserSales.ToLower().Contains(filters.Text))
+                    || (m.UserReviewer != null && m.UserReviewer.ToLower().Contains(filters.Text))
+                    || (m.UserOrganization != null && m.UserOrganization.ToLower().Contains(filters.Text))
                 );
             } // Text
 
@@ -185,26 +178,34 @@ namespace Arysoft.ARI.NF48.Api.Services
                         item.Status = AppFormStatusType.New;
                         break;
 
+                    case AppFormStatusType.Send:
+                        foundItem.UserOrganization = item.UpdatedUser;
+                        break;
+
                     case AppFormStatusType.SalesReview:
                         item.SalesDate = DateTime.UtcNow;
+                        foundItem.UserSales = item.UpdatedUser;
                         if (string.IsNullOrEmpty(item.SalesComments))
                             throw new BusinessException("Sales comments is required");
                         break;
 
                     case AppFormStatusType.SalesRejected:
                         item.SalesDate = DateTime.UtcNow;
+                        foundItem.UserSales = item.UpdatedUser;
                         if (string.IsNullOrEmpty(item.SalesComments))
                             throw new BusinessException("Sales comments is required");
                         break;
 
                     case AppFormStatusType.ApplicantReview:
                         item.ReviewDate = DateTime.UtcNow;
+                        foundItem.UserReviewer = item.UpdatedUser;
                         if (string.IsNullOrEmpty(item.ReviewJustification))
                             throw new BusinessException("Review justification is required");
                         break;
                     
                     case AppFormStatusType.ApplicantRejected:
                         item.ReviewDate = DateTime.UtcNow;
+                        foundItem.UserReviewer = item.UpdatedUser;
                         if (string.IsNullOrEmpty(item.ReviewJustification))
                             throw new BusinessException("Review justification is required");
                         break;
@@ -212,13 +213,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
+            // TODO: AuditLanguage - Validar que sea un idioma aceptado 'es', 'en'
+
             // Set values
             
             //foundItem.OrganizationID = item.OrganizationID;
             //foundItem.AuditCycleID = item.AuditCycleID;
             foundItem.StandardID = item.StandardID;
-            foundItem.UserSalesID = item.UserSalesID;
-            foundItem.UserReviewerID = item.UserReviewerID;
 
             // ISO 9K
             foundItem.ActivitiesScope = item.ActivitiesScope;
@@ -252,7 +253,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
             try
             {   
-                _repository.Update(item);
+                _repository.Update(foundItem);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -307,9 +308,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - No agregar naces a appsforms Canceladas, Eliminadas y ver que otros casos,
             //   tal vez de ciclos ya cerrados
 
+            await _repository.AddNaceCodeAsync(id, naceCodeID); // Fuera del try-catch para enviar los errores hasta el cliente
+
             try
             {
-                await _repository.AddNaceCodeAsync(id, naceCodeID);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -320,9 +322,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task DelNaceCodeAsync(Guid id, Guid naceCodeID)
         {
-            await _repository.DelNaceCodeAsync(id, naceCodeID);
-
             // Igual, considerar validaciones al quitar el nacecode
+
+            await _repository.DelNaceCodeAsync(id, naceCodeID);
 
             try
             {
@@ -343,10 +345,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - Que el contacto esté activo
             // - Que el contacto sea de la organización del app form
+            await _repository.AddContactAsync(id, contactID);
 
             try
             {
-                await _repository.AddContactAsync(id, contactID);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -359,9 +361,10 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Ver que validaciones se necesitan
 
+            await _repository.DelContactAsync(id, contactID);
+
             try
             {
-                await _repository.DelContactAsync(id, contactID);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -377,9 +380,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Que el sitio esté activo
             // - Que el sitio sea de la organización del app form
 
+            await _repository.AddSiteAsync(id, siteID);
+
             try
             {
-                await _repository.AddSiteAsync(id, siteID);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -391,10 +395,10 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task DelSiteAsync(Guid id, Guid siteID)
         {
             // Ver que validaciones se necesitan
+            await _repository.DelSiteAsync(id, siteID);
 
             try
             {
-                await _repository.DelSiteAsync(id, siteID);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
