@@ -64,9 +64,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UserSales { get; set; }
 
         public string UserReviewer { get; set; }
-
-        public string UserOrganization { get; set; }
-
+                
         public AppFormStatusType Status { get; set; }
 
         // RELATIONS
@@ -152,8 +150,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UserSales { get; set; }
 
         public string UserReviewer { get; set; }
-
-        public string UserOrganization { get; set; }
 
         public AppFormStatusType Status { get; set; }
 

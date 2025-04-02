@@ -134,26 +134,27 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // Agregando la última hora del día
                 var endDate = item.EndDate.Value.Date.AddDays(1).AddSeconds(-1);
+                var hasInternalChanges = false; // para solo llamar una vez a .Update
 
-                if (item.Status < AuditStatusType.InProcess)
+                if (item.Status == AuditStatusType.Confirmed && 
+                    item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
                 {
-                    if (item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
-                    {
-                        item.Status = AuditStatusType.InProcess;
-                        _repository.Update(item);
-                        hasChanges = true;
-                    }
+                    item.Status = AuditStatusType.InProcess;
+                    //_repository.Update(item);
+                    hasInternalChanges = true;
+                    hasChanges = true;
                 }
 
-                if (item.Status == AuditStatusType.InProcess)
-                {
-                    if (endDate < DateTime.UtcNow)
-                    {
-                        item.Status = AuditStatusType.Finished;
-                        _repository.Update(item);
-                        hasChanges = true;
-                    }
+                if ((item.Status == AuditStatusType.Confirmed || item.Status == AuditStatusType.InProcess) &&
+                    endDate < DateTime.UtcNow)
+                {   
+                    item.Status = AuditStatusType.Finished;
+                    //_repository.Update(item);
+                    hasInternalChanges = true;
+                    hasChanges = true;
                 }
+
+                if (hasInternalChanges) _repository.Update(item);
             }
 
             if (hasChanges)
@@ -176,21 +177,28 @@ namespace Arysoft.ARI.NF48.Api.Services
             var hasChanges = false;
             var endDate = item.EndDate.Value.Date.AddDays(1).AddSeconds(-1);
 
-            if (item.Status < AuditStatusType.InProcess && item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
+            if (item.Status == AuditStatusType.Confirmed && 
+                item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
             {
                 item.Status = AuditStatusType.InProcess;
-                _repository.Update(item);
+                //_repository.Update(item);
                 hasChanges = true;
             }
 
-            if (item.Status == AuditStatusType.InProcess && endDate < DateTime.UtcNow)
+            // En confirmed ambién por si se registra una auditoria antigua
+            if ((item.Status == AuditStatusType.Confirmed || item.Status == AuditStatusType.InProcess) 
+                && endDate < DateTime.UtcNow)
             {
                 item.Status = AuditStatusType.Finished;
-                _repository.Update(item);
+                //_repository.Update(item);
                 hasChanges = true;
             }
 
-            if (hasChanges) _repository.SaveChanges();
+            if (hasChanges) 
+            {
+                _repository.Update(item);
+                _repository.SaveChanges();
+            }
 
             return item;
         } // GetAsync

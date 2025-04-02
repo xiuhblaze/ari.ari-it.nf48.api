@@ -54,7 +54,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
-                UserOrganization = item.UserOrganization,
                 Status = item.Status,
                 // RELATIONS
                 OrganizationName = item.Organization != null 
@@ -122,7 +121,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
-                UserOrganization = item.UserOrganization,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,

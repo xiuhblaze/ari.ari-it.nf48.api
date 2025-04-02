@@ -80,10 +80,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50);
 
             modelBuilder.Entity<AppForm>()
-                .Property(m => m.UserOrganization)
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<AppForm>()
                 .Property(m => m.Status)
                 .IsRequired();
 

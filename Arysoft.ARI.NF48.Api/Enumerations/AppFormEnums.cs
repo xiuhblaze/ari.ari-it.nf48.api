@@ -2,9 +2,8 @@
 {
     public enum AppFormStatusType
     {
-        Nothing,            // Nuevo registro
+        Nothing,            // Nuevo registro - temporal sino se guarda, se elimina
         New,                // Nuevo registro almacenado con la información mínima
-        startOrg,           // Nuevo registro desde la organización
         SalesReview,        // Ventas revisa y aprueba el appForm recibido por el cliente
         SalesRejected,      // Rechazado por ventas, el cliente debe de completar más información
         ApplicantReview,    // Revisa que todo esté bien y es quien aprueba el appForm

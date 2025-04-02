@@ -62,8 +62,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string UserReviewer { get; set; }
 
-        public string UserOrganization { get; set; }
-
         public new AppFormStatusType Status { get; set; }
 
         // RELATIONS

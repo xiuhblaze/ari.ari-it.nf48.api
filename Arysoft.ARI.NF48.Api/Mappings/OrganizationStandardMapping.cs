@@ -37,6 +37,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardBase = item.Standard != null
                     ? item.Standard.StandardBase ?? StandardBaseType.Nothing
                     : StandardBaseType.Nothing,
+                StandardStatus = item.Standard != null
+                    ? item.Standard.Status
+                    : StatusType.Nothing,
                 Status = item.Status
             };
         } // OrganizationStandardToItemListDto

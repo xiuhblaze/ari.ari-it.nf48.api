@@ -66,7 +66,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.Standard != null && m.Standard.Name.ToLower().Contains(filters.Text))
                     || (m.UserSales != null && m.UserSales.ToLower().Contains(filters.Text))
                     || (m.UserReviewer != null && m.UserReviewer.ToLower().Contains(filters.Text))
-                    || (m.UserOrganization != null && m.UserOrganization.ToLower().Contains(filters.Text))
                 );
             } // Text
 
@@ -171,16 +170,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("UpdatedUser is required");
 
             // - Validaciones por status
-            if (item.Status != foundItem.Status) { // El status cambió
+
+            if (item.Status == AppFormStatusType.Nothing)
+                item.Status = AppFormStatusType.New;
+
+            if (item.Status != foundItem.Status) // El status cambió
+            { 
                 switch (item.Status)
                 {
-                    case AppFormStatusType.Nothing:
-                        item.Status = AppFormStatusType.New;
-                        break;
-
-                    case AppFormStatusType.Send:
-                        foundItem.UserOrganization = item.UpdatedUser;
-                        break;
+                    //case AppFormStatusType.Nothing:
+                    //    item.Status = AppFormStatusType.New;
+                    //    break;
 
                     case AppFormStatusType.SalesReview:
                         item.SalesDate = DateTime.UtcNow;
@@ -199,17 +199,21 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AppFormStatusType.ApplicantReview:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-                        if (string.IsNullOrEmpty(item.ReviewJustification))
-                            throw new BusinessException("Review justification is required");
+                        if (string.IsNullOrEmpty(item.SalesComments))
+                            throw new BusinessException("Review comments is required");
                         break;
                     
                     case AppFormStatusType.ApplicantRejected:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-                        if (string.IsNullOrEmpty(item.ReviewJustification))
-                            throw new BusinessException("Review justification is required");
+                        //if (string.IsNullOrEmpty(item.ReviewJustification)) // Esto es para 22K solamente, creo
+                        //    throw new BusinessException("Review justification is required");
                         break;
-                    //TODO: Falta validar cada caso
+
+                    case AppFormStatusType.Active:
+                        item.ReviewDate = DateTime.UtcNow;
+                        foundItem.UserReviewer = item.UpdatedUser;
+                        break;
                 }
             }
 
