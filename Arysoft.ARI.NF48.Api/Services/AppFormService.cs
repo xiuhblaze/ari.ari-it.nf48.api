@@ -169,6 +169,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (string.IsNullOrEmpty(item.UpdatedUser))
                 throw new BusinessException("UpdatedUser is required");
 
+            // - Validar que no se pueda crear otro AppForm si hay uno activo del mismo standard
+
             // - Validaciones por status
 
             if (item.Status == AppFormStatusType.Nothing)
