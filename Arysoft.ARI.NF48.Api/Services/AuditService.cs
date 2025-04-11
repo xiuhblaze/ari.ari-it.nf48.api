@@ -258,7 +258,22 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
+            if (item.StartDate >= item.EndDate)
+                throw new BusinessException("The start date must be less than the end date");
+
             // - Que las fechas de auditoria no se translapen con otra auditoria del mismo ciclo
+
+            // - Validar que los auditores no estén programados en otra auditoria en la misma fecha
+            var hasAuditorBusy = false;
+            foreach (var auditor in foundItem.AuditAuditors)
+            { 
+                if (await _repository.HasAuditorAnAudit(auditor.ID, item.StartDate.Value, item.EndDate.Value, item.ID))
+                {
+                    hasAuditorBusy = false;
+                }
+            }
+            if (hasAuditorBusy)
+                throw new BusinessException("At least one auditor is assigned to another audit event");
 
             // Assigning values
 
@@ -319,6 +334,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        public async Task<bool> HasAuditorAnAudit(Guid auditorID, DateTime startDate, DateTime endDate, Guid? auditExceptionID)
+        {
+            return await _repository.HasAuditorAnAudit(auditorID, startDate, endDate, auditExceptionID);
+        } // HasAuditorAnAudit
 
         // PRIVATE
 
