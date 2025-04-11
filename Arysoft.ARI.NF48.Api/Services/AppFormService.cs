@@ -177,7 +177,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.Status = AppFormStatusType.New;
 
             if (item.Status != foundItem.Status) // El status cambió
-            { 
+            {
                 switch (item.Status)
                 {
                     //case AppFormStatusType.Nothing:
@@ -199,22 +199,37 @@ namespace Arysoft.ARI.NF48.Api.Services
                         break;
 
                     case AppFormStatusType.ApplicantReview:
-                        item.ReviewDate = DateTime.UtcNow;
-                        foundItem.UserReviewer = item.UpdatedUser;
-                        if (string.IsNullOrEmpty(item.SalesComments))
-                            throw new BusinessException("Review comments is required");
+                        //item.ReviewDate = DateTime.UtcNow;
+                        //foundItem.UserReviewer = item.UpdatedUser;
+                        if (foundItem.Status == AppFormStatusType.SalesReview)
+                        {
+                            if (string.IsNullOrEmpty(item.SalesComments))
+                                throw new BusinessException("Sales comments is required");
+                            item.SalesDate = DateTime.UtcNow;
+                            foundItem.UserSales = item.UpdatedUser;
+                        }
+
+                        if (foundItem.Status == AppFormStatusType.ApplicantRejected)
+                        {
+                            if (string.IsNullOrEmpty(item.ReviewComments))
+                                throw new BusinessException("Review comments is required");
+                            item.ReviewDate = DateTime.UtcNow;
+                            foundItem.UserReviewer = item.UpdatedUser;
+                        }
                         break;
                     
                     case AppFormStatusType.ApplicantRejected:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-                        //if (string.IsNullOrEmpty(item.ReviewJustification)) // Esto es para 22K solamente, creo
-                        //    throw new BusinessException("Review justification is required");
+                        if (string.IsNullOrEmpty(item.ReviewComments))
+                            throw new BusinessException("Review comments is required");
                         break;
 
                     case AppFormStatusType.Active:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
+                        if (string.IsNullOrEmpty(item.ReviewComments))
+                            throw new BusinessException("Review comments is required");
                         break;
                 }
             }
@@ -246,13 +261,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.OutsourcedProcess = item.OutsourcedProcess;
             foundItem.AnyConsultancy = item.AnyConsultancy;
             foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
-            foundItem.SalesDate = item.SalesDate;   // TODO: Este va a cambiar de lugar cuando las validaciones
+            foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
             foundItem.SalesComments = item.SalesComments;
-            foundItem.ReviewDate = item.ReviewDate; // TODO: Este va a cambiar en cuanto se apliquen las validaciones
+            foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
             foundItem.ReviewJustification = item.ReviewJustification;
             foundItem.ReviewComments = item.ReviewComments;
 
-            foundItem.Status = item.Status;         // TODO: Validar los cambios de status
+            foundItem.Status = item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
