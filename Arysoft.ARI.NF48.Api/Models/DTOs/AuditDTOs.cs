@@ -19,6 +19,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public bool? HasWitness { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         public AuditStatusType Status { get; set; }
 
         // RELATIONS
@@ -51,6 +53,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime? EndDate { get; set; }
 
         public bool? HasWitness { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         public AuditStatusType Status { get; set; }
 
@@ -98,6 +102,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime? EndDate { get; set; }
 
         public bool? HasWitness { get; set; }
+
+        [StringLength(1000)]
+        public string ExtraInfo { get; set; }
 
         [Required]
         public AuditStatusType Status { get; set; }

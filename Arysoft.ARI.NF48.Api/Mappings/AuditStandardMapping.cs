@@ -34,6 +34,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardName = item.Standard != null
                     ? item.Standard.Name
                     : string.Empty,
+                StandardBase = item.Standard != null 
+                    ? item.Standard.StandardBase ?? StandardBaseType.Nothing
+                    : StandardBaseType.Nothing,
+                StandardStatus = item.Standard != null
+                    ? item.Standard.Status
+                    : StatusType.Nothing,
                 AuditorsCount = item.AuditAuditors != null
                     ? item.AuditAuditors.Count
                     : 0,

@@ -1,9 +1,9 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
-using System.Threading.Tasks;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using System;
 using System.Data.Entity;
 using System.Linq;
-using Arysoft.ARI.NF48.Api.Enumerations;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {

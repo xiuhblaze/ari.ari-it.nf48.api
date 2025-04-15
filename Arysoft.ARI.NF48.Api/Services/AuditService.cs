@@ -70,15 +70,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Where(e =>
                         (e.Description != null && e.Description.ToLower().Contains(filters.Text))
                         || (e.AuditAuditors != null && e.AuditAuditors
-                            .Where(aa => 
-                                (aa.Auditor.FirstName != null && aa.Auditor.FirstName.ToLower().Contains(filters.Text))
+                            .Where(aa => aa.Auditor != null &&
+                                ((aa.Auditor.FirstName != null && aa.Auditor.FirstName.ToLower().Contains(filters.Text))
                                 || (aa.Auditor.MiddleName != null && aa.Auditor.MiddleName.ToLower().Contains(filters.Text))
-                                || (aa.Auditor.LastName != null && aa.Auditor.LastName.ToLower().Contains(filters.Text))
+                                || (aa.Auditor.LastName != null && aa.Auditor.LastName.ToLower().Contains(filters.Text)))
                             ).Any())
                         || (e.AuditStandards != null && e.AuditStandards
-                            .Where(ads => 
-                                (ads.Standard.Name != null && ads.Standard.Name.ToLower().Contains(filters.Text))
-                                || (ads.Standard.Description != null && ads.Standard.Description.ToLower().Contains(filters.Text))
+                            .Where(ads => ads.Standard != null && 
+                                ((ads.Standard.Name != null && ads.Standard.Name.ToLower().Contains(filters.Text))
+                                || (ads.Standard.Description != null && ads.Standard.Description.ToLower().Contains(filters.Text)))
                             ).Any())
                     );
             }
@@ -258,7 +258,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            if (item.StartDate >= item.EndDate)
+            if (item.StartDate > item.EndDate)
                 throw new BusinessException("The start date must be less than the end date");
 
             // - Que las fechas de auditoria no se translapen con otra auditoria del mismo ciclo
@@ -269,11 +269,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             { 
                 if (await _repository.HasAuditorAnAudit(auditor.ID, item.StartDate.Value, item.EndDate.Value, item.ID))
                 {
-                    hasAuditorBusy = false;
+                    hasAuditorBusy = true;
                 }
             }
             if (hasAuditorBusy)
                 throw new BusinessException("At least one auditor is assigned to another audit event");
+
+            // - Si va a cambiar de Status,
+            //   validar que tenga la información completa requerida por el Status nuevo como:
+            //   - Standars activos
+            //   - Auditores activos y con el Standard correcto 
 
             // Assigning values
 
@@ -284,6 +289,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.StartDate = item.StartDate;
             foundItem.EndDate = item.EndDate;
             foundItem.HasWitness = item.HasWitness;
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status == AuditStatusType.Nothing
                 ? AuditStatusType.Scheduled
                 : item.Status;

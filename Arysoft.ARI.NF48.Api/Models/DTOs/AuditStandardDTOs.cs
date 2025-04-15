@@ -1,6 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -25,6 +24,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string AuditDescription { get; set; }
 
         public string StandardName { get; set; }
+
+        public StandardBaseType StandardBase { get; set; }
+
+        public StatusType StandardStatus { get; set; }
 
         public int AuditorsCount { get; set; }
 
