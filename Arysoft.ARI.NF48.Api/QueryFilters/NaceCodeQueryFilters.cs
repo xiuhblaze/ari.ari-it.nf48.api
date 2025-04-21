@@ -16,6 +16,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public NaceCodeOnlyOptionType? OnlyOption { get; set; }
 
+        public NaceCodeAccreditedType? AccreditedStatus { get; set; }
+
         public StatusType? Status { get; set; }
 
         public NaceCodeOrderType Order { get; set; }

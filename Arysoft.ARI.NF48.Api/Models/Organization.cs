@@ -7,7 +7,7 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public int? Folio { get; set; }
 
-        public string Name { get; set; } // El nombre que aparecerá en el certificado
+        public string Name { get; set; }        // El nombre que aparecerá en el certificado
 
         public string LogoFile { get; set; }
 
@@ -17,29 +17,29 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string ExtraInfo { get; set; }
 
+        public int? FolderFolio { get; set; }    // Contiene el numero de la carpeta donde está ubicado en OneDrive
+
         public new OrganizationStatusType Status { get; set; }
 
         // RELATIONS
 
-        // public virtual ICollection<Application> Applications { get; set; }
-
         public virtual ICollection<AuditCycle> AuditCycles { get; set; }
 
-        public virtual ICollection<Certificate> Certificates { get; set; }
+        // public virtual ICollection<Certificate> Certificates { get; set; }
 
         public virtual ICollection<Company> Companies { get; set; }
 
         public virtual ICollection<Contact> Contacts { get; set; }
 
-        public virtual ICollection<Site> Sites { get; set; }
-
         public virtual ICollection<Note> Notes { get; set; }
+
+        public virtual ICollection<Site> Sites { get; set; }
 
         public virtual ICollection<OrganizationStandard> OrganizationStandards { get; set; }
 
         // NOT MAPPED
 
-        public CertificateValidityStatusType? CertificatesValidityStatus { get; set; }
+        // public CertificateValidityStatusType? CertificatesValidityStatus { get; set; } // xBlaze: módulo fallido, no se va a utilizar, dejar la logica para el futuro
 
     } // Organization
 }

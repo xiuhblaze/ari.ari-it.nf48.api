@@ -13,19 +13,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Name { get; set; }
 
-        public string LegalEntity { get; set; }
+        //public string LegalEntity { get; set; }
 
         public string LogoFile { get; set; }
 
-        public string QRFile { get; set; }
+        //public string QRFile { get; set; }
 
         public string Website { get; set; }
 
         public string Phone { get; set; }
 
-        public string COID { get; set; }
+        //public string COID { get; set; }
 
         public string ExtraInfo { get; set; }
+
+        public int? FolderFolio { get; set; }
 
         public OrganizationStatusType Status { get; set; }
 
@@ -34,6 +36,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
 
         // RELATIONS
+
+        public int AuditCyclesCount { get; set; }
 
         public int ContactsCount { get; set; }
 
@@ -53,7 +57,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int SitesEmployeesCount { get; set; }
 
-        public int CertificatesCount { get; set; }
+        // public int CertificatesCount { get; set; }
 
         public int NotesCount { get; set; }
 
@@ -63,7 +67,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // CALCULATED
 
-        public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
+        // public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
 
     } // OrganizationItemListDto
 
@@ -77,19 +81,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Name { get; set; }
 
-        public string LegalEntity { get; set; }
+        // public string LegalEntity { get; set; }
 
         public string LogoFile { get; set; }
 
-        public string QRFile { get; set; }
+        // public string QRFile { get; set; }
 
         public string Website { get; set; }
 
         public string Phone { get; set; }
 
-        public string COID { get; set; }
+        // public string COID { get; set; }
 
         public string ExtraInfo { get; set; }
+
+        public int? FolderFolio { get; set; }
 
         public OrganizationStatusType Status { get; set; }
 
@@ -101,13 +107,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public IEnumerable<ApplicationItemListDto> Applications { get; set; }
+        // public IEnumerable<ApplicationItemListDto> Applications { get; set; }
 
-        //public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
+        public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
 
         public IEnumerable<CompanyItemListDto> Companies { get; set; }
 
-        public IEnumerable<CertificateItemListDto> Certificates { get; set; }
+        // public IEnumerable<CertificateItemListDto> Certificates { get; set; }
 
         public IEnumerable<ContactItemListDto> Contacts { get; set; }
 
@@ -119,7 +125,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // CALCULATED
 
-        public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
+        // public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
     }
 
     public class OrganizationPostDto
@@ -146,6 +152,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(1000)]
         public string ExtraInfo { get; set; }
+
+        public int? FolderFolio { get; set; }
 
         [Required]
         public OrganizationStatusType Status { get; set; }

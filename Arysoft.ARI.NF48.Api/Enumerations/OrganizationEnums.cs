@@ -19,12 +19,12 @@
         Folio,
         Name,
         Status,
-        CertificatesValidityStatus,
+        FolderFolio,
         Updated,
         FolioDesc,
         NameDesc,
         StatusDesc,
-        CertificatesValidityStatusDesc,
+        FolderFolioDesc,
         UpdatedDesc
     }
 }

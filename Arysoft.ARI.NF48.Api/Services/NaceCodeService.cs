@@ -12,13 +12,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 {
     public class NaceCodeService
     {
-        private readonly BaseRepository<NaceCode> _naceCodeRepository;
+        private readonly NaceCodeRepository _naceCodeRepository; //  BaseRepository<NaceCode> _naceCodeRepository;
 
         // CONSTRUCTOR
 
         public NaceCodeService()
         {
-            _naceCodeRepository = new BaseRepository<NaceCode>();
+            _naceCodeRepository = new NaceCodeRepository(); // BaseRepository<NaceCode>();
         }
 
         // METHODS
@@ -33,7 +33,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(e => 
-                    e.Description != null && e.Description.ToLower().Contains(filters.Text)
+                    (e.Description != null && e.Description.ToLower().Contains(filters.Text))
+                    || (e.AccreditationInfo != null && e.AccreditationInfo.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -76,26 +77,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
-            //if (filters.OnlySectors != null && (bool)filters.OnlySectors)
-            //{
-            //    items = items.Where(e => e.Sector != null && e.Division == null && e.Group == null && e.Class == null);
-            //}
-
-            //if (filters.OnlyDivisions != null && (bool)filters.OnlyDivisions)
-            //{
-            //    items = items.Where(e => e.Sector != null && e.Division != null && e.Group == null && e.Class == null);
-            //}
-
-            //if (filters.OnlyGroups != null && (bool)filters.OnlyGroups)
-            //{
-            //    items = items.Where(e => e.Sector != null && e.Division != null && e.Group != null && e.Class == null);
-            //}
-
-            //if (filters.OnlyClasses != null && (bool)filters.OnlyClasses)
-            //{
-            //    items = items.Where(e => e.Sector != null && e.Division != null && e.Group != null && e.Class != null);
-            //}
-
+            if (filters.AccreditedStatus != null && filters.AccreditedStatus != NaceCodeAccreditedType.Ninguno)
+            {
+                items = items.Where(e => e.AccreditedStatus == filters.AccreditedStatus);
+            }
+            
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);
@@ -115,6 +101,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case NaceCodeOrderType.Description:
                     items = items.OrderBy(e => e.Description);
                     break;
+                case NaceCodeOrderType.Accredited:
+                    items = items.OrderBy(e => e.AccreditedStatus);
+                    break;
+                case NaceCodeOrderType.AccreditationDate:
+                    items = items.OrderBy(e => e.AccreditationDate);
+                    break;
                 case NaceCodeOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
@@ -126,6 +118,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
                 case NaceCodeOrderType.DescriptionDesc:
                     items = items.OrderByDescending(e => e.Description);
+                    break;
+                case NaceCodeOrderType.AccreditedDesc:
+                    items = items.OrderByDescending(e => e.AccreditedStatus);
+                    break;
+                case NaceCodeOrderType.AccreditationDateDesc:
+                    items = items.OrderByDescending(e => e.AccreditationDate);
                     break;
                 case NaceCodeOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
@@ -171,12 +169,35 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<NaceCode> UpdateAsync(NaceCode item)
         {
-            // Validations
-
-            // -- validate if not exist a duplicate item with Sector, Division, Group and Class
-
             var foundItem = await _naceCodeRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
+
+            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+
+            // Validations
+
+            // - Si cambia el status, validar cosas
+            if (item.Status != foundItem.Status)
+            {
+                if (item.Status == StatusType.Active) // Solo si cambia a activo...
+                {
+                    // -- validate if not exist a duplicate item with Sector, Division, Group and Class
+                    if(await _naceCodeRepository
+                        .ExistNacecodeAsync(item.Sector, item.Division, item.Group, item.Class, item.ID))
+                        throw new BusinessException("A record with the same Sector, Division, Group and Class already exists");
+                }
+            }
+
+            // - Cambió el status de la acreditación
+            if (item.AccreditedStatus != foundItem.AccreditedStatus)
+            {
+                if (string.IsNullOrEmpty(item.AccreditationInfo))
+                    throw new BusinessException("The accreditation information must not be empty");
+                
+                foundItem.AccreditedStatus = item.AccreditedStatus;
+                foundItem.AccreditationInfo = item.AccreditationInfo;
+                foundItem.AccreditationDate = DateTime.UtcNow;  // - Actualizar fecha
+            }
 
             // Assigning values
 
@@ -185,9 +206,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Group = item.Group;
             foundItem.Class = item.Class;
             foundItem.Description = item.Description;
-            foundItem.Status = item.Status == StatusType.Nothing
-                ? StatusType.Active
-                : item.Status;
+            //foundItem.AccreditedStatus = item.AccreditedStatus;
+            //foundItem.AccreditationInfo = item.AccreditationInfo;
+            foundItem.Status = item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

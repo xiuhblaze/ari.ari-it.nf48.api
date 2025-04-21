@@ -52,11 +52,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Website = item.Website,
                 Phone = item.Phone,
                 ExtraInfo = item.ExtraInfo,
+                FolderFolio = item.FolderFolio,
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                CertificatesCount = item.Certificates != null
-                    ? item.Certificates.Where(i => i.Status != CertificateStatusType.Nothing).Count()
+                //CertificatesCount = item.Certificates != null
+                //    ? item.Certificates.Where(i => i.Status != CertificateStatusType.Nothing).Count()
+                //    : 0,
+                AuditCyclesCount = item.AuditCycles != null
+                    ? item.AuditCycles.Where(i => 
+                        i.Status != StatusType.Nothing && i.Status != StatusType.Deleted)
+                        .Count()
                     : 0,
                 Companies = item.Companies != null
                     ? CompanyMapping.CompanyToListDto(item.Companies
@@ -93,9 +99,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Standards = item.OrganizationStandards != null
                     ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))
-                    : null,                
-                CertificatesValidityStatus = item.CertificatesValidityStatus
-                    ?? CertificateValidityStatusType.Nothing
+                    : null
+                //CertificatesValidityStatus = item.CertificatesValidityStatus
+                //    ?? CertificateValidityStatusType.Nothing
             };
         } // OrganizationToItemListDto
 
@@ -110,18 +116,19 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Website = item.Website,
                 Phone = item.Phone,
                 ExtraInfo = item.ExtraInfo,
+                FolderFolio = item.FolderFolio,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
-                UpdatedUser = item.UpdatedUser,
-                //Applications = item.Applications != null
-                //    ? ApplicationMapping.ApplicationsToListDto(item.Applications
-                //        .Where(i => i.Status != ApplicationStatusType.Nothing))
-                //    : new List<ApplicationItemListDto>(),
-                Certificates = item.Certificates != null
-                    ? CertificateMapping.CertificatesToListDto(item.Certificates
-                        .Where(i => i.Status != CertificateStatusType.Nothing))
-                    : new List<CertificateItemListDto>(),
+                UpdatedUser = item.UpdatedUser,                
+                //Certificates = item.Certificates != null
+                //    ? CertificateMapping.CertificatesToListDto(item.Certificates
+                //        .Where(i => i.Status != CertificateStatusType.Nothing))
+                //    : new List<CertificateItemListDto>(),
+                AuditCycles = item.AuditCycles != null
+                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : null,
                 Companies = item.Companies != null
                     ? CompanyMapping.CompanyToListDto(item.Companies)
                     : null,
@@ -141,8 +148,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))
                     : null,                
-                CertificatesValidityStatus = item.CertificatesValidityStatus
-                    ?? CertificateValidityStatusType.Nothing,
+                //CertificatesValidityStatus = item.CertificatesValidityStatus
+                //    ?? CertificateValidityStatusType.Nothing,
             };
         } // OrganizationToItemDetailDto
 
@@ -163,6 +170,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Website = itemDto.Website,
                 Phone= itemDto.Phone,
                 ExtraInfo = itemDto.ExtraInfo,
+                FolderFolio = itemDto.FolderFolio,
                 Status = itemDto.Status,
                 UpdatedUser= itemDto.UpdatedUser
             };

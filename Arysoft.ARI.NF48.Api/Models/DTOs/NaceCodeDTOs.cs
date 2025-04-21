@@ -1,9 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -21,6 +18,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
+        public NaceCodeAccreditedType? AccreditedStatus { get; set; }
+
+        public string AccreditationInfo { get; set; }
+
+        public DateTime? AccreditationDate { get; set; }
+
         public StatusType Status { get; set; }
     }
 
@@ -37,6 +40,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public int? Class { get; set; }
 
         public string Description { get; set; }
+
+        public NaceCodeAccreditedType? AccreditedStatus { get; set; }
+
+        public string AccreditationInfo { get; set; }
+
+        public DateTime? AccreditationDate { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -69,6 +78,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(500)]
         public string Description { get; set; }
+
+        public NaceCodeAccreditedType? AccreditedStatus { get; set; }
+
+        [StringLength(500)]
+        public string AccreditationInfo { get; set; }
 
         public StatusType Status { get; set; }
 
