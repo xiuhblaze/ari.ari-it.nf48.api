@@ -1,6 +1,9 @@
-﻿using Arysoft.ARI.NF48.Api.Exceptions;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
@@ -8,6 +11,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
     public class AuditAuditorRepository : BaseRepository<AuditAuditor>
     {
         // Metodos con acceso a datos especificos de AuditAuditor
+
+        public new void Delete(AuditAuditor item)
+        {
+            _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                "DELETE FROM AuditAuditorsStandards WHERE AuditAuditorID = {0}", item.ID);
+
+            base.Delete(item);
+        } // Delete
 
         public async Task AddAuditStandardAsync(Guid id, Guid auditStandardID)
         {   
@@ -40,5 +51,20 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             foundItem.AuditStandards.Remove(itemStandard);
         } // DelAuditStandardAsync
+
+        public new async Task DeleteTmpByUserAsync(string username)
+        { 
+            foreach (var item in await _model
+                .Where(m =>
+                    m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
+                    && m.Status == StatusType.Nothing
+                ).ToListAsync())
+            {
+                _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                    "DELETE FROM AuditAuditorsStandards WHERE AuditAuditorID = {0}", item.ID);
+
+                _model.Remove(item);
+            }
+        }
     }
 }

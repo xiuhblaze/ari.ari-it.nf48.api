@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Arysoft.ARI.NF48.Api.Enumerations
+﻿namespace Arysoft.ARI.NF48.Api.Enumerations
 {
     public enum StandardsOrderType
     {
@@ -14,5 +9,19 @@ namespace Arysoft.ARI.NF48.Api.Enumerations
         NameDesc,
         StatusDesc,
         UpdateDesc,
+    }
+
+    public enum StandardBaseType
+    { 
+        Nothing,
+        ISO9k,
+        ISO14K,
+        ISO22K,
+        ISO27K,
+        ISO37K,
+        ISO45K,
+        FSSC22K,
+        HACCP,
+        GMarkets
     }
 }

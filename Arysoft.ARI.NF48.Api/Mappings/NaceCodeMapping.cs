@@ -1,9 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -31,6 +28,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Group = item.Group,
                 Class = item.Class,
                 Description = item.Description,
+                AccreditedStatus = item.AccreditedStatus,
+                AccreditationInfo = item.AccreditationInfo,
+                AccreditationDate = item.AccreditationDate,
                 Status = item.Status
             };
         } // NaceCodeToItemListDto
@@ -45,6 +45,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Group = item.Group,
                 Class = item.Class,
                 Description = item.Description,
+                AccreditedStatus = item.AccreditedStatus,
+                AccreditationInfo = item.AccreditationInfo,
+                AccreditationDate = item.AccreditationDate,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -70,6 +73,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Group = itemDto.Group,
                 Class = itemDto.Class,
                 Description = itemDto.Description,
+                AccreditedStatus = itemDto.AccreditedStatus,
+                AccreditationInfo = itemDto.AccreditationInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

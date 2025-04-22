@@ -16,11 +16,11 @@
         Danger
     } // DefaultValidityStatusType
 
-    public enum LanguageType
+    public enum LanguageType // Probablemente no se necesite xBlaze 20250325
     {
         Nothing,
-        English,
         Spanish,
+        English,
         Other
     }
 

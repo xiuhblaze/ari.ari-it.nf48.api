@@ -21,6 +21,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // RELATIONS
 
         public string StandardName { get; set; }
+
+        public StandardBaseType StandardBase { get; set; }
+
+        public StatusType StandardStatus { get; set; }
+
     } // AuditCycleStandardItemListDto
 
     public class AuditCycleStandardItemDetailDto

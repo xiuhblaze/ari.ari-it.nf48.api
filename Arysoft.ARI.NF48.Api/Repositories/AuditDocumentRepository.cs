@@ -1,6 +1,9 @@
-﻿using Arysoft.ARI.NF48.Api.Exceptions;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
@@ -9,8 +12,16 @@ namespace Arysoft.ARI.NF48.Api.Repositories
     {
         // Metodos con acceso a datos especificos de AuditDocument
 
-        public async Task AddAuditStandardAsync(Guid id, Guid auditStandardID)
+        public new void Delete(AuditDocument item)
         {
+            _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                "DELETE FROM AuditDocumentsStandards WHERE AuditDocumentID = {0}", item.ID);
+
+            base.Delete(item);
+        } // Delete
+
+        public async Task AddAuditStandardAsync(Guid id, Guid auditStandardID)
+        { 
             var _auditStandardRepository = _context.Set<AuditStandard>();
 
             var foundItem = await _model.FindAsync(id)
@@ -38,5 +49,20 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             foundItem.AuditStandards.Remove(itemStandard);
         } // DelAuditStandardAsync
+
+        public new async Task DeleteTmpByUserAsync(string username)
+        {
+            foreach (var item in await _model
+                .Where(m =>
+                    m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
+                    && m.Status == StatusType.Nothing
+                ).ToListAsync())
+            {
+                _context.Database.ExecuteSqlCommand( // To delete the intermediate table cascade
+                    "DELETE FROM AuditDocumentsStandards WHERE AuditDocumentID = {0}", item.ID);
+
+                _model.Remove(item);
+            }
+        }
     }
 }

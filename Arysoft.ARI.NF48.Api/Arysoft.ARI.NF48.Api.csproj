@@ -227,6 +227,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\AppFormsController.cs" />
     <Compile Include="Controllers\ApplicationsController.cs" />
     <Compile Include="Controllers\AuditAuditorsController.cs" />
     <Compile Include="Controllers\AuditCyclesController.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="CustomEntities\Metadata.cs" />
     <Compile Include="CustomEntities\PagedList.cs" />
+    <Compile Include="Data\Configurations\AppFormConfiguration.cs" />
     <Compile Include="Data\Configurations\ApplicationConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditAuditorConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditConfiguration.cs" />
@@ -299,6 +301,7 @@
     <Compile Include="Data\Configurations\SiteConfiguration.cs" />
     <Compile Include="Data\Configurations\StandardConfiguration.cs" />
     <Compile Include="Data\Configurations\UserConfiguration.cs" />
+    <Compile Include="Enumerations\AppFormEnums.cs" />
     <Compile Include="Enumerations\ApplicationEnum.cs" />
     <Compile Include="Enumerations\AuditAuditorEnum.cs" />
     <Compile Include="Enumerations\AuditCycleDocumentEnum.cs" />
@@ -340,6 +343,7 @@
     </Compile>
     <Compile Include="Invokers\MyApiControllerActionInvoker.cs" />
     <Compile Include="IO\FileRepository.cs" />
+    <Compile Include="Mappings\AppFormMapping.cs" />
     <Compile Include="Mappings\ApplicationMapping.cs" />
     <Compile Include="Mappings\AuditAuditorMapping.cs" />
     <Compile Include="Mappings\AuditCycleDocumentMapping.cs" />
@@ -392,6 +396,7 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\DayCalculationConcept.cs" />
     <Compile Include="Models\DayCalculationConceptApplication.cs" />
+    <Compile Include="Models\DTOs\AppFormDTOs.cs" />
     <Compile Include="Models\DTOs\ApplicationDTOs.cs" />
     <Compile Include="Models\DTOs\AuditAuditorDTOs.cs" />
     <Compile Include="Models\DTOs\AuditCycleDocumentDTOs.cs" />
@@ -443,6 +448,7 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryFilters\AppFormQueryFilters.cs" />
     <Compile Include="QueryFilters\ApplicationQueryFilters.cs" />
     <Compile Include="QueryFilters\AuditAuditorQueryFilters.cs" />
     <Compile Include="QueryFilters\AuditCycleDocumentQueryFilters.cs" />
@@ -478,6 +484,7 @@
     <Compile Include="QueryFilters\SiteQueryFilters.cs" />
     <Compile Include="QueryFilters\StandardQueryFilters.cs" />
     <Compile Include="QueryFilters\UserQueryFilters.cs" />
+    <Compile Include="Repositories\AppFormRepository.cs" />
     <Compile Include="Repositories\ApplicationRepository.cs" />
     <Compile Include="Repositories\AuditAuditorRepository.cs" />
     <Compile Include="Repositories\AuditDocumentRepository.cs" />
@@ -512,6 +519,7 @@
     <Compile Include="Repositories\StandardRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Response\ApiResponse.cs" />
+    <Compile Include="Services\AppFormService.cs" />
     <Compile Include="Services\ApplicationService.cs" />
     <Compile Include="Services\AuditAuditorService.cs" />
     <Compile Include="Services\AuditCycleDocumentService.cs" />

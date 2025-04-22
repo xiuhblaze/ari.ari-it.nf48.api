@@ -16,6 +16,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public bool? HasWitness { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         public new AuditStatusType Status { get; set; }
 
         // RELATIONS

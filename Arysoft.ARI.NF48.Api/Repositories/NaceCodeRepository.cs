@@ -1,5 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Models;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,18 +8,20 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class NaceCodeRepository : BaseRepository<NaceCode>
     {
-        //public async Task DeleteTmpByUser(string username)
-        //{ 
-        //    var items = await _model
-        //        .Where(m => 
-        //            m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
-        //            && m.Status == StatusType.Nothing
-        //        ).ToListAsync();
-
-        //    foreach (var item in items)
-        //    {
-        //        _model.Remove(item);
-        //    }
-        //} // DeleteTmpByUser
+        public async Task<bool> ExistNacecodeAsync(int? sector, int? division, int? group, int? @class, Guid? exceptionID)
+        {
+            var response = _model
+                .Where(nc =>
+                    nc.Sector == sector
+                    && nc.Division == division
+                    && nc.Group == group
+                    && nc.Class == @class
+                );
+            if (exceptionID != null && exceptionID != Guid.Empty)
+            {
+                response = response.Where(nc => nc.ID != exceptionID);
+            }
+            return await response.AnyAsync();
+        } // ExistNacecodeAsync
     }
 }

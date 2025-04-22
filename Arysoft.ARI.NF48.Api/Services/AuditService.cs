@@ -70,15 +70,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Where(e =>
                         (e.Description != null && e.Description.ToLower().Contains(filters.Text))
                         || (e.AuditAuditors != null && e.AuditAuditors
-                            .Where(aa => 
-                                (aa.Auditor.FirstName != null && aa.Auditor.FirstName.ToLower().Contains(filters.Text))
+                            .Where(aa => aa.Auditor != null &&
+                                ((aa.Auditor.FirstName != null && aa.Auditor.FirstName.ToLower().Contains(filters.Text))
                                 || (aa.Auditor.MiddleName != null && aa.Auditor.MiddleName.ToLower().Contains(filters.Text))
-                                || (aa.Auditor.LastName != null && aa.Auditor.LastName.ToLower().Contains(filters.Text))
+                                || (aa.Auditor.LastName != null && aa.Auditor.LastName.ToLower().Contains(filters.Text)))
                             ).Any())
                         || (e.AuditStandards != null && e.AuditStandards
-                            .Where(ads => 
-                                (ads.Standard.Name != null && ads.Standard.Name.ToLower().Contains(filters.Text))
-                                || (ads.Standard.Description != null && ads.Standard.Description.ToLower().Contains(filters.Text))
+                            .Where(ads => ads.Standard != null && 
+                                ((ads.Standard.Name != null && ads.Standard.Name.ToLower().Contains(filters.Text))
+                                || (ads.Standard.Description != null && ads.Standard.Description.ToLower().Contains(filters.Text)))
                             ).Any())
                     );
             }
@@ -134,26 +134,27 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // Agregando la última hora del día
                 var endDate = item.EndDate.Value.Date.AddDays(1).AddSeconds(-1);
+                var hasInternalChanges = false; // para solo llamar una vez a .Update
 
-                if (item.Status < AuditStatusType.InProcess)
+                if (item.Status == AuditStatusType.Confirmed && 
+                    item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
                 {
-                    if (item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
-                    {
-                        item.Status = AuditStatusType.InProcess;
-                        _repository.Update(item);
-                        hasChanges = true;
-                    }
+                    item.Status = AuditStatusType.InProcess;
+                    //_repository.Update(item);
+                    hasInternalChanges = true;
+                    hasChanges = true;
                 }
 
-                if (item.Status == AuditStatusType.InProcess)
-                {
-                    if (endDate < DateTime.UtcNow)
-                    {
-                        item.Status = AuditStatusType.Finished;
-                        _repository.Update(item);
-                        hasChanges = true;
-                    }
+                if ((item.Status == AuditStatusType.Confirmed || item.Status == AuditStatusType.InProcess) &&
+                    endDate < DateTime.UtcNow)
+                {   
+                    item.Status = AuditStatusType.Finished;
+                    //_repository.Update(item);
+                    hasInternalChanges = true;
+                    hasChanges = true;
                 }
+
+                if (hasInternalChanges) _repository.Update(item);
             }
 
             if (hasChanges)
@@ -176,21 +177,28 @@ namespace Arysoft.ARI.NF48.Api.Services
             var hasChanges = false;
             var endDate = item.EndDate.Value.Date.AddDays(1).AddSeconds(-1);
 
-            if (item.Status < AuditStatusType.InProcess && item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
+            if (item.Status == AuditStatusType.Confirmed && 
+                item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
             {
                 item.Status = AuditStatusType.InProcess;
-                _repository.Update(item);
+                //_repository.Update(item);
                 hasChanges = true;
             }
 
-            if (item.Status == AuditStatusType.InProcess && endDate < DateTime.UtcNow)
+            // En confirmed ambién por si se registra una auditoria antigua
+            if ((item.Status == AuditStatusType.Confirmed || item.Status == AuditStatusType.InProcess) 
+                && endDate < DateTime.UtcNow)
             {
                 item.Status = AuditStatusType.Finished;
-                _repository.Update(item);
+                //_repository.Update(item);
                 hasChanges = true;
             }
 
-            if (hasChanges) _repository.SaveChanges();
+            if (hasChanges) 
+            {
+                _repository.Update(item);
+                _repository.SaveChanges();
+            }
 
             return item;
         } // GetAsync
@@ -250,7 +258,27 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
+            if (item.StartDate > item.EndDate)
+                throw new BusinessException("The start date must be less than the end date");
+
             // - Que las fechas de auditoria no se translapen con otra auditoria del mismo ciclo
+
+            // - Validar que los auditores no estén programados en otra auditoria en la misma fecha
+            var hasAuditorBusy = false;
+            foreach (var auditor in foundItem.AuditAuditors)
+            { 
+                if (await _repository.HasAuditorAnAudit(auditor.ID, item.StartDate.Value, item.EndDate.Value, item.ID))
+                {
+                    hasAuditorBusy = true;
+                }
+            }
+            if (hasAuditorBusy)
+                throw new BusinessException("At least one auditor is assigned to another audit event");
+
+            // - Si va a cambiar de Status,
+            //   validar que tenga la información completa requerida por el Status nuevo como:
+            //   - Standars activos
+            //   - Auditores activos y con el Standard correcto 
 
             // Assigning values
 
@@ -261,6 +289,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.StartDate = item.StartDate;
             foundItem.EndDate = item.EndDate;
             foundItem.HasWitness = item.HasWitness;
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status == AuditStatusType.Nothing
                 ? AuditStatusType.Scheduled
                 : item.Status;
@@ -311,6 +340,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        public async Task<bool> HasAuditorAnAudit(Guid auditorID, DateTime startDate, DateTime endDate, Guid? auditExceptionID)
+        {
+            return await _repository.HasAuditorAnAudit(auditorID, startDate, endDate, auditExceptionID);
+        } // HasAuditorAnAudit
 
         // PRIVATE
 

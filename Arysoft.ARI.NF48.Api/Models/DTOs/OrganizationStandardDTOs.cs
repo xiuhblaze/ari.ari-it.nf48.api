@@ -18,6 +18,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string StandardName { get; set; }
 
+        public StandardBaseType StandardBase { get; set; }
+
+        public StatusType StandardStatus { get; set; }
+
         public StatusType Status { get; set; }
     } // OrganizationStandardItemListDto
 

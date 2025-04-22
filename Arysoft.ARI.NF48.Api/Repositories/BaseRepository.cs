@@ -47,7 +47,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             _context.Entry(item).State = EntityState.Modified;
         }
 
-        public void Delete(T item)
+        public virtual void Delete(T item)
         {
             _context.Entry(item).State = EntityState.Deleted;
             //_model.Remove(item);

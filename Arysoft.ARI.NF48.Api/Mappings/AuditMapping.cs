@@ -28,6 +28,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
                 HasWitness = item.HasWitness,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 OrganizationName = item.AuditCycle != null && item.AuditCycle.Organization != null
                     ? item.AuditCycle.Organization.Name
@@ -76,6 +77,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
                 HasWitness = item.HasWitness,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -124,6 +126,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StartDate = itemDto.StartDate,
                 EndDate = itemDto.EndDate,
                 HasWitness = itemDto.HasWitness,
+                ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser,
             };
