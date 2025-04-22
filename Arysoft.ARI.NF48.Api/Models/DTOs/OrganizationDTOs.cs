@@ -47,6 +47,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string ContactPhone { get; set; }
 
+        public ContactItemListDto MainContact { get; set; }
+
+        public AuditItemListDto NextAudit { get; set; }
+
+        public SiteItemListDto MainSite { get; set; }
+
         public int SitesCount { get; set; }
 
         public string SiteDescription { get; set; }
