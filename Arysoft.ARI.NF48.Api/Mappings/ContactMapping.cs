@@ -33,6 +33,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Position = item.Position,
                 PhotoFilename = item.PhotoFilename,
                 IsMainContact = item.IsMainContact,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status
             };
         } // ContactToItemListDto
@@ -53,6 +54,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Position = item.Position,
                 PhotoFilename = item.PhotoFilename,
                 IsMainContact = item.IsMainContact,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -86,6 +88,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Address = itemDto.Address,
                 Position = itemDto.Position,
                 IsMainContact = itemDto.IsMainContact,
+                ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

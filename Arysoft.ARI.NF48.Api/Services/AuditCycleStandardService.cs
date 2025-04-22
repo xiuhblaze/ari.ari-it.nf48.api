@@ -133,20 +133,27 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (await _repository.IsStandardInCycleAsync(item.AuditCycleID, (Guid)item.StandardID, item.ID))
                 throw new BusinessException("There is already a current standard in this cycle");
 
-            // - Que no exista otro ciclo activo con este standard
-            //TODO: Considerar si se debe validar solo si el ciclo está activo
-            //TODO: REVISAR EL USO DE ESTA VALIDACION -xBlaze
-            //if (await _repository.IsStandardInAnyOrganizationActiveCycleAsync(foundItem.AuditCycle.OrganizationID, (Guid)item.StandardID, item.ID))
-            //    throw new BusinessException("There is already a current standard in another active cycle");
-
             // Assigning values
 
             if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
+            // - Que no exista otro el standard en ciclo activo y si el ciclo no es activo,
+            //   permitir agregarlo
+            if (foundItem.Status != item.Status 
+                && item.Status == StatusType.Active
+                && foundItem.AuditCycle.Status == StatusType.Active
+            )
+            {
+                if (await _repository.IsStandardActiveInOrganizationAnyAuditCycleAsync(foundItem.AuditCycle.OrganizationID, (Guid)item.StandardID, item.ID))
+                    throw new BusinessException("There is already a current standard in another active cycle");
+            }   
+
             foundItem.StandardID = item.StandardID;
             foundItem.InitialStep = item.InitialStep;
             foundItem.CycleType = item.CycleType;
-            foundItem.Status = item.Status;
+            foundItem.Status = foundItem.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

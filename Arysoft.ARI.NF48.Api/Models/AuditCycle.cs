@@ -7,13 +7,17 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid OrganizationID { get; set; }
 
+        public string Name { get; set; }
+
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         // RELATIONS
 
-        // public virtual Organization Organization { get; set; }
+        public virtual Organization Organization { get; set; }
 
         public virtual ICollection<Audit> Audits { get; set; }
 

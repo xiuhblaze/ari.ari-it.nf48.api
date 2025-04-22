@@ -36,6 +36,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(100);
 
             modelBuilder.Entity<AuditCycleDocument>()
+                .Property(m => m.UploadedBy)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<AuditCycleDocument>()
                 .Property(m => m.Status)
                 .IsRequired();
 

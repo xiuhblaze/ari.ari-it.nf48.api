@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,20 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditCycleStandardItemListDto
             {
                 ID = item.ID,
+                AuditCycleID = item.AuditCycleID,
+                StandardID = item.StandardID ?? Guid.Empty,
                 InitialStep = item.InitialStep,
                 CycleType = item.CycleType,
                 Status = item.Status,
                 StandardName = item.Standard != null
                     ? item.Standard.Name
-                    : string.Empty
+                    : string.Empty,
+                StandardBase = item.Standard != null
+                    ? item.Standard.StandardBase ?? StandardBaseType.Nothing
+                    : StandardBaseType.Nothing,
+                StandardStatus = item.Standard != null
+                    ? item.Standard.Status
+                    : StatusType.Nothing
             };
         } // AuditCycleStandardToItemListDto
 

@@ -157,15 +157,17 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.DocumentType = item.DocumentType;
             foundItem.Comments = item.Comments;
             foundItem.OtherDescription = item.OtherDescription;
-            foundItem.Status = item.Status;
+            foundItem.UploadedBy = item.UploadedBy;
+            foundItem.Status = item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
 
             try
-            {
-                await _repository.DeleteTmpByUserAsync(foundItem.UpdatedUser);
+            {   
                 _repository.Update(foundItem);
                 await _repository.SaveChangesAsync(); // Async para esperar aquí a ver si sucede un error
             }

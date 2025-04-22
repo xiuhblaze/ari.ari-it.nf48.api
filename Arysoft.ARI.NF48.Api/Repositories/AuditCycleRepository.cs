@@ -1,7 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -31,8 +30,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             }
         } // SetInactiveByOrganizationID
 
-        // Validar que no exista un ciclo activo entre dos fechas
-
+        /// <summary>
+        /// Validar que no exista un ciclo entre dos fechas
+        /// </summary>
+        /// <param name="organizationID"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         public async Task<bool> IsAnyCycleBetweenDatesByOrganizationAsync(
             Guid organizationID, 
             DateTime startDate,
@@ -65,16 +69,49 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 );
         }
 
-        public async Task<bool> IsAnyCycleActiveByOrganizationAndStandardAsync(
+        //public async Task<bool> IsAnyCycleActiveByOrganizationAndStandardAsync(
+        //    Guid organizationID,
+        //    ICollection<AuditCycleStandard> standards,
+        //    Guid? exceptionID
+        //)
+        //{
+        //    return await _model
+        //        .AnyAsync(m => m.OrganizationID == organizationID
+        //            && m.AuditCycleStandards.Any(acs => standards.Where(s => s.StandardID == acs.StandardID).Any())
+        //            && m.Status == StatusType.Active
+        //        );
+        //}
+
+        public bool IsAnyCycleActiveByOrganizationAndStandard(
             Guid organizationID,
-            ICollection<AuditCycleStandard> standards
+            ICollection<AuditCycleStandard> standards,
+            Guid? exceptionID
         )
         {
-            return await _model
-                .AnyAsync(m => m.OrganizationID == organizationID
-                    && m.AuditCycleStandards.Any(acs => standards.Where(s => s.StandardID == acs.StandardID).Any())
-                    && m.Status == StatusType.Active
-                );
+            var auditCycles = _model
+                .Where(m => m.OrganizationID == organizationID
+                    && m.Status == StatusType.Active);
+
+            if (exceptionID != null && exceptionID != Guid.Empty)
+            {
+                auditCycles = auditCycles.Where(m => m.ID != exceptionID);
+            }
+
+            foreach (var ac in auditCycles)
+            {
+                foreach (var acs in ac.AuditCycleStandards.Where(acs => acs.Status == StatusType.Active))
+                {
+                    foreach (var s in standards)
+                    {
+                        if (s.StandardID == acs.StandardID)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

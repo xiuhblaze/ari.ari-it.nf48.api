@@ -29,13 +29,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 MaxReductionDays = item.MaxReductionDays,
                 SalesMaxReductionDays = item.SalesMaxReductionDays,
+                StandardBase = item.StandardBase,
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                ApplicationsCount = item.Applications != null 
-                    ? item.Applications
-                        .Where(app => app.Status != ApplicationStatusType.Nothing).Count()
-                    : 0,
+                //ApplicationsCount = item.Applications != null 
+                //    ? item.Applications
+                //        .Where(app => app.Status != ApplicationStatusType.Nothing).Count()
+                //    : 0,
                 AuditorsCount = item.AuditorStandards != null
                     ? item.AuditorStandards
                         .Where(aus => aus.Status == StatusType.Active).Count()
@@ -64,14 +65,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 MaxReductionDays = item.MaxReductionDays,
                 SalesMaxReductionDays = item.SalesMaxReductionDays,
+                StandardBase = item.StandardBase,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                Applications = item.Applications != null
-                    ? ApplicationMapping.ApplicationsToListDto(item.Applications
-                        .Where(a => a.Status != ApplicationStatusType.Nothing))
-                    : null,
+                //Applications = item.Applications != null
+                //    ? ApplicationMapping.ApplicationsToListDto(item.Applications
+                //        .Where(a => a.Status != ApplicationStatusType.Nothing))
+                //    : null,
                 Auditors = item.AuditorStandards != null
                     ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards
                         .Where(aus => aus.Status >= StatusType.Nothing))
@@ -108,6 +110,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             item.Description = itemDto.Description;
             item.MaxReductionDays = itemDto.MaxReductionDays;
             item.SalesMaxReductionDays = itemDto.SalesMaxReductionDays;
+            item.StandardBase = itemDto.StandardBase;
             item.Status = itemDto.Status;
             item.UpdatedUser = itemDto.UpdatedUser;
 

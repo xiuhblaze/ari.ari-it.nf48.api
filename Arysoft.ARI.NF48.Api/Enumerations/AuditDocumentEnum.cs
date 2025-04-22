@@ -6,12 +6,25 @@
         AuditPlan,
         OaCM,                   // Opening and closing meeting
         AuditReport,
-        NCmay,                  // Non conformity major
-        NCmin,                  // Non conformity minor
-        TechReport,
         FsscIntegrityLetter,    // Solo para FSSC
         FsscAuditPlanSigned,    // Solo para FSSC
+        ActionPlan,             // Action plan & evidence
+        NCCloseReport,          // Non conformities close report
+        TechReport,             // No for FSSC
+        CDC,                    // Certification decision checklist - Aquí se quedó
+        FsscScreenShot,         // Solo para FSSC
+        TravelExpenses,         // Viaticos
+        WitnessReport,          // Informe de testigo   
         Other
     } // AuditDocumentType
+
+    public enum AuditDocumentOrderType
+    {
+        Nothing,
+        DocumentType,
+        Standard,
+        DocumentTypeDesc,
+        StandardDesc
+    } // AuditDocumentOrderType
 }
       

@@ -1,11 +1,9 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {
@@ -35,7 +33,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return await items.AnyAsync();
         } // IsStandardInCycleAsync
 
-        public async Task<bool> IsStandardInAnyOrganizationActiveCycleAsync(
+        public async Task<bool> IsStandardActiveInOrganizationAnyAuditCycleAsync(
             Guid organizationID,
             Guid standardID,
             Guid? exceptionAuditCycleID
@@ -44,6 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var items = _model
                 .Where(m => 
                     m.AuditCycle.OrganizationID == organizationID
+                    && m.AuditCycle.Status == StatusType.Active
                     && m.StandardID == standardID
                     && m.Status == StatusType.Active
                 );

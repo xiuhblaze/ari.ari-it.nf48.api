@@ -11,13 +11,15 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Filename { get; set; }
 
-        public string Version { get; set; }
+        public string Version { get; set; } // Para la versión del ISO, como ejemplo FSSC 5.1 y 6.0
 
         public string Comments { get; set; }
 
         public AuditCycleDocumentType? DocumentType { get; set; }
 
         public string OtherDescription { get; set; }
+
+        public string UploadedBy { get; set; }
 
         // RELATIONS
 

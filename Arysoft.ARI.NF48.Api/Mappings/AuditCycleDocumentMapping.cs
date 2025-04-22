@@ -32,6 +32,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Comments = item.Comments,
                 DocumentType = item.DocumentType ?? AuditCycleDocumentType.Nothing,
                 OtherDescription = item.OtherDescription,
+                UploadedBy = item.UploadedBy,
                 Status = item.Status,
                 StandardName = item.Standard != null
                     ? item.Standard.Name
@@ -51,6 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Comments = item.Comments,
                 DocumentType = item.DocumentType ?? AuditCycleDocumentType.Nothing,
                 OtherDescription = item.OtherDescription,
+                UploadedBy = item.UploadedBy,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,

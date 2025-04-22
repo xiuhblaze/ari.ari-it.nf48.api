@@ -7,7 +7,6 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -66,6 +65,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             else
             {
+                // Un listado general omitiendo los registros de tipo Applicant
+                items = items.Where(e => e.Status != OrganizationStatusType.Applicant);
+
                 if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
                 items = (bool)filters.IncludeDeleted
                     ? items.Where(e => e.Status != OrganizationStatusType.Nothing)
@@ -74,17 +76,17 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Generando los valores calculados
 
-            foreach (var item in items)
-            {
-                item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
-            }
+            //foreach (var item in items)
+            //{
+            //    item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
+            //}
 
-            // Calculated filters
+            //// Calculated filters
 
-            if (filters.CertificatesValidityStatus != null && filters.CertificatesValidityStatus != CertificateValidityStatusType.Nothing)
-            {
-                items = items.Where(e => e.CertificatesValidityStatus == filters.CertificatesValidityStatus);
-            }
+            //if (filters.CertificatesValidityStatus != null && filters.CertificatesValidityStatus != CertificateValidityStatusType.Nothing)
+            //{
+            //    items = items.Where(e => e.CertificatesValidityStatus == filters.CertificatesValidityStatus);
+            //}
 
             // Order
 
@@ -100,10 +102,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Status)
                         .ThenBy(e => e.Name);
                     break;
-                case OrganizationOrderType.CertificatesValidityStatus:
-                    items = items.OrderBy(e => e.CertificatesValidityStatus)
-                        .ThenBy(e => e.Name);
+                case OrganizationOrderType.FolderFolio:
+                    items = items.OrderBy(e => e.FolderFolio);
                     break;
+                //case OrganizationOrderType.CertificatesValidityStatus:
+                //    items = items.OrderBy(e => e.CertificatesValidityStatus)
+                //        .ThenBy(e => e.Name);
+                //    break;
                 case OrganizationOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
@@ -117,10 +122,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Status)
                         .ThenByDescending(e => e.Name);
                     break;
-                case OrganizationOrderType.CertificatesValidityStatusDesc:
-                    items = items.OrderByDescending(e => e.CertificatesValidityStatus)
-                        .ThenByDescending(e => e.Name);
+                case OrganizationOrderType.FolderFolioDesc:
+                    items = items.OrderByDescending(e => e.FolderFolio);
                     break;
+                //case OrganizationOrderType.CertificatesValidityStatusDesc:
+                //    items = items.OrderByDescending(e => e.CertificatesValidityStatus)
+                //        .ThenByDescending(e => e.Name);
+                //    break;
                 case OrganizationOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
@@ -142,7 +150,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var item = await _organizationRepository.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
 
-            item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
+            // item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
 
             return item;
         } // GetAsync
@@ -152,7 +160,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var item = await _organizationRepository.GetAsync(folio)
                 ?? throw new BusinessException("Item not found");
 
-            item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
+            // item.CertificatesValidityStatus = GetCertificatesValidityStatus(item);
 
             return item;
         } // GetAsync
@@ -211,20 +219,25 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (foundItem.Status < OrganizationStatusType.Active 
                 && item.Status == OrganizationStatusType.Active
                 && foundItem.Folio == null)
-            {   
+            {
+                // Validar si tiene la documentación minima
+                //if (!HasMinimalDocumentation(foundItem))
+                //    throw new BusinessException("The applicant does not have the minimum required documentation");
+
+                // CheckMinimalDocumentation(foundItem); // xBlaze 20250312: Deshabilitado hasta que se suba información pasada
+
+                // Generando folio
                 foundItem.Folio = await _organizationRepository.GetNextFolioAsync();
             }
 
             foundItem.Name = item.Name;
-            // foundItem.LegalEntity = item.LegalEntity;
             foundItem.LogoFile = item.LogoFile;
-            // foundItem.QRFile = item.QRFile;
             foundItem.Website = item.Website;
-            foundItem.Phone = item.Phone;
-            // foundItem.COID = item.COID;
+            foundItem.Phone = item.Phone;;
             foundItem.ExtraInfo = item.ExtraInfo;
+            foundItem.FolderFolio = item.FolderFolio;
             foundItem.Status = item.Status == OrganizationStatusType.Nothing 
-                ? OrganizationStatusType.Prospect 
+                ? OrganizationStatusType.Applicant 
                 : item.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
@@ -241,7 +254,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"OrganizationService.UpdateAsync: {ex.Message}");
             }
 
-            foundItem.CertificatesValidityStatus = GetCertificatesValidityStatus(foundItem);
+            // foundItem.CertificatesValidityStatus = GetCertificatesValidityStatus(foundItem);
 
             return foundItem;
         } // UpdateAsync
@@ -286,41 +299,89 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
-        private static CertificateValidityStatusType GetCertificatesValidityStatus(Organization item)
+        //private static CertificateValidityStatusType GetCertificatesValidityStatus(Organization item)
+        //{
+        //    if (item != null 
+        //        && item.Certificates != null 
+        //        && item.Certificates
+        //            .Where(i => i.Status != CertificateStatusType.Nothing)
+        //            .Count() > 0
+        //    )
+        //    {
+        //        foreach (var certificate in item.Certificates)
+        //        {
+        //            certificate.ValidityStatus = CertificateService.GetValidityStatus(certificate);
+        //        }
+
+        //        var anyInDanger = item.Certificates
+        //            .Where(c =>
+        //                c.Status == CertificateStatusType.Active
+        //                && c.ValidityStatus == CertificateValidityStatusType.Danger)
+        //            .Any();
+
+        //        if (anyInDanger) return CertificateValidityStatusType.Danger;
+        //        else {
+        //            var anyInWarning = item.Certificates
+        //                .Where(c =>
+        //                    c.Status == CertificateStatusType.Active
+        //                    && c.ValidityStatus == CertificateValidityStatusType.Warning)
+        //                .Any();
+
+        //            if (anyInWarning) return CertificateValidityStatusType.Warning;
+        //        }
+
+        //        return CertificateValidityStatusType.Success;
+        //    }
+
+        //    return CertificateValidityStatusType.Nothing;
+        //} // GetCertificatesStatus
+
+        private void CheckMinimalDocumentation(Organization item)
         {
-            if (item != null 
-                && item.Certificates != null 
-                && item.Certificates
-                    .Where(i => i.Status != CertificateStatusType.Nothing)
-                    .Count() > 0
-            )
-            {
-                foreach (var certificate in item.Certificates)
-                {
-                    certificate.ValidityStatus = CertificateService.GetValidityStatus(certificate);
-                }
+            if (item.AuditCycles == null || item.AuditCycles.Count == 0)
+                throw new BusinessException("You must create one audit cycle and add the minimal documentation");
 
-                var anyInDanger = item.Certificates
-                    .Where(c =>
-                        c.Status == CertificateStatusType.Active
-                        && c.ValidityStatus == CertificateValidityStatusType.Danger)
-                    .Any();
+            var auditCycle = item.AuditCycles.First(ac => ac.Status == StatusType.Active);
 
-                if (anyInDanger) return CertificateValidityStatusType.Danger;
-                else {
-                    var anyInWarning = item.Certificates
-                        .Where(c =>
-                            c.Status == CertificateStatusType.Active
-                            && c.ValidityStatus == CertificateValidityStatusType.Warning)
-                        .Any();
+            if (auditCycle == null)
+                throw new BusinessException("Must have at least one active audit cycle");
 
-                    if (anyInWarning) return CertificateValidityStatusType.Warning;
-                }
+            if (auditCycle.AuditCycleDocuments == null || auditCycle.AuditCycleDocuments.Count == 0)
+                throw new BusinessException("The audit cycle don't have any document");
 
-                return CertificateValidityStatusType.Success;
-            }
+            bool haveAppForm = false;
+            bool haveADC = false;
+            bool haveProposal = false;
+            bool haveContract = false;
 
-            return CertificateValidityStatusType.Nothing;
-        } // GetCertificatesStatus
+            haveAppForm = auditCycle.AuditCycleDocuments
+                .Where(acd => 
+                    acd.DocumentType == AuditCycleDocumentType.AppForm
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveADC = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.ADC
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveProposal = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Proposal
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            haveContract = auditCycle.AuditCycleDocuments
+                .Where(acd =>
+                    acd.DocumentType == AuditCycleDocumentType.Contract
+                    && acd.Status == StatusType.Active)
+                .Any();
+
+            if (!haveAppForm || !haveADC || !haveProposal || !haveContract)
+                throw new BusinessException("Must have at last a App form, an ADC, a Proposal and a Contract active document");
+
+            //return true;
+        } // CheckMinimalDocumentation
     }
 }

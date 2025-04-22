@@ -20,6 +20,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Audit>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<Audit>()
                 .Property(m => m.Status)
                 .IsRequired();
 
@@ -36,10 +40,33 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
-            modelBuilder.Entity<Audit>() // Ver si jala esto
+            // RELATIONS
+
+            modelBuilder.Entity<Audit>() // Ver si jala esto - si jala jajaja
                 .HasMany(a => a.Notes)
                 .WithOptional()
-                .HasForeignKey(n => n.OwnerID);
+                .HasForeignKey(n => n.OwnerID)
+                .WillCascadeOnDelete(true);
+
+            // - Para que se borren en cascada
+
+            modelBuilder.Entity<Audit>()
+                .HasMany(a => a.AuditAuditors)
+                .WithRequired(aa => aa.Audit)
+                .HasForeignKey(a => a.AuditID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Audit>()
+                .HasMany(a => a.AuditStandards)
+                .WithRequired(asd => asd.Audit)
+                .HasForeignKey(a => a.AuditID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Audit>()
+                .HasMany(a => a.AuditDocuments)
+                .WithRequired(ad => ad.Audit)
+                .HasForeignKey(a => a.AuditID)
+                .WillCascadeOnDelete(true);
         }
     }
 }

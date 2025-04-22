@@ -78,15 +78,21 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<Organization>()
-                .HasMany(o => o.Certificates)
-                .WithRequired(c => c.Organization)
-                .HasForeignKey(c => c.OrganizationID)
+                .HasMany(o => o.AuditCycles)
+                .WithRequired(s => s.Organization)
+                .HasForeignKey(s => s.OrganizationID)
                 .WillCascadeOnDelete(true);
+
+            //modelBuilder.Entity<Organization>()
+            //    .HasMany(o => o.Certificates)
+            //    .WithRequired(c => c.Organization)
+            //    .HasForeignKey(c => c.OrganizationID)
+            //    .WillCascadeOnDelete(true);
 
             // Not Mapped
 
-            modelBuilder.Entity<Organization>()
-                .Ignore(m => m.CertificatesValidityStatus);
+            //modelBuilder.Entity<Organization>()
+            //    .Ignore(m => m.CertificatesValidityStatus);
         } // Configure
     }
 }

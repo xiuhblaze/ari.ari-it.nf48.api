@@ -5,11 +5,11 @@
         Nothing,
         Stage1,
         Stage2,
-        Survey1,
-        Survey2,
+        Surveillance1,
+        Surveillance2,
         Recertification,
-        Transfer,
-        Especial
+        Transfer,   // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
+        Special     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
     }
 
     public enum AuditStatusType
@@ -24,4 +24,13 @@
         Canceled,   // Cancelada - En cualquier Status la auditoria puede ser cancelada, es necesario indicar la razón
         Deleted     // Eliminada - Registro eliminado logicamente, solo para administradores
     } // AuditStatusType
+
+    public enum AuditOrderType
+    {
+        Nothing,
+        Date,
+        Status,
+        DateDesc,
+        StatusDesc
+    } // AuditOrderType
 }

@@ -112,7 +112,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             item.ID = Guid.NewGuid();
-            item.OrganizationID = item.OrganizationID;
+            //item.OrganizationID = item.OrganizationID; // no se ocupa volver a asignar
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;

@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -12,8 +13,12 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public int? Class { get; set; }
 
-         public string Description { get; set; }
+        public string Description { get; set; }
 
-        //public StatusType Status { get; set; }
+        public NaceCodeAccreditedType? AccreditedStatus { get; set; }
+
+        public string AccreditationInfo { get; set; }
+
+        public DateTime? AccreditationDate { get; set; }
     }
 }

@@ -20,6 +20,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<AuditStandard>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AuditStandard>()
                 .Property(m => m.Status)
                 .IsRequired();
 

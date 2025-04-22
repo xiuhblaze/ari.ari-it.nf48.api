@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
@@ -37,6 +38,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardDescription = item.Standard != null
                     ? item.Standard.Description
                     : string.Empty,
+                StandardBase = item.Standard != null 
+                    ? item.Standard.StandardBase ?? StandardBaseType.Nothing
+                    : StandardBaseType.Nothing,
                 Status = item.Status
             };
         } // AuditorStandardToItemListDto

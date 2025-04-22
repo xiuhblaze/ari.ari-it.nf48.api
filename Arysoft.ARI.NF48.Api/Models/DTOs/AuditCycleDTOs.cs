@@ -9,32 +9,42 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public Guid OrganizationID { get; set; }
+
+        public string Name { get; set; }
+
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
 
         // RELATIONS
 
-        // public string OrganizationName { get; set; }
+        public string OrganizationName { get; set; }
 
         public int AuditsCount { get; set; }
 
         public IEnumerable<AuditCycleStandardItemListDto> AuditCycleStandards { get; set; }
 
-        public int DocumentsCount { get; set; }
+        public int DocumentsCount { get; set; } // No lo veo muy necesario
     } // AuditCycleItemListDto
 
     public class AuditCycleItemDetailDto
     {
         public Guid ID { get; set; }
 
-        // public Guid OrganizationID { get; set; }
+        public Guid OrganizationID { get; set; }
+
+        public string Name { get; set; }
 
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -46,9 +56,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        // public OrganizationItemListDto Organization { get; set; }
+        public OrganizationItemListDto Organization { get; set; }
 
-        // public IEnumerable<AuditItemListDto> Audits { get; set; }
+        public IEnumerable<AuditItemListDto> Audits { get; set; }
 
         public IEnumerable<AuditCycleStandardItemListDto> AuditCycleStandards { get; set; }
 
@@ -57,8 +67,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class AuditCyclePostDto
     {
-        //[Required]
-        //public Guid OrganizationID { get; set; }
+        [Required]
+        public Guid OrganizationID { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -70,11 +80,17 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid ID { get; set; }
 
+        [StringLength(50)]
+        public string Name { get; set; }
+
         [Required]
         public DateTime? StartDate { get; set; }
 
         [Required]
         public DateTime? EndDate { get; set; }
+
+        [StringLength(1000)]
+        public string ExtraInfo { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

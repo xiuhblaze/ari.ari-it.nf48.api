@@ -16,6 +16,14 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnName("AuditCycleID");
 
             modelBuilder.Entity<AuditCycle>()
+                .Property(m => m.Name)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<AuditCycle>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AuditCycle>()
                 .Property(m => m.Status)
                 .IsRequired();
 
@@ -31,6 +39,27 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            // RELATIONS
+
+            modelBuilder.Entity<AuditCycle>()
+                .HasMany(ac => ac.Audits)
+                .WithRequired(a => a.AuditCycle)
+                .HasForeignKey(a => a.AuditCycleID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<AuditCycle>()
+                .HasMany(ac => ac.AuditCycleStandards)
+                .WithRequired(acs => acs.AuditCycle)
+                .HasForeignKey(acs => acs.AuditCycleID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<AuditCycle>()
+                .HasMany(ac => ac.AuditCycleDocuments)
+                .WithRequired(acd => acd.AuditCycle)
+                .HasForeignKey(acd => acd.AuditCycleID)
+                .WillCascadeOnDelete(true);
+
         }
     }
 }

@@ -14,6 +14,10 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public DateTime? EndDate { get; set; }
 
+        public bool? HasWitness { get; set; }
+
+        public string ExtraInfo { get; set; }
+
         public new AuditStatusType Status { get; set; }
 
         // RELATIONS

@@ -3,15 +3,13 @@
     public enum AuditCycleDocumentType
     {
         Nothing,
-        AppForm,    // Application form
-        ADC,        // Audit day calculation
+        AppForm,        // Application form
+        ADC,            // Audit day calculation
         Proposal,
         Contract,
-        AuditProgramme,
-        CDC,        // Certification decision checklist
+        AuditProgramme, // Confirmation letter
         Certificate,
         Survey,
-        Viaticos,
         Other
     } // AuditCycleDocumentType
 

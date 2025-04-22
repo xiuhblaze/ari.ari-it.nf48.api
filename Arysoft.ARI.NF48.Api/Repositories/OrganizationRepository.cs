@@ -19,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             var folio = await _model
                 .Where(o => 
-                    o.Status > OrganizationStatusType.Prospect
+                    o.Status > OrganizationStatusType.Applicant
                 )
                 .MaxAsync(o => o.Folio);
 
@@ -42,10 +42,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public new async Task DeleteTmpByUserAsync(string username)
         {
             var items = await _model
+                .Include(o => o.AuditCycles)
                 .Include(o => o.Companies)
                 .Include(o => o.Contacts)
                 .Include(o => o.Sites.Select(s => s.Shifts))
-                .Include(o => o.Certificates)
+                //.Include(o => o.Certificates)
                 .Where(m =>
                     m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
                     && m.Status == OrganizationStatusType.Nothing

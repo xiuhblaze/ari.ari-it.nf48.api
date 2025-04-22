@@ -46,11 +46,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         public async Task AddRoleAsync(Guid id, Guid roleID)
         {
-            var _roleRepository = new RoleRepository();
+            var _roleRepository = _context.Set<Role>(); // new RoleRepository(); // xBlaze 20250227: Cambios realizados porque en AuditAuditorRepository, no funcionó de la forma que aqui estaba
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The user to add role was not found");
-            var itemRole = await _roleRepository.GetAsync(roleID) // _context.Roles.FindAsync(roleID)
+            var itemRole = await _roleRepository.FindAsync(roleID) // _context.Roles.FindAsync(roleID)
                 ?? throw new BusinessException("The role you are trying to add to the user was not found");
 
             if (!foundItem.Roles.Contains(itemRole))

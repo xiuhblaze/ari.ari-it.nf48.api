@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -10,6 +11,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public bool? IsLeader { get; set; } // Para saber si es el auditor lider de la auditoria
 
+        public bool? IsWitness { get; set; }
+
         public string Comments { get; set; }
 
         // RELATIONS
@@ -17,5 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual Audit Audit { get; set; }
 
         public virtual Auditor Auditor { get; set; }
+
+        public virtual ICollection<AuditStandard> AuditStandards { get; set; }
     }
 }

@@ -17,13 +17,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? SalesMaxReductionDays { get; set; }
 
+        public StandardBaseType? StandardBase { get; set; }
+
         public StatusType Status { get; set; }
 
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
 
-        public int ApplicationsCount { get; set; }
+        // public int ApplicationsCount { get; set; }
 
         public int AuditorsCount { get; set; }
 
@@ -47,6 +49,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? SalesMaxReductionDays { get; set; }
 
+        public StandardBaseType? StandardBase { get; set; }
+
         public StatusType Status { get; set; }
 
         public DateTime Created { get; set; }
@@ -57,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public IEnumerable<ApplicationItemListDto> Applications { get; set; }
+        // public IEnumerable<ApplicationItemListDto> Applications { get; set; }
 
         public IEnumerable<AuditorStandardItemListDto> Auditors { get; set; }
 
@@ -92,6 +96,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [Range(0, 20, ErrorMessage = "Value for Max Reduction Days must be between {1} and {2}.")]
         public int? SalesMaxReductionDays { get; set; }
+
+        [Required]
+        public StandardBaseType? StandardBase { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

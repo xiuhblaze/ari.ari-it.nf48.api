@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
@@ -94,15 +95,26 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             if (file != null)
             {
+                var documentType = item.DocumentType ?? itemEditDto.DocumentType;
+
+                if (documentType == AuditCycleDocumentType.Nothing)
+                    throw new BusinessException("Document type is required");
+
                 filename = FileRepository.UploadFile(
                     file,
                     $"~/files/organizations/{item.AuditCycle.OrganizationID}/Cycles/{item.AuditCycle.ID}",
                     item.ID.ToString()
-                );
+                );                
             }
 
             var itemToEdit = AuditCycleDocumentMapping.ItemEditDtoToAuditCycleDocument(itemEditDto);
+
+            // Si se subió un archivo, se actualizan los siguientes campos
             itemToEdit.Filename = filename ?? item.Filename;
+            itemToEdit.UploadedBy = !string.IsNullOrEmpty(filename)
+                ? itemToEdit.UpdatedUser
+                : item.UploadedBy;
+
             item = await _service.UpdateAsync(itemToEdit);
             var itemDto = AuditCycleDocumentMapping.AuditCycleDocumentToItemDetailDto(item);
             var response = new ApiResponse<AuditCycleDocumentItemDetailDto>(itemDto);

@@ -8,6 +8,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public Guid AuditCycleID { get; set; }
+
+        public Guid StandardID { get; set; }
+
         public AuditStepType? InitialStep { get; set; }
 
         public AuditCycleType? CycleType { get; set; }
@@ -17,6 +21,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // RELATIONS
 
         public string StandardName { get; set; }
+
+        public StandardBaseType StandardBase { get; set; }
+
+        public StatusType StandardStatus { get; set; }
+
     } // AuditCycleStandardItemListDto
 
     public class AuditCycleStandardItemDetailDto
