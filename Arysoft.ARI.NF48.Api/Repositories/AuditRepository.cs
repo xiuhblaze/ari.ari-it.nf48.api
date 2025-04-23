@@ -22,7 +22,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             items = items.Where(a =>
                 a.StartDate >= date
                 && a.Status != AuditStatusType.Nothing
-                && a.Status <= AuditStatusType.Canceled
+                && a.Status < AuditStatusType.Canceled
                 && a.AuditCycle.Status != StatusType.Nothing
             );
 

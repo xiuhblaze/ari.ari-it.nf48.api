@@ -31,8 +31,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
                 Country = item.Country,
-                //LocationLat = item.LocationGPS?.Latitude.Value,
-                //LocationLong = item.LocationGPS?.Longitude.Value,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 ShiftsCount = item.Shifts != null 
@@ -45,6 +43,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status == StatusType.Active)
                         .Sum(i => i.NoEmployees) ?? 0 
                     : 0,
+                Shifts = item.Shifts != null
+                    ? ShiftMapping.ShiftsToListDto(item.Shifts
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : new List<ShiftItemListDto>(),
             };
         } // SiteToItemListDto
 
@@ -58,8 +60,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
                 Country = item.Country,
-                //LocationLat = item.LocationGPS?.Latitude.Value,
-                //LocationLong = item.LocationGPS?.Longitude.Value,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 Created = item.Created,

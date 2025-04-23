@@ -40,7 +40,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (filters.Folio != null) 
             {
-                items = items.Where(e => e.Folio == filters.Folio);
+                items = items.Where(e => 
+                    e.Folio == filters.Folio || 
+                    e.FolderFolio == filters.Folio
+                );
             }
 
             if (!string.IsNullOrEmpty(filters.Text))
