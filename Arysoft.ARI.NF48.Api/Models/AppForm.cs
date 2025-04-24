@@ -26,7 +26,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string CriticalComplaintComments { get; set; }
 
-        public string AutomationLevel { get; set; }
+        public int? AutomationLevelPercent { get; set; } // Porcentaje de automatización del proceso
+
+        public string AutomationLevelJustification { get; set; }
 
         public bool? IsDesignResponsibility { get; set; }
 

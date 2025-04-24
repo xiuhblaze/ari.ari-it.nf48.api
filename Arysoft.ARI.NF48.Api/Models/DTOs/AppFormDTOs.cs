@@ -29,7 +29,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CriticalComplaintComments { get; set; }
 
-        public string AutomationLevel { get; set; }
+        public int? AutomationLevelPercent { get; set; }
+
+        public string AutomationLevelJustification { get; set; }
 
         public bool? IsDesignResponsibility { get; set; }
 
@@ -115,7 +117,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CriticalComplaintComments { get; set; }
 
-        public string AutomationLevel { get; set; }
+        public int? AutomationLevelPercent { get; set; }
+
+        public string AutomationLevelJustification { get; set; }
 
         public bool? IsDesignResponsibility { get; set; }
 
@@ -214,8 +218,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(1000)]
         public string CriticalComplaintComments { get; set; }
 
+        public int? AutomationLevelPercent { get; set; }
+
         [StringLength(1000)]
-        public string AutomationLevel { get; set; }
+        public string AutomationLevelJustification { get; set; }
 
         public bool? IsDesignResponsibility { get; set; }
 
@@ -256,7 +262,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(1000)]
         public string ReviewComments { get; set; }
 
-        //[StringLength(50)]    // NO SE VAN A RECIBIR, Se deben calcularc con el UpdateUser y el cambio de Status
+        //[StringLength(50)]    // NO SE VAN A RECIBIR, Se deben calcular con el UpdateUser y el cambio de Status
         //public string UserSales { get; set; }
 
         //[StringLength(50)]

@@ -52,7 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.ProcessServicesDescription != null && m.ProcessServicesDescription.ToLower().Contains(filters.Text))
                     || (m.LegalRequirements != null && m.LegalRequirements.ToLower().Contains(filters.Text))
                     || (m.CriticalComplaintComments != null && m.CriticalComplaintComments.ToLower().Contains(filters.Text))
-                    || (m.AutomationLevel != null && m.AutomationLevel.ToLower().Contains(filters.Text))
+                    || (m.AutomationLevelJustification != null && m.AutomationLevelJustification.ToLower().Contains(filters.Text))
                     || (m.DesignResponsibilityJustify != null && m.DesignResponsibilityJustify.ToLower().Contains(filters.Text))
                     || (m.CurrentCertificationsExpiration != null && m.CurrentCertificationsExpiration.ToLower().Contains(filters.Text))
                     || (m.CurrentStandards != null && m.CurrentStandards.ToLower().Contains(filters.Text))
@@ -166,18 +166,27 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validate
 
-            if (string.IsNullOrEmpty(item.UpdatedUser))
-                throw new BusinessException("UpdatedUser is required");
+            ValidateAppForm(item, foundItem);
 
             // - Validar que no se pueda crear otro AppForm si hay uno activo del mismo standard
 
             // - Validaciones por status
 
-            if (item.Status == AppFormStatusType.Nothing)
+            if (item.Status == AppFormStatusType.Nothing 
+                || item.Status == AppFormStatusType.SalesReview // xBlaze 20250424: Estos dos últimos para evitar que se utilicen - en el futuro se podrian necesitar
+                || item.Status == AppFormStatusType.SalesRejected)
                 item.Status = AppFormStatusType.New;
 
             if (item.Status != foundItem.Status) // El status cambió
             {
+                // - De que status a que status no se puede ir
+                if ((foundItem.Status == AppFormStatusType.Nothing 
+                        || foundItem.Status == AppFormStatusType.New
+                        || foundItem.Status == AppFormStatusType.SalesReview
+                        || foundItem.Status == AppFormStatusType.SalesRejected)
+                    && item.Status == AppFormStatusType.Active)
+                    throw new BusinessException("You cannot change the status to Active");
+
                 switch (item.Status)
                 {
                     //case AppFormStatusType.Nothing:
@@ -249,7 +258,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.LegalRequirements = item.LegalRequirements;
             foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
             foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
-            foundItem.AutomationLevel = item.AutomationLevel;
+            foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
+            foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
             foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
             foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
 
@@ -427,5 +437,25 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AppFormService.DelSiteAsync: {ex.Message}");
             }
         } // DelSiteAsync
+
+        // PRIVATE 
+
+        private void ValidateAppForm(AppForm newItem, AppForm currentItem)
+        {
+
+            if (newItem.Status != currentItem.Status) // El status cambió
+            {
+                // - De que status a que status no se puede ir
+                if ((currentItem.Status == AppFormStatusType.Nothing
+                        || currentItem.Status == AppFormStatusType.New
+                        || currentItem.Status == AppFormStatusType.SalesReview
+                        || currentItem.Status == AppFormStatusType.SalesRejected)
+                    && (newItem.Status == AppFormStatusType.Active
+                        || newItem.Status == AppFormStatusType.Inactive))
+                    throw new BusinessException("You cannot change the status to Active");
+                // TODO: Aqui voy 
+
+            }
+        } // ValidateAppForm
     }
 }
