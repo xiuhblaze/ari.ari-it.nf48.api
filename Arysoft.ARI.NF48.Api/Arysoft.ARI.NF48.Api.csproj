@@ -254,6 +254,7 @@
     <Compile Include="Controllers\FSSCSubCategoriesController.cs" />
     <Compile Include="Controllers\NotesController.cs" />
     <Compile Include="Controllers\OrganizationStandardsController.cs" />
+    <Compile Include="CustomEntities\LanguagesList.cs" />
     <Compile Include="Data\AriContext.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />

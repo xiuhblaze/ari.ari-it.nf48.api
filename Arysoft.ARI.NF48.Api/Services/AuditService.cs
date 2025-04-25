@@ -8,6 +8,7 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Http.Controllers;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -258,27 +259,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            if (item.StartDate > item.EndDate)
-                throw new BusinessException("The start date must be less than the end date");
-
-            // - Que las fechas de auditoria no se translapen con otra auditoria del mismo ciclo
-
-            // - Validar que los auditores no estén programados en otra auditoria en la misma fecha
-            var hasAuditorBusy = false;
-            foreach (var auditor in foundItem.AuditAuditors)
-            { 
-                if (await _repository.HasAuditorAnAudit(auditor.ID, item.StartDate.Value, item.EndDate.Value, item.ID))
-                {
-                    hasAuditorBusy = true;
-                }
-            }
-            if (hasAuditorBusy)
-                throw new BusinessException("At least one auditor is assigned to another audit event");
-
-            // - Si va a cambiar de Status,
-            //   validar que tenga la información completa requerida por el Status nuevo como:
-            //   - Standars activos
-            //   - Auditores activos y con el Standard correcto 
+            await ValidateAuditAsync(item, foundItem);            
 
             // Assigning values
 
@@ -347,6 +328,35 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // HasAuditorAnAudit
 
         // PRIVATE
+
+        private async Task ValidateAuditAsync(Audit newItem, Audit currentItem)
+        {
+            // ----------------------------------------------------------------
+            // - Que las fechas de auditoria no se translapen con otra
+            //   auditoria del mismo ciclo
+            // - Validar que los auditores no estén programados en otra
+            //   auditoria en la misma fecha
+            // - Si va a cambiar de Status,
+            //   validar que tenga la información completa requerida por el Status nuevo como:
+            // - Standars activos
+            // - Auditores activos y con el Standard correcto 
+
+            // TODO: AQUI VOY
+
+            if (newItem.StartDate > newItem.EndDate)
+                throw new BusinessException("The start date must be less than the end date");
+
+            var hasAuditorBusy = false;
+            foreach (var auditor in currentItem.AuditAuditors)
+            {
+                if (await _repository.HasAuditorAnAudit(auditor.ID, item.StartDate.Value, item.EndDate.Value, item.ID))
+                {
+                    hasAuditorBusy = true;
+                }
+            }
+            if (hasAuditorBusy)
+                throw new BusinessException("At least one auditor is assigned to another audit event");
+        } // ValidateAudit
 
         private void CheckMinimalAuditCycleDocumentation(AuditCycle auditCycle)
         {
