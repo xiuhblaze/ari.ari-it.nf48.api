@@ -123,4 +123,33 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // AuditDeleteDto
+
+    public class AuditorInAuditDto
+    {
+        [Required]
+        public Guid AuditorID { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; }
+
+        [Required]
+        public DateTime EndDate { get; set; }
+
+        public Guid? AuditExceptionID { get; set; }
+    }
+
+    public class StandardStepInAuditCycleDto
+    {
+
+        [Required] 
+        public Guid AuditCycleID { get; set; }
+
+        [Required]
+        public Guid StandardID { get; set; }
+
+        [Required] 
+        public AuditStepType Step { get; set; }
+
+        public Guid? AuditExceptionID { get; set; }
+    }
 }

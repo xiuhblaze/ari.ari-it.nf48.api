@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+﻿using Antlr.Runtime;
+using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
@@ -322,18 +323,39 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
-        public async Task<bool> HasAuditorAnAudit(Guid auditorID, DateTime startDate, DateTime endDate, Guid? auditExceptionID)
+        public async Task<bool> HasAuditorAnAudit(
+            Guid auditorID, 
+            DateTime startDate, 
+            DateTime endDate, 
+            Guid? auditExceptionID)
         {
-            return await _repository.HasAuditorAnAudit(auditorID, startDate, endDate, auditExceptionID);
+            return await _repository.HasAuditorAnAudit(
+                auditorID, 
+                startDate, 
+                endDate, 
+                auditExceptionID);
         } // HasAuditorAnAudit
+
+        public async Task<bool> IsAnyStandardStepAuditInAuditCycle(
+            Guid auditCycleID,
+            Guid standardID,
+            AuditStepType step,
+            Guid? auditExceptionID)
+        {
+            return await _repository.IsAnyStandardStepAuditInAuditCycle(
+                auditCycleID,
+                standardID,
+                step,
+                auditExceptionID);
+        } // IsAnyEqualStandardStepAuditInAuditCycle
 
         // PRIVATE
 
         private async Task ValidateAuditAsync(Audit newItem, Audit currentItem)
         {
             // ----------------------------------------------------------------
-            // - Que las fechas de auditoria no se translapen con otra
-            //   auditoria del mismo ciclo
+            // - Que la auditoria no se translapen con otra
+            //   auditoria del mismo ciclo y del mismo paso
             // - Validar que los auditores no estén programados en otra
             //   auditoria en la misma fecha
             // - Si va a cambiar de Status,
@@ -346,16 +368,40 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (newItem.StartDate > newItem.EndDate)
                 throw new BusinessException("The start date must be less than the end date");
 
-            var hasAuditorBusy = false;
-            foreach (var auditor in currentItem.AuditAuditors)
-            {
-                if (await _repository.HasAuditorAnAudit(auditor.ID, item.StartDate.Value, item.EndDate.Value, item.ID))
+            var isAnyAuditStandardStepProgrammed = false;
+            foreach(var auditStandard in currentItem.AuditStandards
+                .Where(aus => aus.Status == StatusType.Active))
+            {   
+                if (await _repository.IsAnyStandardStepAuditInAuditCycle(
+                    currentItem.AuditCycleID,
+                    auditStandard.StandardID ?? Guid.Empty,
+                    auditStandard.Step ?? AuditStepType.Nothing,
+                    currentItem.ID))
                 {
-                    hasAuditorBusy = true;
+                    isAnyAuditStandardStepProgrammed = true;
+                    break;
                 }
             }
-            if (hasAuditorBusy)
+            if (isAnyAuditStandardStepProgrammed)
+                throw new BusinessException("At last one standard step is already programmed in another audit");
+
+            var isAuditorBusy = false;
+            foreach (var auditAuditor in currentItem.AuditAuditors
+                .Where(aa => aa.Status == StatusType.Active))
+            {
+                if (await _repository.HasAuditorAnAudit(
+                    auditAuditor.AuditorID ?? Guid.Empty, 
+                    newItem.StartDate ?? DateTime.MinValue, 
+                    newItem.EndDate ?? DateTime.MinValue, 
+                    newItem.ID))
+                {
+                    isAuditorBusy = true;
+                    break;
+                }
+            }
+            if (isAuditorBusy)
                 throw new BusinessException("At least one auditor is assigned to another audit event");
+
         } // ValidateAudit
 
         private void CheckMinimalAuditCycleDocumentation(AuditCycle auditCycle)

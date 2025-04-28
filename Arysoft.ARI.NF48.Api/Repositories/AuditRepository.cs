@@ -1,6 +1,9 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,14 +39,21 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return items.FirstOrDefault();
         } // GetNextAudit
 
-        public async Task<bool> HasAuditorAnAudit(Guid auditorID, DateTime startDate, DateTime endDate, Guid? auditExceptionID)
+        public async Task<bool> HasAuditorAnAudit(
+            Guid auditorID, 
+            DateTime startDate, 
+            DateTime endDate, 
+            Guid? auditExceptionID)
         {
             var items = _model
                 .Include(a => a.AuditAuditors)
                 .Where(a =>
-                    a.AuditAuditors.Any(aa => aa.AuditorID == auditorID)
-                    && (a.StartDate <= endDate && a.EndDate >= startDate) // Probar esto
+                    a.AuditAuditors.Any(aa => 
+                        aa.AuditorID == auditorID
+                        && aa.Status == StatusType.Active)
+                    && (a.StartDate <= endDate && a.EndDate >= startDate) 
                     && a.Status != AuditStatusType.Nothing 
+                    && a.Status < AuditStatusType.Canceled
                 );
 
             if (auditExceptionID != null && auditExceptionID != Guid.Empty)
@@ -53,6 +63,32 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await items.AnyAsync();
         } // HasAuditorAudit
+
+        public async Task<bool> IsAnyStandardStepAuditInAuditCycle(
+            Guid auditCycleID,
+            Guid standardID,
+            AuditStepType step,
+            Guid? auditExceptionID)
+        {
+            var items = _model
+                .Include(a => a.AuditStandards)
+                .Where(a =>
+                    a.AuditCycleID == auditCycleID
+                    && a.AuditStandards.Any(asd =>
+                        asd.StandardID == standardID
+                        && asd.Step == step
+                        && asd.Status == StatusType.Active)
+                    && a.Status != AuditStatusType.Nothing
+                    && a.Status < AuditStatusType.Canceled
+                );
+
+            if (auditExceptionID != null && auditExceptionID != Guid.Empty)
+            {
+                items = items.Where(a => a.ID != auditExceptionID);
+            }
+
+            return await items.AnyAsync();
+        } // IsAnyStandardStepAuditInAuditCycle
 
         public new async Task DeleteTmpByUserAsync(string username)
         {

@@ -60,6 +60,35 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetAudit
 
+        [HttpGet]
+        [Route("api/Audits/has-auditor-an-audit")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> HasAuditorAnAudit(AuditorInAuditDto auditorInAuditDto)
+        {
+            var hasAudit = await _service.HasAuditorAnAudit(
+                auditorInAuditDto.AuditorID,
+                auditorInAuditDto.StartDate,
+                auditorInAuditDto.EndDate,
+                auditorInAuditDto.AuditExceptionID);
+            var response = new ApiResponse<bool>(hasAudit);
+            return Ok(response);
+        } // GetHasAuditorAnAudit
+
+        [HttpGet]
+        [Route("api/Audits/has-standard-step-an-audit")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> HasStandardStepAnAudit(StandardStepInAuditCycleDto valuesDto)
+        {
+            var hasStandardStep = await _service.IsAnyStandardStepAuditInAuditCycle(
+                valuesDto.AuditCycleID,
+                valuesDto.StandardID,
+                valuesDto.Step,
+                valuesDto.AuditExceptionID
+                );
+            var response = new ApiResponse<bool>(hasStandardStep);
+            return Ok(response);
+        } // HasStandardStepAnAudit
+
         [HttpPost]
         [ResponseType(typeof(ApiResponse<AuditItemDetailDto>))]
         public async Task<IHttpActionResult> PostAudit([FromBody] AuditPostDto itemAddDto)

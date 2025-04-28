@@ -142,6 +142,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The record to update was not found");
 
             // Validations
+            // - ISO9001: Que tenga los NACE codes relacionados a la auditoria (ver appForm)
 
             // - La primera vez debe de traer el ID del auditor
             if (foundItem.Status == StatusType.Nothing)
@@ -150,6 +151,20 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("Must first assign an auditor");
 
                 foundItem.AuditorID = item.AuditorID;
+            }
+
+            // - El auditor no puede estar en dos auditorias al mismo tiempo,
+            //   si la asiganción del auditor esta activa o se va a activar
+            if (item.Status == StatusType.Active) 
+            {
+                var auditsRepository = new AuditRepository();
+                var hasAudit = await auditsRepository.HasAuditorAnAudit(
+                    foundItem.AuditorID.Value,
+                    foundItem.Audit.StartDate.Value,
+                    foundItem.Audit.EndDate.Value,
+                    foundItem.Audit.ID);
+                if (hasAudit)
+                    throw new BusinessException("The auditor is already assigned to another audit");
             }
 
             // - Que el auditor no sea líder y observador al mismo tiempo
