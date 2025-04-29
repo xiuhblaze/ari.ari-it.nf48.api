@@ -156,7 +156,19 @@ namespace Arysoft.ARI.NF48.Api.Services
                     hasChanges = true;
                 }
 
-                if (hasInternalChanges) _repository.Update(item);
+                if (hasInternalChanges)
+                {
+                    var note = new Note
+                    {   
+                        OwnerID = item.ID,
+                        Text = $"Status changed to {item.Status.ToString().ToUpper()} by the system",
+                        UpdatedUser = "System"
+                    };
+                    var noteService = new NoteService();
+                    noteService.AddAsync(note);
+
+                    _repository.Update(item);
+                }
             }
 
             if (hasChanges)
@@ -198,6 +210,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (hasChanges) 
             {
+                var note = new Note
+                {
+                    OwnerID = item.ID,
+                    Text = $"Status changed to {item.Status.ToString().ToUpper()} by the system",
+                    UpdatedUser = "System"
+                };
+                var noteService = new NoteService();
+                noteService.AddAsync(note);
+
                 _repository.Update(item);
                 _repository.SaveChanges();
             }
