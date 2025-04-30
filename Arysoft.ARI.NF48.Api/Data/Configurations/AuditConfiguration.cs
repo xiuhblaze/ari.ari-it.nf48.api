@@ -20,6 +20,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Audit>()
+                .Property(m => m.Days)
+                .HasMaxLength(5);
+
+            modelBuilder.Entity<Audit>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(1000);
 
@@ -42,7 +46,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            modelBuilder.Entity<Audit>() // Ver si jala esto - si jala jajaja
+            modelBuilder.Entity<Audit>()
                 .HasMany(a => a.Notes)
                 .WithOptional()
                 .HasForeignKey(n => n.OwnerID)

@@ -17,7 +17,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? EndDate { get; set; }
 
-        public bool? HasWitness { get; set; }
+        //public bool? HasWitness { get; set; }
+
+        public bool? IsMultisite { get; set; }
+
+        public string Days { get; set; }
+
+        public bool? IncludeSaturday { get; set; }
+
+        public bool? IncludeSunday { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -52,7 +60,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? EndDate { get; set; }
 
-        public bool? HasWitness { get; set; }
+        //public bool? HasWitness { get; set; }
+
+        public bool? IsMultisite { get; set; }
+
+        public string Days { get; set; }
+
+        public bool? IncludeSaturday { get; set; }
+
+        public bool? IncludeSunday { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -101,7 +117,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public DateTime? EndDate { get; set; }
 
-        public bool? HasWitness { get; set; }
+        public bool? IsMultisite { get; set; }
+
+        //public bool? HasWitness { get; set; }
+
+        [StringLength(5)]
+        public string Days { get; set; }
+
+        public bool? IncludeSaturday { get; set; }
+
+        public bool? IncludeSunday { get; set; }
 
         [StringLength(1000)]
         public string ExtraInfo { get; set; }

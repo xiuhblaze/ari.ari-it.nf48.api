@@ -155,7 +155,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - El auditor no puede estar en dos auditorias al mismo tiempo,
             //   si la asiganción del auditor esta activa o se va a activar
-            if (item.Status == StatusType.Active) 
+            if (item.Status == StatusType.Active && foundItem.Audit != null
+                && foundItem.Audit.StartDate.HasValue
+                && foundItem.Audit.EndDate.HasValue) 
             {
                 var auditsRepository = new AuditRepository();
                 var hasAudit = await auditsRepository.HasAuditorAnAudit(
