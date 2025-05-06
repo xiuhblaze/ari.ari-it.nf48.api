@@ -47,12 +47,19 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             // RELATIONS
 
             modelBuilder.Entity<Audit>()
+                .HasMany(a => a.Sites)
+                .WithMany(s => s.Audits)
+                .Map(e => e.MapLeftKey("AuditID")
+                    .MapRightKey("SiteID")
+                    .ToTable("AuditSites"));
+
+            // - Para que se borren en cascada
+
+            modelBuilder.Entity<Audit>()
                 .HasMany(a => a.Notes)
                 .WithOptional()
                 .HasForeignKey(n => n.OwnerID)
                 .WillCascadeOnDelete(true);
-
-            // - Para que se borren en cascada
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.AuditAuditors)

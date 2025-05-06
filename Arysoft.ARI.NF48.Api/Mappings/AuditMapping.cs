@@ -66,7 +66,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
                         asd.Status != StatusType.Nothing
                         && asd.Status != StatusType.Deleted))
-                    : null
+                    : null,
+                SitesCount = item.Sites != null
+                    ? item.Sites.Where(s =>
+                        s.Status != StatusType.Nothing
+                        && s.Status != StatusType.Deleted)
+                        .Count()
+                    : 0,
             };
         } // AuditToItemListDto
 
@@ -110,7 +116,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
                         asd.Status != StatusType.Nothing
                         && asd.Status != StatusType.Deleted))
-                    : null
+                    : null,
+                Sites = item.Sites != null
+                    ? SiteMapping.SiteToListDto(item.Sites.Where(s =>
+                        s.Status != StatusType.Nothing
+                        && s.Status != StatusType.Deleted))
+                    : null,
             };
         } // AuditToItemDetailDto
 

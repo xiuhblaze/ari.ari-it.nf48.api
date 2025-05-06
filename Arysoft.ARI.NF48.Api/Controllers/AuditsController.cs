@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using WebGrease;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
@@ -136,5 +137,39 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // DeleteAudit
+
+        // SITES
+
+        [HttpPost]
+        [Route("api/Audits/{id}/site")]
+        public async Task<IHttpActionResult> AddSite(Guid id, [FromBody] AuditEditSiteDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AuditID)
+                throw new BusinessException("ID mismatch");
+                        
+            await _service.AddSiteAsync(itemDto.AuditID, itemDto.SiteID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // AddSite
+
+        [HttpDelete]
+        [Route("api/Audits/{id}/site")] 
+        public async Task<IHttpActionResult> DelSite(Guid id, [FromBody] AuditEditSiteDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AuditID)
+                throw new BusinessException("ID mismatch");
+
+            await _service.DelSiteAsync(itemDto.AuditID, itemDto.SiteID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // DelSite
     }
 }

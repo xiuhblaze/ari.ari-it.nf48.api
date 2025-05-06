@@ -14,8 +14,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public DateTime? EndDate { get; set; }
 
-        //public bool? HasWitness { get; set; }
-
         public bool? IsMultisite { get; set; }
 
         public string Days { get; set; }
@@ -32,11 +30,13 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual AuditCycle AuditCycle { get; set; }
 
+        public virtual ICollection<AuditDocument> AuditDocuments { get; set; }
+
         public virtual ICollection<AuditAuditor> AuditAuditors { get; set; }
 
-        public virtual ICollection<AuditStandard> AuditStandards { get; set; }
+        public virtual ICollection<Site> Sites { get; set; }
 
-        public virtual ICollection<AuditDocument> AuditDocuments { get; set; }
+        public virtual ICollection<AuditStandard> AuditStandards { get; set; }
 
         public virtual ICollection<Note> Notes { get; set; }
     } // Audit

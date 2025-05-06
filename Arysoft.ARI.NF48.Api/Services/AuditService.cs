@@ -375,6 +375,36 @@ namespace Arysoft.ARI.NF48.Api.Services
                 auditExceptionID);
         } // IsAnyEqualStandardStepAuditInAuditCycle
 
+        // SITES
+
+        public async Task AddSiteAsync(Guid id, Guid siteID)
+        {
+            await _repository.AddSiteAsync(id, siteID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditService.AddSiteAsync: {ex.Message}");
+            }
+        } // AddSiteAsync
+
+        public async Task DelSiteAsync(Guid id, Guid siteID)
+        {
+            await _repository.DelSiteAsync(id, siteID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditService.DelSiteAsync: {ex.Message}");
+            }
+        } // DelSiteAsync
+
         // PRIVATE
 
         private async Task ValidateAuditAsync(Audit newItem, Audit currentItem)

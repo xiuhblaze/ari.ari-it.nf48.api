@@ -17,8 +17,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? EndDate { get; set; }
 
-        //public bool? HasWitness { get; set; }
-
         public bool? IsMultisite { get; set; }
 
         public string Days { get; set; }
@@ -46,6 +44,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public int DocumentsCount { get; set; }
 
         public int NotesCount { get; set; }
+
+        public int SitesCount { get; set; }
+
     } // AuditItemListDto
 
     public class AuditItemDetailDto
@@ -86,11 +87,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public IEnumerable<AuditAuditorItemListDto> Auditors { get; set; }
 
-        public IEnumerable<AuditStandardItemListDto> Standards { get; set; }
-
         public IEnumerable<AuditDocumentItemListDto> Documents { get; set; }
 
         public IEnumerable<NoteItemDto> Notes { get; set; }
+
+        public IEnumerable<AuditStandardItemListDto> Standards { get; set; }
+
+        public IEnumerable<SiteItemListDto> Sites { get; set; }
     } // AuditItemDetailDto
 
     public class AuditPostDto
@@ -177,4 +180,18 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? AuditExceptionID { get; set; }
     }
+
+    // SITES
+
+    /// <summary>
+    /// Para agregar o quitar un sitio de una auditoria
+    /// </summary>
+    public class AuditEditSiteDto
+    {
+        [Required]
+        public Guid AuditID { get; set; }
+
+        [Required]
+        public Guid SiteID { get; set; }        
+    } // AuditEditSiteDto
 }
