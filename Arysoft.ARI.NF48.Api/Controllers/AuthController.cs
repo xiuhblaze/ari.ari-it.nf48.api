@@ -8,12 +8,14 @@ using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
+    [AllowAnonymous]
     public class AuthController : ApiController
     {
         private UserService _userService;
@@ -23,13 +25,29 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             _userService = new UserService();
         }
 
+        [HttpGet]
+        [Route("api/Auth/echo-ping")]
+        public IHttpActionResult EchoPing()
+        {
+            return Ok(true);
+        } // EchoPing
+
+        [HttpGet]
+        [Route("api/Auth/echo-user")]
+        public IHttpActionResult EchoUser()
+        {
+            var identity = Thread.CurrentPrincipal.Identity;
+            return Ok($" IPrincipal-user: {identity.Name} - IsAuthenticated: {identity.IsAuthenticated}");
+        } // EchoUser
+
         [ResponseType(typeof(ApiResponse<string>))]
         public async Task<IHttpActionResult> Login([FromBody] AuthLoginDto userDto)
         {   
             var user = await _userService.LoginAsync(userDto.Username, userDto.Password);
 
-            var token = GetToken(user.ID.ToString(), user.Username, user.Email);
-            var response = new ApiResponse<string>(token);
+            var tokenJwt = Tools.TokenGenerator.GenerateTokenJwt(user);
+            //var token = GetToken(user.ID.ToString(), user.Username, user.Email);
+            var response = new ApiResponse<string>(tokenJwt);
 
             return Ok(response);
         } // Login
@@ -77,11 +95,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                             signingCredentials: credentials);
             var jwt_token = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return jwt_token; //new ReturnValue { Data = jwt_token };
+            return jwt_token;
         }
-    }
-
-    public class ReturnValue {
-        public string Data { get; set; }
     }
 }

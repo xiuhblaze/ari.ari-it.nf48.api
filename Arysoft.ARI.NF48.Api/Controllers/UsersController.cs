@@ -15,6 +15,7 @@ using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
+    [Authorize]
     public class UsersController : ApiController
     {
         private UserService _userService;
