@@ -326,6 +326,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == AuditStatusType.Deleted)
             {
+
                 _repository.Delete(foundItem);
             }
             else

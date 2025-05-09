@@ -14,9 +14,10 @@ using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
+    [Authorize]
     public class RolesController : ApiController
     {
-        private RoleService roleService;
+        private readonly RoleService roleService;
 
         // CONSTRUCTOR
 
@@ -53,12 +54,13 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         { 
             var item = await roleService.GetAsync(id) 
                 ?? throw new BusinessException("Item not found");
-            var itemDto = RoleMapping.RoleToItemDetailDto(item);    
+            var itemDto = await RoleMapping.RoleToItemDetailDto(item);    
             var response = new ApiResponse<RoleItemDetailDto>(itemDto);
 
             return Ok(response);
         } // GetRole
 
+        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<RoleItemDetailDto>))]
         public async Task<IHttpActionResult> PostRole([FromBody] RolePostDto itemAddDto)
         {
@@ -67,12 +69,13 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = await roleService
                 .AddAsync(new Models.Role { UpdatedUser = itemAddDto.UpdatedUser });
-            var itemDto = RoleMapping.RoleToItemDetailDto(item);
+            var itemDto = await RoleMapping.RoleToItemDetailDto(item);
             var response = new ApiResponse<RoleItemDetailDto>(itemDto);
 
             return Ok(response);
         } // PostRole
 
+        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<RoleItemDetailDto>))]
         public async Task<IHttpActionResult> PutRole(Guid id, [FromBody] RolePutDto itemEditDto)
         {
@@ -81,12 +84,13 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToEdit = RoleMapping.ItemEditDtoToRole(itemEditDto);
             var item = await roleService.UpdateAsync(itemToEdit);
-            var itemDto = RoleMapping.RoleToItemDetailDto(item);
+            var itemDto = await RoleMapping.RoleToItemDetailDto(item);
             var response = new ApiResponse<RoleItemDetailDto>(itemDto);
 
             return Ok(response);
         } // PutUser
 
+        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteRole(Guid id, [FromBody] RoleDeleteDto itemDeleteDto)
         {

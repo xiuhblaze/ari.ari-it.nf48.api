@@ -20,7 +20,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public Guid ID { get; set; }
 
         [Required]
-        [StringLength(32)]
+        [StringLength(64)]
+        public string OldPassword { get; set; }
+
+        [Required]
+        [StringLength(64)]
         public string NewPassword { get; set; }
     }
 }

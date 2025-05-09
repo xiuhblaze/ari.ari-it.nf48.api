@@ -60,6 +60,12 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                     .MapRightKey("RoleID")
                     .ToTable("RolesUsers")
                 );
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Notes)
+                .WithOptional()
+                .HasForeignKey(n => n.OwnerID)
+                .WillCascadeOnDelete(true);
         } // Configure
     }
 }

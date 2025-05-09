@@ -9,10 +9,10 @@ namespace Arysoft.ARI.NF48.Api
     {
         public static void Register(HttpConfiguration config)
         {
-            config.SuppressDefaultHostAuthentication();
-            config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
             // Configuración y servicios de Web API
+            config.SuppressDefaultHostAuthentication();
+            config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
             // CORS - Desarrollo
             var corsDev = new EnableCorsAttribute("http://localhost:5173", "*", "*");
@@ -24,8 +24,8 @@ namespace Arysoft.ARI.NF48.Api
 
             // Rutas de Web API
             config.MapHttpAttributeRoutes();
-
-            config.MessageHandlers.Add(new TokenValidationHandler());
+            //config.MessageHandlers.Add(new Tools.CorsMessageHandler());  // Primero el handler CORS
+            //config.MessageHandlers.Add(new TokenValidationHandler());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

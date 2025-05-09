@@ -25,6 +25,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static async Task<UserListItemDto> UserToItemListDto(User item)
         {
+            var roles = item.Roles != null
+                ? RoleMapping.RolesToListDto(item.Roles
+                    .Where(r => r.Status != StatusType.Nothing
+                        && r.Status != StatusType.Deleted))
+                    .ToList()
+                : null;
+
             return new UserListItemDto
             {
                 ID = item.ID,                
@@ -36,15 +43,20 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Type = item.Type ?? UserType.Nothing,
                 LastAccess = item.LastAccess,
                 Status = item.Status,                
-                Roles = item.Roles != null
-                    ? RoleMapping.RolesToListDto(item.Roles).ToList()
-                    : null
+                Roles = roles
             };
         } // UserToItemListDto
 
         public static async Task<UserDetailDto> UserToDetailDto(User item)
         {
-            var itemDto = new UserDetailDto
+            var roles = item.Roles != null
+                ? RoleMapping.RolesToListDto(item.Roles
+                    .Where(r => r.Status != StatusType.Nothing
+                        && r.Status != StatusType.Deleted))
+                    .ToList()
+                : null;
+
+            return new UserDetailDto
             {
                 ID = item.ID,
                 OwnerID = item.OwnerID,
@@ -59,12 +71,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                Roles = item.Roles != null
-                    ? RoleMapping.RolesToListDto(item.Roles).ToList()
-                    : null
+                Roles = roles
             };
-
-            return itemDto;
         } // UserToDetailDto
 
         public static User ItemEditDtoToUser(UserPutDto itemDto)

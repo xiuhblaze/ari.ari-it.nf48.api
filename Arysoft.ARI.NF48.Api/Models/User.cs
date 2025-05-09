@@ -6,7 +6,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 {
     public class User : BaseModel
     {
-        public Guid? OwnerID { get; set; } // Organization, Auditor
+        public Guid? OwnerID { get; set; } // Organization, Auditor, ARI User
 
         public string Username { get; set; }
 
@@ -25,5 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         // RELATIONS
 
         public virtual ICollection<Role> Roles { get; set; }
+
+        public virtual ICollection<Note> Notes { get; set; }
     }
 }

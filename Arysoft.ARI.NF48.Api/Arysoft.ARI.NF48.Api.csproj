@@ -573,9 +573,11 @@
     <Compile Include="Services\StandardService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Tools\CorsMessageHandler.cs" />
     <Compile Include="Tools\Encrypt.cs" />
     <Compile Include="Tools\FullName.cs" />
     <Compile Include="Tools\GetModelStateErrors.cs" />
+    <Compile Include="Tools\GlobalCorsPolicyAttribute.cs" />
     <Compile Include="Tools\TokenGenerator.cs" />
     <Compile Include="Tools\TokenValidationHandler.cs" />
   </ItemGroup>

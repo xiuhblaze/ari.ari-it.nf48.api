@@ -44,6 +44,24 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync();
         } // GetUserByLoginAsync
 
+        public async Task<bool> ValidatePasswordAsync(Guid id, string passwordHash)
+        {
+            return await _model
+                .Where(m => m.ID == id && m.PasswordHash == passwordHash)
+                .AnyAsync();
+        } // ValidatePasswordAsync
+
+        public new void Delete(User item)
+        {
+            _context.Database.ExecuteSqlCommand(
+                "DELETE FROM UserRoles WHERE UserID = {0}", item.ID
+            );
+
+            _context.Entry(item).State = EntityState.Deleted;
+        } // Delete
+
+        // ROLES
+
         public async Task AddRoleAsync(Guid id, Guid roleID)
         {
             var _roleRepository = _context.Set<Role>(); // new RoleRepository(); // xBlaze 20250227: Cambios realizados porque en AuditAuditorRepository, no funcionó de la forma que aqui estaba
@@ -53,11 +71,25 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var itemRole = await _roleRepository.FindAsync(roleID) // _context.Roles.FindAsync(roleID)
                 ?? throw new BusinessException("The role you are trying to add to the user was not found");
 
-            if (!foundItem.Roles.Contains(itemRole))
-            {
-                foundItem.Roles.Add(itemRole);
-            }
-            else throw new BusinessException("The role already was assigned to the user");
+            if (foundItem.Roles.Contains(itemRole))
+                throw new BusinessException("The role already was assigned to the user");
+            
+            foundItem.Roles.Add(itemRole);
         } // AddRoleAsync
+
+        public async Task DelRoleAsync(Guid id, Guid roleID)
+        {
+            var _roleRepository = _context.Set<Role>();
+
+            var foundItem = await _model.FindAsync(id)
+                ?? throw new BusinessException("The user to delete role was not found");
+            var itemRole = await _roleRepository.FindAsync(roleID)
+                ?? throw new BusinessException("The role you are trying to delete from the user was not found");
+
+            if (!foundItem.Roles.Contains(itemRole))
+                throw new BusinessException("The role was not assigned to the user");
+             
+            foundItem.Roles.Remove(itemRole);
+        } // DelRoleAsync
     }
 }

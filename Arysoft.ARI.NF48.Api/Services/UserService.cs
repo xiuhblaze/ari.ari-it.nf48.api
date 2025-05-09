@@ -119,6 +119,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // LoginAsync
 
+        public async Task<bool> ValidatePasswordAsync(Guid id, string password)
+        {
+            string passwordHash = Tools.Encrypt.GetSHA256(password);
+            
+            return await _userRepository
+                .ValidatePasswordAsync(id, passwordHash);
+        } // ValidatePasswordAsync
+
         public async Task<User> AddAsync(User item)
         {
             // Validations 
@@ -232,18 +240,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // UpdatePasswordAsync 
 
-        /// <summary>
-        /// Add a role to a user according to IDs
-        /// </summary>
-        /// <param name="id">User Id to add role</param>
-        /// <param name="roleID">Role to add</param>
-        /// <returns></returns>
-        public async Task AddRoleAsync(Guid id, Guid roleID)
-        {
-            await _userRepository.AddRoleAsync(id, roleID);
-            await _userRepository.SaveChangesAsync();            
-        } // AddRoleAsync
-
         public async Task DeleteAsync(User item)
         {   
             var foundItem = await _userRepository.GetAsync(item.ID) 
@@ -266,5 +262,41 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             _userRepository.SaveChanges();
         } // DeleteAsync
+
+        // ROLES
+
+        /// <summary>
+        /// Add a role to a user according to IDs
+        /// </summary>
+        /// <param name="id">User Id to add role</param>
+        /// <param name="roleID">Role to add</param>
+        /// <returns></returns>
+        public async Task AddRoleAsync(Guid id, Guid roleID)
+        {
+            await _userRepository.AddRoleAsync(id, roleID);
+
+            try
+            {
+                await _userRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"UserService.AddRoleAsync: {ex.Message}");
+            }
+        } // AddRoleAsync
+
+        public async Task DelRoleAsync(Guid id, Guid roleID)
+        {
+            await _userRepository.DelRoleAsync(id, roleID);
+
+            try
+            {
+                await _userRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"UserService.DelRoleAsync: {ex.Message}");
+            }
+        } // DelRoleAsync
     }
 }
