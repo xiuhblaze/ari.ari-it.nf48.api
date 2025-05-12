@@ -15,7 +15,6 @@ using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
-    [Authorize]
     public class UsersController : ApiController
     {
         private UserService _userService;
@@ -66,7 +65,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
         } // GetUser
 
-        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<UserDetailDto>))]
         public async Task<IHttpActionResult> PostUser([FromBody] UserPostDto itemAddDto)
         {
@@ -81,7 +79,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         } // PostUser
 
-        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<UserDetailDto>))]
         public async Task<IHttpActionResult> PutUser(Guid id, [FromBody] UserPutDto itemEditDto)
         {
@@ -96,7 +93,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutUser
 
-        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteUser(Guid id, [FromBody] UserDeleteDto itemDeleteDto)
         {
@@ -113,7 +109,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         // ROLES
 
-        [Authorize(Roles = "admin")]
         [HttpPost]
         [Route("api/Users/{id}/role")]
         [ResponseType(typeof(ApiResponse<bool>))]
@@ -131,7 +126,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // AddRole
 
-        [Authorize(Roles = "admin")]
         [HttpDelete]
         [Route("api/Users/{id}/role")]
         public async Task<IHttpActionResult> DelRole(Guid id, [FromBody] UserEditRoleDto itemDelRole)

@@ -10,7 +10,6 @@ using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
-    [AllowAnonymous]
     public class AuthController : ApiController
     {
         private UserService _userService;

@@ -14,7 +14,6 @@ using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
-    [Authorize]
     public class RolesController : ApiController
     {
         private readonly RoleService roleService;
@@ -60,7 +59,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetRole
 
-        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<RoleItemDetailDto>))]
         public async Task<IHttpActionResult> PostRole([FromBody] RolePostDto itemAddDto)
         {
@@ -75,7 +73,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PostRole
 
-        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<RoleItemDetailDto>))]
         public async Task<IHttpActionResult> PutRole(Guid id, [FromBody] RolePutDto itemEditDto)
         {
@@ -90,7 +87,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutUser
 
-        [Authorize(Roles = "admin")]
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteRole(Guid id, [FromBody] RoleDeleteDto itemDeleteDto)
         {
