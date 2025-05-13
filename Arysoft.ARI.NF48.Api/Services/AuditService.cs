@@ -326,6 +326,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == AuditStatusType.Deleted)
             {
+                var fileDirectory = $"~/files/organizations/{foundItem.AuditCycle.OrganizationID}/Cycles/{foundItem.AuditCycle.ID}/{foundItem.ID}";
+                FileRepository.DeleteDirectory(fileDirectory);
 
                 _repository.Delete(foundItem);
             }

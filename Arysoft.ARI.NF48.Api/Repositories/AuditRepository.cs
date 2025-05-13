@@ -12,13 +12,25 @@ namespace Arysoft.ARI.NF48.Api.Repositories
     {
         // GETS
 
+        public new async Task<Audit> GetAsync(Guid id)
+        {
+            return await _model
+                .Include(a => a.AuditAuditors)
+                .Include(a => a.AuditStandards)
+                .Include(a => a.AuditDocuments)
+                .Include(a => a.Notes)
+                .Include(a => a.Sites)
+                .FirstOrDefaultAsync(m => m.ID == id);
+        } // GetAsync
+
         public Audit GetNextAudit(Guid? OrganizationID, DateTime? date)
         {  
             var items = _model
                 .Include(a => a.AuditAuditors)
                 .Include(a => a.AuditStandards)
                 .Include(a => a.AuditDocuments)
-                .Include(a => a.Notes);
+                .Include(a => a.Notes)
+                .Include(a => a.Sites);
 
             if (date == null) date = DateTime.Now;
 
@@ -90,6 +102,73 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return await items.AnyAsync();
         } // IsAnyStandardStepAuditInAuditCycle
 
+        // DELETES
+
+        public new void Delete(Audit item)
+        {
+            if (item.AuditAuditors != null && item.AuditAuditors.Count > 0)
+            {
+                foreach (var auditAuditor in item.AuditAuditors)
+                {
+                    _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                        "DELETE FROM AuditAuditorsStandards WHERE AuditAuditorID = {0}", auditAuditor.ID);
+                }
+                _context.Database.ExecuteSqlCommand( 
+                    "DELETE FROM AuditAuditors WHERE AuditID = {0}", item.ID);
+            }
+
+            if (item.AuditDocuments != null && item.AuditDocuments.Count > 0)
+            {
+                foreach (var auditDocument in item.AuditDocuments)
+                {
+                    _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                        "DELETE FROM AuditDocumentsStandards WHERE AuditDocumentID = {0}", auditDocument.ID);
+                }
+                _context.Database.ExecuteSqlCommand(
+                    "DELETE FROM AuditDocuments WHERE AuditID = {0}", item.ID);
+            }
+
+            if (item.AuditStandards != null && item.AuditStandards.Count > 0)
+            {   
+                _context.Database.ExecuteSqlCommand(
+                    "DELETE FROM AuditStandards WHERE AuditID = {0}", item.ID);
+            }
+
+            if (item.Notes != null && item.Notes.Count > 0)
+            {
+                _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                    "DELETE FROM Notes WHERE OwnerID = {0}", item.ID);
+            }
+
+            _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                "DELETE FROM AuditSites WHERE AuditID = {0}", item.ID);
+
+
+            // TODO: Creo que este estado lo wa convertir tambien en un DELETE
+            _context.Entry(item).State = EntityState.Deleted;
+        }
+
+        public new async Task DeleteTmpByUserAsync(string username)
+        {
+            var items = await _model
+                .Include(o => o.AuditAuditors)
+                .Include(o => o.AuditStandards)
+                .Include(o => o.AuditDocuments)
+                .Include(o => o.Notes)
+                .Where(m =>
+                    m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
+                    && m.Status == AuditStatusType.Nothing
+                ).ToListAsync();
+
+            foreach (var item in items)
+            {
+                _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                    "DELETE FROM AuditSites WHERE AuditID = {0}", item.ID);
+
+                _model.Remove(item);
+            }
+        } // DeleteTmpByUserAsync
+
         // SITES
 
         public async Task AddSiteAsync(Guid id, Guid siteID)
@@ -121,28 +200,5 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             foundItem.Sites.Remove(itemSite);
         } // DelSiteAsync
-
-        // DELETES
-
-        public new async Task DeleteTmpByUserAsync(string username)
-        {
-            var items = await _model
-                .Include(o => o.AuditAuditors)
-                .Include(o => o.AuditStandards)
-                .Include(o => o.AuditDocuments)
-                .Include(o => o.Notes)
-                .Where(m =>
-                    m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
-                    && m.Status == AuditStatusType.Nothing
-                ).ToListAsync();
-
-            foreach (var item in items)
-            {
-                _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
-                    "DELETE FROM AuditSites WHERE AuditID = {0}", item.ID);
-
-                _model.Remove(item);
-            }
-        } // DeleteTmpByUserAsync
     }
 }

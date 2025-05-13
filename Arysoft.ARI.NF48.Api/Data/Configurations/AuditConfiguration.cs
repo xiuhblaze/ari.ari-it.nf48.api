@@ -53,31 +53,33 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                     .MapRightKey("SiteID")
                     .ToTable("AuditSites"));
 
-            // - Para que se borren en cascada
+            // - Para que se borren en cascada, no jaló por su complejidad
+            //   en AuditRepository.Delete() se encuentran las instrucciones
+            //   para borrar en cascada los registros de las tablas intermedias
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.Notes)
                 .WithOptional()
                 .HasForeignKey(n => n.OwnerID)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.AuditAuditors)
                 .WithRequired(aa => aa.Audit)
                 .HasForeignKey(a => a.AuditID)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.AuditStandards)
                 .WithRequired(asd => asd.Audit)
                 .HasForeignKey(a => a.AuditID)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.AuditDocuments)
                 .WithRequired(ad => ad.Audit)
                 .HasForeignKey(a => a.AuditID)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
         }
     }
 }
