@@ -104,6 +104,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         // DELETES
 
+        /// <summary>
+        /// Elimina de forma directa con sentencias SQL porque con
+        /// entityframwork no se puede borrar en cascada, se apendeja XD
+        /// </summary>
+        /// <param name="item"></param>
         public new void Delete(Audit item)
         {
             if (item.AuditAuditors != null && item.AuditAuditors.Count > 0)
@@ -143,9 +148,9 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
                 "DELETE FROM AuditSites WHERE AuditID = {0}", item.ID);
 
-
-            // TODO: Creo que este estado lo wa convertir tambien en un DELETE
-            _context.Entry(item).State = EntityState.Deleted;
+            _context.Database.ExecuteSqlCommand(
+                "DELETE FROM Audits WHERE AuditID = {0}", item.ID);
+            //_context.Entry(item).State = EntityState.Deleted;
         }
 
         public new async Task DeleteTmpByUserAsync(string username)

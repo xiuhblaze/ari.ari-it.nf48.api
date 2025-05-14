@@ -14,17 +14,27 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string Password { get; set; }
     }
 
+    public class AuthValidateDto
+    {
+        [Required]
+        public Guid ID { get; set; }
+
+        [Required]
+        [StringLength(32)]
+        public string Password { get; set; }
+    }
+
     public class AuthChangePasswordDto
     {
         [Required]
         public Guid ID { get; set; }
 
         [Required]
-        [StringLength(64)]
+        [StringLength(32)]
         public string OldPassword { get; set; }
 
         [Required]
-        [StringLength(64)]
+        [StringLength(32)]
         public string NewPassword { get; set; }
     }
 }

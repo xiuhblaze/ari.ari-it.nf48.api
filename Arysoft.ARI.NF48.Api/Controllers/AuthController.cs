@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Response;
 using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -33,6 +34,23 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var identity = Thread.CurrentPrincipal.Identity;
             return Ok($" IPrincipal-user: {identity.Name} - IsAuthenticated: {identity.IsAuthenticated}");
         } // EchoUser
+
+        [HttpPost]
+        [Route("api/Auth/{id}/validate")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> ValidateUser(Guid id, [FromBody] AuthValidateDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.ID)
+                throw new BusinessException("ID mismatch");
+
+            var isValid = await _userService.ValidatePasswordAsync(itemDto.ID, itemDto.Password);
+            var response = new ApiResponse<bool>(isValid);
+
+            return Ok(response);
+        } // ValidateUser
 
         [ResponseType(typeof(ApiResponse<string>))]
         public async Task<IHttpActionResult> Login([FromBody] AuthLoginDto userDto)
@@ -65,6 +83,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // ChangePassword
+
+
 
         ///// <summary>
         ///// Basado en: https://www.linkedin.com/pulse/tutorial-jwt-token-aspnet-48-webapi-mohamed-ebrahim
