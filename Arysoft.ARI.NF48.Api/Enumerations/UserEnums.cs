@@ -3,11 +3,10 @@
     public enum UserType
     { 
         Nothing,
+        SuperAdmin,
         Admin,
         Auditor,
-        Organization,
-        Sales,
-        SuperAdmin
+        Organization
     }
 
 

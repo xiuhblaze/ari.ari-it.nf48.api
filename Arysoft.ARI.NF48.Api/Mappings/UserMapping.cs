@@ -111,9 +111,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
             switch (type)
             {
+                case UserType.SuperAdmin:
+                    ownerName = "GOD";
+                    break;
+
                 case UserType.Admin:
                     ownerName = "ARI";
                     break;
+
                 case UserType.Auditor:
                     if (id != null)
                     {
@@ -127,6 +132,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     }
                     else ownerName = "ARI";
                     break;
+
                 case UserType.Organization:
                     if (id != null)
                     {
@@ -139,12 +145,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     }
                     else ownerName = "(organization)";
                     break;
-                case UserType.Sales:
-                    ownerName = "ARI";
-                    break;
-                case UserType.SuperAdmin:
-                    ownerName = "GOD";
-                    break;
+                
                 default:
                     ownerName = "(unknow)";
                     break;
