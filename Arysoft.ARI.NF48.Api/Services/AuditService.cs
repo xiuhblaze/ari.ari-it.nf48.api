@@ -128,8 +128,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // Validar si están en ejecución para ponerlos InProcess o Finished
+            // y agregar una nota
 
             var hasChanges = false;
+            var noteRepository = new BaseRepository<Note>();
+
             foreach (var item in items)
             {
                 // Agregando la última hora del día
@@ -140,7 +143,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     item.StartDate <= DateTime.UtcNow && endDate >= DateTime.UtcNow)
                 {
                     item.Status = AuditStatusType.InProcess;
-                    //_repository.Update(item);
                     hasInternalChanges = true;
                     hasChanges = true;
                 }
@@ -149,16 +151,30 @@ namespace Arysoft.ARI.NF48.Api.Services
                     endDate < DateTime.UtcNow)
                 {   
                     item.Status = AuditStatusType.Finished;
-                    //_repository.Update(item);
                     hasInternalChanges = true;
                     hasChanges = true;
                 }
 
-                if (hasInternalChanges) _repository.Update(item);
+                if (hasInternalChanges)
+                {   
+                    var note = new Note
+                    {
+                        ID = Guid.NewGuid(),
+                        OwnerID = item.ID,
+                        Text = $"Status changed to {item.Status.ToString().ToUpper()}",
+                        UpdatedUser = "system",
+                        Created = DateTime.UtcNow,
+                        Updated = DateTime.UtcNow
+                    };
+                    noteRepository.Add(note);
+                    
+                    _repository.Update(item);
+                }
             }
 
             if (hasChanges)
             {
+                noteRepository.SaveChanges();
                 _repository.SaveChanges();
             }   
 
@@ -196,6 +212,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (hasChanges) 
             {
+                var note = new Note
+                {
+                    OwnerID = item.ID,
+                    Text = $"Status changed to {item.Status.ToString().ToUpper()}",
+                    UpdatedUser = "system"
+                };
+                var noteService = new NoteService();
+                await noteService.AddAsync(note);
+
                 _repository.Update(item);
                 _repository.SaveChanges();
             }
@@ -258,27 +283,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            if (item.StartDate > item.EndDate)
-                throw new BusinessException("The start date must be less than the end date");
-
-            // - Que las fechas de auditoria no se translapen con otra auditoria del mismo ciclo
-
-            // - Validar que los auditores no estén programados en otra auditoria en la misma fecha
-            var hasAuditorBusy = false;
-            foreach (var auditor in foundItem.AuditAuditors)
-            { 
-                if (await _repository.HasAuditorAnAudit(auditor.ID, item.StartDate.Value, item.EndDate.Value, item.ID))
-                {
-                    hasAuditorBusy = true;
-                }
-            }
-            if (hasAuditorBusy)
-                throw new BusinessException("At least one auditor is assigned to another audit event");
-
-            // - Si va a cambiar de Status,
-            //   validar que tenga la información completa requerida por el Status nuevo como:
-            //   - Standars activos
-            //   - Auditores activos y con el Standard correcto 
+            await ValidateAuditAsync(item, foundItem);            
 
             // Assigning values
 
@@ -287,8 +292,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Description = item.Description;
             foundItem.StartDate = item.StartDate;
-            foundItem.EndDate = item.EndDate;
-            foundItem.HasWitness = item.HasWitness;
+            foundItem.EndDate = item.EndDate;            
+            foundItem.IsMultisite = item.IsMultisite;
+            foundItem.Days = item.Days;
+            foundItem.IncludeSaturday = item.IncludeSaturday;
+            foundItem.IncludeSunday = item.IncludeSunday;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = item.Status == AuditStatusType.Nothing
                 ? AuditStatusType.Scheduled
@@ -318,6 +326,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == AuditStatusType.Deleted)
             {
+                var fileDirectory = $"~/files/organizations/{foundItem.AuditCycle.OrganizationID}/Cycles/{foundItem.AuditCycle.ID}/{foundItem.ID}";
+                FileRepository.DeleteDirectory(fileDirectory);
+
                 _repository.Delete(foundItem);
             }
             else
@@ -341,62 +352,175 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
-        public async Task<bool> HasAuditorAnAudit(Guid auditorID, DateTime startDate, DateTime endDate, Guid? auditExceptionID)
+        public async Task<bool> HasAuditorAnAudit(
+            Guid auditorID, 
+            DateTime startDate, 
+            DateTime endDate, 
+            Guid? auditExceptionID)
         {
-            return await _repository.HasAuditorAnAudit(auditorID, startDate, endDate, auditExceptionID);
+            return await _repository.HasAuditorAnAudit(
+                auditorID, 
+                startDate, 
+                endDate, 
+                auditExceptionID);
         } // HasAuditorAnAudit
+
+        public async Task<bool> IsAnyStandardStepAuditInAuditCycle(
+            Guid auditCycleID,
+            Guid standardID,
+            AuditStepType step,
+            Guid? auditExceptionID)
+        {
+            return await _repository.IsAnyStandardStepAuditInAuditCycle(
+                auditCycleID,
+                standardID,
+                step,
+                auditExceptionID);
+        } // IsAnyEqualStandardStepAuditInAuditCycle
+
+        // SITES
+
+        public async Task AddSiteAsync(Guid id, Guid siteID)
+        {
+            await _repository.AddSiteAsync(id, siteID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditService.AddSiteAsync: {ex.Message}");
+            }
+        } // AddSiteAsync
+
+        public async Task DelSiteAsync(Guid id, Guid siteID)
+        {
+            await _repository.DelSiteAsync(id, siteID);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditService.DelSiteAsync: {ex.Message}");
+            }
+        } // DelSiteAsync
 
         // PRIVATE
 
-        private void CheckMinimalAuditCycleDocumentation(AuditCycle auditCycle)
+        private async Task ValidateAuditAsync(Audit newItem, Audit currentItem)
         {
-            if (auditCycle.AuditCycleDocuments == null || auditCycle.AuditCycleDocuments.Count == 0)
-                throw new BusinessException("The audit cycle don't have any document");
+            // ----------------------------------------------------------------
+            // - Que la auditoria no se translapen con otra
+            //   auditoria del mismo ciclo, del mismo paso y en el mismo sitio
+            // - Validar que los auditores no estén programados en otra
+            //   auditoria en la misma fecha
+            // - Si va a cambiar de Status,
+            //   validar que tenga la información completa requerida por el Status nuevo como:
+            // - Standars activos
+            // - Auditores activos y con el Standard correcto 
 
-            bool haveAppForm = false;
-            bool haveADC = false;
-            bool haveProposal = false;
-            bool haveContract = false;
-            bool haveAuditProgramme = false;
+            // TODO: AQUI VOY
 
-            haveAppForm = auditCycle.AuditCycleDocuments
-                .Where(acd =>
-                    acd.DocumentType == AuditCycleDocumentType.AppForm
-                    && acd.Status == StatusType.Active)
-                .Any();
+            if (newItem.StartDate > newItem.EndDate)
+                throw new BusinessException("The start date must be less than the end date");
 
-            haveADC = auditCycle.AuditCycleDocuments
-                .Where(acd =>
-                    acd.DocumentType == AuditCycleDocumentType.ADC
-                    && acd.Status == StatusType.Active)
-                .Any();
+            // NOTE: Esta validación queda en espera de mejora pues si se puede
+            // programar una auditoria en el mismo ciclo y paso, pero no se puede
+            // que sea del mismo sitio, parte que no se ha implementado aun. -xB 20250430
+            // ACTUALIZACION: Creo que con validar si es multisitio ya es suficiente
 
-            haveProposal = auditCycle.AuditCycleDocuments
-                .Where(acd =>
-                    acd.DocumentType == AuditCycleDocumentType.Proposal
-                    && acd.Status == StatusType.Active)
-                .Any();
+            if (!(newItem.IsMultisite.HasValue && newItem.IsMultisite.Value))
+            {
+                var isAnyAuditStandardStepProgrammed = false;
 
-            haveContract = auditCycle.AuditCycleDocuments
-                .Where(acd =>
-                    acd.DocumentType == AuditCycleDocumentType.Contract
-                    && acd.Status == StatusType.Active)
-                .Any();
+                foreach (var auditStandard in currentItem.AuditStandards
+                    .Where(aus => aus.Status == StatusType.Active))
+                {
+                    if (await _repository.IsAnyStandardStepAuditInAuditCycle(
+                        currentItem.AuditCycleID,
+                        auditStandard.StandardID ?? Guid.Empty,
+                        auditStandard.Step ?? AuditStepType.Nothing,
+                        currentItem.ID))
+                    {
+                        isAnyAuditStandardStepProgrammed = true;
+                        break;
+                    }
+                }
+                if (isAnyAuditStandardStepProgrammed)
+                    throw new BusinessException("At last one standard step is already programmed in another audit");
+            } // IsMultisite
 
-            haveAuditProgramme = auditCycle.AuditCycleDocuments
-                .Where(acd =>
-                    acd.DocumentType == AuditCycleDocumentType.AuditProgramme
-                    && acd.Status == StatusType.Active)
-                .Any();
+            var isAuditorBusy = false;
+            foreach (var auditAuditor in currentItem.AuditAuditors
+                .Where(aa => aa.Status == StatusType.Active))
+            {
+                if (await _repository.HasAuditorAnAudit(
+                    auditAuditor.AuditorID ?? Guid.Empty, 
+                    newItem.StartDate ?? DateTime.MinValue, 
+                    newItem.EndDate ?? DateTime.MinValue, 
+                    newItem.ID))
+                {
+                    isAuditorBusy = true;
+                    break;
+                }
+            }
+            if (isAuditorBusy)
+                throw new BusinessException("At least one auditor is assigned to another audit event");
 
-            if (!haveAppForm 
-                || !haveADC 
-                || !haveProposal 
-                || !haveContract 
-                || !haveAuditProgramme
-            )
-                throw new BusinessException("Must have at last a App form, an ADC, a Proposal, a Contract and a Confirmation Letter active document");
+        } // ValidateAudit
 
-        } // CheckMinimalAuditCycleDocumentation
+        //private void CheckMinimalAuditCycleDocumentation(AuditCycle auditCycle)
+        //{
+        //    if (auditCycle.AuditCycleDocuments == null || auditCycle.AuditCycleDocuments.Count == 0)
+        //        throw new BusinessException("The audit cycle don't have any document");
+
+        //    bool haveAppForm = false;
+        //    bool haveADC = false;
+        //    bool haveProposal = false;
+        //    bool haveContract = false;
+        //    bool haveAuditProgramme = false;
+
+        //    haveAppForm = auditCycle.AuditCycleDocuments
+        //        .Where(acd =>
+        //            acd.DocumentType == AuditCycleDocumentType.AppForm
+        //            && acd.Status == StatusType.Active)
+        //        .Any();
+
+        //    haveADC = auditCycle.AuditCycleDocuments
+        //        .Where(acd =>
+        //            acd.DocumentType == AuditCycleDocumentType.ADC
+        //            && acd.Status == StatusType.Active)
+        //        .Any();
+
+        //    haveProposal = auditCycle.AuditCycleDocuments
+        //        .Where(acd =>
+        //            acd.DocumentType == AuditCycleDocumentType.Proposal
+        //            && acd.Status == StatusType.Active)
+        //        .Any();
+
+        //    haveContract = auditCycle.AuditCycleDocuments
+        //        .Where(acd =>
+        //            acd.DocumentType == AuditCycleDocumentType.Contract
+        //            && acd.Status == StatusType.Active)
+        //        .Any();
+
+        //    haveAuditProgramme = auditCycle.AuditCycleDocuments
+        //        .Where(acd =>
+        //            acd.DocumentType == AuditCycleDocumentType.AuditProgramme
+        //            && acd.Status == StatusType.Active)
+        //        .Any();
+
+        //    if (!haveAppForm 
+        //        || !haveADC 
+        //        || !haveProposal 
+        //        || !haveContract 
+        //        || !haveAuditProgramme
+        //    )
+        //        throw new BusinessException("Must have at last a App form, an ADC, a Proposal, a Contract and a Confirmation Letter active document");
+
+        //} // CheckMinimalAuditCycleDocumentation
     }
 }

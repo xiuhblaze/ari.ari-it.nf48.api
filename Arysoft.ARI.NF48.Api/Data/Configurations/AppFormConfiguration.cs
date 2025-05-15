@@ -32,7 +32,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
-                .Property(m => m.AutomationLevel)
+                .Property(m => m.AutomationLevelJustification)
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()

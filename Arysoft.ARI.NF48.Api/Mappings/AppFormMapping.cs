@@ -36,7 +36,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
-                AutomationLevel = item.AutomationLevel,
+                AutomationLevelPercent = item.AutomationLevelPercent,
+                AutomationLevelJustification = item.AutomationLevelJustification,
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
@@ -103,7 +104,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
-                AutomationLevel = item.AutomationLevel,
+                AutomationLevelPercent = item.AutomationLevelPercent,
+                AutomationLevelJustification = item.AutomationLevelJustification,
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
@@ -173,7 +175,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
-                AutomationLevel = item.AutomationLevel,
+                AutomationLevelPercent = item.AutomationLevelPercent,
+                AutomationLevelJustification = item.AutomationLevelJustification,
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL

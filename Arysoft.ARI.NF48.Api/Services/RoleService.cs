@@ -122,17 +122,17 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status;
-            foundItem.Updated = item.Updated;
+            foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
 
             try
             { 
-                _roleRepository.Update(item);
+                _roleRepository.Update(foundItem);
                 await _roleRepository.SaveChangesAsync();
             }
             catch (Exception ex)

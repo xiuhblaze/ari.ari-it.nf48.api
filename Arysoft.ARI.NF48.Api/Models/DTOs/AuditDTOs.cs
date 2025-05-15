@@ -17,7 +17,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? EndDate { get; set; }
 
-        public bool? HasWitness { get; set; }
+        public bool? IsMultisite { get; set; }
+
+        public string Days { get; set; }
+
+        public bool? IncludeSaturday { get; set; }
+
+        public bool? IncludeSunday { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -38,6 +44,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public int DocumentsCount { get; set; }
 
         public int NotesCount { get; set; }
+
+        public int SitesCount { get; set; }
+
     } // AuditItemListDto
 
     public class AuditItemDetailDto
@@ -52,7 +61,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? EndDate { get; set; }
 
-        public bool? HasWitness { get; set; }
+        //public bool? HasWitness { get; set; }
+
+        public bool? IsMultisite { get; set; }
+
+        public string Days { get; set; }
+
+        public bool? IncludeSaturday { get; set; }
+
+        public bool? IncludeSunday { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -70,11 +87,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public IEnumerable<AuditAuditorItemListDto> Auditors { get; set; }
 
-        public IEnumerable<AuditStandardItemListDto> Standards { get; set; }
-
         public IEnumerable<AuditDocumentItemListDto> Documents { get; set; }
 
         public IEnumerable<NoteItemDto> Notes { get; set; }
+
+        public IEnumerable<AuditStandardItemListDto> Standards { get; set; }
+
+        public IEnumerable<SiteItemListDto> Sites { get; set; }
     } // AuditItemDetailDto
 
     public class AuditPostDto
@@ -101,7 +120,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public DateTime? EndDate { get; set; }
 
-        public bool? HasWitness { get; set; }
+        public bool? IsMultisite { get; set; }
+
+        //public bool? HasWitness { get; set; }
+
+        [StringLength(5)]
+        public string Days { get; set; }
+
+        public bool? IncludeSaturday { get; set; }
+
+        public bool? IncludeSunday { get; set; }
 
         [StringLength(1000)]
         public string ExtraInfo { get; set; }
@@ -123,4 +151,47 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // AuditDeleteDto
+
+    public class AuditorInAuditDto
+    {
+        [Required]
+        public Guid AuditorID { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; }
+
+        [Required]
+        public DateTime EndDate { get; set; }
+
+        public Guid? AuditExceptionID { get; set; }
+    }
+
+    public class StandardStepInAuditCycleDto
+    {
+
+        [Required] 
+        public Guid AuditCycleID { get; set; }
+
+        [Required]
+        public Guid StandardID { get; set; }
+
+        [Required] 
+        public AuditStepType Step { get; set; }
+
+        public Guid? AuditExceptionID { get; set; }
+    }
+
+    // SITES
+
+    /// <summary>
+    /// Para agregar o quitar un sitio de una auditoria
+    /// </summary>
+    public class AuditEditSiteDto
+    {
+        [Required]
+        public Guid AuditID { get; set; }
+
+        [Required]
+        public Guid SiteID { get; set; }        
+    } // AuditEditSiteDto
 }

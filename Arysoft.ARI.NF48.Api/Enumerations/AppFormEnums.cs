@@ -9,7 +9,7 @@
         ApplicantReview,    // Revisa que todo esté bien y es quien aprueba el appForm
         ApplicantRejected,  // Rechazado por el revisor del appForm, sales debe de completar más información
         Active,             // AppForm activo
-        Inactive,           // Ya no está en uso este appForm
+        Inactive,           // Ya no está en uso este appForm, todo debe de estar bloqueado (solo lectura)
         Cancel,             // En algún momento el appForm fué cancelado
         Deleted             // Eliminación logica
     }
@@ -21,5 +21,11 @@
         Organization,
         CreatedDesc,
         OrganizationDesc        
+    }
+
+    public enum AppFormValidityStatusType // TODO: Terminarlo, se va a ocupar luego
+    { 
+        Nothing,
+
     }
 }

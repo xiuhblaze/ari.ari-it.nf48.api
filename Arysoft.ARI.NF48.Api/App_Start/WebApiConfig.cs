@@ -8,21 +8,23 @@ namespace Arysoft.ARI.NF48.Api
     {
         public static void Register(HttpConfiguration config)
         {
+
+            // Configuración y servicios de Web API
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
-            // Configuración y servicios de Web API
-
             // CORS - Desarrollo
-            //var corsDev = new EnableCorsAttribute("http://localhost:5173", "*", "*");
-            //config.EnableCors(corsDev);
+            var corsDev = new EnableCorsAttribute("http://localhost:5173", "*", "*");
+            config.EnableCors(corsDev);
 
             // CORS - Producción
-            var corsProduction = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,http://cortana.im-prove.com.mx", "*", "*");
-            config.EnableCors(corsProduction);
+            //var corsProduction = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,http://cortana.im-prove.com.mx", "*", "*");
+            //config.EnableCors(corsProduction);
 
             // Rutas de Web API
             config.MapHttpAttributeRoutes();
+            //config.MessageHandlers.Add(new Tools.CorsMessageHandler());  // Primero el handler CORS
+            //config.MessageHandlers.Add(new TokenValidationHandler());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

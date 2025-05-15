@@ -9,8 +9,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Description { get; set; }
 
-        //public StatusType Status { get; set; }
-
         // RELATIONS
 
         public virtual ICollection<User> Users { get; set; }

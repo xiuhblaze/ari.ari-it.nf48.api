@@ -22,6 +22,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
+        public virtual ICollection<Audit> Audits { get; set; }
+
         public virtual Organization Organization { get; set; }
 
         public virtual ICollection<Shift> Shifts { get; set; }

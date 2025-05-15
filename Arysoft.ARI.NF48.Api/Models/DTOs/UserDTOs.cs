@@ -100,7 +100,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
     } // UserPutDto
 
-    public class UserAddRoleDto
+    public class UserEditRoleDto
     {
         [Required]
         public Guid ID { get; set; }

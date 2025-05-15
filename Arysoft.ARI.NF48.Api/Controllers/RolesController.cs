@@ -16,7 +16,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 {
     public class RolesController : ApiController
     {
-        private RoleService roleService;
+        private readonly RoleService roleService;
 
         // CONSTRUCTOR
 
@@ -53,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         { 
             var item = await roleService.GetAsync(id) 
                 ?? throw new BusinessException("Item not found");
-            var itemDto = RoleMapping.RoleToItemDetailDto(item);    
+            var itemDto = await RoleMapping.RoleToItemDetailDto(item);    
             var response = new ApiResponse<RoleItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -67,7 +67,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = await roleService
                 .AddAsync(new Models.Role { UpdatedUser = itemAddDto.UpdatedUser });
-            var itemDto = RoleMapping.RoleToItemDetailDto(item);
+            var itemDto = await RoleMapping.RoleToItemDetailDto(item);
             var response = new ApiResponse<RoleItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -81,7 +81,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToEdit = RoleMapping.ItemEditDtoToRole(itemEditDto);
             var item = await roleService.UpdateAsync(itemToEdit);
-            var itemDto = RoleMapping.RoleToItemDetailDto(item);
+            var itemDto = await RoleMapping.RoleToItemDetailDto(item);
             var response = new ApiResponse<RoleItemDetailDto>(itemDto);
 
             return Ok(response);

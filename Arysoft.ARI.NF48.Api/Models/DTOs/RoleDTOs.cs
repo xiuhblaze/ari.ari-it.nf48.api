@@ -16,6 +16,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string Description { get; set; }
 
         public StatusType Status { get; set; }
+
+        public int UsersCount { get; set; }
     } // RoleItemListDto
 
     public class RoleItemDetailDto
@@ -34,7 +36,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
-        public ICollection<User> Users { get; set; }
+        public IEnumerable<UserListItemDto> Users { get; set; }
     } // RoleItemDetailDto
 
     public class RolePostDto

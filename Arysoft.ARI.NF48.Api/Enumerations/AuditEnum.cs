@@ -33,4 +33,19 @@
         DateDesc,
         StatusDesc
     } // AuditOrderType
+
+    public enum AuditWarningType
+    {
+        Nothing,
+        // 1. Falta documentacion antes de iniciar la auditoria
+        MissingDocuments,
+        // 2. Falta documentacion a una semana de la auditoria
+        MissingDocumentsWeek,
+        // 3. Falta documentación despues de terminar la auditoria
+        MissingDocumentsAfter,
+        // 4. Falta el plan de acción
+        MissingActionPlan,
+        // 5. Falta documentación a un mes de terminar la auditoria
+        MissingDocumentsAfterMonth,
+    } // AuditWarningType
 }

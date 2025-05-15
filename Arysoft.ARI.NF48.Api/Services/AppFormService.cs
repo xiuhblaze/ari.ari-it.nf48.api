@@ -52,7 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.ProcessServicesDescription != null && m.ProcessServicesDescription.ToLower().Contains(filters.Text))
                     || (m.LegalRequirements != null && m.LegalRequirements.ToLower().Contains(filters.Text))
                     || (m.CriticalComplaintComments != null && m.CriticalComplaintComments.ToLower().Contains(filters.Text))
-                    || (m.AutomationLevel != null && m.AutomationLevel.ToLower().Contains(filters.Text))
+                    || (m.AutomationLevelJustification != null && m.AutomationLevelJustification.ToLower().Contains(filters.Text))
                     || (m.DesignResponsibilityJustify != null && m.DesignResponsibilityJustify.ToLower().Contains(filters.Text))
                     || (m.CurrentCertificationsExpiration != null && m.CurrentCertificationsExpiration.ToLower().Contains(filters.Text))
                     || (m.CurrentStandards != null && m.CurrentStandards.ToLower().Contains(filters.Text))
@@ -166,45 +166,50 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validate
 
-            if (string.IsNullOrEmpty(item.UpdatedUser))
-                throw new BusinessException("UpdatedUser is required");
+            ValidateAppForm(item, foundItem);
 
-            // - Validar que no se pueda crear otro AppForm si hay uno activo del mismo standard
+            // - Asignaciones por status
 
-            // - Validaciones por status
+            if (foundItem.Status == AppFormStatusType.Nothing)
+            {
+                foundItem.StandardID = item.StandardID; // Solo la primera vez se asigna el standard
+            }
 
-            if (item.Status == AppFormStatusType.Nothing)
+            if (item.Status == AppFormStatusType.Nothing 
+                || item.Status == AppFormStatusType.SalesReview // xBlaze 20250424: Estos dos últimos para evitar que se utilicen - en el futuro se podrian necesitar
+                || item.Status == AppFormStatusType.SalesRejected)
                 item.Status = AppFormStatusType.New;
 
             if (item.Status != foundItem.Status) // El status cambió
             {
                 switch (item.Status)
                 {
-                    //case AppFormStatusType.Nothing:
-                    //    item.Status = AppFormStatusType.New;
+                    //case AppFormStatusType.SalesReview:
+                    //    item.SalesDate = DateTime.UtcNow;
+                    //    foundItem.UserSales = item.UpdatedUser;
+                    //    if (string.IsNullOrEmpty(item.SalesComments))
+                    //        throw new BusinessException("Sales comments is required");
                     //    break;
 
-                    case AppFormStatusType.SalesReview:
-                        item.SalesDate = DateTime.UtcNow;
-                        foundItem.UserSales = item.UpdatedUser;
-                        if (string.IsNullOrEmpty(item.SalesComments))
-                            throw new BusinessException("Sales comments is required");
-                        break;
-
-                    case AppFormStatusType.SalesRejected:
-                        item.SalesDate = DateTime.UtcNow;
-                        foundItem.UserSales = item.UpdatedUser;
-                        if (string.IsNullOrEmpty(item.SalesComments))
-                            throw new BusinessException("Sales comments is required");
-                        break;
+                    //case AppFormStatusType.SalesRejected:
+                    //    item.SalesDate = DateTime.UtcNow;
+                    //    foundItem.UserSales = item.UpdatedUser;
+                    //    if (string.IsNullOrEmpty(item.SalesComments))
+                    //        throw new BusinessException("Sales comments is required");
+                    //    break;
 
                     case AppFormStatusType.ApplicantReview:
-                        //item.ReviewDate = DateTime.UtcNow;
-                        //foundItem.UserReviewer = item.UpdatedUser;
-                        if (foundItem.Status == AppFormStatusType.SalesReview)
+                        //if (foundItem.Status == AppFormStatusType.SalesReview)
+                        //{
+                        //    if (string.IsNullOrEmpty(item.SalesComments))
+                        //        throw new BusinessException("Sales comments is required");
+                        //    item.SalesDate = DateTime.UtcNow;
+                        //    foundItem.UserSales = item.UpdatedUser;
+                        //}
+                        if (foundItem.Status == AppFormStatusType.New)
                         {
                             if (string.IsNullOrEmpty(item.SalesComments))
-                                throw new BusinessException("Sales comments is required");
+                                throw new BusinessException("Comments is required");
                             item.SalesDate = DateTime.UtcNow;
                             foundItem.UserSales = item.UpdatedUser;
                         }
@@ -234,14 +239,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
-            // TODO: AuditLanguage - Validar que sea un idioma aceptado 'es', 'en'
-
-            // Set values
+            // Asignar valores
             
-            //foundItem.OrganizationID = item.OrganizationID;
-            //foundItem.AuditCycleID = item.AuditCycleID;
-            foundItem.StandardID = item.StandardID;
-
             // ISO 9K
             foundItem.ActivitiesScope = item.ActivitiesScope;
             foundItem.ProcessServicesCount = item.ProcessServicesCount;
@@ -249,7 +248,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.LegalRequirements = item.LegalRequirements;
             foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
             foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
-            foundItem.AutomationLevel = item.AutomationLevel;
+            foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
+            foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
             foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
             foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
 
@@ -427,5 +427,108 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AppFormService.DelSiteAsync: {ex.Message}");
             }
         } // DelSiteAsync
+
+        // PRIVATE 
+
+        private void ValidateAppForm(AppForm newItem, AppForm currentItem)
+        {
+            // - Solo puede haber un appform activo por ciclo y standard
+            // - Validar que el ciclo esté activo - Omitir por ahora
+            //   por lo pronto, validar que el ciclo no sea del pasado
+            // - Validar que el standard esté activo y que pertenesca al ciclo,
+            //   solo la primera vez
+            // - Validar que el appform no esté en un status que no se pueda editar
+            // - AuditLanguage - Validar que sea un idioma aceptado 'es', 'en'
+
+            var standardRepository = new StandardRepository();
+
+            if (currentItem.Status == AppFormStatusType.Inactive
+                || currentItem.Status == AppFormStatusType.Deleted)
+                throw new BusinessException("The record is not editable");
+
+            if (newItem.Status != currentItem.Status) // El status cambió
+            {
+                // - De que status a que status no se puede ir
+                if ((currentItem.Status == AppFormStatusType.Nothing
+                        || currentItem.Status == AppFormStatusType.New
+                        || currentItem.Status == AppFormStatusType.SalesReview
+                        || currentItem.Status == AppFormStatusType.SalesRejected)
+                    && newItem.Status != AppFormStatusType.ApplicantReview
+                    && newItem.Status != AppFormStatusType.Cancel)
+                    throw new BusinessException("You can't change to this status from New");
+
+                if (currentItem.Status == AppFormStatusType.ApplicantReview
+                    && newItem.Status != AppFormStatusType.ApplicantRejected
+                    && newItem.Status != AppFormStatusType.Active
+                    && newItem.Status != AppFormStatusType.Cancel)
+                    throw new BusinessException("You can't change to this status from Review");
+
+                if (currentItem.Status == AppFormStatusType.ApplicantRejected
+                    && newItem.Status != AppFormStatusType.ApplicantReview
+                    && newItem.Status != AppFormStatusType.Cancel)
+                    throw new BusinessException("You can't change to this status from Review rejected");
+
+                if (currentItem.Status == AppFormStatusType.Active
+                    && newItem.Status != AppFormStatusType.Inactive
+                    && newItem.Status != AppFormStatusType.Cancel)
+                    throw new BusinessException("You can't change to this status from Active");
+
+                //if (currentItem.Status == AppFormStatusType.Inactive
+                //    && newItem.Status != AppFormStatusType.Active
+                //    && newItem.Status != AppFormStatusType.Cancel)
+                //    throw new BusinessException("You can't change to this status from Inactive");
+
+                if (currentItem.Status == AppFormStatusType.Cancel
+                    && newItem.Status != AppFormStatusType.New)
+                    throw new BusinessException("You can't change to this status from Cancel");
+            } // El status cambió
+
+            if (_repository.Gets()
+                .Where(m => m.ID != newItem.ID
+                    && m.AuditCycleID == newItem.AuditCycleID
+                    && m.StandardID == newItem.StandardID
+                    && m.Status == AppFormStatusType.Active).Any())
+                throw new BusinessException("There is already an active Application Form for this cycle and standard");
+
+            //if (currentItem.AuditCycle != null &&
+            //    currentItem.AuditCycle.Status != StatusType.Active)
+            //    throw new BusinessException("The audits cycle is not active");
+
+            if (currentItem.AuditCycle != null 
+                && currentItem.AuditCycle.EndDate != null 
+                && currentItem.AuditCycle.EndDate < DateTime.Now)
+                throw new BusinessException("The audits cycle is old");
+
+            // Considerar que solo la primera vez se registra el standard, despues si
+            // ya se validó, sin importar el status del standard, se queda
+            if (currentItem.Status == AppFormStatusType.Nothing) 
+            { 
+                if (newItem.StandardID != null && newItem.StandardID != Guid.Empty)
+                {
+                    var standardItem = standardRepository.Gets()
+                        .Where(s => s.ID == newItem.StandardID).FirstOrDefault()
+                        ?? throw new BusinessException("The selected standard was not found");
+
+                    if (standardItem.Status != StatusType.Active)
+                        throw new BusinessException("The selected standard is not active");
+
+                    // Falta validar que el standard esté asociado en el ciclo
+                }
+                else // Probablemente aquí no entre nunca
+                {
+                    throw new BusinessException("The standard is required");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(newItem.AuditLanguage))
+            {   
+                var languages = LanguagesList.GetLanguages();
+                string languagesCodes = string.Join(", ", languages.Select(l => l.Code));
+
+                if (!languages.Where(l => l.Code.Equals(newItem.AuditLanguage.ToLower())).Any())
+                    throw new BusinessException("The audit language is not valid, must be: " + languagesCodes);
+            } else throw new BusinessException("The audit language is required");
+
+        } // ValidateAppForm
     }
 }

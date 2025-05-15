@@ -27,7 +27,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
-                HasWitness = item.HasWitness,
+                IsMultisite = item.IsMultisite,
+                Days = item.Days,
+                IncludeSaturday = item.IncludeSaturday,
+                IncludeSunday = item.IncludeSunday,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 OrganizationName = item.AuditCycle != null && item.AuditCycle.Organization != null
@@ -63,7 +66,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
                         asd.Status != StatusType.Nothing
                         && asd.Status != StatusType.Deleted))
-                    : null
+                    : null,
+                SitesCount = item.Sites != null
+                    ? item.Sites.Where(s =>
+                        s.Status != StatusType.Nothing
+                        && s.Status != StatusType.Deleted)
+                        .Count()
+                    : 0,
             };
         } // AuditToItemListDto
 
@@ -76,7 +85,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = item.Description,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
-                HasWitness = item.HasWitness,
+                IsMultisite = item.IsMultisite,
+                Days = item.Days,
+                IncludeSaturday = item.IncludeSaturday,
+                IncludeSunday = item.IncludeSunday,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
@@ -104,7 +116,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
                         asd.Status != StatusType.Nothing
                         && asd.Status != StatusType.Deleted))
-                    : null
+                    : null,
+                Sites = item.Sites != null
+                    ? SiteMapping.SiteToListDto(item.Sites.Where(s =>
+                        s.Status != StatusType.Nothing
+                        && s.Status != StatusType.Deleted))
+                    : null,
             };
         } // AuditToItemDetailDto
 
@@ -125,7 +142,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Description = itemDto.Description,
                 StartDate = itemDto.StartDate,
                 EndDate = itemDto.EndDate,
-                HasWitness = itemDto.HasWitness,
+                IsMultisite = itemDto.IsMultisite,
+                Days = itemDto.Days,
+                IncludeSaturday = itemDto.IncludeSaturday,
+                IncludeSunday = itemDto.IncludeSunday,
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser,

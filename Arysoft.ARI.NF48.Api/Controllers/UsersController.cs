@@ -93,19 +93,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutUser
 
-        [HttpPost]
-        [Route("api/Users/add-role/{id}")]
-        [ResponseType(typeof(ApiResponse<bool>))]
-        public async Task<IHttpActionResult> AddRole(Guid id, [FromBody] UserAddRoleDto itemAddRole)
-        {
-            if (id != itemAddRole.ID) throw new BusinessException("ID mismatch");
-
-            await _userService.AddRoleAsync(id, itemAddRole.RoleID);
-            var response = new ApiResponse<bool>(true);
-
-            return Ok(response);
-        } // AddRole
-
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteUser(Guid id, [FromBody] UserDeleteDto itemDeleteDto)
         {
@@ -119,5 +106,40 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // DeleteUser
+
+        // ROLES
+
+        [HttpPost]
+        [Route("api/Users/{id}/role")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> AddRole(Guid id, [FromBody] UserEditRoleDto itemAddRole)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemAddRole.ID) 
+                throw new BusinessException("ID mismatch");
+
+            await _userService.AddRoleAsync(id, itemAddRole.RoleID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // AddRole
+
+        [HttpDelete]
+        [Route("api/Users/{id}/role")]
+        public async Task<IHttpActionResult> DelRole(Guid id, [FromBody] UserEditRoleDto itemDelRole)
+        {
+            if (!ModelState.IsValid) 
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDelRole.ID) 
+                throw new BusinessException("ID mismatch");
+
+            await _userService.DelRoleAsync(id, itemDelRole.RoleID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // DelRole
     }
 }

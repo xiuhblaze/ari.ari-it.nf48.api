@@ -20,6 +20,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<Audit>()
+                .Property(m => m.Days)
+                .HasMaxLength(5);
+
+            modelBuilder.Entity<Audit>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(1000);
 
@@ -42,31 +46,40 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            modelBuilder.Entity<Audit>() // Ver si jala esto - si jala jajaja
+            modelBuilder.Entity<Audit>()
+                .HasMany(a => a.Sites)
+                .WithMany(s => s.Audits)
+                .Map(e => e.MapLeftKey("AuditID")
+                    .MapRightKey("SiteID")
+                    .ToTable("AuditSites"));
+
+            // - Para que se borren en cascada, no jaló por su complejidad
+            //   en AuditRepository.Delete() se encuentran las instrucciones
+            //   para borrar en cascada los registros de las tablas intermedias
+
+            modelBuilder.Entity<Audit>()
                 .HasMany(a => a.Notes)
                 .WithOptional()
                 .HasForeignKey(n => n.OwnerID)
-                .WillCascadeOnDelete(true);
-
-            // - Para que se borren en cascada
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.AuditAuditors)
                 .WithRequired(aa => aa.Audit)
                 .HasForeignKey(a => a.AuditID)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.AuditStandards)
                 .WithRequired(asd => asd.Audit)
                 .HasForeignKey(a => a.AuditID)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Audit>()
                 .HasMany(a => a.AuditDocuments)
                 .WithRequired(ad => ad.Audit)
                 .HasForeignKey(a => a.AuditID)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
         }
     }
 }

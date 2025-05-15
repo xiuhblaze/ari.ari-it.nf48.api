@@ -97,6 +97,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.AuditID == null || item.AuditID == Guid.Empty)
                 throw new BusinessException("Must first assign an audit");
 
+            // - Solo en los status de la auditoria de: [Nothing, Sheduled,
+            //   Confirmed] se pueden agregar standards
+            
             // Assigning values
 
             item.ID = Guid.NewGuid();
@@ -133,13 +136,42 @@ namespace Arysoft.ARI.NF48.Api.Services
                 if (item.StandardID == null || item.StandardID == Guid.Empty)
                     throw new BusinessException("The standard must be assigned");
 
+                // - Validar que el standard esté activo
+                var standardRepository = new StandardRepository();
+
+                var foundStandard = await standardRepository.GetAsync(item.StandardID.Value)
+                    ?? throw new BusinessException("The standard was not found");
+
+                if (foundStandard.Status != StatusType.Active)
+                    throw new BusinessException("The standard is not active");
+
+                // Asignando el standard
                 foundItem.StandardID = item.StandardID;
             }
 
             // - Que no esté duplicado el standard en el mismo audit
-            // - Que la fecha no se translape con otra auditoria del mismo ciclo y mismo standard
-            // - Si al menos un standard es de tipo special, todos deben de ser igual
+            // - Que el standard no este asignado con otra auditoria del mismo
+            //   ciclo y mismo step
+            // - Si al menos un standard en su Step es de tipo special, todos deben de ser igual
+            //   DUDA: Cuando es una auditoria especial, se seleccionan Standares a revisar?
+            //         R: Si se seleccionan los standares y se marcan como special
 
+            if (item.Status == StatusType.Active 
+                && foundItem.Audit != null 
+                && foundItem.Audit.Status != AuditStatusType.Nothing
+                && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
+            { 
+                var auditsRepository = new AuditRepository();
+                var hasStandard = await auditsRepository.IsAnyStandardStepAuditInAuditCycle(
+                    foundItem.Audit.AuditCycleID,
+                    foundItem.StandardID.Value,
+                    item.Step.Value,
+                    foundItem.Audit.ID
+                );
+                if (hasStandard)
+                    throw new BusinessException("The standard with this step is already assigned to another audit");
+
+            }
             // Assigning values
 
             if (item.Status == StatusType.Nothing)
