@@ -102,7 +102,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             string passwordHash = Tools.Encrypt.GetSHA256(password);
 
             var foundItem = await _userRepository.GetUserByLoginAsync(username, passwordHash)
-                ?? throw new BusinessException("The username or password is not valid");
+                ?? throw new BusinessException("Username or password is not valid");
+
+            if (foundItem.Status != StatusType.Active)
+                throw new BusinessException("User is not valid");
 
             try // Actualizar la fecha del último acceso
             {

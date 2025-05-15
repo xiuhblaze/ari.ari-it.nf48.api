@@ -22,6 +22,7 @@ namespace Arysoft.ARI.NF48.Api.Tools
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[] {
                 new Claim(ClaimTypes.NameIdentifier, item.ID.ToString()),
                 new Claim(ClaimTypes.Name, item.Username),
+                new Claim(ClaimTypes.GivenName, Strings.FullName(item.FirstName, null, item.LastName)),
                 new Claim(ClaimTypes.Email, item.Email)
             });
 

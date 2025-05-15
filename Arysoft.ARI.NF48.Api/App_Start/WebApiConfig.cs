@@ -1,5 +1,4 @@
-﻿using Arysoft.ARI.NF48.Api.Tools;
-using Microsoft.Owin.Security.OAuth;
+﻿using Microsoft.Owin.Security.OAuth;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
