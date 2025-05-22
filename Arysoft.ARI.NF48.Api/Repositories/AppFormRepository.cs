@@ -32,6 +32,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The application form to add a NACE code was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
             var naceCodeItem = await _naceCodeRepository.FindAsync(naceCodeID)
                 ?? throw new BusinessException("The NACE code you're trying to relate to the application form was not found");
 
@@ -47,6 +49,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The application form to remove a NACE code was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
             var naceCodeItem = await _naceCodeRepository.FindAsync(naceCodeID)
                 ?? throw new BusinessException("The NACE code you're trying to relate to the application form was not found");
 
@@ -64,6 +68,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The application form to add a Contact was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
             var contactItem = await _contactRepository.FindAsync(contactID)
                 ?? throw new BusinessException("The Contact you're trying to relate to the application form was not found");
 
@@ -79,6 +85,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The application form to remove a Contact was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
             var contactItem = await _contactRepository.FindAsync(contactID)
                 ?? throw new BusinessException("The contact related was not found");
 
@@ -96,6 +104,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The application form to add a Site was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The Site you're trying to relate was not found");
 
@@ -111,6 +121,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The application form to remove a Site was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The site related was not found");
 

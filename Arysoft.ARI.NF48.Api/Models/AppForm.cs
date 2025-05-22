@@ -50,6 +50,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string AnyConsultancyBy { get; set; }
 
+        // INTERNAL
+
         public DateTime? SalesDate { get; set; }        // Última fecha en que Ventas (sales) aprueba o rechaza el appform
 
         public string SalesComments { get; set; }       // Comentarios de Ventas (sales) de la última aprobación o cambio de status
@@ -63,6 +65,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public string UserSales { get; set; }
 
         public string UserReviewer { get; set; }
+
+        public string HistoricalDataJSON { get; set; } 
 
         public new AppFormStatusType Status { get; set; }
 

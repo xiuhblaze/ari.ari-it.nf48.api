@@ -188,11 +188,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
+            if (!string.IsNullOrEmpty(item.PasswordHash))
+            {
+                foundItem.PasswordHash = Tools.Encrypt.GetSHA256(item.PasswordHash);
+                foundItem.LastPasswordChange = DateTime.UtcNow;
+            }
+
             foundItem.OwnerID = item.OwnerID;            
-            foundItem.Username = item.Username;
-            foundItem.PasswordHash = string.IsNullOrEmpty(item.PasswordHash)
-                ? foundItem.PasswordHash
-                : Tools.Encrypt.GetSHA256(item.PasswordHash);
+            foundItem.Username = item.Username;            
             foundItem.Email = item.Email;
             foundItem.FirstName = item.FirstName;
             foundItem.LastName = item.LastName;
@@ -227,6 +230,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("Must specify new password");
 
             foundItem.PasswordHash = Tools.Encrypt.GetSHA256(newPassword);
+            foundItem.LastPasswordChange = DateTime.UtcNow;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = foundItem.Username;
 

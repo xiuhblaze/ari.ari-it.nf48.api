@@ -4,7 +4,10 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -236,36 +239,60 @@ namespace Arysoft.ARI.NF48.Api.Services
                         if (string.IsNullOrEmpty(item.ReviewComments))
                             throw new BusinessException("Review comments is required");
                         break;
+
+                    case AppFormStatusType.Inactive:
+                        // Guardar todos los datos de contacts y sites en formato
+                        // json solo si viene de estar activo
+                        if (foundItem.Status == AppFormStatusType.Active)
+                        {
+                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                        }
+                        break;
+
+                    case AppFormStatusType.Cancel:
+                        // Guardar todos los datos de contacts y sites en formato
+                        // json solo si viene de cualquier status que sea menor a inactivo
+                        if (foundItem.Status <= AppFormStatusType.Active)
+                        {
+                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                        }
+                        break;
+
                 }
             }
 
-            // Asignar valores
             
-            // ISO 9K
-            foundItem.ActivitiesScope = item.ActivitiesScope;
-            foundItem.ProcessServicesCount = item.ProcessServicesCount;
-            foundItem.ProcessServicesDescription = item.ProcessServicesDescription;
-            foundItem.LegalRequirements = item.LegalRequirements;
-            foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
-            foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
-            foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
-            foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
-            foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
-            foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+            // Asignar valores
 
-            // General
-            foundItem.AuditLanguage = item.AuditLanguage;
-            foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
-            foundItem.CurrentStandards = item.CurrentStandards;
-            foundItem.CurrentCertificationsBy = item.CurrentCertificationsBy;
-            foundItem.OutsourcedProcess = item.OutsourcedProcess;
-            foundItem.AnyConsultancy = item.AnyConsultancy;
-            foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
-            foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
-            foundItem.SalesComments = item.SalesComments;
-            foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
-            foundItem.ReviewJustification = item.ReviewJustification;
-            foundItem.ReviewComments = item.ReviewComments;
+            // Si es inactivo, cancelado solo guardar ciertos valores y no todo lo demas
+            if (item.Status < AppFormStatusType.Inactive)
+            {
+                // ISO 9K
+                foundItem.ActivitiesScope = item.ActivitiesScope;
+                foundItem.ProcessServicesCount = item.ProcessServicesCount;
+                foundItem.ProcessServicesDescription = item.ProcessServicesDescription;
+                foundItem.LegalRequirements = item.LegalRequirements;
+                foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
+                foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
+                foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
+                foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
+                foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
+                foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+
+                // General
+                foundItem.AuditLanguage = item.AuditLanguage;
+                foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
+                foundItem.CurrentStandards = item.CurrentStandards;
+                foundItem.CurrentCertificationsBy = item.CurrentCertificationsBy;
+                foundItem.OutsourcedProcess = item.OutsourcedProcess;
+                foundItem.AnyConsultancy = item.AnyConsultancy;
+                foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
+                foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
+                foundItem.SalesComments = item.SalesComments;
+                foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
+                foundItem.ReviewJustification = item.ReviewJustification;
+                foundItem.ReviewComments = item.ReviewComments;                
+            }
 
             foundItem.Status = item.Status;
             foundItem.Updated = DateTime.UtcNow;
@@ -429,6 +456,65 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // DelSiteAsync
 
         // PRIVATE 
+
+        private string GetHistoricalDataJSON(AppForm item)
+        {
+            var historicalData = new
+            {
+                OrganizationName = item.Organization != null
+                                    ? item.Organization.Name : null,
+                AuditCycleName = item.AuditCycle != null
+                                    ? item.AuditCycle.Name : null,
+                StandardName = item.Standard != null
+                                    ? item.Standard.Name : null,
+                Website = item.Organization != null
+                                    ? item.Organization.Website : null,
+                Phone = item.Organization != null
+                                    ? item.Organization.Phone : null,
+                Companies = item.Organization.Companies
+                                    .Where(c => c.Status == StatusType.Active)
+                                    .Select(c => new { c.Name, c.LegalEntity, c.COID }),
+                Contacts = item.Contacts
+                                    .Where(c => c.Status == StatusType.Active)
+                                    .Select(c => new { c.FirstName, c.MiddleName, c.LastName, c.Email, c.Phone, c.Position }),
+                Sites = item.Sites
+                                    .Where(s => s.Status == StatusType.Active)
+                                    .Select(s => new {
+                                        s.Description,
+                                        s.IsMainSite,
+                                        s.Address,
+                                        s.Country,
+                                        Shifts = s.Shifts
+                                            .Where(sh => sh.Status == StatusType.Active)
+                                            .Select(sh => new
+                                            {
+                                                sh.Type,
+                                                sh.NoEmployees,
+                                                sh.ActivitiesDescription,
+                                                sh.ShiftStart,
+                                                sh.ShiftEnd,
+                                                sh.ShiftStart2,
+                                                sh.ShiftEnd2,
+                                            }),
+                                        NoEmployees = s.Shifts
+                                            .Where(sh => sh.Status == StatusType.Active)
+                                            .Sum(sh => sh.NoEmployees)
+                                    }),
+                SitesEmployeesCount = item.Sites != null
+                                    ? item.Sites
+                                        .Where(s => s.Status == StatusType.Active)
+                                        .Sum(s => s.Shifts
+                                            .Where(sh => sh.Status == StatusType.Active)
+                                            .Sum(sh => sh.NoEmployees)) ?? 0
+                                    : 0,
+                NaceCodes = item.NaceCodes
+                                    .Where(nc => nc.Status == StatusType.Active)
+
+                                    .Select(nc => new { nc.Sector, nc.Division, nc.Group, nc.Class, nc.Description })
+            };
+
+            return JsonConvert.SerializeObject(historicalData);
+        } // GetHistoricalDataJSON
 
         private void ValidateAppForm(AppForm newItem, AppForm currentItem)
         {
