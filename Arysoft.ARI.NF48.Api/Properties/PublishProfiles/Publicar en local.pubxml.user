@@ -3,7 +3,7 @@
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\comun\compiled\ari\backend</_PublishTargetUrl>
-    <History>True|2025-05-22T22:28:47.8354119Z||;True|2025-05-21T15:58:04.9751332-06:00||;True|2025-05-15T15:56:38.4852685-06:00||;True|2025-05-15T15:54:44.8349315-06:00||;True|2025-05-14T16:37:52.9251678-06:00||;True|2025-05-13T13:21:31.5915065-06:00||;True|2025-05-13T12:55:02.0911019-06:00||;True|2025-05-13T09:15:09.8029338-06:00||;True|2025-05-12T12:38:07.0237856-06:00||;True|2025-05-12T12:22:19.5370073-06:00||;</History>
+    <History>True|2025-05-26T15:10:53.0763898Z||;True|2025-05-23T12:37:00.7978180-06:00||;True|2025-05-23T12:13:36.5950375-06:00||;True|2025-05-23T11:54:54.6517361-06:00||;True|2025-05-23T09:14:27.2398684-06:00||;True|2025-05-22T16:28:47.8354119-06:00||;True|2025-05-21T15:58:04.9751332-06:00||;True|2025-05-15T15:56:38.4852685-06:00||;True|2025-05-15T15:54:44.8349315-06:00||;True|2025-05-14T16:37:52.9251678-06:00||;True|2025-05-13T13:21:31.5915065-06:00||;True|2025-05-13T12:55:02.0911019-06:00||;True|2025-05-13T09:15:09.8029338-06:00||;True|2025-05-12T12:38:07.0237856-06:00||;True|2025-05-12T12:22:19.5370073-06:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -56,13 +56,13 @@
       <publishTime>05/16/2025 08:25:56</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Help/Index.cshtml">
-      <publishTime>05/16/2025 08:25:56</publishTime>
+      <publishTime>05/23/2025 09:11:40</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Help/ResourceModel.cshtml">
       <publishTime>05/16/2025 08:25:56</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Shared/_Layout.cshtml">
-      <publishTime>05/16/2025 08:25:56</publishTime>
+      <publishTime>05/23/2025 09:08:10</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Web.config">
       <publishTime>05/16/2025 08:25:56</publishTime>
@@ -77,10 +77,10 @@
       <publishTime>05/16/2025 08:25:56</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.dll">
-      <publishTime>05/22/2025 16:07:36</publishTime>
+      <publishTime>05/23/2025 12:36:59</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.pdb">
-      <publishTime>05/22/2025 16:07:36</publishTime>
+      <publishTime>05/23/2025 12:36:59</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -443,7 +443,7 @@
       <publishTime>05/16/2025 08:25:56</publishTime>
     </File>
     <File Include="Content/Site.css">
-      <publishTime>05/16/2025 08:25:56</publishTime>
+      <publishTime>05/23/2025 08:43:38</publishTime>
     </File>
     <File Include="favicon.ico">
       <publishTime>05/16/2025 08:25:57</publishTime>
@@ -512,13 +512,13 @@
       <publishTime>05/16/2025 08:25:56</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>05/16/2025 08:25:56</publishTime>
+      <publishTime>05/23/2025 09:12:22</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>05/16/2025 08:25:56</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>05/16/2025 08:25:56</publishTime>
+      <publishTime>05/23/2025 08:54:03</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>05/16/2025 08:25:56</publishTime>

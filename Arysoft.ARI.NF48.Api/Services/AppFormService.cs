@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -242,7 +243,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                     case AppFormStatusType.Inactive:
                         // Guardar todos los datos de contacts y sites en formato
-                        // json solo si viene de estar activo
+                        // JSON solo si viene de estar activo
                         if (foundItem.Status == AppFormStatusType.Active)
                         {
                             foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
@@ -251,17 +252,16 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                     case AppFormStatusType.Cancel:
                         // Guardar todos los datos de contacts y sites en formato
-                        // json solo si viene de cualquier status que sea menor a inactivo
+                        // JSON solo si viene de cualquier status que sea menor a inactivo
                         if (foundItem.Status <= AppFormStatusType.Active)
                         {
                             foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
                         }
                         break;
 
-                }
-            }
+                } // switch
+            } // Cambio de status
 
-            
             // Asignar valores
 
             // Si es inactivo, cancelado solo guardar ciertos valores y no todo lo demas
@@ -287,6 +287,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.OutsourcedProcess = item.OutsourcedProcess;
                 foundItem.AnyConsultancy = item.AnyConsultancy;
                 foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
+                // Internal
                 foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
                 foundItem.SalesComments = item.SalesComments;
                 foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
@@ -473,13 +474,21 @@ namespace Arysoft.ARI.NF48.Api.Services
                                     ? item.Organization.Phone : null,
                 Companies = item.Organization.Companies
                                     .Where(c => c.Status == StatusType.Active)
-                                    .Select(c => new { c.Name, c.LegalEntity, c.COID }),
+                                    .Select(c => new { c.ID, c.Name, c.LegalEntity, c.COID }),
                 Contacts = item.Contacts
                                     .Where(c => c.Status == StatusType.Active)
-                                    .Select(c => new { c.FirstName, c.MiddleName, c.LastName, c.Email, c.Phone, c.Position }),
+                                    .Select(c => new 
+                                    { 
+                                        c.ID, 
+                                        FullName = Strings.FullName(c.FirstName, c.MiddleName, c.LastName), 
+                                        c.Email, 
+                                        c.Phone, 
+                                        c.Position 
+                                    }),
                 Sites = item.Sites
                                     .Where(s => s.Status == StatusType.Active)
                                     .Select(s => new {
+                                        s.ID,
                                         s.Description,
                                         s.IsMainSite,
                                         s.Address,
@@ -488,6 +497,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                                             .Where(sh => sh.Status == StatusType.Active)
                                             .Select(sh => new
                                             {
+                                                sh.ID,
                                                 sh.Type,
                                                 sh.NoEmployees,
                                                 sh.ActivitiesDescription,
@@ -496,7 +506,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                                                 sh.ShiftStart2,
                                                 sh.ShiftEnd2,
                                             }),
-                                        NoEmployees = s.Shifts
+                                        EmployeesCount = s.Shifts
                                             .Where(sh => sh.Status == StatusType.Active)
                                             .Sum(sh => sh.NoEmployees)
                                     }),
@@ -509,8 +519,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                                     : 0,
                 NaceCodes = item.NaceCodes
                                     .Where(nc => nc.Status == StatusType.Active)
-
-                                    .Select(nc => new { nc.Sector, nc.Division, nc.Group, nc.Class, nc.Description })
+                                    .Select(nc => new 
+                                        { 
+                                            nc.ID, 
+                                            nc.Sector,
+                                            nc.Division,
+                                            nc.Group,
+                                            nc.Class,
+                                            nc.Description 
+                                        }
+                                    )
             };
 
             return JsonConvert.SerializeObject(historicalData);
