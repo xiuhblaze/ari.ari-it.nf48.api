@@ -526,7 +526,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                                             nc.Division,
                                             nc.Group,
                                             nc.Class,
-                                            nc.Description 
+                                            nc.Description,
+                                            nc.AccreditedStatus
                                         }
                                     )
             };
