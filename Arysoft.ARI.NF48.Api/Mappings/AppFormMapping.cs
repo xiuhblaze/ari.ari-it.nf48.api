@@ -48,6 +48,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OutsourcedProcess = item.OutsourcedProcess,
                 AnyConsultancy = item.AnyConsultancy,
                 AnyConsultancyBy = item.AnyConsultancyBy,
+                // INTERNAL
                 SalesDate = item.SalesDate,
                 SalesComments = item.SalesComments,
                 ReviewDate = item.ReviewDate,
@@ -55,6 +56,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
+                HistoricalDataJSON = item.HistoricalDataJSON,
                 Status = item.Status,
                 // RELATIONS
                 OrganizationName = item.Organization != null 
@@ -116,6 +118,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OutsourcedProcess = item.OutsourcedProcess,
                 AnyConsultancy = item.AnyConsultancy,
                 AnyConsultancyBy = item.AnyConsultancyBy,
+                // INTERNAL
                 SalesDate = item.SalesDate,
                 SalesComments = item.SalesComments,
                 ReviewDate = item.ReviewDate,
@@ -123,6 +126,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
+                HistoricalDataJSON = item.HistoricalDataJSON,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,

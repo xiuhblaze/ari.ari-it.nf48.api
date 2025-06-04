@@ -22,6 +22,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public DateTime? LastAccess { get; set; }
 
+        public DateTime? LastPasswordChange { get; set; }
+
         // RELATIONS
 
         public virtual ICollection<Role> Roles { get; set; }

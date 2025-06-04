@@ -42,6 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 FullName = Tools.Strings.FullName(item.FirstName, null, item.LastName),
                 Type = item.Type ?? UserType.Nothing,
                 LastAccess = item.LastAccess,
+                LastPasswordChange = item.LastPasswordChange,
                 Status = item.Status,                
                 Roles = roles
             };
@@ -67,6 +68,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 LastName = item.LastName,
                 Type = item.Type ?? UserType.Nothing,
                 LastAccess = item.LastAccess,
+                LastPasswordChange = item.LastPasswordChange,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
