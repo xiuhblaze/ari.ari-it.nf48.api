@@ -32,8 +32,11 @@ namespace Arysoft.ARI.NF48.Api.Data
             AppFormConfiguration.Configure(modelBuilder);
 
             // Módulo de ADC - Audit Day Calculation
+            ADCConfiguration.Configure(modelBuilder);
+            ADCConceptConfiguration.Configure(modelBuilder);
+            ADCConceptValueConfiguration.Configure(modelBuilder);
+            ADCSiteConfiguration.Configure(modelBuilder);
             MD5Configuration.Configure(modelBuilder);
-
 
             // Módulo de Auditorias
             AuditCycleConfiguration.Configure(modelBuilder);

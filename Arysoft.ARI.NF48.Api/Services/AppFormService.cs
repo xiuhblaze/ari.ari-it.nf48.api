@@ -141,8 +141,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Set values
 
             item.ID = Guid.NewGuid();
-            item.OrganizationID = item.OrganizationID;
-            item.AuditCycleID = item.AuditCycleID;
+            //item.OrganizationID = item.OrganizationID;
+            //item.AuditCycleID = item.AuditCycleID;
             item.Status = AppFormStatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;

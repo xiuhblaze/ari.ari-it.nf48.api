@@ -38,6 +38,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual AppForm AppForm { get; set; }
 
-        // public virtual ICollection<ADCSites> ADCSites { get; set; }
+        public virtual ICollection<ADCSite> ADCSites { get; set; }
+
+        public virtual ICollection<Note> Notes { get; set; }
     }
 }
