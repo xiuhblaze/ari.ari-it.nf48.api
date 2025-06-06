@@ -261,6 +261,7 @@
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\CompaniesController.cs" />
     <Compile Include="Controllers\DisclaimerController.cs" />
+    <Compile Include="Controllers\MD5Controller.cs" />
     <Compile Include="Controllers\NotesController.cs" />
     <Compile Include="Controllers\OrganizationStandardsController.cs" />
     <Compile Include="CustomEntities\LanguagesList.cs" />
@@ -359,6 +360,7 @@
     <Compile Include="Mappings\CertificateMapping.cs" />
     <Compile Include="Mappings\CompanyMapping.cs" />
     <Compile Include="Mappings\ContactMapping.cs" />
+    <Compile Include="Mappings\MD5Mapping.cs" />
     <Compile Include="Mappings\NaceCodeMapping.cs" />
     <Compile Include="Mappings\NoteMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
@@ -405,6 +407,7 @@
     <Compile Include="Models\DTOs\CertificateDTOs.cs" />
     <Compile Include="Models\DTOs\CompanyDTOs.cs" />
     <Compile Include="Models\DTOs\ContactDTOs.cs" />
+    <Compile Include="Models\DTOs\MD5DTOs.cs" />
     <Compile Include="Models\DTOs\NaceCodeDTOs.cs" />
     <Compile Include="Models\DTOs\NoteDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />

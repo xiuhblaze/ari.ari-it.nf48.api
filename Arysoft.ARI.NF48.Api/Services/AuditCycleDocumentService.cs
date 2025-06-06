@@ -158,9 +158,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Comments = item.Comments;
             foundItem.OtherDescription = item.OtherDescription;
             foundItem.UploadedBy = item.UploadedBy;
-            foundItem.Status = item.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

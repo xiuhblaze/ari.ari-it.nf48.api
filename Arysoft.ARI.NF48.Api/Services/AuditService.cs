@@ -298,9 +298,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.IncludeSaturday = item.IncludeSaturday;
             foundItem.IncludeSunday = item.IncludeSunday;
             foundItem.ExtraInfo = item.ExtraInfo;
-            foundItem.Status = item.Status == AuditStatusType.Nothing
+            foundItem.Status = foundItem.Status == AuditStatusType.Nothing && item.Status == AuditStatusType.Nothing
                 ? AuditStatusType.Scheduled
-                : item.Status;
+                : item.Status != AuditStatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

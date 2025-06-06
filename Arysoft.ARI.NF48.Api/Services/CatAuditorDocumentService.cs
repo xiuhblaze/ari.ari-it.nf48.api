@@ -128,8 +128,6 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validations
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
@@ -161,9 +159,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.WarningPeriodicity = item.WarningPeriodicity;
             foundItem.IsRequired = item.IsRequired;
             foundItem.Order = item.Order;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

@@ -159,12 +159,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.WhenTrue = item.WhenTrue;
             foundItem.Increase = item.Increase;
             foundItem.Decrease = item.Decrease;
-            foundItem.IncreaseUnit = item.IncreaseUnit;
+            foundItem.IncreaseUnit = item.IncreaseUnit; 
             foundItem.DecreaseUnit = item.DecreaseUnit;
-            foundItem.ToFinalTiming = item.ToFinalTiming;
-            foundItem.Status = item.Status == StatusType.Nothing
+            foundItem.ToFinalTiming = item.ToFinalTiming;            
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

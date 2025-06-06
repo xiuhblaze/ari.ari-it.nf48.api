@@ -201,8 +201,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _auditorRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-
             // Assigning values
 
             foundItem.FirstName = item.FirstName;
@@ -214,9 +212,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.PhotoFilename = item.PhotoFilename;
             foundItem.FeePayment = item.FeePayment;
             foundItem.IsLeadAuditor = item.IsLeadAuditor;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
