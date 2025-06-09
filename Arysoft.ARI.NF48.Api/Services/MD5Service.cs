@@ -203,7 +203,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The start value must be less than or equal to the end value");
 
                 // - Que el rango de empleados no se solape con otro rango existente
-                if (await _repository.IsInRangeAsync(item.StartValue ?? 0, item.EndValue ?? 0))
+                if (await _repository.IsInRangeAsync(item.StartValue ?? 0, item.EndValue ?? 0, item.ID))
                     throw new BusinessException("The range of employees already exists in the database");
             }
         }

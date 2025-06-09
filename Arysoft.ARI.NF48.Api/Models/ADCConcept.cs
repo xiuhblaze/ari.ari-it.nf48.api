@@ -8,7 +8,7 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid StandardID { get; set; }
 
-        public int IndexSort { get; set; }      // Para ordenar los conceptos de forma personalizada
+        public int? IndexSort { get; set; }      // Para ordenar los conceptos de forma personalizada
 
         public string Description { get; set; }
 

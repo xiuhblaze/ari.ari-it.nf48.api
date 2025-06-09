@@ -8,9 +8,6 @@ using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -66,7 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpPost]
         [ResponseType(typeof(ApiResponse<MD5ItemDetailDto>))]
-        public async Task<IHttpActionResult> PostMD5(MD5ItemCreateDto itemCreateDto)
+        public async Task<IHttpActionResult> PostMD5([FromBody] MD5ItemCreateDto itemCreateDto)
         {
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
@@ -79,5 +76,42 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // PostMD5
+
+        [HttpPut]
+        [ResponseType(typeof(ApiResponse<MD5ItemDetailDto>))]
+        public async Task<IHttpActionResult> PutMD5(Guid id, [FromBody] MD5ItemUpdateDto itemUpdateDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemUpdateDto.ID)
+                throw new BusinessException("ID mismatch");
+
+            var item = MD5Mapping
+                .ItemUpdateDtoToMD5(itemUpdateDto);
+            var itemDto = MD5Mapping
+                .MD5ToItemDetailDto(await _service.UpdateAsync(item));
+            var response = new ApiResponse<MD5ItemDetailDto>(itemDto);
+
+            return Ok(response);
+        } // PutMD5
+
+        [HttpDelete]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> DeleteMD5(Guid id, [FromBody] MD5ItemDeleteDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.ID)
+                throw new BusinessException("ID mismatch");
+
+            var item = MD5Mapping
+                .ItemDeleteDtoToMD5(itemDto);
+            await _service.DeleteAsync(item);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // DeleteMD5
     }
 }

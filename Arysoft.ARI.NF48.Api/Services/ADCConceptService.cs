@@ -5,10 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -106,6 +104,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Set Values
 
             item.ID = Guid.NewGuid();
+            item.IndexSort = 1000; // Default value for new items
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -138,6 +137,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             //    // Es registro nuevo, se puede hacer algo
             //}
 
+            // - Al menos debe de haber un incremento o decremento
+            if (item.Increase == null && item.Decrease == null)
+                throw new BusinessException("At least one of Increase or Decrease must be specified");
+
+
             // - Si tiene increase, debe de tener la unidad
             if (item.Increase != null && item.IncreaseUnit == null)
                 throw new BusinessException("The Increase Unit is required when Increase is specified");
@@ -146,10 +150,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Decrease != null && item.DecreaseUnit == null)
                 throw new BusinessException("The Decrease Unit is required when Decrease is specified");
 
-            // - El indice cambió, reordenar todos los indices del mismo Standard
-            if (item.IndexSort != foundItem.IndexSort)
+            // - El indice cambió, reordenar todos los Conceptos activos
+            //   del mismo Standard
+            if (item.IndexSort.HasValue && item.IndexSort != foundItem.IndexSort)
             {
-                _repository.ReorderByIndex(item.StandardID, item.IndexSort, item.ID);
+                _repository.ReorderByIndex(foundItem.StandardID, item.IndexSort ?? 1000, item.ID);
                 foundItem.IndexSort = item.IndexSort;
             }
 
@@ -192,9 +197,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
+            if (foundItem.Status == StatusType.Active) // Va a cambiar a inactive
+            {
+                // - Rehacer el indice con el resto de elementos
+                _repository.ReorderByIndex(foundItem.StandardID, 0, Guid.Empty);
+            }
+
             if (foundItem.Status == StatusType.Deleted)
             {
-                // - Ver si se necesita alguna validación
+                // TODO: Ver si se necesita alguna validación
 
                 _repository.Delete(foundItem);
             }
