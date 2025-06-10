@@ -9,11 +9,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? SiteID { get; set; }
 
-        public decimal? InitialMD5 { get; set; }
-        
-        public int? Employees { get; set; }
+        public decimal? InitialMD5 { get; set; }    // Se obtiene de tabla MD5
+            
+        public int? Employees { get; set; }         // Se obtiene de Sites
 
-        public decimal? TotalInitial { get; set; }
+        public decimal? TotalInitial { get; set; } // Siempre se redondea hacia arriba
 
         public decimal? MD11 { get; set; }
         

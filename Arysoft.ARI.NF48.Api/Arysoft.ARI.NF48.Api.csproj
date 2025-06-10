@@ -247,6 +247,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\ADCConceptsController.cs" />
     <Compile Include="Controllers\ADCConceptValuesController.cs" />
+    <Compile Include="Controllers\ADCSitesController.cs" />
     <Compile Include="Controllers\AppFormsController.cs" />
     <Compile Include="Controllers\AuditAuditorsController.cs" />
     <Compile Include="Controllers\AuditCyclesController.cs" />
@@ -313,6 +314,7 @@
     <Compile Include="Enumerations\ADCConceptEnums.cs" />
     <Compile Include="Enumerations\ADCConceptValueEnums.cs" />
     <Compile Include="Enumerations\ADCEnums.cs" />
+    <Compile Include="Enumerations\ADCSiteEnums.cs" />
     <Compile Include="Enumerations\AppFormEnums.cs" />
     <Compile Include="Enumerations\AuditAuditorEnum.cs" />
     <Compile Include="Enumerations\AuditCycleDocumentEnum.cs" />
@@ -349,6 +351,7 @@
     <Compile Include="IO\FileRepository.cs" />
     <Compile Include="Mappings\ADCConceptMapping.cs" />
     <Compile Include="Mappings\ADCConceptValueMapping.cs" />
+    <Compile Include="Mappings\ADCSiteMapping.cs" />
     <Compile Include="Mappings\AppFormMapping.cs" />
     <Compile Include="Mappings\AuditAuditorMapping.cs" />
     <Compile Include="Mappings\AuditCycleDocumentMapping.cs" />
@@ -397,6 +400,7 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\DTOs\ADCConceptDTOs.cs" />
     <Compile Include="Models\DTOs\ADCConceptValueDTOs.cs" />
+    <Compile Include="Models\DTOs\ADCSiteDTOs.cs" />
     <Compile Include="Models\DTOs\AppFormDTOs.cs" />
     <Compile Include="Models\DTOs\AuditAuditorDTOs.cs" />
     <Compile Include="Models\DTOs\AuditCycleDocumentDTOs.cs" />
@@ -438,6 +442,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryFilters\ADCConceptQueryFilters.cs" />
     <Compile Include="QueryFilters\ADCConceptValueQueryFilters.cs" />
+    <Compile Include="QueryFilters\ADCQueryFilters.cs" />
+    <Compile Include="QueryFilters\ADCSiteQueryFilters.cs" />
     <Compile Include="QueryFilters\AppFormQueryFilters.cs" />
     <Compile Include="QueryFilters\AuditAuditorQueryFilters.cs" />
     <Compile Include="QueryFilters\AuditCycleDocumentQueryFilters.cs" />
@@ -499,6 +505,8 @@
     <Compile Include="Response\ApiResponse.cs" />
     <Compile Include="Services\ADCConceptService.cs" />
     <Compile Include="Services\ADCConceptValueService.cs" />
+    <Compile Include="Services\ADCService.cs" />
+    <Compile Include="Services\ADCSiteService.cs" />
     <Compile Include="Services\AppFormService.cs" />
     <Compile Include="Services\AuditAuditorService.cs" />
     <Compile Include="Services\AuditCycleDocumentService.cs" />
