@@ -167,10 +167,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             foreach (var item in items)
             {
-                _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
-                    "DELETE FROM AuditSites WHERE AuditID = {0}", item.ID);
+                //_context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia
+                //    "DELETE FROM AuditSites WHERE AuditID = {0}", item.ID);
 
-                _model.Remove(item);
+                //_model.Remove(item);
+                Delete(item); // Usar el método Delete para borrar en cascada
             }
         } // DeleteTmpByUserAsync
 
