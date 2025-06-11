@@ -187,9 +187,41 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateAsync
 
+        public async Task DeleteAsync(ADC item)
+        {
+            var foundItem = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to delete was not found");
+
+            // Validations
+
+            if (item.Status == ADCStatusType.Deleted) // Eliminación física
+            {
+                _repository.Delete(item);
+            }
+            else // Eliminación lógica
+            {
+                item.Status = foundItem.Status < ADCStatusType.Cancel
+                    ? ADCStatusType.Cancel
+                    : ADCStatusType.Deleted;
+                item.Updated = DateTime.UtcNow;
+                item.UpdatedUser = item.UpdatedUser;
+
+                _repository.Update(item);
+            }
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCService.DeleteAsync: {ex.Message}");
+            }
+        } // DeleteAsync
+
         // PRIVATE
 
-        public void RecalcularTotales(ADC item)
+        private void RecalcularTotales(ADC item)
         {
             if (item.ADCSites != null && item.ADCSites.Any())
             {
@@ -218,6 +250,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.TotalEmployees = totalEmployees;
                 item.TotalMD11 = totalMD11;
             }
-        }
+        } // RecalcularTotales
     }
 }

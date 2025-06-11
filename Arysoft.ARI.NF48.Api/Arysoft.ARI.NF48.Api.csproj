@@ -247,6 +247,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\ADCConceptsController.cs" />
     <Compile Include="Controllers\ADCConceptValuesController.cs" />
+    <Compile Include="Controllers\ADCsController.cs" />
     <Compile Include="Controllers\ADCSitesController.cs" />
     <Compile Include="Controllers\AppFormsController.cs" />
     <Compile Include="Controllers\AuditAuditorsController.cs" />
