@@ -352,6 +352,7 @@
     <Compile Include="IO\FileRepository.cs" />
     <Compile Include="Mappings\ADCConceptMapping.cs" />
     <Compile Include="Mappings\ADCConceptValueMapping.cs" />
+    <Compile Include="Mappings\ADCMapping.cs" />
     <Compile Include="Mappings\ADCSiteMapping.cs" />
     <Compile Include="Mappings\AppFormMapping.cs" />
     <Compile Include="Mappings\AuditAuditorMapping.cs" />
@@ -401,6 +402,7 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\DTOs\ADCConceptDTOs.cs" />
     <Compile Include="Models\DTOs\ADCConceptValueDTOs.cs" />
+    <Compile Include="Models\DTOs\ADCDtos.cs" />
     <Compile Include="Models\DTOs\ADCSiteDTOs.cs" />
     <Compile Include="Models\DTOs\AppFormDTOs.cs" />
     <Compile Include="Models\DTOs\AuditAuditorDTOs.cs" />

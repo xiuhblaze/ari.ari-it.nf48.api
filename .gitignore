@@ -1,6 +1,8 @@
 # Archivos de compilación
 bin/
 obj/
+Arysoft.ARI.NF48.Api/bin/
+Arysoft.ARI.NF48.Api/obj/
 *.exe
 *.dll
 *.pdb
@@ -9,6 +11,7 @@ obj/
 *.config
 *.user
 *.vs/
+Arysoft.ARI.NF48.Api/*.vs/
 
 # Paquetes y dependencias
 packages/

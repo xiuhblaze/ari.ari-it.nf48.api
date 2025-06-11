@@ -61,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public ADCConceptItemListDto ADCConcept { get; set; }
 
-        // public ADCSiteTiemListDto ADCSite { get; set; }
+        public ADCSiteItemListDto ADCSite { get; set; }
     } // ADCConceptValueItemDetailDto
 
     public class ADCConceptValueItemCreateDto

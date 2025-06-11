@@ -42,7 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                     && m.Status == StatusType.Active)
                 .FirstOrDefaultAsync();
 
-            return item.Days ?? 0;
+            return item?.Days ?? 0;
         } // GetDaysAsync
     }
 }

@@ -31,7 +31,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 ADCConceptDescription = item.ADCConcept != null 
                     ? item.ADCConcept.Description 
-                    : string.Empty
+                    : string.Empty,
+                ADCSiteDescription = item.ADCSite?.Site?.Description ?? string.Empty
             };
         } // ADCConceptValueToItemListDto
 
@@ -54,9 +55,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCConcept = item.ADCConcept != null
                     ? ADCConceptMapping.ADCConceptToItemListDto(item.ADCConcept)
                     : null,
-                //ADCSite = item.ADCSite != null
-                //    ? ADCSiteMapping.ADCSiteToItemListDto(item.ADCSite)
-                //    : null
+                ADCSite = item.ADCSite != null
+                    ? ADCSiteMapping.ADCSiteToItemListDto(item.ADCSite)
+                    : null
             };
         } // ADCConceptValueToItemDetailDto
 
