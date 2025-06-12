@@ -6,7 +6,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
     public class ADCConfiguration
     {
         public static void Configure(DbModelBuilder modelBuilder)
-        { 
+        {
             modelBuilder.Entity<ADC>()
                 .ToTable("ADCs")
                 .HasKey(m => m.ID);
@@ -53,6 +53,15 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             // RELATIONS
+
+            //modelBuilder.Entity<ADC>()
+            //    .HasRequired(adc => adc.AppForm)
+            //    .WithMany()
+            //    .HasForeignKey(adc => adc.AppFormID);
+
+            //modelBuilder.Entity<ADC>()
+            //    .HasIndex(ADC => ADC.AppFormID)
+            //    .IsUnique();
 
             modelBuilder.Entity<ADC>()
                 .HasMany(a => a.ADCSites)

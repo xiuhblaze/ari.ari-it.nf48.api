@@ -558,6 +558,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         || currentItem.Status == AppFormStatusType.New
                         || currentItem.Status == AppFormStatusType.SalesReview
                         || currentItem.Status == AppFormStatusType.SalesRejected)
+                    && newItem.Status != AppFormStatusType.New
                     && newItem.Status != AppFormStatusType.ApplicantReview
                     && newItem.Status != AppFormStatusType.Cancel)
                     throw new BusinessException("You can't change to this status from New");

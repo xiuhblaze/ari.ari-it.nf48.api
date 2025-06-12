@@ -78,6 +78,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual Standard Standard { get; set; }
 
+        public virtual ICollection<ADC> ADCs { get; set; }
+
         public virtual ICollection<Contact> Contacts { get; set; }
 
         // public virtual ICollection<AppFormCurrentCertification> CurrentCertifications { get; set; }

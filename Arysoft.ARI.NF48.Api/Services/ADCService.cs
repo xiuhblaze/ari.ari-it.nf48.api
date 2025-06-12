@@ -87,8 +87,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             if (item.AppFormID == null || item.AppFormID == Guid.Empty)            
-                throw new ArgumentException("The AppForm ID is required.");
-            
+                throw new BusinessException("The AppForm ID is required.");
+
+            // Validar que el AppForm no tenga un ADC
+
+            if (await _repository.AppFormHasValidADCAsync(item.AppFormID))
+                throw new BusinessException("The Application Form already has a valid ADC");
             
             // Set default values
             
