@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -38,7 +39,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : string.Empty,
                 SiteDescription = item.Site != null 
                     ? item.Site.Description 
-                    : string.Empty
+                    : string.Empty,
+                ADCConceptValuesCount = item.ADCConceptValues != null
+                    ? item.ADCConceptValues.Count
+                    : 0,
             };
         } // ADCSiteToItemListDto
 
@@ -62,6 +66,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser,
                 Site = item.Site != null
                     ? SiteMapping.SiteToItemListDto(item.Site)
+                    : null,
+                ADC = item.ADC != null
+                    ? ADCMapping.ADCToItemListDto(item.ADC)
+                    : null,
+                ADCConceptValues = item.ADCConceptValues != null
+                    ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null
             };
         } // ADCSiteToItemDetailDto

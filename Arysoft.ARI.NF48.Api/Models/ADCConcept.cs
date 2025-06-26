@@ -22,7 +22,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public ADCConceptUnitType? DecreaseUnit { get; set; }
 
-        public bool? ToFinalTiming { get; set; }
+        public string ExtraInfo { get; set; }
 
         // RELATIONS
 

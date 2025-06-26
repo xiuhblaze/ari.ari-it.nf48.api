@@ -66,11 +66,19 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case ADCConceptOrderType.Description:
                     items = items.OrderBy(i => i.Description);
                     break;
+                case ADCConceptOrderType.Standard:
+                    items = items.OrderBy(i => i.Standard.Name)
+                        .ThenBy(i => i.IndexSort);
+                    break;
                 case ADCConceptOrderType.IndexSortDesc:
                     items = items.OrderByDescending(i => i.IndexSort);
                     break;
                 case ADCConceptOrderType.DescriptionDesc:
                     items = items.OrderByDescending(i => i.Description);
+                    break;
+                case ADCConceptOrderType.StandardDesc:
+                    items = items.OrderByDescending(i => i.Standard.Name)
+                        .ThenByDescending(i => i.IndexSort);
                     break;
                 default:
                     items = items.OrderBy(i => i.IndexSort)
@@ -97,9 +105,6 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<ADCConcept> AddAsync(ADCConcept item)
         {
             // Validations
-
-            if (item.StandardID == null || item.StandardID == Guid.Empty)
-                throw new BusinessException("The Standard ID is required");
 
             // Set Values
 
@@ -132,10 +137,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            //if (foundItem.Status == StatusType.Nothing)
-            //{ 
-            //    // Es registro nuevo, se puede hacer algo
-            //}
+            if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
+            {
+                if (item.StandardID == null || item.StandardID == Guid.Empty)
+                    throw new BusinessException("The Standard ID is required for a new ADC Concept");
+
+                foundItem.StandardID = item.StandardID; // Solo cuando es nuevo, se asigna
+            }
 
             // - Al menos debe de haber un incremento o decremento
             if (item.Increase == null && item.Decrease == null)
@@ -166,7 +174,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Decrease = item.Decrease;
             foundItem.IncreaseUnit = item.IncreaseUnit; 
             foundItem.DecreaseUnit = item.DecreaseUnit;
-            foundItem.ToFinalTiming = item.ToFinalTiming;            
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing

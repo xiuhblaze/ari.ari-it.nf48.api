@@ -31,9 +31,22 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 // .AsNoTracking()
         }
 
-        public virtual async Task<T> GetAsync(Guid id)
+        /// <summary>
+        /// Obtiene un registro por su ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="asNoTracking">Para que en una llamada en un mismo
+        ///   metodo se haga o no seguimiento de los cambios
+        /// </param>
+        /// <returns></returns>
+        public virtual async Task<T> GetAsync(Guid id, bool asNoTracking = false)
         {
-            return await _model                
+            var query = _model.AsQueryable();
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            return await query
                 .FirstOrDefaultAsync(m => m.ID == id);
         }
 

@@ -12,9 +12,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
     {
         // GETS
 
-        public new async Task<Audit> GetAsync(Guid id)
+        public new async Task<Audit> GetAsync(Guid id, bool asNoTracking = false)
         {
-            return await _model
+            var query = _model.AsQueryable();
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            return await query
                 .Include(a => a.AuditAuditors)
                 .Include(a => a.AuditStandards)
                 .Include(a => a.AuditDocuments)

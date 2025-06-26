@@ -31,7 +31,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Decrease = item.Decrease,
                 IncreaseUnit = item.IncreaseUnit,
                 DecreaseUnit = item.DecreaseUnit,
-                ToFinalTiming = item.ToFinalTiming,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 StandardName = item.Standard != null
                     ? item.Standard.Name
@@ -52,7 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Decrease = item.Decrease,
                 IncreaseUnit = item.IncreaseUnit,
                 DecreaseUnit = item.DecreaseUnit,
-                ToFinalTiming = item.ToFinalTiming,
+                ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -66,8 +66,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         public static ADCConcept ItemCreateDtoToADCConcept(ADCConceptItemCreateDto itemDto)
         {
             return new ADCConcept
-            {
-                StandardID = itemDto.StandardID,
+            {   
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemCreateDtoToADCConcept
@@ -77,6 +76,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADCConcept
             {
                 ID = itemDto.ID,
+                StandardID = itemDto.StandardID,
                 IndexSort = itemDto.IndexSort,
                 Description = itemDto.Description,
                 WhenTrue = itemDto.WhenTrue,
@@ -84,7 +84,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Decrease = itemDto.Decrease,
                 IncreaseUnit = itemDto.IncreaseUnit,
                 DecreaseUnit = itemDto.DecreaseUnit,
-                ToFinalTiming = itemDto.ToFinalTiming,
+                ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

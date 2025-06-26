@@ -1,6 +1,9 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -33,6 +36,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string ADCDescription { get; set; }
 
         public string SiteDescription { get; set; }
+
+        public int ADCConceptValuesCount { get; set; }
     } // ADCSiteItemListDto
 
     public class ADCSiteItemDetailDto
@@ -67,9 +72,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        // public ADCItemListDto ADC { get; set; }
+        public ADCItemListDto ADC { get; set; }
 
         public SiteItemListDto Site { get; set; }
+
+        public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
     } // ADCSiteItemDetailDto
 
     public class ADCSiteItemCreateDto

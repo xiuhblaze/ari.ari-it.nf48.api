@@ -17,9 +17,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .AsEnumerable();
         } // Gets
 
-        public override async Task<User> GetAsync(Guid id)
+        public override async Task<User> GetAsync(Guid id, bool asNoTracking = false)
         {
-            return await _model
+            var query = _model.AsQueryable();
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            return await query
                 .Include(m => m.Roles)
                 .Where(m => m.ID == id)
                 .FirstOrDefaultAsync();

@@ -12,7 +12,9 @@
         Nothing,
         IndexSort,
         Description,
+        Standard,
         IndexSortDesc,
         DescriptionDesc,
+        StandardDesc
     }
 }

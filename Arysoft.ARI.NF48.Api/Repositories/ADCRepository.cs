@@ -13,6 +13,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         { 
             return await _model
                 .AnyAsync(m => m.AppFormID == appFormID
+                    && m.Status > ADCStatusType.Nothing
                     && m.Status < ADCStatusType.Cancel);
         } // AppFormHasValidADCAsync
 

@@ -24,7 +24,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         
         public ADCConceptUnitType? DecreaseUnit { get; set; }
         
-        public bool? ToFinalTiming { get; set; }
+        public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -53,8 +53,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public ADCConceptUnitType? DecreaseUnit { get; set; }
 
-        public bool? ToFinalTiming { get; set; }
-        
+        public string ExtraInfo { get; set; }
+
         public StatusType Status { get; set; }
         
         public DateTime Created { get; set; }
@@ -71,9 +71,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class ADCConceptItemCreateDto
     {
         [Required]
-        public Guid StandardID { get; set; }
-
-        [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCConceptItemCreateDto
@@ -82,6 +79,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         [Required]
         public Guid ID { get; set; }
+
+        public Guid StandardID { get; set; }
 
         public int? IndexSort { get; set; }
 
@@ -99,7 +98,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public ADCConceptUnitType? DecreaseUnit { get; set; }
 
-        public bool? ToFinalTiming { get; set; }
+        [StringLength(500)]
+        public string ExtraInfo { get; set; }
 
         [Required]
         public StatusType Status { get; set; }
