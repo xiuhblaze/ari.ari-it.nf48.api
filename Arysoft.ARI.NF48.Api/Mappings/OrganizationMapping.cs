@@ -24,7 +24,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         public static OrganizationItemListDto OrganizationToItemListDto(Organization item)
         {
             var auditRepository = new AuditRepository();
-            var nextAudit = auditRepository.GetNextAudit(item.ID, null);
+            var nextAudit = auditRepository
+                .GetNextAudit(item.ID, null, AuditNextAuditOwnerType.Organization);
             var mainContact = item.Contacts?
                 .Where(c => c.IsMainContact && c.Status == StatusType.Active)
                 .FirstOrDefault();

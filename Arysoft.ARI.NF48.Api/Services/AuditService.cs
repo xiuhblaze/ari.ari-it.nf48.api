@@ -380,6 +380,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 auditExceptionID);
         } // IsAnyEqualStandardStepAuditInAuditCycle
 
+        public Audit GetNextAudit(
+            Guid? ownerID,
+            DateTime? initialDate,
+            AuditNextAuditOwnerType owner)
+        {
+            return _repository.GetNextAudit(ownerID, initialDate, owner);
+        } // GetNextAuditAsync
+
         // SITES
 
         public async Task AddSiteAsync(Guid id, Guid siteID)

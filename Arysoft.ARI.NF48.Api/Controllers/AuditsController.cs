@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
@@ -88,6 +89,23 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var response = new ApiResponse<bool>(hasStandardStep);
             return Ok(response);
         } // HasStandardStepAnAudit
+
+        [HttpGet]
+        [Route("api/Audits/next-audit")]
+        [ResponseType(typeof(ApiResponse<AuditItemDetailDto>))]
+        public IHttpActionResult GetNextAudit([FromUri] NextAuditDto valuesDto)
+        {
+            var item = _service.GetNextAudit(
+                valuesDto.OwnerID,
+                valuesDto.InitialDate, 
+                AuditNextAuditOwnerType.Auditor)
+                ?? throw new BusinessException("Item not found");
+
+            var itemDto = AuditMapping.AuditToItemDetailDto(item);
+            var response = new ApiResponse<AuditItemDetailDto>(itemDto);
+
+            return Ok(response);
+        } // GetNextAuditorAudit
 
         [HttpPost]
         [ResponseType(typeof(ApiResponse<AuditItemDetailDto>))]

@@ -181,6 +181,20 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public Guid? AuditExceptionID { get; set; }
     }
 
+    public class NextAuditDto
+    { 
+        [Required]
+        public Guid OwnerID { get; set; }
+
+        /// <summary>
+        /// A partír de esta fecha buscar la siguiente auditoría
+        /// </summary>
+        public DateTime? InitialDate { get; set; }
+
+        [Required]
+        public AuditNextAuditOwnerType Owner { get; set; }
+    }
+
     // SITES
 
     /// <summary>
