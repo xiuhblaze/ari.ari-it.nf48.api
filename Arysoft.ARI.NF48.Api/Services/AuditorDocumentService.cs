@@ -165,22 +165,29 @@ namespace Arysoft.ARI.NF48.Api.Services
             //    foundItem.Status = StatusType.Inactive;
             //}
 
-            // - Si el documento es el activo, inactiva los demas
-            if (item.Status == StatusType.Nothing || item.Status == StatusType.Active) {
-                item.Status = StatusType.Active;
-                await _repository.SetToInactiveDocumentsAsync(foundItem.AuditorID, foundItem.CatAuditorDocumentID);
+            if (foundItem.Status != item.Status 
+                || (foundItem.Status == StatusType.Nothing 
+                    && item.Status == StatusType.Nothing)) // Si cambió el status o va acambiar...
+            { 
+                // - Si el documento cambia a activo, inactiva los demas
+                if (item.Status == StatusType.Nothing || item.Status == StatusType.Active) {
+                    item.Status = StatusType.Active;
+                    await _repository.SetToInactiveDocumentsAsync(foundItem.AuditorID, foundItem.CatAuditorDocumentID);
+                }
             }
 
             // Assigning values
-
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
             foundItem.Filename = item.Filename;
             foundItem.StartDate = item.StartDate;
             foundItem.DueDate = item.DueDate;
             foundItem.Observations = item.Observations;
             foundItem.Type = item.Type;
-            foundItem.Status = item.Status;
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

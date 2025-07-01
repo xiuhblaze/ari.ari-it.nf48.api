@@ -68,6 +68,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardName = item.Standard != null
                     ? item.Standard.Name
                     : string.Empty,
+                ADCCount = item.ADCs != null
+                    ? item.ADCs.Count
+                    : 0,
                 Nacecodes = item.NaceCodes != null
                     ? item.NaceCodes.Select(n => n.Description).ToList()
                     : new List<string>(),
@@ -140,6 +143,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 Standard = item.Standard != null
                     ? StandardMapping.StandardToItemListDto(item.Standard)
+                    : null,
+                ADCs = item.ADCs != null
+                    ? ADCMapping.ADCToListDto(item.ADCs).ToList()
                     : null,
                 Nacecodes = item.NaceCodes != null
                     ? NaceCodeMapping.NaceCodeToListDto(item.NaceCodes).ToList()

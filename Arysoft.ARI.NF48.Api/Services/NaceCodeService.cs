@@ -172,7 +172,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _naceCodeRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+            // if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
             // Validations
 
@@ -208,7 +208,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Description = item.Description;
             //foundItem.AccreditedStatus = item.AccreditedStatus;
             //foundItem.AccreditationInfo = item.AccreditationInfo;
-            foundItem.Status = item.Status;
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

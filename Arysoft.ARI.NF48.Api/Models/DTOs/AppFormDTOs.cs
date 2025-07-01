@@ -95,6 +95,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int NotesCount { get; set; }
 
+        public int ADCCount { get; set; }
     } // AppFormItemListDto
 
     public class AppFormItemDetailDto
@@ -178,6 +179,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditCycleItemListDto AuditCycle { get; set; }
 
         public StandardItemListDto Standard { get; set; }
+
+        public ICollection<ADCItemListDto> ADCs { get; set; }
 
         public ICollection<NaceCodeItemListDto> Nacecodes { get; set; }
 

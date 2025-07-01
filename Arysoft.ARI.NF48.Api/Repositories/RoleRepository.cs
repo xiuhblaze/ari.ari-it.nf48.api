@@ -1,8 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Models;
 using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {
@@ -16,19 +13,5 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             _context.Entry(item).State = EntityState.Deleted;
         } // Delete
-
-        public async Task DeleteTmpByUser(string username)
-        {
-            var items = await _model
-                .Where(m =>
-                    m.UpdatedUser.ToUpper() == username.ToUpper()
-                    && m.Status == StatusType.Nothing
-                ).ToListAsync();
-
-            foreach (var item in items)
-            {
-                _model.Remove(item);
-            }
-        } // DeleteTmpByUser
     }
 }

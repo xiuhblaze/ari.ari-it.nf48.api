@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arysoft.ARI.NF48.Api.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,6 +7,9 @@ namespace Arysoft.ARI.NF48.Api.CustomEntities
 {
     public class PagedList<T> : List<T>
     {
+        private IEnumerable<MD5> items;
+        private int pageNumber;
+
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
         public int TotalPages { get; set; }
@@ -25,6 +29,13 @@ namespace Arysoft.ARI.NF48.Api.CustomEntities
             CurrentPage = pageNumber > TotalPages ? TotalPages : pageNumber;
 
             AddRange(items);
+        }
+
+        public PagedList(IEnumerable<MD5> items, int pageNumber, int pageSize)
+        {
+            this.items = items;
+            this.pageNumber = pageNumber;
+            PageSize = pageSize;
         }
 
         public static PagedList<T> Create(IEnumerable<T> source, int? pageNumber = 0, int? pageSize = 0)

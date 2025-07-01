@@ -31,8 +31,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<AuditorDocument> Documents { get; set;  }
 
-        public virtual ICollection<FSSCAuditorActivity> FSSCAuditorActivities { get; set; }
-
         // NOT MAPPED
 
         public AuditorDocumentValidityType? ValidityStatus { get; set; }

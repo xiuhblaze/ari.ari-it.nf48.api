@@ -17,16 +17,14 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        // public virtual ICollection<Application> Applications { get; set; }
-
         public virtual ICollection<AuditorStandard> AuditorStandards { get; set; }
 
         public virtual ICollection<CatAuditorDocument> CatAuditorDocuments { get; set; }
 
         public virtual ICollection<Certificate> Certificates { get; set; }
 
-        public virtual ICollection<DayCalculationConcept> DayCalculationConcepts { get; set; }
-
         public virtual ICollection<OrganizationStandard> OrganizationStandards { get; set; }
+
+        public virtual ICollection<ADCConcept> ADCConcepts { get; set; }
     }
 }

@@ -238,11 +238,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.StandardID = item.StandardID;
             }
 
-            if (item.Status == CertificateStatusType.Nothing)
-            {
-                item.Status = CertificateStatusType.Active;
-            }
-
             // - Si hay alguna NC es necesario la fecha del plan de acción
             if ((item.HasNCsCritical ?? false) 
                 || (item.HasNCsMajor ?? false) 
@@ -275,7 +270,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.HasNCsCritical = item.HasNCsCritical;
             foundItem.ActionPlanDate = item.ActionPlanDate;
             foundItem.ActionPlanDelivered = item.ActionPlanDelivered;
-            foundItem.Status = item.Status;
+            foundItem.Status = foundItem.Status == CertificateStatusType.Nothing && item.Status == CertificateStatusType.Nothing
+                ? CertificateStatusType.Active
+                : item.Status != CertificateStatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

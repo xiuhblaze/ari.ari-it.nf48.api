@@ -122,9 +122,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
-            foundItem.Status = item.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

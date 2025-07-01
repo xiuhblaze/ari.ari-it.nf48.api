@@ -161,11 +161,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            if (item.Status == StatusType.Nothing)
-            {
-                item.Status = StatusType.Active;
-            }
-
             //foundItem.StandardID = item.StandardID;
             foundItem.Filename = item.Filename;
             foundItem.Comments = item.Comments;
@@ -173,9 +168,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.OtherDescription = item.OtherDescription;
             foundItem.UploadedBy = item.UploadedBy;
             foundItem.IsWitnessIncluded = item.IsWitnessIncluded;
-            foundItem.Status = item.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

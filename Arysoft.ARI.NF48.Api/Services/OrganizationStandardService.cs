@@ -5,10 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -131,9 +129,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-
-            if (foundItem.Status == StatusType.Nothing)
+            if (foundItem.Status == StatusType.Nothing) // Si es nuevo
             {
                 if (item.StandardID == null || item.StandardID == Guid.Empty)
                     throw new BusinessException("The Standard ID must not be empty");
@@ -149,9 +145,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             foundItem.ExtraInfo = item.ExtraInfo;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

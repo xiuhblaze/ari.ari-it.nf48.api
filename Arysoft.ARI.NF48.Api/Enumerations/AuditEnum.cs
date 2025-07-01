@@ -48,4 +48,12 @@
         // 5. Falta documentación a un mes de terminar la auditoria
         MissingDocumentsAfterMonth,
     } // AuditWarningType
+
+    public enum AuditNextAuditOwnerType
+    {
+        Nothing,
+        Organization, // La organización es la dueña de la siguiente auditoria
+        AuditCycle,   // El ciclo de auditoria es el dueño de la siguiente auditoria
+        Auditor       // El auditor es el dueño de la siguiente auditoria
+    } // AuditNextAuditOwnerType
 }

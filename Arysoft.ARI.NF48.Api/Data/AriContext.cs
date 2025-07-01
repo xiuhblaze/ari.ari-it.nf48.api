@@ -13,26 +13,13 @@ namespace Arysoft.ARI.NF48.Api.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-
-            // Módulo para actualización del proceso de auditorias
-            ApplicationConfiguration.Configure(modelBuilder);
-            DayCalculationConceptConfiguration.Configure(modelBuilder);
-            DayCalculationConceptApplicationConfiguration.Configure(modelBuilder);
-            
+                        
             // Módulo de auditores 
             AuditorConfiguration.Configure(modelBuilder);
             AuditorDocumentConfiguration.Configure(modelBuilder);
             AuditorStandardConfiguration.Configure(modelBuilder);
             CatAuditorDocumentConfiguration.Configure(modelBuilder);
 
-            // Módulo de documentción para FSSC
-            FSSCCategoryConfiguration.Configure(modelBuilder);
-            FSSCSubCategoryConfiguration.Configure(modelBuilder);
-            FSSCActivityConfiguration.Configure(modelBuilder);
-            FSSCAuditorActivityConfiguration.Configure(modelBuilder);
-            FSSCJobExperienceConfiguration.Configure(modelBuilder);
-            FSSCAuditExperienceConfiguration.Configure(modelBuilder);
-            
             // Módulo de organizaciones
             OrganizationConfiguration.Configure(modelBuilder);
             OrganizationStandardConfiguration.Configure(modelBuilder);
@@ -44,7 +31,14 @@ namespace Arysoft.ARI.NF48.Api.Data
 
             AppFormConfiguration.Configure(modelBuilder);
 
-            // Módulo de documentación para auditorias
+            // Módulo de ADC - Audit Day Calculation
+            ADCConfiguration.Configure(modelBuilder);
+            ADCConceptConfiguration.Configure(modelBuilder);
+            ADCConceptValueConfiguration.Configure(modelBuilder);
+            ADCSiteConfiguration.Configure(modelBuilder);
+            MD5Configuration.Configure(modelBuilder);
+
+            // Módulo de Auditorias
             AuditCycleConfiguration.Configure(modelBuilder);
             AuditCycleDocumentConfiguration.Configure(modelBuilder);
             AuditCycleStandardConfiguration.Configure(modelBuilder);

@@ -1,25 +1,37 @@
-# Logs
-logs
+# Archivos de compilación
+bin/
+obj/
+Arysoft.ARI.NF48.Api/bin/
+Arysoft.ARI.NF48.Api/obj/
+*.exe
+*.dll
+*.pdb
+
+# Archivos de configuración y caché de usuario
+*.config
+*.user
+*.vs/
+Arysoft.ARI.NF48.Api/*.vs/
+
+# Paquetes y dependencias
+packages/
+*.nupkg
+
+# Logs y datos temporales
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+*.cache
+*.tmp
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-.vs/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# Archivos generados por VS
+.vscode/
+.vs/
 *.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.userprefs
+
+# Archivos de publicación y despliegue
+publish/
+app.publish/
+
+# Ignorar información sensible y credenciales
+secrets.json
+appsettings.json

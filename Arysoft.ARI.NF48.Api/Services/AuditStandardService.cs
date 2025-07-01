@@ -174,14 +174,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             // Assigning values
 
-            if (item.Status == StatusType.Nothing)
-                item.Status = StatusType.Active;
-
             foundItem.Step = item.Step;
             foundItem.ExtraInfo = item.ExtraInfo;
-            foundItem.Status = foundItem.Status == StatusType.Nothing
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
-                : item.Status;
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

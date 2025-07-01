@@ -239,9 +239,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Phone = item.Phone;;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.FolderFolio = item.FolderFolio;
-            foundItem.Status = item.Status == OrganizationStatusType.Nothing 
-                ? OrganizationStatusType.Applicant 
-                : item.Status;
+            foundItem.Status = foundItem.Status == OrganizationStatusType.Nothing && item.Status == OrganizationStatusType.Nothing
+                ? OrganizationStatusType.Applicant
+                : item.Status != OrganizationStatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

@@ -10,6 +10,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class AppFormRepository : BaseRepository<AppForm>
     {
+        public async Task<bool> HasAnAppFormValid(Guid auditCycleID, Guid standardID)
+        {
+            return await _model
+                .AnyAsync(m => m.AuditCycleID == auditCycleID
+                    && m.StandardID == standardID
+                    && m.Status < AppFormStatusType.Inactive);
+        } // HasAnAppFormValid
+
         public new void Delete(AppForm item)
         {
             _context.Database.ExecuteSqlCommand( // Para borrar en cascada la tabla intermedia

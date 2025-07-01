@@ -12,9 +12,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
     {
         // GETS
 
-        public new async Task<Audit> GetAsync(Guid id)
+        public new async Task<Audit> GetAsync(Guid id, bool asNoTracking = false)
         {
-            return await _model
+            var query = _model.AsQueryable();
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            return await query
                 .Include(a => a.AuditAuditors)
                 .Include(a => a.AuditStandards)
                 .Include(a => a.AuditDocuments)
@@ -23,7 +28,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync(m => m.ID == id);
         } // GetAsync
 
-        public Audit GetNextAudit(Guid? OrganizationID, DateTime? date)
+        public Audit GetNextAudit(Guid? ownerID, DateTime? initialDate, AuditNextAuditOwnerType owner)
         {  
             var items = _model
                 .Include(a => a.AuditAuditors)
@@ -32,18 +37,31 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(a => a.Notes)
                 .Include(a => a.Sites);
 
-            if (date == null) date = DateTime.Now;
+            if (initialDate == null) initialDate = DateTime.Now;
 
             items = items.Where(a =>
-                a.StartDate >= date
+                a.StartDate >= initialDate
                 && a.Status != AuditStatusType.Nothing
                 && a.Status < AuditStatusType.Canceled
                 && a.AuditCycle.Status != StatusType.Nothing
             );
 
-            if (OrganizationID != null && OrganizationID != Guid.Empty)
+            if (ownerID != null && ownerID != Guid.Empty)
             {
-                items = items.Where(a => a.AuditCycle.OrganizationID == OrganizationID);
+                switch (owner)
+                {
+                    case AuditNextAuditOwnerType.Organization:
+                        items = items.Where(a => a.AuditCycle.OrganizationID == ownerID);
+                        break;
+                    case AuditNextAuditOwnerType.AuditCycle:
+                        items = items.Where(a => a.AuditCycleID == ownerID);
+                        break;
+                    case AuditNextAuditOwnerType.Auditor:
+                        items = items.Where(a => a.AuditAuditors.Any(aa => aa.AuditorID == ownerID && aa.Status == StatusType.Active));
+                        break;
+                    default:
+                        throw new BusinessException("Invalid owner type for next audit.");
+                }
             }
 
             items = items.OrderBy(a => a.StartDate);

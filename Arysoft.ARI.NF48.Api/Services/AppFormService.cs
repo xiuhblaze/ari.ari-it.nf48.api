@@ -137,12 +137,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - Validar que la organizacion exista y esté activo
             // - Validar que el ciclo exista y esté activo
+            // - Validar que no exista otro appForm del mismo standard
+            //   en ese ciclo y este activo
+
 
             // Set values
 
             item.ID = Guid.NewGuid();
-            item.OrganizationID = item.OrganizationID;
-            item.AuditCycleID = item.AuditCycleID;
+            //item.OrganizationID = item.OrganizationID;
+            //item.AuditCycleID = item.AuditCycleID;
             item.Status = AppFormStatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -558,6 +561,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         || currentItem.Status == AppFormStatusType.New
                         || currentItem.Status == AppFormStatusType.SalesReview
                         || currentItem.Status == AppFormStatusType.SalesRejected)
+                    && newItem.Status != AppFormStatusType.New
                     && newItem.Status != AppFormStatusType.ApplicantReview
                     && newItem.Status != AppFormStatusType.Cancel)
                     throw new BusinessException("You can't change to this status from New");
