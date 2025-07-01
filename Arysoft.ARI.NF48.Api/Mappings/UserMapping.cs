@@ -114,13 +114,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             switch (type)
             {
                 case UserType.SuperAdmin:
-                    ownerName = "GOD";
-                    break;
-
                 case UserType.Admin:
-                    ownerName = "ARI";
-                    break;
-
                 case UserType.Auditor:
                     if (id != null)
                     {
