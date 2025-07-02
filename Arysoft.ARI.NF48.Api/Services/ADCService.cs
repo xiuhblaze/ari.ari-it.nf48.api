@@ -7,6 +7,7 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Http.Filters;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -28,6 +29,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             var items = _repository.Gets();
 
             // Filters
+
+            if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
+            { 
+                items = items.Where(e => e.AppForm.AuditCycle.OrganizationID == filters.OrganizationID);
+            }
+
+            if (filters.AuditCycleID != null && filters.AuditCycleID != Guid.Empty)
+            { 
+                items = items.Where(e => e.AppForm.AuditCycleID == filters.AuditCycleID);
+            }
 
             if (filters.AppFormID != null && filters.AppFormID != Guid.Empty)
             {
