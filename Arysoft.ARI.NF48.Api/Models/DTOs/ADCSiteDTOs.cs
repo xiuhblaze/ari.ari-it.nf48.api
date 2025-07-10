@@ -37,7 +37,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SiteDescription { get; set; }
 
-        public int ADCConceptValuesCount { get; set; }
+        public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
     } // ADCSiteItemListDto
 
     public class ADCSiteItemDetailDto

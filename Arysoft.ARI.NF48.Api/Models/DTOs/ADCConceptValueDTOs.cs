@@ -12,6 +12,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid ADCSiteID { get; set; }
 
+        public bool? CheckValue { get; set; }
+
         public decimal? Value { get; set; }
 
         public string Justification { get; set; }
@@ -38,6 +40,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public Guid ADCConceptID { get; set; }
 
         public Guid ADCSiteID { get; set; }
+
+        public bool? CheckValue { get; set; }
 
         public decimal? Value { get; set; }
 
@@ -81,6 +85,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     { 
         [Required]
         public Guid ID { get; set; }
+
+        [Required]
+        public bool? CheckValue { get; set; }
 
         [Required]
         public decimal? Value { get; set; }

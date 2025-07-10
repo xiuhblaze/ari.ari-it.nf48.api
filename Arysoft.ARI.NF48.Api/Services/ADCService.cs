@@ -112,6 +112,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             try
             { 
+            // Procesar ADC
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
@@ -121,18 +122,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.AddAsync: {ex.Message}");
             }
 
-            // Procesar ADC
             await ProcesarADCAsync(item);
 
             try 
             { 
-                _repository.Update(item);
+                _repository.UpdateValues(item);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
 
             {
-                throw new BusinessException($"ADCService.AddAsync.Updating: {ex.Message}");
+                throw new BusinessException($"ADCService.AddAsync.Update.ProcesarADCAsync: {ex.Message}");
             }
 
             item = await _repository.GetAsync(item.ID, asNoTracking: true)
@@ -140,7 +140,18 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             RecalcularTotales(item);
 
-            item = await _repository.GetAsync(item.ID, asNoTracking: true)
+            try
+            {
+                _repository.UpdateValues(item);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+
+            {
+                throw new BusinessException($"ADCService.AddAsync.Update.RecalcularTotales: {ex.Message}");
+            }
+
+            item = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The ADC was not found after and recalculation.");
 
             return item;
@@ -348,6 +359,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         ID = Guid.NewGuid(),
                         ADCConceptID = concept.ID,
                         ADCSiteID = adcSite.ID,
+                        CheckValue = false,
                         Value = 0, // Inicializar en 0 o el valor que corresponda
                         Created = DateTime.UtcNow,
                         Updated = DateTime.UtcNow,

@@ -40,9 +40,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteDescription = item.Site != null 
                     ? item.Site.Description 
                     : string.Empty,
-                ADCConceptValuesCount = item.ADCConceptValues != null
-                    ? item.ADCConceptValues.Count
-                    : 0,
+                //ADCConceptValuesCount = item.ADCConceptValues != null
+                //    ? item.ADCConceptValues.Count
+                //    : 0,
+                ADCConceptValues = item.ADCConceptValues != null
+                    ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
+                    : null
             };
         } // ADCSiteToItemListDto
 

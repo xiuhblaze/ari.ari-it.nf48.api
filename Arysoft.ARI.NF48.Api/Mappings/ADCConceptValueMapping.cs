@@ -23,6 +23,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 ADCConceptID = item.ADCConceptID,
                 ADCSiteID = item.ADCSiteID,
+                CheckValue = item.CheckValue,
                 Value = item.Value,
                 Justification = item.Justification,
                 ValueApproved = item.ValueApproved,
@@ -43,6 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 ADCConceptID = item.ADCConceptID,
                 ADCSiteID = item.ADCSiteID,
+                CheckValue = item.CheckValue,
                 Value = item.Value,
                 Justification = item.Justification,
                 ValueApproved = item.ValueApproved,
@@ -76,6 +78,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADCConceptValue
             {
                 ID = itemUpdateDto.ID,
+                CheckValue = itemUpdateDto.CheckValue,
                 Value = itemUpdateDto.Value,
                 Justification = itemUpdateDto.Justification,
                 ValueApproved = itemUpdateDto.ValueApproved,

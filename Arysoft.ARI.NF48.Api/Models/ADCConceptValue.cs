@@ -9,6 +9,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid ADCSiteID { get; set; }
 
+        public bool? CheckValue { get; set; }
+
         public decimal? Value { get; set; }
 
         public string Justification { get; set; }

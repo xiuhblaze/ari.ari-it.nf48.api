@@ -140,22 +140,26 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.ID == null || item.ID == Guid.Empty)
                 throw new BusinessException("The ID is required");
 
-            // - validar contra ADCConcept, que no se salga de los rangos indicados
-            if (foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Increase != null)
-            {
-                // Ver que no se pase del incremento maximo permitido
-                if (item.Value > foundItem.ADCConcept.Increase)
-                    throw new BusinessException("The Value exceeds the maximum allowed for this Concept");
-            }
-            else if (!foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Decrease != null)
-            {
-                // Ver que no se pase del decremento maximo permitido
-                if (item.Value > foundItem.ADCConcept.Decrease)
-                    throw new BusinessException("The Value exceeds the minimum allowed for this Concept");
-            }
+            // - validar contra ADCConcept, que no se salga de los rangos indicados UPDATE: Validarlo junto con CheckValue
+            //if (foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Increase != null)
+            //{
+            //    // Ver que no se pase del incremento maximo permitido
+            //    if (item.Value > foundItem.ADCConcept.Increase)
+            //        throw new BusinessException("The Value exceeds the maximum allowed for this Concept");
+            //}
+            //else if (!foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Decrease != null)
+            //{
+            //    // HACK: Update (xBlaze:20250710) - El decremento se va a medir en valores de 5, 10, 15 y 20% para todos!
+            //    // Ver que no se pase del decremento maximo permitido
+            //    if (item.Value > foundItem.ADCConcept.Decrease)
+            //        throw new BusinessException("The Value exceeds the minimum allowed for this Concept");
+            //}
+
+            // TODO: - validar si el checkValue coincida con el incremento o decremento correspondiente
 
             // Set Values
 
+            foundItem.CheckValue = item.CheckValue;
             foundItem.Value = item.Value;
             foundItem.Justification = item.Justification;
             foundItem.ValueApproved = item.ValueApproved;
