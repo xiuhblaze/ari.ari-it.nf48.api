@@ -23,9 +23,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalRR { get; set; }
 
-        public string UserCreate { get; set; }
+        public string UserCreates { get; set; }
 
-        public string UserReviewer { get; set; }
+        public string UserReview { get; set; }
 
         public DateTime? ReviewDate { get; set; }
 
@@ -68,9 +68,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalRR { get; set; }
 
-        public string UserCreate { get; set; }
+        public string UserCreates { get; set; }
 
-        public string UserReviewer { get; set; }
+        public string UserReview { get; set; }
 
         public DateTime? ReviewDate { get; set; }
 

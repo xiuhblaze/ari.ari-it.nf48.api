@@ -7,7 +7,6 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http.Filters;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -105,7 +104,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Set default values
             
             item.ID = Guid.NewGuid();
-            item.UserCreate = item.UpdatedUser;
+            item.UserCreates = item.UpdatedUser;
             item.Status = ADCStatusType.New;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -193,13 +192,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                         foundItem.ReviewDate = DateTime.UtcNow;
                         foundItem.ReviewComments = item.ReviewComments;
-                        foundItem.UserReviewer = item.UpdatedUser;
+                        foundItem.UserReview = item.UpdatedUser;
                         break;
 
                     case ADCStatusType.Active:
                         if (foundItem.Status != ADCStatusType.Review)
                             throw new BusinessException("Only items in Review can be set to Active.");
-                        foundItem.UserReviewer = item.UpdatedUser;
+                        foundItem.UserReview = item.UpdatedUser;
                         foundItem.ActiveDate = DateTime.UtcNow;
                         break;
 

@@ -20,9 +20,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public decimal? TotalRR { get; set; }
 
-        public string UserCreate { get; set; }      // Usuario que crea el ADC
+        public string UserCreates { get; set; }      // Usuario que crea el ADC
 
-        public string UserReviewer { get; set; }    // Usuario que revisa y aprueba el ADC
+        public string UserReview { get; set; }    // Usuario que revisa y aprueba el ADC
 
         public DateTime? ReviewDate { get; set; }   // Fecha en que se envió a revisión por parte del creador
 
