@@ -94,6 +94,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = itemDto.ID,
                 SiteID = itemDto.SiteID,
+                TotalInitial = itemDto.TotalInitial,
                 MD11 = itemDto.MD11,
                 Surveillance = itemDto.Surveillance,
                 RR = itemDto.RR,

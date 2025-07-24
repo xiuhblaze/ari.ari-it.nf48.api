@@ -22,7 +22,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string JustificationApproved { get; set; }
 
-        public ADCConceptUnitType ValueUnit { get; set; }
+        public ADCConceptUnitType? ValueUnit { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -51,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string JustificationApproved { get; set; }
 
-        public ADCConceptUnitType ValueUnit { get; set; }
+        public ADCConceptUnitType? ValueUnit { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -89,7 +89,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public bool? CheckValue { get; set; }
 
-        [Required]
         public decimal? Value { get; set; }
 
         [StringLength(500)]
@@ -99,6 +98,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(500)]
         public string JustificationApproved { get; set; }
+
+        public ADCConceptUnitType? ValueUnit { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

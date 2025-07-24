@@ -86,6 +86,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<ADC> GetAsync(Guid id)
         {
+
+            //TODO: Revisar que los datos no hayan cambiado respecto a:
+            // - Los sites del application form
+            // - el numero de empleados por site
+
             return await _repository.GetAsync(id);
         } // GetAsync
 
@@ -283,6 +288,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The AppForm does not have any Sites.");
 
             // - Obtener los Sites del AppForm y agregarlos al ADC
+            //HACK: Que pasa si se quita algun site del AppForm?
             foreach (var site in appForm.Sites
                 .Where(s => s.Status == StatusType.Active))
             {

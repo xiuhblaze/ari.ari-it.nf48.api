@@ -154,6 +154,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
+            // Validar si cambia el número de empleados, notificar a AppForm y a ADC
+            // que estén activos o menos y tengan asociado el Site que tiene el Shift
+            if (item.NoEmployees != foundItem.NoEmployees)
+            {
+                // realizar la notificación a AppForm y ADC
+            }
+
             // Assigning values
 
             foundItem.Type = item.Type;

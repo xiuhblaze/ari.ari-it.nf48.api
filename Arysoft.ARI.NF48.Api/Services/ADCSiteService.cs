@@ -140,7 +140,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
 
                 foundItem.SiteID = item.SiteID; // Solo se asigna si es nuevo
-            }
+            } // xBlaze Update: Creo que no se va a utilizar, se genera automáticamente
 
             if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
             { 

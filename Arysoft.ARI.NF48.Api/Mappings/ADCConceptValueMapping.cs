@@ -73,7 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemCreateDtoToADCConceptValue
 
-        public static ADCConceptValue ItemUpdateDtoToADCConceptValue( ADCConceptValueItemUpdateDto itemUpdateDto)
+        public static ADCConceptValue ItemUpdateDtoToADCConceptValue(ADCConceptValueItemUpdateDto itemUpdateDto)
         {
             return new ADCConceptValue
             {
@@ -83,6 +83,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Justification = itemUpdateDto.Justification,
                 ValueApproved = itemUpdateDto.ValueApproved,
                 JustificationApproved = itemUpdateDto.JustificationApproved,
+                ValueUnit = itemUpdateDto.ValueUnit,
                 Status = itemUpdateDto.Status,
                 UpdatedUser = itemUpdateDto.UpdatedUser
             };

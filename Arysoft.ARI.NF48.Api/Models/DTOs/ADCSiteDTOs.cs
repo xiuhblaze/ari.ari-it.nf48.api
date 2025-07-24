@@ -97,6 +97,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid SiteID { get; set; }
 
+        public decimal? TotalInitial { get; set; }
+
         public decimal? MD11 { get; set; }
 
         public decimal? Surveillance { get; set; }

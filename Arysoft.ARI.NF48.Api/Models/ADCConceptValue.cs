@@ -19,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string JustificationApproved { get; set; }
 
-        public ADCConceptUnitType ValueUnit { get; set; }
+        public ADCConceptUnitType? ValueUnit { get; set; }
 
         // RELATIONS
 
