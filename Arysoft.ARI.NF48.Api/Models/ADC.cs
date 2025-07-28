@@ -41,5 +41,9 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<ADCSite> ADCSites { get; set; }
 
         public virtual ICollection<Note> Notes { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCAlertType> Alerts { get; set; }
     }
 }

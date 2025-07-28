@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
@@ -30,5 +31,9 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual Site Site { get; set; }
 
         public virtual ICollection<ADCConceptValue> ADCConceptValues { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCSiteAlertType> Alerts { get; set; }
     }
 }

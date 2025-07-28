@@ -5,6 +5,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -76,6 +77,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
             }
 
+            foreach (var item in items)
+            {
+                // Get alerts
+                item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
+            }
+
             var pagedItems = PagedList<ADCSite>
                 .Create(items, filters.PageNumber, filters.PageSize);
 
@@ -89,7 +96,13 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <returns></returns>
         public async Task<ADCSite> GetAsync(Guid id)
         {
-            return await _repository.GetAsync(id);
+            var item = await _repository.GetAsync(id)
+                ?? throw new BusinessException("The record was not found");
+
+            // Get alerts
+            item.Alerts = await GetAlertsAsync(item);
+
+            return item;
         } // GetAsync
 
         public async Task<ADCSite> AddAsync(ADCSite item)
@@ -225,5 +238,35 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCSite.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
-    }
+
+        // PRIVATE 
+
+        public static async Task<List<ADCSiteAlertType>> GetAlertsAsync(ADCSite item)
+        {
+            var alerts = new List<ADCSiteAlertType>();
+
+            var noEmployees = item.Site.Shifts
+                .Where(s => s.Status == StatusType.Active)
+                .Sum(s => s.NoEmployees) ?? 0;
+
+            if (noEmployees != (item.Employees ?? 0)) { 
+                alerts.Add(ADCSiteAlertType.EmployeesMistmatch);
+            }
+
+            //// Concept value decrease exceeded
+            //if (item.TotalInitial != null && item.TotalInitial > 0
+            //    && item.MD11 != null && item.MD11 < 0.7m * item.TotalInitial)
+            //{
+            //    alerts.Add(ADCSiteAlertType.ConceptValueDecreaseExceeded);
+            //}
+
+            //// MD11 reduction exceeded
+            //if (item.MD11 != null && item.MD11 < 0.7m * item.TotalInitial)
+            //{
+            //    alerts.Add(ADCSiteAlertType.MD11ReductionExceeded);
+            //}
+
+            return alerts;
+        } // GetAlertsAsync
+    } // ADCSiteService
 }

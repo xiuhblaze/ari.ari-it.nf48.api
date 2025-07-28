@@ -43,7 +43,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AppFormAuditCycleName = item.AppForm?.AuditCycle?.Name ?? string.Empty,
                 AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
                 NotesCount = item.Notes?.Count() ?? 0,
-                ADCSitesCount = item.ADCSites?.Count() ?? 0
+                ADCSitesCount = item.ADCSites?.Count() ?? 0,
+                // NOT MAPPED
+                Alerts = item.Alerts
             };
         } // ADCToItemListDto
 
@@ -78,7 +80,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 Notes = item.Notes != null
                     ? NoteMapping.NotesToListDto(item.Notes).ToList()
-                    : null
+                    : null,
+                Alerts = item.Alerts
             };
         } // ADCToItemDetailDto
 

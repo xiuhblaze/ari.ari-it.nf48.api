@@ -47,6 +47,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .WithRequired(cv => cv.ADCSite)
                 .HasForeignKey(cv => cv.ADCSiteID)
                 .WillCascadeOnDelete(true);
+
+            // NOT MAPPED
+
+            modelBuilder.Entity<ADCSite>()
+                .Ignore(m => m.Alerts); // Not mapped property
         }
     }
 }

@@ -5,6 +5,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -57,6 +58,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                         && e.Status != ADCStatusType.Deleted);
             }
 
+            foreach (var item in items)
+            {
+                item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
+            }
+
             // Order
 
             switch (filters.Order)
@@ -89,9 +95,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             //TODO: Revisar que los datos no hayan cambiado respecto a:
             // - Los sites del application form
-            // - el numero de empleados por site
+            // - el numero de empleados por site - YA
 
-            return await _repository.GetAsync(id);
+            var item = await _repository.GetAsync(id)
+                ?? throw new BusinessException("The ADC was not found.");
+            
+            item.Alerts = await GetAlertsAsync(item);
+
+            return item;
         } // GetAsync
 
         public async Task<ADC> AddAsync(ADC item)
@@ -142,21 +153,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             item = await _repository.GetAsync(item.ID, asNoTracking: true)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            RecalcularTotales(item);
+            //RecalcularTotales(item);
 
-            try
-            {
-                _repository.UpdateValues(item);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
+            //try
+            //{
+            //    _repository.UpdateValues(item);
+            //    await _repository.SaveChangesAsync();
+            //}
+            //catch (Exception ex)
 
-            {
-                throw new BusinessException($"ADCService.AddAsync.Update.RecalcularTotales: {ex.Message}");
-            }
+            //{
+            //    throw new BusinessException($"ADCService.AddAsync.Update.RecalcularTotales: {ex.Message}");
+            //}
 
-            item = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The ADC was not found after and recalculation.");
+            //item = await _repository.GetAsync(item.ID)
+            //    ?? throw new BusinessException("The ADC was not found after and recalculation.");
 
             return item;
         } // AddAsync
@@ -169,12 +180,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - no se me ocurre que ahorita
-
-            if (item.Status < ADCStatusType.Inactive)
-            {
-                await ProcesarADCAsync(item);
-                //RecalcularTotales(item);
-            }
 
             // - Dependiendo del status, realizar diferentes acciones
             if (foundItem.Status != item.Status)
@@ -216,6 +221,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             foundItem.Description = item.Description;
+            foundItem.TotalInitial = item.TotalInitial;
+            foundItem.TotalMD11 = item.TotalMD11;
+            foundItem.TotalSurveillance = item.TotalSurveillance;
+            foundItem.TotalRR = item.TotalRR;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == ADCStatusType.Nothing && item.Status == ADCStatusType.Nothing
                 ? ADCStatusType.New
@@ -224,6 +233,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
+
+            if (item.Status < ADCStatusType.Inactive)
+            {
+                await ProcesarADCAsync(foundItem);
+            }
 
             try
             {
@@ -235,8 +249,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.UpdateAsync: {ex.Message}");
             }
 
-            if (item.Status < ADCStatusType.Inactive)
-                RecalcularTotales(foundItem);
+            //if (item.Status < ADCStatusType.Inactive) // Al parecer lo wa hacer en el frontend
+            //    RecalcularTotales(foundItem);
 
             return foundItem;
         } // UpdateAsync
@@ -275,6 +289,32 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
+        //private async Task<List<ADCAlertType>> CheckForWarningsAsync(ADC item)
+        //{
+        //    var alerts = new List<ADCAlertType>();
+
+        //    // Advertir del cambio de número de empleados
+        //    if (item.ADCSites != null && item.ADCSites.Any())
+        //    {
+        //        foreach (var adcSite in item.ADCSites
+        //            .Where(adcsite => adcsite.Status == StatusType.Active))
+        //        {
+        //            var site = adcSite.Site;
+        //            if (site == null || site.Shifts == null || site.Shifts.Count == 0)
+        //                continue;
+        //            var noEmployees = site.Shifts
+        //                .Where(s => s.Status == StatusType.Active)
+        //                .Sum(s => s.NoEmployees) ?? 0;
+        //            if (adcSite.Employees != noEmployees)
+        //            {
+        //                alerts.Add(ADCAlertType.EmployeesMistmatch);
+        //            }
+        //        }
+        //    }
+
+        //    return alerts;
+        //} // CheckForWarningsAsync
+
         private async Task ProcesarADCAsync(ADC item)
         {
             var appFormRepository = new AppFormRepository();
@@ -299,9 +339,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                 
                 // - Obtener el MD5
                 var initialMd5 = await md5Repository.GetDaysAsync(noEmployees);
-                var adcSite = item.ADCSites != null
-                    ? item.ADCSites.FirstOrDefault(s => s.SiteID == site.ID) ?? new ADCSite()
-                    : new ADCSite();
+                //var adcSite = item.ADCSites != null
+                //    ? item.ADCSites.FirstOrDefault(s => s.SiteID == site.ID) ?? new ADCSite()
+                //    : new ADCSite();
+                var adcSite = adcSiteRepository.Gets()
+                    .FirstOrDefault(s => s.SiteID == site.ID && s.ADCID == item.ID)
+                    ?? new ADCSite();
 
                 adcSite.InitialMD5 = initialMd5;
                 adcSite.Employees = noEmployees;
@@ -439,5 +482,35 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.TotalMD11 = 0;
             }
         } // RecalcularTotales
+
+        // STATIC METHODS
+
+        public static async Task<List<ADCAlertType>> GetAlertsAsync(ADC item)
+        { 
+            var alerts = new List<ADCAlertType>();
+
+            // Obtener alertas de ADCSites
+            if (item.ADCSites != null && item.ADCSites.Any())
+            {
+                foreach (var adcSite in item.ADCSites
+                    .Where(adcsite => adcsite.Status == StatusType.Active))
+                {
+                    adcSite.Alerts = await ADCSiteService.GetAlertsAsync(adcSite);
+
+                    if (adcSite.Alerts != null && adcSite.Alerts.Any())
+                    {
+                        // Si hay alerta de EmployeesMistmatch, agregarla a la lista de alerts de ADC
+                        if (adcSite.Alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
+                        {
+                            alerts.Add(ADCAlertType.EmployeesMistmatch);
+                        }
+                    }
+                }
+            }
+
+            // Otras alertas...
+
+            return alerts;
+        }
     }
 }

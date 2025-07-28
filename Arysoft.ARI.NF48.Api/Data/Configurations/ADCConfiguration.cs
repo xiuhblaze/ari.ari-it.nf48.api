@@ -74,6 +74,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .WithOptional()
                 .HasForeignKey(m => m.OwnerID)
                 .WillCascadeOnDelete(true);
+
+            // NOT MAPPED
+
+            modelBuilder.Entity<ADC>()
+                .Ignore(m => m.Alerts); // Not mapped property
         }
     }
 }

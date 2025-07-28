@@ -38,6 +38,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string SiteDescription { get; set; }
 
         public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCSiteAlertType> Alerts { get; set; }
+
     } // ADCSiteItemListDto
 
     public class ADCSiteItemDetailDto
@@ -77,6 +82,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public SiteItemListDto Site { get; set; }
 
         public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCSiteAlertType> Alerts { get; set; }
+
     } // ADCSiteItemDetailDto
 
     public class ADCSiteItemCreateDto

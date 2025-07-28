@@ -48,6 +48,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public int NotesCount { get; set; }
 
         public int ADCSitesCount { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCAlertType> Alerts { get; set; }
+
     } // ADCItemListDto
 
     public class ADCItemDetailDto
@@ -95,6 +100,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ICollection<ADCSiteItemListDto> ADCSites { get; set; }
 
         public ICollection<NoteItemDto> Notes { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCAlertType> Alerts { get; set; }
+
     } // ADCItemDetailDto
 
     public class ADCCreateDto

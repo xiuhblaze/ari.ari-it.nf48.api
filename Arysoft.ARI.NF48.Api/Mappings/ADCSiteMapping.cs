@@ -45,7 +45,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 //    : 0,
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
-                    : null
+                    : null,
+                Alerts = item.Alerts
             };
         } // ADCSiteToItemListDto
 
@@ -75,7 +76,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
-                    : null
+                    : null,
+                Alerts = item.Alerts
             };
         } // ADCSiteToItemDetailDto
 
