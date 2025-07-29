@@ -24,7 +24,6 @@
     public enum ADCAlertType { 
         Nothing,            // No hay alerta
         EmployeesMistmatch, // Alerta de discrepancia en el número de empleados
-        ConceptValueDecreaseExceeded, // Alerta de decremento de valor del concepto excedido
-        MD11ReductionExceeded, // Alerta de reducción del MD11 excedido
+        SitesMistmatch,     // Alerta de discrepancia en el número de sitios
     }
 }

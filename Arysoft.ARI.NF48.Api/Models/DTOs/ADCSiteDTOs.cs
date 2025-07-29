@@ -17,7 +17,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? InitialMD5 { get; set; }
 
-        public int? Employees { get; set; }
+        public int? NoEmployees { get; set; }
 
         public decimal? TotalInitial { get; set; }
 
@@ -55,7 +55,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? InitialMD5 { get; set; }
 
-        public int? Employees { get; set; }
+        public int? NoEmployees { get; set; }
 
         public decimal? TotalInitial { get; set; }
 

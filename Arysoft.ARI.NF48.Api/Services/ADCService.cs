@@ -92,15 +92,26 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<ADC> GetAsync(Guid id)
         {
-
-            //TODO: Revisar que los datos no hayan cambiado respecto a:
-            // - Los sites del application form
-            // - el numero de empleados por site - YA
-
             var item = await _repository.GetAsync(id)
                 ?? throw new BusinessException("The ADC was not found.");
             
             item.Alerts = await GetAlertsAsync(item);
+
+            if (item.Alerts.Count > 0)
+            {
+                RecalcularTotales(item);
+
+                try
+                {
+                    _repository.UpdateValues(item);
+                    await _repository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+
+                {
+                    throw new BusinessException($"ADCService.GetAsync.Update.RecalcularTotales: {ex.Message}");
+                }
+            }
 
             return item;
         } // GetAsync
@@ -153,21 +164,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             item = await _repository.GetAsync(item.ID, asNoTracking: true)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            //RecalcularTotales(item);
+            RecalcularTotales(item);
 
-            //try
-            //{
-            //    _repository.UpdateValues(item);
-            //    await _repository.SaveChangesAsync();
-            //}
-            //catch (Exception ex)
+            try
+            {
+                _repository.UpdateValues(item);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
 
-            //{
-            //    throw new BusinessException($"ADCService.AddAsync.Update.RecalcularTotales: {ex.Message}");
-            //}
+            {
+                throw new BusinessException($"ADCService.AddAsync.Update.RecalcularTotales: {ex.Message}");
+            }
 
-            //item = await _repository.GetAsync(item.ID)
-            //    ?? throw new BusinessException("The ADC was not found after and recalculation.");
+            item = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("The ADC was not found after and recalculation.");
 
             return item;
         } // AddAsync
@@ -252,6 +263,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             //if (item.Status < ADCStatusType.Inactive) // Al parecer lo wa hacer en el frontend
             //    RecalcularTotales(foundItem);
 
+            foundItem.Alerts = await GetAlertsAsync(foundItem);
+
             return foundItem;
         } // UpdateAsync
 
@@ -289,32 +302,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
-        //private async Task<List<ADCAlertType>> CheckForWarningsAsync(ADC item)
-        //{
-        //    var alerts = new List<ADCAlertType>();
-
-        //    // Advertir del cambio de número de empleados
-        //    if (item.ADCSites != null && item.ADCSites.Any())
-        //    {
-        //        foreach (var adcSite in item.ADCSites
-        //            .Where(adcsite => adcsite.Status == StatusType.Active))
-        //        {
-        //            var site = adcSite.Site;
-        //            if (site == null || site.Shifts == null || site.Shifts.Count == 0)
-        //                continue;
-        //            var noEmployees = site.Shifts
-        //                .Where(s => s.Status == StatusType.Active)
-        //                .Sum(s => s.NoEmployees) ?? 0;
-        //            if (adcSite.Employees != noEmployees)
-        //            {
-        //                alerts.Add(ADCAlertType.EmployeesMistmatch);
-        //            }
-        //        }
-        //    }
-
-        //    return alerts;
-        //} // CheckForWarningsAsync
-
         private async Task ProcesarADCAsync(ADC item)
         {
             var appFormRepository = new AppFormRepository();
@@ -326,6 +313,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
+
+            //var adcSiteList = new List<ADCSite>();
 
             // - Obtener los Sites del AppForm y agregarlos al ADC
             //HACK: Que pasa si se quita algun site del AppForm?
@@ -347,7 +336,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     ?? new ADCSite();
 
                 adcSite.InitialMD5 = initialMd5;
-                adcSite.Employees = noEmployees;
+                adcSite.NoEmployees = noEmployees;
                 adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
 
@@ -360,20 +349,26 @@ namespace Arysoft.ARI.NF48.Api.Services
                     adcSite.Status = StatusType.Active;
 
                     adcSiteRepository.Add(adcSite);
+                    //adcSiteList.Add(adcSite);
                 }
                 else 
                 { 
                     adcSiteRepository.Update(adcSite);
+                    //adcSiteList.Add(adcSite);
                 }
 
                 // Agregar los ADCConceptValues si no existen
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
             } // foreach site
 
-            if (item.ADCSites != null && appForm.Sites.Count < item.ADCSites.Count)
+            // HACK: Hacer un segundo foreach para eliminar los Sites que no están en el AppForm
+            var adcSitesFromBDD = adcSiteRepository.Gets()
+                .Where(s => s.ADCID == item.ID);
+
+            if (adcSitesFromBDD != null) // Esto aun no funciona, pues no se han subido a la bdd los nuevos sites en este momento
             {
                 // - Eliminar los Sites que no están en el AppForm
-                var sitesToRemove = item.ADCSites
+                var sitesToRemove = adcSitesFromBDD
                     .Where(s => !appForm.Sites.Any(a => a.ID == s.SiteID))
                     .ToList();
                 foreach (var siteToRemove in sitesToRemove)
@@ -440,46 +435,35 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.ADCSites != null && item.ADCSites.Any())
             {
                 var totalEmployees = 0;
-                decimal totalMD11 = 0;
-                decimal allSitesTotalInitial = 0;
+                //decimal totalMD11 = 0;
+                //decimal allSitesTotalInitial = 0;
 
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
                     var totalInitial = adcSite.InitialMD5 ?? 0;
 
-                    if (adcSite.ADCConceptValues.Any())
-                    {
-                        foreach (var conceptValue in adcSite.ADCConceptValues
-                            .Where(acv => acv.Status == StatusType.Active))
-                        {
-                            //TODO: Evaluar cada Concept para sacar el Value o algo asi jojojo...
-                            // devolver operaciones que afectan a totalInitial
-                        }
-                    }
-
                     adcSite.TotalInitial = totalInitial;
-                    adcSite.Surveillance = totalInitial / 3; // Por lo pronto, una tercera parte del TotalInitial
-                    adcSite.RR = (totalInitial * 2) / 3; // Por lo pronto, dos terceras partes del TotalInitial
+                    //adcSite.Surveillance = totalInitial / 3; // Por lo pronto, una tercera parte del TotalInitial
+                    //adcSite.RR = (totalInitial * 2) / 3; // Por lo pronto, dos terceras partes del TotalInitial
 
-
-                    allSitesTotalInitial += totalInitial;
+                    //allSitesTotalInitial += totalInitial;
                     totalEmployees += adcSite.Site.Shifts
                         .Where(s => s.Status == StatusType.Active)
                         .Sum(s => s.NoEmployees) ?? 0;
 
-                    totalMD11 += adcSite.MD11 ?? 0;
+                    //totalMD11 += adcSite.MD11 ?? 0;
                 }
 
                 item.TotalEmployees = totalEmployees;
-                item.TotalInitial = allSitesTotalInitial;
-                item.TotalMD11 = totalMD11;
+                //item.TotalInitial = allSitesTotalInitial;
+                //item.TotalMD11 = totalMD11;
             }
             else 
             {
                 item.TotalEmployees = 0;
-                item.TotalInitial = 0;
-                item.TotalMD11 = 0;
+                //item.TotalInitial = 0;
+                //item.TotalMD11 = 0;
             }
         } // RecalcularTotales
 
@@ -488,22 +472,61 @@ namespace Arysoft.ARI.NF48.Api.Services
         public static async Task<List<ADCAlertType>> GetAlertsAsync(ADC item)
         { 
             var alerts = new List<ADCAlertType>();
-
+            
             // Obtener alertas de ADCSites
             if (item.ADCSites != null && item.ADCSites.Any())
             {
+                var noEmployees = item.ADCSites
+                    .Where(adcsite => adcsite.Status == StatusType.Active)
+                    .Sum(adcsite => adcsite.NoEmployees) ?? 0;
+
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
                     adcSite.Alerts = await ADCSiteService.GetAlertsAsync(adcSite);
 
                     if (adcSite.Alerts != null && adcSite.Alerts.Any())
+                    {   
+                        alerts.Add(ADCAlertType.EmployeesMistmatch);
+                    }
+                }
+
+                // Si el total de empleados del ADC no coincide con la suma de empleados de los ADCSites
+                if (item.TotalEmployees != noEmployees 
+                    && !alerts.Contains(ADCAlertType.EmployeesMistmatch))
+                {
+                    alerts.Add(ADCAlertType.EmployeesMistmatch);
+                }
+            }
+
+            // Si el número de ADCSites no coincide con el número de Sites del AppForm
+            if (item.AppForm != null && item.AppForm.Sites != null)
+            {
+                var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;
+                var noAppFormSites = item.AppForm.Sites.Count(site => site.Status == StatusType.Active);
+
+                if (noADCSites != noAppFormSites)
+                {
+                    if (!alerts.Contains(ADCAlertType.SitesMistmatch))
+                        alerts.Add(ADCAlertType.SitesMistmatch);
+                }
+                else 
+                {
+                    // verificar que sean los mismos Sites
+                    var sameSites = true;
+                    foreach (var site in item.AppForm.Sites
+                        .Where(site => site.Status == StatusType.Active))
                     {
-                        // Si hay alerta de EmployeesMistmatch, agregarla a la lista de alerts de ADC
-                        if (adcSite.Alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
+                        if (!item.ADCSites.Any(adcsite => adcsite.SiteID == site.ID))                        
                         {
-                            alerts.Add(ADCAlertType.EmployeesMistmatch);
+                            sameSites = false;
+                            break;
                         }
+                    }
+
+                    if (!sameSites && !alerts.Contains(ADCAlertType.SitesMistmatch))
+                    {
+                        alerts.Add(ADCAlertType.SitesMistmatch);
                     }
                 }
             }

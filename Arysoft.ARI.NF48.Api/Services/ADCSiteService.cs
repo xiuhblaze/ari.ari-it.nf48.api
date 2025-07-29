@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -14,6 +15,12 @@ namespace Arysoft.ARI.NF48.Api.Services
     public class ADCSiteService
     {
         public readonly ADCSiteRepository _repository;
+
+        private class EmployeesMD5
+        {
+            public decimal InitialMD5 { get; set; }
+            public int NoEmployees { get; set; }
+        } // EmployeesMD5
 
         // CONSTRUCTOR
 
@@ -102,6 +109,25 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Get alerts
             item.Alerts = await GetAlertsAsync(item);
 
+            if (item.Alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
+            {
+                // Volver a obtener el MD5 y guardar antes de enviar
+                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty, item.NoEmployees ?? 0);
+                
+                item.InitialMD5 = employeesMD5.InitialMD5;
+                item.NoEmployees = employeesMD5.NoEmployees;
+                
+                _repository.Update(item);
+                try
+                {
+                    await _repository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ADCSite.GetAsync: {ex.Message}");
+                }
+            }
+
             return item;
         } // GetAsync
 
@@ -140,8 +166,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
             
-            var siteRepository = new SiteRepository();
-            var md5Repository = new MD5Repository();
+            //var siteRepository = new SiteRepository();
+            //var md5Repository = new MD5Repository();
 
             // Validations
 
@@ -157,26 +183,30 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
             { 
-                var site = await siteRepository.GetAsync(item.SiteID ?? Guid.Empty)
-                    ?? throw new BusinessException("The Site ID does not exist");
-                var employeesCount = site.Shifts != null
-                    ? site.Shifts.Where(s => s.Status == StatusType.Active)
-                        .Sum(s => s.NoEmployees) ?? 0
-                    : 0;
+                //var site = await siteRepository.GetAsync(item.SiteID ?? Guid.Empty)
+                //    ?? throw new BusinessException("The Site ID does not exist");
+                //var employeesCount = site.Shifts != null
+                //    ? site.Shifts.Where(s => s.Status == StatusType.Active)
+                //        .Sum(s => s.NoEmployees) ?? 0
+                //    : 0;
 
-                if (foundItem.Employees != employeesCount) // Cambió el número de empleados, volver a obtener InitialMD5
-                { 
-                    item.InitialMD5 = await md5Repository.GetDaysAsync(employeesCount);
-                    item.Employees = employeesCount;
-                }
+                //if (foundItem.NoEmployees != employeesCount) // Cambió el número de empleados, volver a obtener InitialMD5
+                //{ 
+                //    item.InitialMD5 = await md5Repository.GetDaysAsync(employeesCount);
+                //    item.NoEmployees = employeesCount;
+                //}
+                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty, item.NoEmployees ?? 0);
+
+                foundItem.InitialMD5 = employeesMD5.InitialMD5;
+                foundItem.NoEmployees = employeesMD5.NoEmployees;
             }
 
-            // HACK: Probablemente aqui va el recalculo para el TotalInitial, pero ahorita no jojojo
+            // HACK: IMPORTANTE Ver que realmente se va a seguir actualizando despues de que sea Inactive
 
             // Assigning values
 
-            foundItem.InitialMD5 = item.InitialMD5;     // Este se va a obtener de la tabla MD5
-            foundItem.Employees = item.Employees;       // Este se va a obtener de Sites
+            //foundItem.InitialMD5 = item.InitialMD5;     // Este se va a obtener de la tabla MD5
+            //foundItem.NoEmployees = item.NoEmployees;       // Este se va a obtener de Sites
             foundItem.TotalInitial = item.TotalInitial; // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
             foundItem.MD11 = item.MD11;                 // Por lo pronto manual hasta que entienda el MD11
             foundItem.Surveillance = item.Surveillance; // Debe ser una tercera parte del TotalInitial (x)/3
@@ -241,6 +271,26 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE 
 
+        private async Task<EmployeesMD5> GetEmployeesMD5Async(Guid siteID, int noEmployees)
+        {
+            var siteRepository = new SiteRepository();
+            var md5Repository = new MD5Repository();
+            var site = await siteRepository.GetAsync(siteID)
+                    ?? throw new BusinessException("The Site ID does not exist");
+            var employeesCount = site.Shifts != null
+                ? site.Shifts.Where(s => s.Status == StatusType.Active)
+                    .Sum(s => s.NoEmployees) ?? 0
+                : 0;
+
+            var initialMD5 = await md5Repository.GetDaysAsync(employeesCount);
+
+            return new EmployeesMD5
+            {
+                InitialMD5 = initialMD5,
+                NoEmployees = employeesCount
+            };
+        } // GetEmployeesMD5Async
+
         public static async Task<List<ADCSiteAlertType>> GetAlertsAsync(ADCSite item)
         {
             var alerts = new List<ADCSiteAlertType>();
@@ -249,7 +299,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 .Where(s => s.Status == StatusType.Active)
                 .Sum(s => s.NoEmployees) ?? 0;
 
-            if (noEmployees != (item.Employees ?? 0)) { 
+            if (noEmployees != (item.NoEmployees ?? 0)) { 
                 alerts.Add(ADCSiteAlertType.EmployeesMistmatch);
             }
 

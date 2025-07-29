@@ -12,7 +12,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public decimal? InitialMD5 { get; set; }    // Se obtiene de tabla MD5
             
-        public int? Employees { get; set; }         // Se obtiene de Sites
+        public int? NoEmployees { get; set; }       // Se obtiene de Sites
 
         public decimal? TotalInitial { get; set; } // Siempre se redondea hacia arriba
 
