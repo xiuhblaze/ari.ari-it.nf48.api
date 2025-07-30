@@ -16,11 +16,11 @@ namespace Arysoft.ARI.NF48.Api.Services
     {
         public readonly ADCSiteRepository _repository;
 
-        private class EmployeesMD5
-        {
-            public decimal InitialMD5 { get; set; }
-            public int NoEmployees { get; set; }
-        } // EmployeesMD5
+        //private class EmployeesMD5
+        //{
+        //    public decimal InitialMD5 { get; set; }
+        //    public int NoEmployees { get; set; }
+        //} // EmployeesMD5
 
         // CONSTRUCTOR
 
@@ -88,6 +88,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // Get alerts
                 item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
+                // TODO: Verificar si esto si jala :/
             }
 
             var pagedItems = PagedList<ADCSite>
@@ -112,7 +113,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
             {
                 // Volver a obtener el MD5 y guardar antes de enviar
-                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty, item.NoEmployees ?? 0);
+                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
                 
                 item.InitialMD5 = employeesMD5.InitialMD5;
                 item.NoEmployees = employeesMD5.NoEmployees;
@@ -195,7 +196,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 //    item.InitialMD5 = await md5Repository.GetDaysAsync(employeesCount);
                 //    item.NoEmployees = employeesCount;
                 //}
-                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty, item.NoEmployees ?? 0);
+                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
 
                 foundItem.InitialMD5 = employeesMD5.InitialMD5;
                 foundItem.NoEmployees = employeesMD5.NoEmployees;
@@ -235,6 +236,29 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateAsync
 
+        public async Task UpdateEmployeesMD5Async(Guid adcSiteID)
+        {
+            var foundItem = await _repository.GetAsync(adcSiteID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            var employeesMD5 = await GetEmployeesMD5Async(foundItem.SiteID ?? Guid.Empty);
+
+            foundItem.InitialMD5 = employeesMD5.InitialMD5;
+            foundItem.NoEmployees = employeesMD5.NoEmployees;
+
+            // Execute queries
+
+            try
+            {
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCSite.UpdateEmployeesMD5Async: {ex.Message}");
+            }
+        } // UpdateEmployeesMD5Async
+
         public async Task DeleteAsync(ADCSite item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
@@ -269,9 +293,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
-        // PRIVATE 
+        // STATICs
 
-        private async Task<EmployeesMD5> GetEmployeesMD5Async(Guid siteID, int noEmployees)
+        public static async Task<EmployeesMD5> GetEmployeesMD5Async(Guid siteID)
         {
             var siteRepository = new SiteRepository();
             var md5Repository = new MD5Repository();
@@ -281,7 +305,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ? site.Shifts.Where(s => s.Status == StatusType.Active)
                     .Sum(s => s.NoEmployees) ?? 0
                 : 0;
-
             var initialMD5 = await md5Repository.GetDaysAsync(employeesCount);
 
             return new EmployeesMD5

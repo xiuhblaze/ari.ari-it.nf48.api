@@ -61,6 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foreach (var item in items)
             {
                 item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
+                // TODO: Verificar si esto si jala :/
             }
 
             // Order
@@ -99,7 +100,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (item.Alerts.Count > 0)
             {
-                RecalcularTotales(item);
+                await RecalcularTotalesAsync(item);
 
                 try
                 {
@@ -164,7 +165,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             item = await _repository.GetAsync(item.ID, asNoTracking: true)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            RecalcularTotales(item);
+            await RecalcularTotalesAsync(item);
 
             try
             {
@@ -428,42 +429,41 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // RegisterADCConceptsAsync
 
-        private void RecalcularTotales(ADC item) //! Este va a ser una vez este toda la info guardadad ADC
+        private async Task RecalcularTotalesAsync(ADC item) 
         {
             // HACK: Buscar los ADCSites de forma manual primero
 
             if (item.ADCSites != null && item.ADCSites.Any())
             {
                 var totalEmployees = 0;
-                //decimal totalMD11 = 0;
-                //decimal allSitesTotalInitial = 0;
-
+                
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
                     var totalInitial = adcSite.InitialMD5 ?? 0;
 
                     adcSite.TotalInitial = totalInitial;
-                    //adcSite.Surveillance = totalInitial / 3; // Por lo pronto, una tercera parte del TotalInitial
-                    //adcSite.RR = (totalInitial * 2) / 3; // Por lo pronto, dos terceras partes del TotalInitial
 
-                    //allSitesTotalInitial += totalInitial;
-                    totalEmployees += adcSite.Site.Shifts
-                        .Where(s => s.Status == StatusType.Active)
-                        .Sum(s => s.NoEmployees) ?? 0;
+                    var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(adcSite.SiteID ?? Guid.Empty);
 
-                    //totalMD11 += adcSite.MD11 ?? 0;
+                    if (employeesMD5.NoEmployees != adcSite.NoEmployees)
+                    { 
+                        var adcSiteService = new ADCSiteService();
+
+                        await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID);
+
+                        adcSite.NoEmployees = employeesMD5.NoEmployees;
+                        adcSite.InitialMD5 = employeesMD5.InitialMD5;
+                    }
+
+                    totalEmployees += employeesMD5.NoEmployees;
                 }
 
                 item.TotalEmployees = totalEmployees;
-                //item.TotalInitial = allSitesTotalInitial;
-                //item.TotalMD11 = totalMD11;
             }
             else 
             {
                 item.TotalEmployees = 0;
-                //item.TotalInitial = 0;
-                //item.TotalMD11 = 0;
             }
         } // RecalcularTotales
 
