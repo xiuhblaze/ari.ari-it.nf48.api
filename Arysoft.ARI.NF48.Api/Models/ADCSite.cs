@@ -14,13 +14,17 @@ namespace Arysoft.ARI.NF48.Api.Models
             
         public int? NoEmployees { get; set; }       // Se obtiene de Sites
 
-        public decimal? TotalInitial { get; set; } // Siempre se redondea hacia arriba
+        public decimal? TotalInitial { get; set; }  // Siempre se redondea hacia arriba
 
-        public decimal? MD11 { get; set; }
-        
+        public decimal? MD11 { get; set; }          // Ahora se va a manejar como porcentaje
+
+        public string MD11Filename { get; set; }    // Para el nombre del archivo de evidencia del calculo del MD11
+
+        public string MD11UploadedBy { get; set; }
+
         public decimal? Surveillance { get; set; }
 
-        public decimal? RR { get; set; }
+        public decimal? RR { get; set; }            // 20250731: Este se va a eliminar, dejarlo mientras para que no falle nada
 
         public string ExtraInfo { get; set; }
 

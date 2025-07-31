@@ -104,7 +104,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                     file,
                     $"~/files/organizations/{item.AuditCycle.OrganizationID}/Cycles/{item.AuditCycle.ID}",
                     item.ID.ToString()
-                );                
+                );
             }
 
             var itemToEdit = AuditCycleDocumentMapping.ItemEditDtoToAuditCycleDocument(itemEditDto);

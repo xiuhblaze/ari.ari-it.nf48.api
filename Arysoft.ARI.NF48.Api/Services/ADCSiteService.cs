@@ -1,7 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
-using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
@@ -15,12 +14,6 @@ namespace Arysoft.ARI.NF48.Api.Services
     public class ADCSiteService
     {
         public readonly ADCSiteRepository _repository;
-
-        //private class EmployeesMD5
-        //{
-        //    public decimal InitialMD5 { get; set; }
-        //    public int NoEmployees { get; set; }
-        //} // EmployeesMD5
 
         // CONSTRUCTOR
 
@@ -207,11 +200,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             //foundItem.InitialMD5 = item.InitialMD5;     // Este se va a obtener de la tabla MD5
-            //foundItem.NoEmployees = item.NoEmployees;       // Este se va a obtener de Sites
-            foundItem.TotalInitial = item.TotalInitial; // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
-            foundItem.MD11 = item.MD11;                 // Por lo pronto manual hasta que entienda el MD11
-            foundItem.Surveillance = item.Surveillance; // Debe ser una tercera parte del TotalInitial (x)/3
-            foundItem.RR = item.RR;                     // Deben ser dos terceras partes del TotalInitial (2x)/3
+            //foundItem.NoEmployees = item.NoEmployees;   // Este se va a obtener de Sites
+            foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
+            foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
+            foundItem.MD11Filename = item.MD11Filename;     // Nombre del archivo de evidencia del MD11
+            foundItem.MD11UploadedBy = item.MD11UploadedBy; // Usuario que subió el archivo del MD11
+            foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
+            foundItem.RR = item.RR;                         // Deben ser dos terceras partes del TotalInitial (2x)/3 - 20250731: Se va a eliminar
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active

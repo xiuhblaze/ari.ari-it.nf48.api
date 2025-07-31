@@ -21,7 +21,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalInitial { get; set; }
 
-        public decimal? MD11 { get; set; }
+        public decimal? MD11 { get; set; } // Ahora se va a manejar como porcentaje
+
+        public string MD11Filename { get; set; }
+
+        public string MD11UploadedBy { get; set; }
 
         public decimal? Surveillance { get; set; }
 
@@ -60,6 +64,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public decimal? TotalInitial { get; set; }
 
         public decimal? MD11 { get; set; }
+
+        public string MD11Filename { get; set; }
+
+        public string MD11UploadedBy { get; set; }
 
         public decimal? Surveillance { get; set; }
 
@@ -110,6 +118,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public decimal? TotalInitial { get; set; }
 
         public decimal? MD11 { get; set; }
+
+        //public string MD11Filename { get; set; } // Creo que los voy a generar en el Controller
+
+        //public string MD11UploadedBy { get; set; }
 
         public decimal? Surveillance { get; set; }
 

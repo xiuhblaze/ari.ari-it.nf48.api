@@ -20,6 +20,14 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<ADCSite>()
+                .Property(m => m.MD11Filename)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<ADCSite>()
+                .Property(m => m.MD11UploadedBy)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<ADCSite>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(500);
 

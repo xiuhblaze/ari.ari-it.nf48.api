@@ -1,14 +1,17 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
 using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 
@@ -79,22 +82,65 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpPut]
         [ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]
-        public async Task<IHttpActionResult> PutADCSite(Guid id, [FromBody] ADCSiteItemUpdateDto itemUpdateDto)
+        public async Task<IHttpActionResult> PutADCSite()
         {
-            if (!ModelState.IsValid)
-                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+            var data = HttpContext.Current.Request.Params["data"];
+            var file = HttpContext.Current.Request.Files.Count > 0
+                ? HttpContext.Current.Request.Files[0]
+                : null;
+            string filename = null;
 
-            if (id != itemUpdateDto.ID)
-                throw new BusinessException("ID mismatch");
+            ADCSiteItemUpdateDto itemUpdateDto = JsonConvert
+                    .DeserializeObject<ADCSiteItemUpdateDto>(data)
+                ?? throw new BusinessException("Can't read data object");
 
-            var item = ADCSiteMapping
-                .ItemUpdateDtoToADCSite(itemUpdateDto);
+            var item = await _service.GetAsync(itemUpdateDto.ID)
+                ?? throw new BusinessException("Item not found");
+
+            if (file != null && file.ContentLength > 0)
+            {
+                var organizationID = item.ADC.AppForm.AuditCycle.OrganizationID.ToString();
+                var auditCycleID = item.ADC.AppForm.AuditCycle.ID.ToString();
+
+                filename = FileRepository.UploadFile(
+                    file,
+                    $"~/files/organizations/{organizationID}/Cycles/{auditCycleID}/ADC",
+                    item.ID.ToString()
+                );
+            }
+
+            var itemToUpdate = ADCSiteMapping.ItemUpdateDtoToADCSite(itemUpdateDto);
+
+            itemToUpdate.MD11Filename = filename ?? item.MD11Filename;
+            itemToUpdate.MD11UploadedBy = string.IsNullOrEmpty(filename)
+                ? item.MD11UploadedBy
+                : itemToUpdate.UpdatedUser;
+
             var itemDto = ADCSiteMapping
-                .ADCSiteToItemDetailDto(await _service.UpdateAsync(item));
+                .ADCSiteToItemDetailDto(await _service.UpdateAsync(itemToUpdate));
             var response = new ApiResponse<ADCSiteItemDetailDto>(itemDto);
 
             return Ok(response);
-        } // PutADCSite
+        } // PutADCSite - with file
+
+        //[HttpPut] // OLD CODE - Antes de Fileupload
+        //[ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]
+        //public async Task<IHttpActionResult> PutADCSite(Guid id, [FromBody] ADCSiteItemUpdateDto itemUpdateDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+        //    if (id != itemUpdateDto.ID)
+        //        throw new BusinessException("ID mismatch");
+
+        //    var item = ADCSiteMapping
+        //        .ItemUpdateDtoToADCSite(itemUpdateDto);
+        //    var itemDto = ADCSiteMapping
+        //        .ADCSiteToItemDetailDto(await _service.UpdateAsync(item));
+        //    var response = new ApiResponse<ADCSiteItemDetailDto>(itemDto);
+
+        //    return Ok(response);
+        //} // PutADCSite
 
         [HttpDelete]
         [ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]
