@@ -1,9 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -27,9 +25,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string MD11UploadedBy { get; set; }
 
-        public decimal? Surveillance { get; set; }
+        public decimal? Total { get; set; }
 
-        public decimal? RR { get; set; }
+        public decimal? Surveillance { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -69,9 +67,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string MD11UploadedBy { get; set; }
 
-        public decimal? Surveillance { get; set; }
+        public decimal? Total { get; set; }
 
-        public decimal? RR { get; set; }
+        public decimal? Surveillance { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -123,9 +121,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         //public string MD11UploadedBy { get; set; }
 
-        public decimal? Surveillance { get; set; }
+        public decimal? Total { get; set; }
 
-        public decimal? RR { get; set; }
+        public decimal? Surveillance { get; set; }
 
         public string ExtraInfo { get; set; }
 

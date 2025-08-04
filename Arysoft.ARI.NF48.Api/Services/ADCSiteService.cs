@@ -205,8 +205,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
             foundItem.MD11Filename = item.MD11Filename;     // Nombre del archivo de evidencia del MD11
             foundItem.MD11UploadedBy = item.MD11UploadedBy; // Usuario que subió el archivo del MD11
+            foundItem.Total = item.Total;                   // Total en días ya sea de TotalInitial o de MD11
             foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
-            foundItem.RR = item.RR;                         // Deben ser dos terceras partes del TotalInitial (2x)/3 - 20250731: Se va a eliminar
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active

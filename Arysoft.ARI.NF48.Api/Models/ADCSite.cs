@@ -22,9 +22,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string MD11UploadedBy { get; set; }
 
-        public decimal? Surveillance { get; set; }
+        public decimal? Total { get; set; }         // Total en días ya sea de TotalInitial o de MD11
 
-        public decimal? RR { get; set; }            // 20250731: Este se va a eliminar, dejarlo mientras para que no falle nada
+        public decimal? Surveillance { get; set; }
 
         public string ExtraInfo { get; set; }
 
