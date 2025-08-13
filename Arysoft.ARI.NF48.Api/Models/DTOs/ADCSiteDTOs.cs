@@ -106,7 +106,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     } // ADCSiteItemCreateDto
 
     public class ADCSiteItemUpdateDto
-    { 
+    {
         [Required]
         public Guid ID { get; set; }
 
@@ -116,10 +116,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public decimal? TotalInitial { get; set; }
 
         public decimal? MD11 { get; set; }
-
-        //public string MD11Filename { get; set; } // Creo que los voy a generar en el Controller
-
-        //public string MD11UploadedBy { get; set; }
 
         public decimal? Total { get; set; }
 
@@ -134,6 +130,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCSiteItemUpdateDto
+
+    public class ADCSiteWithCVListUpdateDto
+    {
+        [Required]
+        public ADCSiteItemUpdateDto ADCSite { get; set; }
+
+        [Required]
+        public List<ADCConceptValueItemUpdateDto> ADCConceptValues { get; set; }
+    } // ADCSiteWithCVListUpdateDto
 
     public class ADCSiteItemDeleteDto
     {

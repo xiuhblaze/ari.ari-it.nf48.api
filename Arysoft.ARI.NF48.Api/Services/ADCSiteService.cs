@@ -165,35 +165,35 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
-            { 
-                if (item.SiteID == null || item.SiteID == Guid.Empty)
-                {
-                    throw new ArgumentException("The Site ID is required");
-                }
+            //if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
+            //{ 
+            //    if (item.SiteID == null || item.SiteID == Guid.Empty)
+            //    {
+            //        throw new ArgumentException("The Site ID is required");
+            //    }
 
-                foundItem.SiteID = item.SiteID; // Solo se asigna si es nuevo
-            } // xBlaze Update: Creo que no se va a utilizar, se genera automáticamente
+            //    foundItem.SiteID = item.SiteID; // Solo se asigna si es nuevo
+            //} // xBlaze Update: Creo que no se va a utilizar, se genera automáticamente
 
-            if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
-            { 
-                //var site = await siteRepository.GetAsync(item.SiteID ?? Guid.Empty)
-                //    ?? throw new BusinessException("The Site ID does not exist");
-                //var employeesCount = site.Shifts != null
-                //    ? site.Shifts.Where(s => s.Status == StatusType.Active)
-                //        .Sum(s => s.NoEmployees) ?? 0
-                //    : 0;
+            //if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
+            //{ 
+            //    //var site = await siteRepository.GetAsync(item.SiteID ?? Guid.Empty)
+            //    //    ?? throw new BusinessException("The Site ID does not exist");
+            //    //var employeesCount = site.Shifts != null
+            //    //    ? site.Shifts.Where(s => s.Status == StatusType.Active)
+            //    //        .Sum(s => s.NoEmployees) ?? 0
+            //    //    : 0;
 
-                //if (foundItem.NoEmployees != employeesCount) // Cambió el número de empleados, volver a obtener InitialMD5
-                //{ 
-                //    item.InitialMD5 = await md5Repository.GetDaysAsync(employeesCount);
-                //    item.NoEmployees = employeesCount;
-                //}
-                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
+            //    //if (foundItem.NoEmployees != employeesCount) // Cambió el número de empleados, volver a obtener InitialMD5
+            //    //{ 
+            //    //    item.InitialMD5 = await md5Repository.GetDaysAsync(employeesCount);
+            //    //    item.NoEmployees = employeesCount;
+            //    //}
+            //    var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
 
-                foundItem.InitialMD5 = employeesMD5.InitialMD5;
-                foundItem.NoEmployees = employeesMD5.NoEmployees;
-            }
+            //    foundItem.InitialMD5 = employeesMD5.InitialMD5;
+            //    foundItem.NoEmployees = employeesMD5.NoEmployees;
+            //}
 
             // HACK: IMPORTANTE Ver que realmente se va a seguir actualizando despues de que sea Inactive
 
@@ -201,20 +201,23 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             //foundItem.InitialMD5 = item.InitialMD5;     // Este se va a obtener de la tabla MD5
             //foundItem.NoEmployees = item.NoEmployees;   // Este se va a obtener de Sites
-            foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
-            foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
-            foundItem.MD11Filename = item.MD11Filename;     // Nombre del archivo de evidencia del MD11
-            foundItem.MD11UploadedBy = item.MD11UploadedBy; // Usuario que subió el archivo del MD11
-            foundItem.Total = item.Total;                   // Total en días ya sea de TotalInitial o de MD11
-            foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
-            foundItem.ExtraInfo = item.ExtraInfo;
-            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
-                ? StatusType.Active
-                : item.Status != StatusType.Nothing
-                    ? item.Status
-                    : foundItem.Status;
-            foundItem.Updated = DateTime.UtcNow;
-            foundItem.UpdatedUser = item.UpdatedUser;
+            //foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
+            //foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
+            //foundItem.MD11Filename = item.MD11Filename;     // Nombre del archivo de evidencia del MD11
+            //foundItem.MD11UploadedBy = item.MD11UploadedBy; // Usuario que subió el archivo del MD11
+            //foundItem.Total = item.Total;                   // Total en días ya sea de TotalInitial o de MD11
+            //foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
+            //foundItem.ExtraInfo = item.ExtraInfo;
+            //foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
+            //    ? StatusType.Active
+            //    : item.Status != StatusType.Nothing
+            //        ? item.Status
+            //        : foundItem.Status;
+            //foundItem.Updated = DateTime.UtcNow;
+            //foundItem.UpdatedUser = item.UpdatedUser;
+
+            await ValidateUpdateItemAsync(item, foundItem);
+            await SetValuesUpdateItemAsync(item, foundItem);
 
             // Execute queries
 
@@ -254,6 +257,53 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // UpdateEmployeesMD5Async
 
+        public async Task<List<ADCSite>> UpdateListAsync(List<ADCSite> adcSites)
+        {
+            if (!(adcSites?.Any() ?? false)) // Valida si la lista es nula o vacía
+                throw new ArgumentException("The list of ADC Sites to update is empty.");
+
+            var _conceptValueService = new ADCConceptValueService();
+            var areUpdatedItems = false;
+            var updatedItems = new List<ADCSite>();
+
+            foreach (var adcSite in adcSites)
+            {
+                var foundItem = await _repository.GetAsync(adcSite.ID)
+                    ?? throw new BusinessException($"One of the records (ADC Site) to Update was not found: {adcSite.ID}");
+                var listConceptValues = new List<ADCConceptValue>();
+
+
+                await ValidateUpdateItemAsync(adcSite, foundItem);
+                await SetValuesUpdateItemAsync(adcSite, foundItem);
+
+                if (adcSite.ADCConceptValues?.Any() ?? false) // en adcSite.ADCConceptValues traigo los nuevos valores
+                {
+                    listConceptValues = await _conceptValueService
+                        .UpdateListAsync(adcSite.ADCConceptValues.ToList());
+                }
+
+                _repository.Update(foundItem);
+                areUpdatedItems = true;
+
+                foundItem.ADCConceptValues = listConceptValues; // HACK: Ver si esto jala
+                updatedItems.Add(foundItem);
+            }
+
+            if (areUpdatedItems)
+            {
+                try
+                { 
+                    await _repository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ADCSite.UpdateListAsync: {ex.Message}");
+                }
+            }
+
+            return updatedItems;
+        } // UpdateListAsync
+
         public async Task DeleteAsync(ADCSite item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
@@ -287,6 +337,57 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCSite.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // PRIVATE
+
+        private async Task ValidateUpdateItemAsync(ADCSite item, ADCSite foundItem)
+        {   
+
+            if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
+            {
+                if (item.SiteID == null || item.SiteID == Guid.Empty)
+                    throw new ArgumentException("The Site ID is required");
+            } // xBlaze Update: Creo que no se va a utilizar, se genera automáticamente
+
+            // 1. Validar que el descuento de totalInitial no sea mayor al 30% del InitialMD5
+            // 2. Validar que TotalInitial no sea menor a 2 días
+            // 3. Validar que si la organizacion maneja un solo standard no aplique el MD11
+            //  3.1. Validar que el descuento de MD11 no sea mayor al 20% de TotalInitial
+            
+        } // ValidateUpdateItemAsync
+
+        private async Task SetValuesUpdateItemAsync(ADCSite item, ADCSite foundItem)
+        {
+            if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
+            {
+                foundItem.SiteID = item.SiteID; // Solo se asigna si es nuevo
+            }
+
+            if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
+            {
+                // NOTA: La mayoria de calculos se va a realizar en el frontend
+
+                var employeesMD5 = await GetEmployeesMD5Async(foundItem.SiteID ?? Guid.Empty);
+
+                foundItem.InitialMD5 = employeesMD5.InitialMD5;
+                foundItem.NoEmployees = employeesMD5.NoEmployees;
+            }
+
+            foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
+            foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
+            foundItem.MD11Filename = item.MD11Filename;     // Nombre del archivo de evidencia del MD11
+            foundItem.MD11UploadedBy = item.MD11UploadedBy; // Usuario que subió el archivo del MD11
+            foundItem.Total = item.Total;                   // Total en días ya sea de TotalInitial o de MD11
+            foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
+            foundItem.ExtraInfo = item.ExtraInfo;
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = item.UpdatedUser;
+        } // SetValuesUpdateItemAsync
 
         // STATICs
 

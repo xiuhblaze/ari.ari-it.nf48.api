@@ -1,9 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -30,7 +28,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
                 TotalSurveillance = item.TotalSurveillance,
-                TotalRR = item.TotalRR,
                 UserCreates = item.UserCreates,
                 UserReview = item.UserReview,
                 ReviewDate = item.ReviewDate,
@@ -60,7 +57,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
                 TotalSurveillance = item.TotalSurveillance,
-                TotalRR = item.TotalRR,
                 UserCreates = item.UserCreates,
                 UserReview = item.UserReview,
                 ReviewDate = item.ReviewDate,
@@ -103,13 +99,27 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalInitial = itemDto.TotalInitial,
                 TotalMD11 = itemDto.TotalMD11,
                 TotalSurveillance = itemDto.TotalSurveillance,
-                TotalRR = itemDto.TotalRR,
                 ReviewComments = itemDto.ReviewComments,                
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemUpdateDtoToADC
+
+        public static ADC ItemUpdateWithListDtoToADC(ADCWithSiteListUpdateDto itemDto)
+        {
+            var item = ItemUpdateDtoToADC(itemDto.ADC);
+
+            if (itemDto.ADCSites != null)
+            {
+                foreach (var siteDto in itemDto.ADCSites)
+                {
+                    item.ADCSites.Add(ADCSiteMapping.ItemUpdateWithListDtoToADCSite(siteDto));
+                }
+            }
+
+            return item;
+        } // ItemUpdateAllDtoToADC
 
         public static ADC ItemDeleteDtoToADC(ADCDeleteDto itemDto)
         {

@@ -189,62 +189,65 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            // Validations
+            //// Validations
 
-            // - no se me ocurre que ahorita
+            //// - no se me ocurre que ahorita
 
-            // - Dependiendo del status, realizar diferentes acciones
-            if (foundItem.Status != item.Status)
-            {
-                // - 'orita no me acuerdo...
-                switch (item.Status) // Si el nuevo status es...
-                {
-                    case ADCStatusType.Review:
+            //// - Dependiendo del status, realizar diferentes acciones
+            //if (foundItem.Status != item.Status)
+            //{
+            //    // - 'orita no me acuerdo...
+            //    switch (item.Status) // Si el nuevo status es...
+            //    {
+            //        case ADCStatusType.Review:
 
-                        if (string.IsNullOrEmpty(item.ReviewComments))
-                            throw new BusinessException("Comments are required when send to Review.");
+            //            if (string.IsNullOrEmpty(item.ReviewComments))
+            //                throw new BusinessException("Comments are required when send to Review.");
 
-                        foundItem.ReviewDate = DateTime.UtcNow;
-                        foundItem.ReviewComments = item.ReviewComments;
-                        break;
+            //            foundItem.ReviewDate = DateTime.UtcNow;
+            //            foundItem.ReviewComments = item.ReviewComments;
+            //            break;
 
-                    case ADCStatusType.Rejected:
-                        if (string.IsNullOrEmpty(item.ReviewComments))
-                            throw new BusinessException("Comments are required when rejected.");
+            //        case ADCStatusType.Rejected:
+            //            if (string.IsNullOrEmpty(item.ReviewComments))
+            //                throw new BusinessException("Comments are required when rejected.");
 
-                        foundItem.ReviewDate = DateTime.UtcNow;
-                        foundItem.ReviewComments = item.ReviewComments;
-                        foundItem.UserReview = item.UpdatedUser;
-                        break;
+            //            foundItem.ReviewDate = DateTime.UtcNow;
+            //            foundItem.ReviewComments = item.ReviewComments;
+            //            foundItem.UserReview = item.UpdatedUser;
+            //            break;
 
-                    case ADCStatusType.Active:
-                        if (foundItem.Status != ADCStatusType.Review)
-                            throw new BusinessException("Only items in Review can be set to Active.");
-                        foundItem.UserReview = item.UpdatedUser;
-                        foundItem.ActiveDate = DateTime.UtcNow;
-                        break;
+            //        case ADCStatusType.Active:
+            //            if (foundItem.Status != ADCStatusType.Review)
+            //                throw new BusinessException("Only items in Review can be set to Active.");
+            //            foundItem.UserReview = item.UpdatedUser;
+            //            foundItem.ActiveDate = DateTime.UtcNow;
+            //            break;
 
-                    case ADCStatusType.Inactive:
+            //        case ADCStatusType.Inactive:
 
-                        break;
-                }
-            }
+            //            break;
+            //    }
+            //}
 
-            // Assigning values
+            //// Assigning values
 
-            foundItem.Description = item.Description;
-            foundItem.TotalInitial = item.TotalInitial;
-            foundItem.TotalMD11 = item.TotalMD11;
-            foundItem.TotalSurveillance = item.TotalSurveillance;
-            foundItem.TotalRR = item.TotalRR;
-            foundItem.ExtraInfo = item.ExtraInfo;
-            foundItem.Status = foundItem.Status == ADCStatusType.Nothing && item.Status == ADCStatusType.Nothing
-                ? ADCStatusType.New
-                : item.Status != ADCStatusType.Nothing
-                    ? item.Status
-                    : foundItem.Status;
-            foundItem.Updated = DateTime.UtcNow;
-            foundItem.UpdatedUser = item.UpdatedUser;
+            //foundItem.Description = item.Description;
+            //foundItem.TotalInitial = item.TotalInitial;
+            //foundItem.TotalMD11 = item.TotalMD11;
+            //foundItem.TotalSurveillance = item.TotalSurveillance;
+            //foundItem.TotalRR = item.TotalRR;
+            //foundItem.ExtraInfo = item.ExtraInfo;
+            //foundItem.Status = foundItem.Status == ADCStatusType.Nothing && item.Status == ADCStatusType.Nothing
+            //    ? ADCStatusType.New
+            //    : item.Status != ADCStatusType.Nothing
+            //        ? item.Status
+            //        : foundItem.Status;
+            //foundItem.Updated = DateTime.UtcNow;
+            //foundItem.UpdatedUser = item.UpdatedUser;
+
+            ValidateUpdateItem(item, foundItem);
+            SetValuesUpdateItem(item, foundItem);
 
             if (item.Status < ADCStatusType.Inactive)
             {
@@ -268,6 +271,46 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
+
+
+        public async Task<ADC> UpdateCompleteADCAsync(ADC item)
+        {
+            var foundItem = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            var _adcSitesService = new ADCSiteService();
+
+            ValidateUpdateItem(item, foundItem);
+            SetValuesUpdateItem(item, foundItem);
+
+            var listSites = new List<ADCSite>();
+
+            if (item.ADCSites?.Any() ?? false) // en item.ADCSites traigo los nuevos valores
+            {
+                listSites = await _adcSitesService
+                    .UpdateListAsync(item.ADCSites.ToList());
+            }
+
+            if (item.Status < ADCStatusType.Inactive)
+            {
+                await ProcesarADCAsync(foundItem);
+            }
+
+            try
+            {
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCService.UpdateCompleteADCAsync: {ex.Message}");
+            }
+
+            foundItem.ADCSites = listSites;
+            foundItem.Alerts = await GetAlertsAsync(foundItem);
+
+            return foundItem;
+        } // UpdateListAsync
 
         public async Task DeleteAsync(ADC item)
         {
@@ -303,6 +346,84 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
+        private void ValidateUpdateItem(ADC item, ADC foundItem)
+        {
+            // Validations
+
+            // - Si cambia el status, realizar diferentes validaciones
+            if (foundItem.Status != item.Status)
+            { 
+                switch (item.Status) // Si el nuevo status es...
+                {
+                    case ADCStatusType.Review:
+                        if (string.IsNullOrEmpty(item.ReviewComments))
+                            throw new BusinessException("Comments are required when send to Review.");
+                        break;
+
+                    case ADCStatusType.Rejected:
+                        if (string.IsNullOrEmpty(item.ReviewComments))
+                            throw new BusinessException("Comments are required when rejected.");
+                        break;
+
+                    case ADCStatusType.Active:
+                        if (foundItem.Status != ADCStatusType.Review)
+                            throw new BusinessException("Only items after Review can be set to Active.");
+                        break;
+
+                    case ADCStatusType.Inactive:
+                        // No hay validaciones para Inactive aun
+                        break;
+                }
+            }
+
+        } // ValidateUpdateItem
+
+        private void SetValuesUpdateItem(ADC item, ADC foundItem)
+        {
+            // - Si hay cambios en el status, realizar diferentes asignaciones
+            if (foundItem.Status != item.Status)
+            {
+                switch (item.Status) // Si el nuevo status es...
+                {
+                    case ADCStatusType.Review:
+                        foundItem.ReviewDate = DateTime.UtcNow;
+                        foundItem.ReviewComments = item.ReviewComments;
+                        break;
+
+                    case ADCStatusType.Rejected:                        
+                        foundItem.ReviewDate = DateTime.UtcNow;
+                        foundItem.ReviewComments = item.ReviewComments;
+                        foundItem.UserReview = item.UpdatedUser;
+                        break;
+
+                    case ADCStatusType.Active:
+                        foundItem.UserReview = item.UpdatedUser;
+                        foundItem.ActiveDate = DateTime.UtcNow;
+                        break;
+
+                    case ADCStatusType.Inactive:
+
+                        break;
+                }
+            } // Si cambia el status
+
+            // Assigning values
+
+            foundItem.Description = item.Description;
+            foundItem.TotalInitial = item.TotalInitial;
+            foundItem.TotalMD11 = item.TotalMD11;
+            foundItem.TotalSurveillance = item.TotalSurveillance;
+            foundItem.TotalRR = item.TotalRR;
+            foundItem.ExtraInfo = item.ExtraInfo;
+            foundItem.Status = foundItem.Status == ADCStatusType.Nothing && item.Status == ADCStatusType.Nothing
+                ? ADCStatusType.New
+                : item.Status != ADCStatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = item.UpdatedUser;
+        } // SetValuesUpdateItem
+
         private async Task ProcesarADCAsync(ADC item)
         {
             var appFormRepository = new AppFormRepository();
@@ -322,22 +443,25 @@ namespace Arysoft.ARI.NF48.Api.Services
             foreach (var site in appForm.Sites
                 .Where(s => s.Status == StatusType.Active))
             {
-                // - Obtener los Empleados de cada turno y sumarlos
-                var noEmployees = site.Shifts
-                    .Where(s => s.Status == StatusType.Active)
-                    .Sum(s => s.NoEmployees) ?? 0;
+                //// - Obtener los Empleados de cada turno y sumarlos
+                //var noEmployees = site.Shifts
+                //    .Where(s => s.Status == StatusType.Active)
+                //    .Sum(s => s.NoEmployees) ?? 0;
                 
-                // - Obtener el MD5
-                var initialMd5 = await md5Repository.GetDaysAsync(noEmployees);
-                //var adcSite = item.ADCSites != null
-                //    ? item.ADCSites.FirstOrDefault(s => s.SiteID == site.ID) ?? new ADCSite()
-                //    : new ADCSite();
+                //// - Obtener el MD5
+                //var initialMd5 = await md5Repository.GetDaysAsync(noEmployees);
+                ////var adcSite = item.ADCSites != null
+                ////    ? item.ADCSites.FirstOrDefault(s => s.SiteID == site.ID) ?? new ADCSite()
+                ////    : new ADCSite();
+
+                var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
+
                 var adcSite = adcSiteRepository.Gets()
                     .FirstOrDefault(s => s.SiteID == site.ID && s.ADCID == item.ID)
                     ?? new ADCSite();
 
-                adcSite.InitialMD5 = initialMd5;
-                adcSite.NoEmployees = noEmployees;
+                adcSite.InitialMD5 = employeesMD5.InitialMD5;
+                adcSite.NoEmployees = employeesMD5.NoEmployees;
                 adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
 
@@ -534,6 +658,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Otras alertas...
 
             return alerts;
-        }
+        } // GetAlertsAsync
     }
 }

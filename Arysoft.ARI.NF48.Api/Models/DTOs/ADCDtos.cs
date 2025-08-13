@@ -131,8 +131,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalSurveillance { get; set; }
         
-        public decimal? TotalRR { get; set; }
-
         [StringLength(1000)]
         public string ReviewComments { get; set; }
 
@@ -145,6 +143,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCUpdateDto
+
+    public class ADCWithSiteListUpdateDto
+    {
+        [Required]
+        public ADCUpdateDto ADC { get; set; }
+
+        [Required]
+        public List<ADCSiteWithCVListUpdateDto> ADCSites { get; set; }
+    } // ADCWithSiteListUpdateDto
 
     public class ADCDeleteDto
     {

@@ -90,5 +90,21 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // PutUpdateADC
+
+        [HttpPut()]
+        [Route("api/[controller]/complete")]
+        [ResponseType(typeof(ApiResponse<ADCItemDetailDto>))]
+        public async Task<IHttpActionResult> PutUpdateCompleteADC([FromBody] ADCWithSiteListUpdateDto itemUpdateDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            var item = ADCMapping.ItemUpdateWithListDtoToADC(itemUpdateDto);
+            item = await _service.UpdateCompleteADCAsync(item);
+            var itemDto = ADCMapping.ADCToItemDetailDto(item);
+            var response = new ApiResponse<ADCItemDetailDto>(itemDto);
+
+            return Ok(response);
+        } // PutUpdateCompleteADC
     }
 }

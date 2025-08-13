@@ -110,6 +110,21 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemUpdateDtoToADCSite
 
+        public static ADCSite ItemUpdateWithListDtoToADCSite(ADCSiteWithCVListUpdateDto itemDto)
+        {   
+            var item = ItemUpdateDtoToADCSite(itemDto.ADCSite);
+
+            if (itemDto.ADCConceptValues != null) 
+            {
+                foreach (var cvDto in itemDto.ADCConceptValues)
+                {
+                    item.ADCConceptValues.Add(ADCConceptValueMapping.ItemUpdateDtoToADCConceptValue(cvDto));
+                }
+            }
+
+            return item;
+        } // ListUpdateDtoToADCSite
+
         public static ADCSite ItemDeleteDtoToADCSite(ADCSiteItemDeleteDto itemDto)
         {
             return new ADCSite
