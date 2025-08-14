@@ -92,7 +92,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // PutUpdateADC
 
         [HttpPut()]
-        [Route("api/[controller]/complete")]
+        [Route("api/ADCs/complete")]
         [ResponseType(typeof(ApiResponse<ADCItemDetailDto>))]
         public async Task<IHttpActionResult> PutUpdateCompleteADC([FromBody] ADCWithSiteListUpdateDto itemUpdateDto)
         {

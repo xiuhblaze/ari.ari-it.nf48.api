@@ -115,9 +115,9 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             itemToUpdate.MD11UploadedBy = string.IsNullOrEmpty(filename)
                 ? item.MD11UploadedBy
                 : itemToUpdate.UpdatedUser;
-
+            var itemUpdated = await _service.UpdateAsync(itemToUpdate);
             var itemDto = ADCSiteMapping
-                .ADCSiteToItemDetailDto(await _service.UpdateAsync(itemToUpdate));
+                .ADCSiteToItemDetailDto(itemUpdated);
             var response = new ApiResponse<ADCSiteItemDetailDto>(itemDto);
 
             return Ok(response);
