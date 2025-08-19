@@ -60,6 +60,9 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<ADCSite>()
                 .Ignore(m => m.Alerts); // Not mapped property
+
+            modelBuilder.Entity<ADCSite>()
+                .Ignore(m => m.IsMultiStandard); // Not mapped property
         }
     }
 }

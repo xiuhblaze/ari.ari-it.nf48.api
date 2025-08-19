@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -108,6 +109,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCConceptValueItemUpdateDto
+
+    public class ADCConceptValueListUpdateDto
+    { 
+        [Required]
+        public ICollection<ADCConceptValueItemUpdateDto> Items { get; set; }
+    } // ADCConceptValueListUpdateDto
 
     public class ADCConceptValueItemDeleteDto
     {

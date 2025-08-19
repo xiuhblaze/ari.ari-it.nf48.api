@@ -39,5 +39,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         // NOT MAPPED
 
         public List<ADCSiteAlertType> Alerts { get; set; }
+
+        public bool IsMultiStandard { get; set; }
     }
 }

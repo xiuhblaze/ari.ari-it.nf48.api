@@ -18,7 +18,12 @@ namespace Arysoft.ARI.NF48.Api.IO
         /// <param name="allowedExtensions">Array of allowed lowercase extensions</param>
         /// <returns>String with contains the new file name</returns>
         /// <exception cref="BusinessException"></exception>
-        public static string UploadFile(HttpPostedFile file, string virtualPath, string newFilename, string[] allowedExtensions = null)
+        public static string UploadFile(
+            HttpPostedFile file, 
+            string virtualPath, 
+            string newFilename, 
+            string[] allowedExtensions = null
+        )
         {
             if (file == null || file.ContentLength == 0)
                 throw new BusinessException("The file to upload is empty");

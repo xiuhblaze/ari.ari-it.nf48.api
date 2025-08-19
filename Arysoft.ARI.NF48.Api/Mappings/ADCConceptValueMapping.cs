@@ -89,6 +89,18 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemUpdateDtoToADCConceptValue
 
+        public static IEnumerable<ADCConceptValue> UpdateListDtoToADCConceptValues(ADCConceptValueListUpdateDto itemsUpdateDto)
+        {
+            var items = new List<ADCConceptValue>();
+
+            foreach (var itemUpdateDto in itemsUpdateDto.Items)
+            {
+                items.Add(ItemUpdateDtoToADCConceptValue(itemUpdateDto));
+            }
+
+            return items;
+        } // UpdateListDtoToADCConceptValues
+
         public static ADCConceptValue ItemDeleteDtoToADCConceptValue(ADCConceptValueItemDeleteDto itemDeleteDto)
         {
             return new ADCConceptValue

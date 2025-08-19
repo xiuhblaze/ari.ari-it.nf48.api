@@ -45,6 +45,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public List<ADCSiteAlertType> Alerts { get; set; }
 
+        public bool IsMultiStandard { get; set; }
+
     } // ADCSiteItemListDto
 
     public class ADCSiteItemDetailDto
@@ -93,6 +95,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public List<ADCSiteAlertType> Alerts { get; set; }
 
+        public bool IsMultiStandard { get; set; }
+
     } // ADCSiteItemDetailDto
 
     public class ADCSiteItemCreateDto
@@ -130,6 +134,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCSiteItemUpdateDto
+
+    public class ADCSiteListUpdateDto
+    { 
+        [Required]
+        public List<ADCSiteItemUpdateDto> Items { get; set; }
+    } // ADCSiteListUpdateDto
 
     public class ADCSiteWithCVListUpdateDto
     {

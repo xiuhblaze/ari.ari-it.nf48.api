@@ -81,6 +81,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // Get alerts
                 item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
+                item.IsMultiStandard = IsMultiStandard(item.ADCID);
                 // TODO: Verificar si esto si jala :/
             }
 
@@ -122,8 +123,18 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
+            item.IsMultiStandard = IsMultiStandard(item.ADCID);
+
             return item;
         } // GetAsync
+
+        public bool IsMultiStandard(Guid ADCSiteID)
+        {
+            if (ADCSiteID == Guid.Empty)
+                throw new ArgumentException("The ADC Site ID is required.");
+
+            return _repository.OrganizationStandardCount(ADCSiteID) > 1;
+        } // IsMultiStandard
 
         public async Task<ADCSite> AddAsync(ADCSite item)
         {
@@ -262,7 +273,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!(adcSites?.Any() ?? false)) // Valida si la lista es nula o vacía
                 throw new ArgumentException("The list of ADC Sites to update is empty.");
 
-            var _conceptValueService = new ADCConceptValueService();
+            //var _conceptValueService = new ADCConceptValueService();
             var areUpdatedItems = false;
             var updatedItems = new List<ADCSite>();
 
@@ -270,22 +281,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 var foundItem = await _repository.GetAsync(adcSite.ID)
                     ?? throw new BusinessException($"One of the records (ADC Site) to Update was not found: {adcSite.ID}");
-                var listConceptValues = new List<ADCConceptValue>();
-
+                //var listConceptValues = new List<ADCConceptValue>();
 
                 await ValidateUpdateItemAsync(adcSite, foundItem);
                 await SetValuesUpdateItemAsync(adcSite, foundItem);
 
-                if (adcSite.ADCConceptValues?.Any() ?? false) // en adcSite.ADCConceptValues traigo los nuevos valores
-                {
-                    listConceptValues = await _conceptValueService
-                        .UpdateListAsync(adcSite.ADCConceptValues.ToList());
-                }
+                //if (adcSite.ADCConceptValues?.Any() ?? false) // en adcSite.ADCConceptValues traigo los nuevos valores
+                //{
+                //    listConceptValues = await _conceptValueService
+                //        .UpdateListAsync(adcSite.ADCConceptValues.ToList());
+                //}
 
                 _repository.Update(foundItem);
                 areUpdatedItems = true;
 
-                foundItem.ADCConceptValues = listConceptValues; // HACK: Ver si esto jala
+                //foundItem.ADCConceptValues = listConceptValues; // HACK: Ver si esto jala
                 updatedItems.Add(foundItem);
             }
 
@@ -297,7 +307,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    throw new BusinessException($"ADCSite.UpdateListAsync: {ex.Message}");
+                    throw new BusinessException($"ADCSiteService.UpdateListAsync: {ex.Message}");
                 }
             }
 
@@ -349,6 +359,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new ArgumentException("The Site ID is required");
             } // xBlaze Update: Creo que no se va a utilizar, se genera automáticamente
 
+            // 0. Validar que si no es multiestandard no maneje MD11 o
+            //    ignorar los valores y archivos
             // 1. Validar que el descuento de totalInitial no sea mayor al 30% del InitialMD5
             // 2. Validar que TotalInitial no sea menor a 2 días
             // 3. Validar que si la organizacion maneja un solo standard no aplique el MD11
@@ -375,8 +387,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
             foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
-            foundItem.MD11Filename = item.MD11Filename;     // Nombre del archivo de evidencia del MD11
-            foundItem.MD11UploadedBy = item.MD11UploadedBy; // Usuario que subió el archivo del MD11
+            foundItem.MD11Filename = String.IsNullOrEmpty(item.MD11Filename)
+                ? foundItem.MD11Filename
+                : item.MD11Filename;                        // Nombre del archivo de evidencia del MD11
+            foundItem.MD11UploadedBy = string.IsNullOrEmpty(item.MD11UploadedBy)
+                ? foundItem.MD11UploadedBy
+                : item.MD11UploadedBy;                      // Usuario que subió el archivo del MD11
             foundItem.Total = item.Total;                   // Total en días ya sea de TotalInitial o de MD11
             foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
             foundItem.ExtraInfo = item.ExtraInfo;

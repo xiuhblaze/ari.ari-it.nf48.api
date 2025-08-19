@@ -48,7 +48,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,
-                Alerts = item.Alerts
+                Alerts = item.Alerts,
+                IsMultiStandard = item.IsMultiStandard
             };
         } // ADCSiteToItemListDto
 
@@ -81,7 +82,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,
-                Alerts = item.Alerts
+                Alerts = item.Alerts,
+                IsMultiStandard = item.IsMultiStandard
             };
         } // ADCSiteToItemDetailDto
 
@@ -109,6 +111,18 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemUpdateDtoToADCSite
+
+        public static IEnumerable<ADCSite> UpdateListDtoToADCSite(ADCSiteListUpdateDto itemsUpdateDto)
+        { 
+            var items = new List<ADCSite>();
+
+            foreach (var itemDto in itemsUpdateDto.Items)
+            {
+                items.Add(ItemUpdateDtoToADCSite(itemDto));
+            }
+
+            return items;
+        } // UpdateListDtoToADCSite
 
         public static ADCSite ItemUpdateWithListDtoToADCSite(ADCSiteWithCVListUpdateDto itemDto)
         {   
