@@ -249,10 +249,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             ValidateUpdateItem(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
 
-            if (item.Status < ADCStatusType.Inactive)
-            {
-                await ProcesarADCAsync(foundItem);
-            }
+            //if (item.Status < ADCStatusType.Inactive)
+            //{
+            //    await ProcesarADCAsync(foundItem);
+            //}
 
             try
             {

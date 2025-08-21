@@ -72,10 +72,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? AppFormMapping.AppFormToItemListDto(item.AppForm)
                     : null,
                 ADCSites = item.ADCSites != null
-                    ? ADCSiteMapping.ADCSiteToListDto(item.ADCSites).ToList()
+                    ? ADCSiteMapping.ADCSiteToListDto(
+                        item.ADCSites.OrderByDescending(x => x.Site?.IsMainSite)
+                            .ThenBy(x => x.Site?.Description)
+                        ).ToList()
                     : null,
                 Notes = item.Notes != null
-                    ? NoteMapping.NotesToListDto(item.Notes).ToList()
+                    ? NoteMapping.NotesToListDto(
+                        item.Notes.OrderByDescending(n => n.Created)
+                        ).ToList()
                     : null,
                 Alerts = item.Alerts
             };
