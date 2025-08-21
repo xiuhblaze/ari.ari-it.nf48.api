@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Arysoft.ARI.NF48.Api.Services;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,14 +43,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteDescription = item.Site != null 
                     ? item.Site.Description 
                     : string.Empty,
-                //ADCConceptValuesCount = item.ADCConceptValues != null
-                //    ? item.ADCConceptValues.Count
-                //    : 0,
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,
-                Alerts = item.Alerts,
-                IsMultiStandard = item.IsMultiStandard
+                Alerts = ADCSiteService.GetAlerts(item),
+                IsMultiStandard = ADCSiteService.IsMultiStandard(item.ID)
             };
         } // ADCSiteToItemListDto
 
@@ -82,8 +80,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,
-                Alerts = item.Alerts,
-                IsMultiStandard = item.IsMultiStandard
+                Alerts = ADCSiteService.GetAlerts(item),
+                IsMultiStandard = ADCSiteService.IsMultiStandard(item.ID)
             };
         } // ADCSiteToItemDetailDto
 

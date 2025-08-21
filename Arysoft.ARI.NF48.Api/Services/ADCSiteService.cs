@@ -77,13 +77,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
             }
 
-            foreach (var item in items)
-            {
-                // Get alerts
-                item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
-                item.IsMultiStandard = IsMultiStandard(item.ADCID);
-                // TODO: Verificar si esto si jala :/
-            }
+            //foreach (var item in items)
+            //{
+            //    // Get alerts
+            //    item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
+            //    item.IsMultiStandard = IsMultiStandard(item.ID);
+            //    // TODO: Verificar si esto si jala :/
+            //}
 
             var pagedItems = PagedList<ADCSite>
                 .Create(items, filters.PageNumber, filters.PageSize);
@@ -102,9 +102,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The record was not found");
 
             // Get alerts
-            item.Alerts = await GetAlertsAsync(item);
+            var alerts = await GetAlertsAsync(item);
 
-            if (item.Alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
+            if (alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
             {
                 // Volver a obtener el MD5 y guardar antes de enviar
                 var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
@@ -123,18 +123,18 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
-            item.IsMultiStandard = IsMultiStandard(item.ADCID);
+            // item.IsMultiStandard = IsMultiStandard(item.ID);
 
             return item;
         } // GetAsync
 
-        public bool IsMultiStandard(Guid ADCSiteID)
-        {
-            if (ADCSiteID == Guid.Empty)
-                throw new ArgumentException("The ADC Site ID is required.");
+        //public bool IsMultiStandard(Guid ADCSiteID)
+        //{
+        //    if (ADCSiteID == Guid.Empty)
+        //        throw new ArgumentException("The ADC Site ID is required.");
 
-            return _repository.OrganizationStandardCount(ADCSiteID) > 1;
-        } // IsMultiStandard
+        //    return _repository.OrganizationStandardCount(ADCSiteID) > 1;
+        //} // IsMultiStandard
 
         public async Task<ADCSite> AddAsync(ADCSite item)
         {
@@ -453,5 +453,45 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return alerts;
         } // GetAlertsAsync
+
+        public static List<ADCSiteAlertType> GetAlerts(ADCSite item)
+        {
+            var alerts = new List<ADCSiteAlertType>();
+
+            var noEmployees = item.Site.Shifts
+                .Where(s => s.Status == StatusType.Active)
+                .Sum(s => s.NoEmployees) ?? 0;
+
+            if (noEmployees != (item.NoEmployees ?? 0))
+            {
+                alerts.Add(ADCSiteAlertType.EmployeesMistmatch);
+            }
+
+            //// Concept value decrease exceeded
+            //if (item.TotalInitial != null && item.TotalInitial > 0
+            //    && item.MD11 != null && item.MD11 < 0.7m * item.TotalInitial)
+            //{
+            //    alerts.Add(ADCSiteAlertType.ConceptValueDecreaseExceeded);
+            //}
+
+            //// MD11 reduction exceeded
+            //if (item.MD11 != null && item.MD11 < 0.7m * item.TotalInitial)
+            //{
+            //    alerts.Add(ADCSiteAlertType.MD11ReductionExceeded);
+            //}
+
+            return alerts;
+        } // GetAlerts
+
+        public static bool IsMultiStandard(Guid ADCSiteID)
+        {
+            if (ADCSiteID == Guid.Empty)
+                throw new ArgumentException("The ADC Site ID is required.");
+
+            var _repository = new ADCSiteRepository();
+
+            return _repository.OrganizationStandardCount(ADCSiteID) > 1;
+        } // IsMultiStandard
+
     } // ADCSiteService
 }

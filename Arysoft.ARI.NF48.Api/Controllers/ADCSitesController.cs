@@ -143,7 +143,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemsToUpdate = ADCSiteMapping.UpdateListDtoToADCSite(itemsUpdateDto);
 
-            if (_service.IsMultiStandard(itemsUpdateDto.Items.First().ID))
+            if (ADCSiteService.IsMultiStandard(itemsUpdateDto.Items.First().ID))
             {   
                 if (files != null && files.Count > 0)
                 {
