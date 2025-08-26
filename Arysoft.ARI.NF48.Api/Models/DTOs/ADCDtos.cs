@@ -37,6 +37,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public ADCStatusType Status { get; set; }
 
+        // INTERNAL
+
+        public string HistoricalDataJSON { get; set; }
+
         // RELATIONS
 
         public string AppFormOrganizationName { get; set; }
@@ -92,6 +96,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
+
+        // INTERNAL
+
+        public string HistoricalDataJSON { get; set; }
 
         // RELATIONS
 

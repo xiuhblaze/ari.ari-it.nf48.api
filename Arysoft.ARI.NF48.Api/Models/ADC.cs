@@ -34,6 +34,10 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public new ADCStatusType Status { get; set; }
 
+        // INTERNAL
+
+        public string HistoricalDataJSON { get; set; }
+
         // RELATIONS
 
         public virtual AppForm AppForm { get; set; }

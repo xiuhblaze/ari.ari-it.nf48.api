@@ -7,6 +7,7 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -402,7 +403,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         break;
 
                     case ADCStatusType.Inactive:
-
+                        foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
                         break;
                 }
             } // Si cambia el status
@@ -590,6 +591,36 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.TotalEmployees = 0;
             }
         } // RecalcularTotales
+
+        private string GetHistoricalDataJSON(ADC item)
+        {
+            var firstSite = item.ADCSites?
+                .FirstOrDefault(s => s.Status == StatusType.Active);
+
+            var historicalData = new 
+            { 
+                Sites = item.ADCSites?
+                    .Where(s => s.Status == StatusType.Active)
+                    .Select(s => new {
+                        s.SiteID,
+                        s.Site.Description,
+                        s.Site.IsMainSite,
+                        s.Site.Address,
+                        s.Site.Country,
+                        s.Site.LocationURL
+                    }),
+                ADCConcepts = firstSite.ADCConceptValues
+                    .Select(acv => new {
+                        acv.ADCConceptID,
+                        acv.ADCConcept.StandardID,
+                        acv.ADCConcept.IndexSort,
+                        acv.ADCConcept.Description,
+                        acv.ADCConcept.ExtraInfo
+                    })
+            };
+
+            return JsonSerializer.Serialize(historicalData);
+        } // GetHistoricalDataJSON
 
         // STATIC METHODS
 

@@ -289,6 +289,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
     } // AppFormUpdateDto
 
+    public class AppFormDuplicateDto
+    {
+        [Required]
+        public Guid ID { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string UpdatedUser { get; set; }
+    } // AppFormDuplicateDto
+
     public class AppFormDeleteDto
     {
         [Required]

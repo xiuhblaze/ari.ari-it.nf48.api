@@ -35,6 +35,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ActiveDate = item.ActiveDate,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
+                // INTERNAL
+                HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
                 AppFormOrganizationName = item.AppForm?.Organization?.Name ?? string.Empty,
                 AppFormAuditCycleName = item.AppForm?.AuditCycle?.Name ?? string.Empty,
@@ -67,6 +69,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
+                // INTERNAL
+                HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
                 AppForm = item.AppForm != null
                     ? AppFormMapping.AppFormToItemListDto(item.AppForm)

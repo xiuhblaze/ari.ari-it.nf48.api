@@ -4,10 +4,12 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.UI.HtmlControls;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -207,25 +209,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             //}
 
             // HACK: IMPORTANTE Ver que realmente se va a seguir actualizando despues de que sea Inactive
-
-            // Assigning values
-
-            //foundItem.InitialMD5 = item.InitialMD5;     // Este se va a obtener de la tabla MD5
-            //foundItem.NoEmployees = item.NoEmployees;   // Este se va a obtener de Sites
-            //foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
-            //foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
-            //foundItem.MD11Filename = item.MD11Filename;     // Nombre del archivo de evidencia del MD11
-            //foundItem.MD11UploadedBy = item.MD11UploadedBy; // Usuario que subió el archivo del MD11
-            //foundItem.Total = item.Total;                   // Total en días ya sea de TotalInitial o de MD11
-            //foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
-            //foundItem.ExtraInfo = item.ExtraInfo;
-            //foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
-            //    ? StatusType.Active
-            //    : item.Status != StatusType.Nothing
-            //        ? item.Status
-            //        : foundItem.Status;
-            //foundItem.Updated = DateTime.UtcNow;
-            //foundItem.UpdatedUser = item.UpdatedUser;
 
             await ValidateUpdateItemAsync(item, foundItem);
             await SetValuesUpdateItemAsync(item, foundItem);

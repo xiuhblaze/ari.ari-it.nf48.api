@@ -10,13 +10,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class AppFormRepository : BaseRepository<AppForm>
     {
-        public async Task<bool> HasAnAppFormValid(Guid auditCycleID, Guid standardID)
+        public async Task<bool> IsThereValidAppFormAsync(Guid auditCycleID, Guid standardID)
         {
             return await _model
                 .AnyAsync(m => m.AuditCycleID == auditCycleID
                     && m.StandardID == standardID
+                    && m.Status > AppFormStatusType.Nothing
                     && m.Status < AppFormStatusType.Inactive);
-        } // HasAnAppFormValid
+        } // IsThereValidAppFormAsync
 
         public new void Delete(AppForm item)
         {
@@ -49,6 +50,21 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 throw new BusinessException("The application form already has the NACE code related");
 
             foundItem.NaceCodes.Add(naceCodeItem);
+        } // AddNaceCodeAsync
+
+        public async Task AddNaceCodeAsync(AppForm item, Guid naceCodeID)
+        {
+            var _naceCodeRepository = _context.Set<NaceCode>();
+            
+            //if (item.Status >= AppFormStatusType.Inactive)
+            //    throw new BusinessException("The application form is not active");
+            var naceCodeItem = await _naceCodeRepository.FindAsync(naceCodeID)
+                ?? throw new BusinessException("The NACE code you're trying to relate to the application form was not found");
+
+            //if (item.NaceCodes.Contains(naceCodeItem))
+            //    throw new BusinessException("The application form already has the NACE code related");
+
+            item.NaceCodes.Add(naceCodeItem);
         } // AddNaceCodeAsync
 
         public async Task DelNaceCodeAsync(Guid id, Guid naceCodeID)
@@ -87,6 +103,21 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             foundItem.Contacts.Add(contactItem);
         } // AddContactAsync
 
+        public async Task AddContactAsync(AppForm item, Guid contactID)
+        {
+            var _contactRepository = _context.Set<Contact>();
+
+            //if (item.Status >= AppFormStatusType.Inactive)
+            //    throw new BusinessException("The application form is not active");
+            var contactItem = await _contactRepository.FindAsync(contactID)
+                ?? throw new BusinessException("The Contact you're trying to relate to the application form was not found");
+            
+            //if (item.Contacts.Contains(contactItem))
+            //    throw new BusinessException("The application form already has the Contact related");
+            
+            item.Contacts.Add(contactItem);
+        } // AddContactAsync
+
         public async Task DelContactAsync(Guid id, Guid contactID)
         {
             var _contactRepository = _context.Set<Contact>();
@@ -117,10 +148,25 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The Site you're trying to relate was not found");
 
-            if (foundItem.Sites.Contains(siteItem))
-                throw new BusinessException("The application form already has the Site related");
+            //if (foundItem.Sites.Contains(siteItem))
+            //    throw new BusinessException("The application form already has the Site related");
 
             foundItem.Sites.Add(siteItem);
+        } // AddSiteAsync
+
+        public async Task AddSiteAsync(AppForm item, Guid siteID)
+        {
+            var _siteRepository = _context.Set<Site>();
+
+            //if (item.Status >= AppFormStatusType.Inactive)
+            //    throw new BusinessException("The application form is not active");
+            var siteItem = await _siteRepository.FindAsync(siteID)
+                ?? throw new BusinessException("The Site you're trying to relate was not found");
+
+            if (item.Sites.Contains(siteItem))
+                throw new BusinessException("The application form already has the Site related");
+            
+            item.Sites.Add(siteItem);
         } // AddSiteAsync
 
         public async Task DelSiteAsync(Guid id, Guid siteID)

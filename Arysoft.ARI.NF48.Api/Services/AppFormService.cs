@@ -7,6 +7,7 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
@@ -136,10 +137,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("UpdatedUser is required");
 
             // - Validar que la organizacion exista y esté activo
-            // - Validar que el ciclo exista y esté activo
-            // - Validar que no exista otro appForm del mismo standard
-            //   en ese ciclo y este activo
-
+            // - Validar que el ciclo exista y esté activo o inactivo
 
             // Set values
 
@@ -173,7 +171,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validate
 
-            ValidateAppForm(item, foundItem);
+            await ValidateAppFormAsync(item, foundItem);
 
             // - Asignaciones por status
 
@@ -316,10 +314,100 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateAsync
 
+        public async Task<AppForm> DuplicateAsync(Guid id, string updatedUser)
+        {
+            var originalItem = await _repository.GetAsync(id)
+                ?? throw new BusinessException("The record to duplicate was not found");
+
+            // Validations 
+
+            // - Validar que no haya otro appform activo del mismo standard y ciclo
+            if (await _repository.IsThereValidAppFormAsync(originalItem.AuditCycleID, originalItem.StandardID.Value))
+            {
+                throw new BusinessException("There is already an active application form for the same standard in the selected audit cycle");
+            }
+
+            var newItem = new AppForm
+            {
+                ID = Guid.NewGuid(),
+                OrganizationID = originalItem.OrganizationID,
+                AuditCycleID = originalItem.AuditCycleID,
+                StandardID = originalItem.StandardID,
+                // General
+                AuditLanguage = originalItem.AuditLanguage,
+                CurrentCertificationsExpiration = originalItem.CurrentCertificationsExpiration,
+                CurrentStandards = originalItem.CurrentStandards,
+                CurrentCertificationsBy = originalItem.CurrentCertificationsBy,
+                AnyConsultancy = originalItem.AnyConsultancy,
+                AnyConsultancyBy = originalItem.AnyConsultancyBy,
+                // Internal
+                Status = AppFormStatusType.New,
+                Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
+                UpdatedUser = updatedUser,
+                NaceCodes = new List<NaceCode>(),
+                Contacts = new List<Contact>(),
+                Sites = new List<Site>()
+            };
+
+            switch (originalItem.Standard.StandardBase)
+            { 
+                case StandardBaseType.ISO9k:
+                    // ISO 9000
+                    newItem.ActivitiesScope = originalItem.ActivitiesScope;
+                    newItem.ProcessServicesCount = originalItem.ProcessServicesCount;
+                    newItem.ProcessServicesDescription = originalItem.ProcessServicesDescription;
+                    newItem.LegalRequirements = originalItem.LegalRequirements;
+                    newItem.AnyCriticalComplaint = originalItem.AnyCriticalComplaint;
+                    newItem.CriticalComplaintComments = originalItem.CriticalComplaintComments;
+                    newItem.AutomationLevelPercent = originalItem.AutomationLevelPercent;
+                    newItem.AutomationLevelJustification = originalItem.AutomationLevelJustification;
+                    newItem.IsDesignResponsibility = originalItem.IsDesignResponsibility;
+                    newItem.DesignResponsibilityJustify = originalItem.DesignResponsibilityJustify;
+                    break;
+            }
+
+            // Agregar los NaceCodes, Contacts y Sites
+
+            foreach (var nace in originalItem.NaceCodes
+                .Where(nc => nc.Status == StatusType.Active))
+            {
+                await _repository.AddNaceCodeAsync(newItem, nace.ID);
+            }
+
+            // - Contacts
+
+            foreach (var contact in originalItem.Contacts
+                .Where(c => c.Status == StatusType.Active))
+            {
+                await _repository.AddContactAsync(newItem, contact.ID);
+            }
+
+            // - Sites
+
+            foreach (var site in originalItem.Sites
+                .Where(s => s.Status == StatusType.Active))
+            {
+                await _repository.AddSiteAsync(newItem, site.ID);
+            }
+
+            try
+            {
+                _repository.Add(newItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.DuplicateAsync.AddNaceCode: {ex.Message}");
+            }
+
+            return newItem;
+        } // DuplicateAsync
+
         public async Task DeleteAsync(AppForm item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found");
+                ?? throw new BusinessException("The record to delete was not found");
 
             // Validations
 
@@ -465,16 +553,11 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var historicalData = new
             {
-                OrganizationName = item.Organization != null
-                                    ? item.Organization.Name : null,
-                AuditCycleName = item.AuditCycle != null
-                                    ? item.AuditCycle.Name : null,
-                StandardName = item.Standard != null
-                                    ? item.Standard.Name : null,
-                Website = item.Organization != null
-                                    ? item.Organization.Website : null,
-                Phone = item.Organization != null
-                                    ? item.Organization.Phone : null,
+                OrganizationName = item.Organization?.Name,
+                AuditCycleName = item.AuditCycle?.Name,
+                StandardName = item.Standard?.Name,
+                Website = item.Organization?.Website,
+                Phone = item.Organization?.Phone,
                 Companies = item.Organization.Companies
                                     .Where(c => c.Status == StatusType.Active)
                                     .Select(c => new { c.ID, c.Name, c.LegalEntity, c.COID }),
@@ -538,15 +621,15 @@ namespace Arysoft.ARI.NF48.Api.Services
             return JsonConvert.SerializeObject(historicalData);
         } // GetHistoricalDataJSON
 
-        private void ValidateAppForm(AppForm newItem, AppForm currentItem)
+        private async Task ValidateAppFormAsync(AppForm newItem, AppForm currentItem)
         {
             // - Solo puede haber un appform activo por ciclo y standard
-            // - Validar que el ciclo esté activo - Omitir por ahora
+            // - Validar que el ciclo esté activo - Omitir por ahora -UPDATE xBlaze(20250826): este no, es necesario subir auditorias o documentación estando inactivo
             //   por lo pronto, validar que el ciclo no sea del pasado
             // - Validar que el standard esté activo y que pertenesca al ciclo,
-            //   solo la primera vez
+            //   solo la primera vez - YA
             // - Validar que el appform no esté en un status que no se pueda editar
-            // - AuditLanguage - Validar que sea un idioma aceptado 'es', 'en'
+            // - AuditLanguage - Validar que sea un idioma aceptado 'es', 'en' - YA
 
             var standardRepository = new StandardRepository();
 
@@ -610,7 +693,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Considerar que solo la primera vez se registra el standard, despues si
             // ya se validó, sin importar el status del standard, se queda
-            if (currentItem.Status == AppFormStatusType.Nothing) 
+            if (currentItem.Status == AppFormStatusType.Nothing) // Si es nuevo...
             { 
                 if (newItem.StandardID != null && newItem.StandardID != Guid.Empty)
                 {
@@ -620,6 +703,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                     if (standardItem.Status != StatusType.Active)
                         throw new BusinessException("The selected standard is not active");
+
+                    if (await _repository.IsThereValidAppFormAsync(currentItem.AuditCycleID, newItem.StandardID.Value))
+                    {
+                        throw new BusinessException("There is already an active application form for the same standard in the selected audit cycle");
+                    } TODO: PROBAR ESTO AUN NO CONTINUA AUNQUE EXISTA UNO ACTIVO
 
                     // Falta validar que el standard esté asociado en el ciclo
                 }
@@ -638,6 +726,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The audit language is not valid, must be: " + languagesCodes);
             } else throw new BusinessException("The audit language is required");
 
-        } // ValidateAppForm
+        } // ValidateAppFormAsync
     }
 }
