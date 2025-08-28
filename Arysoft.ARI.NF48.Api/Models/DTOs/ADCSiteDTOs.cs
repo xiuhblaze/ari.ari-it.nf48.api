@@ -39,6 +39,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SiteDescription { get; set; }
 
+        public string SiteAddress { get; set; }
+
         public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
 
         // NOT MAPPED

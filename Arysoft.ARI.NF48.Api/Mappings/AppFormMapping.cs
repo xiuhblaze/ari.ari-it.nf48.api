@@ -41,6 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
+                Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,
@@ -121,6 +122,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
+                Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,
@@ -205,6 +207,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
+                Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,

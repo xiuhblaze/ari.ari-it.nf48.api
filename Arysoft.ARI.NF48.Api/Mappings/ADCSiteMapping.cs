@@ -43,6 +43,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteDescription = item.Site != null 
                     ? item.Site.Description 
                     : string.Empty,
+                SiteAddress = item.Site != null
+                    ? item.Site.Address
+                    : string.Empty,
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,

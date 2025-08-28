@@ -281,6 +281,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
 
                 // General
+                foundItem.Description = item.Description;
                 foundItem.AuditLanguage = item.AuditLanguage;
                 foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
                 foundItem.CurrentStandards = item.CurrentStandards;
@@ -705,10 +706,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                         throw new BusinessException("The selected standard is not active");
 
                     if (await _repository.IsThereValidAppFormAsync(currentItem.AuditCycleID, newItem.StandardID.Value))
-                    {
-                        throw new BusinessException("There is already an active application form for the same standard in the selected audit cycle");
-                    } TODO: PROBAR ESTO AUN NO CONTINUA AUNQUE EXISTA UNO ACTIVO
-
+                        throw new BusinessException("There is already an active application form for the same standard in the current audit cycle");
+                    
                     // Falta validar que el standard esté asociado en el ciclo
                 }
                 else // Probablemente aquí no entre nunca
