@@ -60,9 +60,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             foreach (var item in items)
-            {
+            {   
                 item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
-                // TODO: Verificar si esto si jala :/
             }
 
             // Order
@@ -99,7 +98,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             
             item.Alerts = await GetAlertsAsync(item);
 
-            if (item.Alerts.Count > 0)
+            if (item.Alerts.Count > 0 && item.Status < ADCStatusType.Inactive)
             {
                 await RecalcularTotalesAsync(item);
 
@@ -190,70 +189,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            //// Validations
-
-            //// - no se me ocurre que ahorita
-
-            //// - Dependiendo del status, realizar diferentes acciones
-            //if (foundItem.Status != item.Status)
-            //{
-            //    // - 'orita no me acuerdo...
-            //    switch (item.Status) // Si el nuevo status es...
-            //    {
-            //        case ADCStatusType.Review:
-
-            //            if (string.IsNullOrEmpty(item.ReviewComments))
-            //                throw new BusinessException("Comments are required when send to Review.");
-
-            //            foundItem.ReviewDate = DateTime.UtcNow;
-            //            foundItem.ReviewComments = item.ReviewComments;
-            //            break;
-
-            //        case ADCStatusType.Rejected:
-            //            if (string.IsNullOrEmpty(item.ReviewComments))
-            //                throw new BusinessException("Comments are required when rejected.");
-
-            //            foundItem.ReviewDate = DateTime.UtcNow;
-            //            foundItem.ReviewComments = item.ReviewComments;
-            //            foundItem.UserReview = item.UpdatedUser;
-            //            break;
-
-            //        case ADCStatusType.Active:
-            //            if (foundItem.Status != ADCStatusType.Review)
-            //                throw new BusinessException("Only items in Review can be set to Active.");
-            //            foundItem.UserReview = item.UpdatedUser;
-            //            foundItem.ActiveDate = DateTime.UtcNow;
-            //            break;
-
-            //        case ADCStatusType.Inactive:
-
-            //            break;
-            //    }
-            //}
-
-            //// Assigning values
-
-            //foundItem.Description = item.Description;
-            //foundItem.TotalInitial = item.TotalInitial;
-            //foundItem.TotalMD11 = item.TotalMD11;
-            //foundItem.TotalSurveillance = item.TotalSurveillance;
-            //foundItem.TotalRR = item.TotalRR;
-            //foundItem.ExtraInfo = item.ExtraInfo;
-            //foundItem.Status = foundItem.Status == ADCStatusType.Nothing && item.Status == ADCStatusType.Nothing
-            //    ? ADCStatusType.New
-            //    : item.Status != ADCStatusType.Nothing
-            //        ? item.Status
-            //        : foundItem.Status;
-            //foundItem.Updated = DateTime.UtcNow;
-            //foundItem.UpdatedUser = item.UpdatedUser;
-
             ValidateUpdateItem(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
-
-            //if (item.Status < ADCStatusType.Inactive)
-            //{
-            //    await ProcesarADCAsync(foundItem);
-            //}
 
             try
             {
@@ -265,14 +202,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.UpdateAsync: {ex.Message}");
             }
 
-            //if (item.Status < ADCStatusType.Inactive) // Al parecer lo wa hacer en el frontend
-            //    RecalcularTotales(foundItem);
-
             foundItem.Alerts = await GetAlertsAsync(foundItem);
 
             return foundItem;
         } // UpdateAsync
-
 
         public async Task<ADC> UpdateCompleteADCAsync(ADC item)
         {
@@ -307,7 +240,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.UpdateCompleteADCAsync: {ex.Message}");
             }
 
-            foundItem.ADCSites = listSites;
+            foundItem.ADCSites = listSites;            
             foundItem.Alerts = await GetAlertsAsync(foundItem);
 
             return foundItem;
@@ -565,10 +498,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
-                    var totalInitial = adcSite.InitialMD5 ?? 0;
-
-                    adcSite.TotalInitial = totalInitial;
-
+                    adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
                     var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(adcSite.SiteID ?? Guid.Empty);
 
                     if (employeesMD5.NoEmployees != adcSite.NoEmployees)
@@ -627,64 +557,67 @@ namespace Arysoft.ARI.NF48.Api.Services
         public static async Task<List<ADCAlertType>> GetAlertsAsync(ADC item)
         { 
             var alerts = new List<ADCAlertType>();
-            
-            // Obtener alertas de ADCSites
-            if (item.ADCSites != null && item.ADCSites.Any())
-            {
-                var noEmployees = item.ADCSites
-                    .Where(adcsite => adcsite.Status == StatusType.Active)
-                    .Sum(adcsite => adcsite.NoEmployees) ?? 0;
 
-                foreach (var adcSite in item.ADCSites
-                    .Where(adcsite => adcsite.Status == StatusType.Active))
+            if (item.Status < ADCStatusType.Inactive)
+            { 
+                // Obtener alertas de ADCSites
+                if (item.ADCSites != null && item.ADCSites.Any())
                 {
-                    adcSite.Alerts = await ADCSiteService.GetAlertsAsync(adcSite);
+                    var noEmployees = item.ADCSites
+                        .Where(adcsite => adcsite.Status == StatusType.Active)
+                        .Sum(adcsite => adcsite.NoEmployees) ?? 0;
 
-                    if (adcSite.Alerts != null && adcSite.Alerts.Any())
-                    {   
-                        alerts.Add(ADCAlertType.EmployeesMistmatch);
-                    }
-                }
-
-                // Si el total de empleados del ADC no coincide con la suma de empleados de los ADCSites
-                if (item.TotalEmployees != noEmployees 
-                    && !alerts.Contains(ADCAlertType.EmployeesMistmatch))
-                {
-                    alerts.Add(ADCAlertType.EmployeesMistmatch);
-                }
-            }
-
-            // Si el número de ADCSites no coincide con el número de Sites del AppForm
-            if (item.AppForm != null && item.AppForm.Sites != null)
-            {
-                var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;
-                var noAppFormSites = item.AppForm.Sites.Count(site => site.Status == StatusType.Active);
-
-                if (noADCSites != noAppFormSites)
-                {
-                    if (!alerts.Contains(ADCAlertType.SitesMistmatch))
-                        alerts.Add(ADCAlertType.SitesMistmatch);
-                }
-                else 
-                {
-                    // verificar que sean los mismos Sites
-                    var sameSites = true;
-                    foreach (var site in item.AppForm.Sites
-                        .Where(site => site.Status == StatusType.Active))
+                    foreach (var adcSite in item.ADCSites
+                        .Where(adcsite => adcsite.Status == StatusType.Active))
                     {
-                        if (!item.ADCSites.Any(adcsite => adcsite.SiteID == site.ID))                        
-                        {
-                            sameSites = false;
-                            break;
+                        adcSite.Alerts = await ADCSiteService.GetAlertsAsync(adcSite);
+
+                        if (adcSite.Alerts != null && adcSite.Alerts.Any())
+                        {   
+                            alerts.Add(ADCAlertType.EmployeesMistmatch);
                         }
                     }
 
-                    if (!sameSites && !alerts.Contains(ADCAlertType.SitesMistmatch))
+                    // Si el total de empleados del ADC no coincide con la suma de empleados de los ADCSites
+                    if (item.TotalEmployees != noEmployees 
+                        && !alerts.Contains(ADCAlertType.EmployeesMistmatch))
                     {
-                        alerts.Add(ADCAlertType.SitesMistmatch);
+                        alerts.Add(ADCAlertType.EmployeesMistmatch);
                     }
-                }
-            }
+                } // Validando si cambia el numero de empleados
+
+                // Si el número de ADCSites no coincide con el número de Sites del AppForm
+                if (item.AppForm != null && item.AppForm.Sites != null)
+                {
+                    var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;
+                    var noAppFormSites = item.AppForm.Sites.Count(site => site.Status == StatusType.Active);
+
+                    if (noADCSites != noAppFormSites)
+                    {
+                        if (!alerts.Contains(ADCAlertType.SitesMistmatch))
+                            alerts.Add(ADCAlertType.SitesMistmatch);
+                    }
+                    else 
+                    {
+                        // verificar que sean los mismos Sites
+                        var sameSites = true;
+                        foreach (var site in item.AppForm.Sites
+                            .Where(site => site.Status == StatusType.Active))
+                        {
+                            if (!item.ADCSites.Any(adcsite => adcsite.SiteID == site.ID))                        
+                            {
+                                sameSites = false;
+                                break;
+                            }
+                        }
+
+                        if (!sameSites && !alerts.Contains(ADCAlertType.SitesMistmatch))
+                        {
+                            alerts.Add(ADCAlertType.SitesMistmatch);
+                        }
+                    }
+                } // Validando si cambia el numero de ADCSites vs el AppForm
+            } // if status < Inactive
 
             // Otras alertas...
 
