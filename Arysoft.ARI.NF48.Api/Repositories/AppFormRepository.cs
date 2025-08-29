@@ -103,6 +103,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             foundItem.Contacts.Add(contactItem);
         } // AddContactAsync
 
+        /// <summary>
+        /// Uso particular para duplicar un AppForm con sus Contacts
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="contactID"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task AddContactAsync(AppForm item, Guid contactID)
         {
             var _contactRepository = _context.Set<Contact>();
@@ -148,12 +155,19 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The Site you're trying to relate was not found");
 
-            //if (foundItem.Sites.Contains(siteItem))
-            //    throw new BusinessException("The application form already has the Site related");
+            if (foundItem.Sites.Contains(siteItem))
+                throw new BusinessException("The application form already has the Site related");
 
             foundItem.Sites.Add(siteItem);
         } // AddSiteAsync
 
+        /// <summary>
+        /// Uso particular para duplicar un AppForm con sus Sites
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="siteID"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task AddSiteAsync(AppForm item, Guid siteID)
         {
             var _siteRepository = _context.Set<Site>();
@@ -163,8 +177,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The Site you're trying to relate was not found");
 
-            if (item.Sites.Contains(siteItem))
-                throw new BusinessException("The application form already has the Site related");
+            //if (item.Sites.Contains(siteItem))
+            //    throw new BusinessException("The application form already has the Site related");
             
             item.Sites.Add(siteItem);
         } // AddSiteAsync
