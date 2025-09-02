@@ -149,7 +149,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.AddAsync: {ex.Message}");
             }
 
-            await ProcesarADCAsync(item);
+            await AddSitesToNewADCAsync(item);
+
+            //await ProcesarADCAsync(item);
 
             try 
             { 
@@ -191,6 +193,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             ValidateUpdateItem(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
+
+            if (!SitesMistmatch(foundItem))
+            {
+                await AddSitesToExistingADCAsync(foundItem);
+            }
 
             try
             {
@@ -253,19 +260,22 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            if (item.Status == ADCStatusType.Deleted) // Eliminación física
+            if (foundItem.Status == ADCStatusType.Deleted) // Eliminación física
             {
-                _repository.Delete(item);
+                _repository.Delete(foundItem);
             }
             else // Eliminación lógica
             {
-                item.Status = foundItem.Status < ADCStatusType.Cancel
+                if (string.IsNullOrEmpty(foundItem.HistoricalDataJSON))
+                    foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+
+                foundItem.Status = foundItem.Status < ADCStatusType.Cancel
                     ? ADCStatusType.Cancel
                     : ADCStatusType.Deleted;
-                item.Updated = DateTime.UtcNow;
-                item.UpdatedUser = item.UpdatedUser;
+                foundItem.Updated = DateTime.UtcNow;
+                foundItem.UpdatedUser = item.UpdatedUser;
 
-                _repository.Update(item);
+                _repository.Update(foundItem);
             }
 
             try
@@ -307,6 +317,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case ADCStatusType.Inactive:
                         // No hay validaciones para Inactive aun
                         break;
+
+                    case ADCStatusType.Deleted:
+                        throw new BusinessException("To delete an ADC, use the Delete method.");
                 }
             }
 
@@ -338,6 +351,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case ADCStatusType.Inactive:
                         foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
                         break;
+
+                    case ADCStatusType.Cancel:
+                        if (foundItem.Status <= ADCStatusType.Active)
+                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                        break;
                 }
             } // Si cambia el status
 
@@ -357,6 +375,86 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
         } // SetValuesUpdateItem
+
+        private async Task AddSitesToNewADCAsync(ADC item)
+        {
+            var appFormRepository = new AppFormRepository();
+            var adcSiteRepository = new ADCSiteRepository();
+            var md5Repository = new MD5Repository();
+
+            var appForm = await appFormRepository.GetAsync(item.AppFormID)
+                ?? throw new BusinessException("The AppForm was not found.");
+
+            if (appForm.Sites == null || !appForm.Sites.Any())
+                throw new BusinessException("The AppForm does not have any Sites.");
+
+            // - Obtener los Sites del AppForm y agregarlos al ADC
+
+            foreach(var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
+            {
+                var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
+                var adcSite = new ADCSite
+                {
+                    ID = Guid.NewGuid(),
+                    ADCID = item.ID,
+                    SiteID = site.ID,
+                    InitialMD5 = employeesMD5.InitialMD5,
+                    NoEmployees = employeesMD5.NoEmployees,
+                    TotalInitial = employeesMD5.InitialMD5,
+                    Created = DateTime.UtcNow,
+                    Updated = DateTime.UtcNow,
+                    UpdatedUser = item.UpdatedUser,
+                    Status = StatusType.Active
+                };
+                adcSiteRepository.Add(adcSite);
+
+                // Agregar los ADCConceptValues si no existen
+                await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+            } // foreach site
+
+            await adcSiteRepository.SaveChangesAsync();
+        } // AddSitesToNewADCAsync
+
+        private async Task AddSitesToExistingADCAsync(ADC item)
+        {
+            //TODO: Esto lo puso la IA, hay que revisarlo AQUI VOY 20250902
+            var appFormRepository = new AppFormRepository();
+            var adcSiteRepository = new ADCSiteRepository();
+            var md5Repository = new MD5Repository();
+            var appForm = await appFormRepository.GetAsync(item.AppFormID)
+                ?? throw new BusinessException("The AppForm was not found.");
+            if (appForm.Sites == null || !appForm.Sites.Any())
+                throw new BusinessException("The AppForm does not have any Sites.");
+            // - Obtener los Sites del AppForm y agregarlos al ADC
+            foreach (var site in appForm.Sites
+                .Where(s => s.Status == StatusType.Active))
+            {
+                var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
+                var adcSite = adcSiteRepository.Gets()
+                    .FirstOrDefault(s => s.SiteID == site.ID && s.ADCID == item.ID)
+                    ?? new ADCSite();
+                adcSite.InitialMD5 = employeesMD5.InitialMD5;
+                adcSite.NoEmployees = employeesMD5.NoEmployees;
+                adcSite.Updated = DateTime.UtcNow;
+                adcSite.UpdatedUser = item.UpdatedUser;
+                if (adcSite.ID == Guid.Empty)
+                {
+                    adcSite.ID = Guid.NewGuid();
+                    adcSite.ADCID = item.ID;
+                    adcSite.SiteID = site.ID;
+                    adcSite.Created = DateTime.UtcNow;
+                    adcSite.Status = StatusType.Active;
+                    adcSiteRepository.Add(adcSite);
+                }
+                else
+                {
+                    adcSiteRepository.Update(adcSite);
+                }
+                // Agregar los ADCConceptValues si no existen
+                await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+            } // foreach site
+            await adcSiteRepository.SaveChangesAsync();
+        } // AddSitesToExistingADCAsync
 
         private async Task ProcesarADCAsync(ADC item)
         {
@@ -587,41 +685,75 @@ namespace Arysoft.ARI.NF48.Api.Services
                 } // Validando si cambia el numero de empleados
 
                 // Si el número de ADCSites no coincide con el número de Sites del AppForm
-                if (item.AppForm != null && item.AppForm.Sites != null)
+                if (item.AppForm != null
+                    && item.AppForm.Sites != null
+                    && item.ADCSites != null)
                 {
-                    var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;
-                    var noAppFormSites = item.AppForm.Sites.Count(site => site.Status == StatusType.Active);
+                    if (!SitesMistmatch(item) && !alerts.Contains(ADCAlertType.SitesMistmatch))
+                        alerts.Add(ADCAlertType.SitesMistmatch);
 
-                    if (noADCSites != noAppFormSites)
-                    {
-                        if (!alerts.Contains(ADCAlertType.SitesMistmatch))
-                            alerts.Add(ADCAlertType.SitesMistmatch);
-                    }
-                    else 
-                    {
-                        // verificar que sean los mismos Sites
-                        var sameSites = true;
-                        foreach (var site in item.AppForm.Sites
-                            .Where(site => site.Status == StatusType.Active))
-                        {
-                            if (!item.ADCSites.Any(adcsite => adcsite.SiteID == site.ID))                        
-                            {
-                                sameSites = false;
-                                break;
-                            }
-                        }
+                    //var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;
+                    //var noAppFormSites = item.AppForm.Sites.Count(site => site.Status == StatusType.Active);
 
-                        if (!sameSites && !alerts.Contains(ADCAlertType.SitesMistmatch))
-                        {
-                            alerts.Add(ADCAlertType.SitesMistmatch);
-                        }
-                    }
-                } // Validando si cambia el numero de ADCSites vs el AppForm
+                    //if (noADCSites != noAppFormSites)
+                    //{
+                    //    if (!alerts.Contains(ADCAlertType.SitesMistmatch))
+                    //        alerts.Add(ADCAlertType.SitesMistmatch);
+                    //}
+                    //else 
+                    //{
+                    //    // verificar que sean los mismos Sites
+                    //    var sameSites = true;
+                    //    foreach (var site in item.AppForm.Sites
+                    //        .Where(site => site.Status == StatusType.Active))
+                    //    {
+                    //        if (!item.ADCSites.Any(adcsite => adcsite.SiteID == site.ID))                        
+                    //        {
+                    //            sameSites = false;
+                    //            break;
+                    //        }
+                    //    }
+
+                    //    if (!sameSites && !alerts.Contains(ADCAlertType.SitesMistmatch))
+                    //    {
+                    //        alerts.Add(ADCAlertType.SitesMistmatch);
+                    //    }
+                    //}
+                }
+                else
+                {
+                    // TODO: Realmente no se cargó la información. Ver otra forma de informarlo
+                    if (!alerts.Contains(ADCAlertType.SitesMistmatch))
+                        alerts.Add(ADCAlertType.SitesMistmatch);
+                }
+                // Validando si cambia el numero de ADCSites vs el AppForm
             } // if status < Inactive
 
             // Otras alertas...
 
             return alerts;
         } // GetAlertsAsync
+
+        private static bool SitesMistmatch(ADC item)
+        {
+            var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;
+            var noAppFormSites = item.AppForm?.Sites?.Count(site => site.Status == StatusType.Active) ?? 0;
+
+            if (noADCSites != noAppFormSites)
+                return false;
+
+            // verificar que sean los mismos Sites
+            
+            foreach (var site in item.AppForm.Sites
+                .Where(site => site.Status == StatusType.Active))
+            {
+                if (!item.ADCSites.Any(adcsite => adcsite.SiteID == site.ID))
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        } // SitesMistmatch
     }
 }

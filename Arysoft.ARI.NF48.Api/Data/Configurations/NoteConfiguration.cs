@@ -21,7 +21,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<Note>()
                 .Property(m => m.Text)
-                .HasMaxLength(250);
+                .HasMaxLength(500);
 
             modelBuilder.Entity<Note>()
                 .Property(m => m.Status)
@@ -39,13 +39,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
-
-            // Relations
-
-            //modelBuilder.Entity<Note>()
-            //    .HasOptional(m => m.Owner)
-            //    .WithMany(m => m.Notes)
-            //    .HasForeignKey(m => m.OwnerID);
         }
     }
 }
