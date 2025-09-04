@@ -57,5 +57,17 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 _model.Remove(item);
             }
         } // DeleteTmpByUserAsync
+
+        public void DetachAllEntities()
+        { 
+            var changedEntriesCopy = _context.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added ||
+                            e.State == EntityState.Modified ||
+                            e.State == EntityState.Deleted ||
+                            e.State == EntityState.Unchanged)
+                .ToList();
+            foreach (var entry in changedEntriesCopy)
+                entry.State = EntityState.Detached;
+        } // DetachAllEntities
     }
 }

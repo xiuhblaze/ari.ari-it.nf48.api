@@ -95,23 +95,38 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var item = await _repository.GetAsync(id)
                 ?? throw new BusinessException("The ADC was not found.");
-            
-            item.Alerts = await GetAlertsAsync(item);
 
-            if (item.Alerts.Count > 0 && item.Status < ADCStatusType.Inactive)
-            {
-                await RecalcularTotalesAsync(item);
+            if (item.Status < ADCStatusType.Inactive)
+            { 
+                var alerts = await GetAlertsAsync(item);
 
-                try
+                if (alerts.Count > 0)
                 {
-                    _repository.UpdateValues(item);
-                    await _repository.SaveChangesAsync();
-                }
-                catch (Exception ex)
+                    if (alerts.Contains(ADCAlertType.SitesMistmatch))
+                    { 
+                        await UpdateSitesToExistingADCAsync(item);
+                        _repository.DetachAllEntities();
+                        item = await _repository.GetAsync(item.ID)
+                            ?? throw new BusinessException("The ADC was not found after update sites.");
+                    }
 
-                {
-                    throw new BusinessException($"ADCService.GetAsync.Update.RecalcularTotales: {ex.Message}");
+                    await RecalcularTotalesAsync(item);
+
+                    try
+                    {
+                        _repository.UpdateValues(item);
+                        await _repository.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BusinessException($"ADCService.GetAsync.Update.RecalcularTotales: {ex.Message}");
+                    }
+
+                    item = await _repository.GetAsync(item.ID)
+                        ?? throw new BusinessException("The ADC was not found after and recalculation.");
                 }
+
+                item.Alerts = alerts;
             }
 
             return item;
@@ -194,10 +209,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             ValidateUpdateItem(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
 
-            if (!SitesMistmatch(foundItem))
-            {
-                await AddSitesToExistingADCAsync(foundItem);
-            }
+            foundItem.Alerts = await GetAlertsAsync(foundItem);
+
+            //if (foundItem.Alerts.Contains(ADCAlertType.SitesMistmatch))
+            //{
+            //    await UpdateSitesToExistingADCAsync(foundItem);
+            //}
 
             try
             {
@@ -208,8 +225,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 throw new BusinessException($"ADCService.UpdateAsync: {ex.Message}");
             }
-
-            foundItem.Alerts = await GetAlertsAsync(foundItem);
 
             return foundItem;
         } // UpdateAsync
@@ -224,6 +239,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             ValidateUpdateItem(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
 
+            foundItem.Alerts = await GetAlertsAsync(foundItem);
+
             var listSites = new List<ADCSite>();
 
             if (item.ADCSites?.Any() ?? false) // en item.ADCSites traigo los nuevos valores
@@ -232,10 +249,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .UpdateListAsync(item.ADCSites.ToList());
             }
 
-            if (item.Status < ADCStatusType.Inactive)
-            {
-                await ProcesarADCAsync(foundItem);
-            }
+            // Creo que no lo necesita pues en Get ya se actualizan los sites
+            // y debe de traer ya los nuevos datos
+            //if (item.Status < ADCStatusType.Inactive)
+            //{
+            //    //await ProcesarADCAsync(foundItem);
+            //    if (foundItem.Alerts.Contains(ADCAlertType.SitesMistmatch))
+            //        await UpdateSitesToExistingADCAsync(foundItem);
+            //}
 
             try
             {
@@ -248,8 +269,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             foundItem.ADCSites = listSites;            
-            foundItem.Alerts = await GetAlertsAsync(foundItem);
-
+            
             return foundItem;
         } // UpdateListAsync
 
@@ -290,6 +310,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
+        /// <summary>
+        /// Procesa las validaciones necesarias para actualizar un ADC
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="foundItem"></param>
+        /// <exception cref="BusinessException"></exception>
         private void ValidateUpdateItem(ADC item, ADC foundItem)
         {
             // Validations
@@ -325,6 +351,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         } // ValidateUpdateItem
 
+        /// <summary>
+        /// Establece los valores para actualizar un ADC
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="foundItem"></param>
         private void SetValuesUpdateItem(ADC item, ADC foundItem)
         {
             // - Si hay cambios en el status, realizar diferentes asignaciones
@@ -376,6 +407,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.UpdatedUser = item.UpdatedUser;
         } // SetValuesUpdateItem
 
+        /// <summary>
+        /// Agrega los sites para un nuevo ADC en base a los sites del AppForm
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         private async Task AddSitesToNewADCAsync(ADC item)
         {
             var appFormRepository = new AppFormRepository();
@@ -415,46 +452,68 @@ namespace Arysoft.ARI.NF48.Api.Services
             await adcSiteRepository.SaveChangesAsync();
         } // AddSitesToNewADCAsync
 
-        private async Task AddSitesToExistingADCAsync(ADC item)
+        /// <summary>
+        /// Revisa un ADC existente y actualiza sus sites en base a los sites del AppForm
+        /// agregando los que no existen y eliminando los que ya no están en el AppForm
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        private async Task UpdateSitesToExistingADCAsync(ADC item)
         {
-            //TODO: Esto lo puso la IA, hay que revisarlo AQUI VOY 20250902
             var appFormRepository = new AppFormRepository();
             var adcSiteRepository = new ADCSiteRepository();
             var md5Repository = new MD5Repository();
             var appForm = await appFormRepository.GetAsync(item.AppFormID)
-                ?? throw new BusinessException("The AppForm was not found.");
+                ?? throw new BusinessException($"The AppForm was not found: {item.AppFormID}.");
+
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
-            // - Obtener los Sites del AppForm y agregarlos al ADC
+
+            // - Obtener los Sites del AppForm y agregar solo los que no existen al ADC
             foreach (var site in appForm.Sites
                 .Where(s => s.Status == StatusType.Active))
             {
+                if (adcSiteRepository.Gets().Any(s => s.SiteID == site.ID && s.ADCID == item.ID))
+                    continue; // El Site ya existe en el ADC, saltar al siguiente
+
+                var adcSite = new ADCSite();
                 var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
-                var adcSite = adcSiteRepository.Gets()
-                    .FirstOrDefault(s => s.SiteID == site.ID && s.ADCID == item.ID)
-                    ?? new ADCSite();
+
+                adcSite.ID = Guid.NewGuid();
+                adcSite.ADCID = item.ID;
+                adcSite.SiteID = site.ID;
                 adcSite.InitialMD5 = employeesMD5.InitialMD5;
                 adcSite.NoEmployees = employeesMD5.NoEmployees;
+                adcSite.Status = StatusType.Active;
+                adcSite.Created = DateTime.UtcNow;
                 adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
-                if (adcSite.ID == Guid.Empty)
-                {
-                    adcSite.ID = Guid.NewGuid();
-                    adcSite.ADCID = item.ID;
-                    adcSite.SiteID = site.ID;
-                    adcSite.Created = DateTime.UtcNow;
-                    adcSite.Status = StatusType.Active;
-                    adcSiteRepository.Add(adcSite);
-                }
-                else
-                {
-                    adcSiteRepository.Update(adcSite);
-                }
+        
+                adcSiteRepository.Add(adcSite);
+
                 // Agregar los ADCConceptValues si no existen
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
             } // foreach site
+
             await adcSiteRepository.SaveChangesAsync();
-        } // AddSitesToExistingADCAsync
+
+            // Segundo foreach para eliminar los Sites que no están en el AppForm
+            var sitesFromBDD = adcSiteRepository.Gets()
+                .Where(s => s.ADCID == item.ID)
+                .ToList();
+
+            if (sitesFromBDD != null && sitesFromBDD.Any())
+            {   
+                var sitesToRemove = sitesFromBDD
+                    .Where(s => !appForm.Sites.Any(a => a.ID == s.SiteID))
+                    .Select(s => s.ID)
+                    .ToList();
+
+                await adcSiteRepository.DeleteByListToRemoveAsync(sitesToRemove);
+            }
+
+        } // UpdateSitesToExistingADCAsync
 
         private async Task ProcesarADCAsync(ADC item)
         {
@@ -537,7 +596,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             await adcSiteRepository.SaveChangesAsync();
         } // ProcesarADC
 
-        private async Task RegisterADCConceptsAsync(ADCSite adcSite, Guid standardID)
+        /// <summary>
+        /// Agrega los ADCConceptValues a un ADCSite en base a los ADCConcepts del Standard
+        /// </summary>
+        /// <param name="adcSite"></param>
+        /// <param name="standardID"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        private async Task<List<ADCConceptValue>> RegisterADCConceptsAsync(ADCSite adcSite, Guid standardID)
         { 
             var adcConceptRepository = new ADCConceptRepository();
             var adcConceptValueRepository = new ADCConceptValueRepository();
@@ -548,6 +614,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     && c.Status == StatusType.Active)
                 .ToList() ?? throw new BusinessException("No ADC Concepts found for the Standard.");
             var hasChanges = false;
+            var listADCConceptValues = new List<ADCConceptValue>();
 
             foreach (var concept in concepts)
             { 
@@ -568,6 +635,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     };
                     
                     adcConceptValueRepository.Add(adcConceptValue);
+                    listADCConceptValues.Add(adcConceptValue);
                     hasChanges = true;
                 }
             }
@@ -583,8 +651,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException($"ADCService.RegisterADCConceptsAsync: {ex.Message}");
                 }
             }
+
+            return listADCConceptValues;
         } // RegisterADCConceptsAsync
 
+        /// <summary>
+        /// Calcula los valores para un ADCSite tanto su numero de empleados como
+        /// el numero de dias en base a MD5, así como el Total de Empleados del ADC
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private async Task RecalcularTotalesAsync(ADC item) 
         {
             // HACK: Buscar los ADCSites de forma manual primero
@@ -652,6 +728,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // STATIC METHODS
 
+        /// <summary>
+        /// Revisa de un ADC si tiene alertas y cuáles son
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public static async Task<List<ADCAlertType>> GetAlertsAsync(ADC item)
         { 
             var alerts = new List<ADCAlertType>();
@@ -722,7 +803,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
                 else
                 {
-                    // TODO: Realmente no se cargó la información. Ver otra forma de informarlo
+                    // TODO: Realmente no se cargó la información.
+                    // Ver otra forma de informarlo sin interrumpir el flujo.
                     if (!alerts.Contains(ADCAlertType.SitesMistmatch))
                         alerts.Add(ADCAlertType.SitesMistmatch);
                 }
@@ -753,7 +835,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
-            return false;
+            return true;
         } // SitesMistmatch
     }
 }
