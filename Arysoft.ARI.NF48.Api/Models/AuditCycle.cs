@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
@@ -12,6 +13,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }
+
+        public AuditCyclePeriodicityType? Periodicity { get; set; }
 
         public string ExtraInfo { get; set; }
 

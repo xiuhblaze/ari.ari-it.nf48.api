@@ -135,8 +135,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            // TODO: Esto se debe de validar al integrar un standard, puede haber más de un
-            //       ciclo activo por organización pero con diferente standard
+            // TODO: Esto se debe de validar al integrar un standard, puede haber
+            //     más de un ciclo activo por organización pero con diferente
+            //     standard
             // ACTUALIZACION (xb-20250212): Al parecer solo puede haber un ciclo activo por organización, un standard nuevo se agregaria al ciclo
             // - Validar que las fechas de inicio y termino no se superpongan a otro
             // ACTUALIZACION (xb-20250225): Nop puede haber más de un ciclo activo por organización, pero no con el mismo standard
@@ -151,7 +152,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
+            // if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
 
             // Si cambia a ciclo activo, verificar que no exista otro ciclo activo
             // con el mismo standard
@@ -163,9 +164,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Name = item.Name;
             foundItem.StartDate = item.StartDate;
-            foundItem.EndDate = item.EndDate;            
+            foundItem.EndDate = item.EndDate;
+            foundItem.Periodicity = item.Periodicity;
             foundItem.ExtraInfo = item.ExtraInfo;
-            foundItem.Status = item.Status;
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 

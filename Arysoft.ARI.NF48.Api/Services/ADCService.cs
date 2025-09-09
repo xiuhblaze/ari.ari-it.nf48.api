@@ -447,6 +447,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 // Agregar los ADCConceptValues si no existen
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+
+                // Agregar los ADCSiteAudits si no existen
+                var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
+                    .FirstOrDefault(s => s.ID == appForm.StandardID);
+                await AddADCSiteAuditsAsync(adcSite, 
+                    currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing,
+                    currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing,
+                    appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing);
             } // foreach site
 
             await adcSiteRepository.SaveChangesAsync();
@@ -494,6 +502,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 // Agregar los ADCConceptValues si no existen
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+
+                // Agregar los ADCSiteAudits si no existen
+                var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
+                    .FirstOrDefault(s => s.ID == appForm.StandardID);
+                await AddADCSiteAuditsAsync(adcSite,
+                    currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing,
+                    currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing,
+                    appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing);
             } // foreach site
 
             await adcSiteRepository.SaveChangesAsync();
@@ -654,6 +670,104 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return listADCConceptValues;
         } // RegisterADCConceptsAsync
+
+        private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(
+            ADCSite adcSite, 
+            AuditCycleType cycleType, 
+            AuditStepType initialStep,
+            AuditCyclePeriodicityType periodicity)
+        {
+            if (cycleType == AuditCycleType.Nothing 
+                || (cycleType == AuditCycleType.Transfer && initialStep == AuditStepType.Nothing))
+                throw new BusinessException("The Audit Cycle Type or Initial Step are not valid, can't be generate the ADCSiteAudits.");
+
+            if (periodicity == AuditCyclePeriodicityType.Nothing)
+                throw new BusinessException("The Audit Cycle Periodicity is not valid, can't be generate the ADCSiteAudits.");
+
+            var adcSiteAuditRepository = new ADCSiteAuditRepository();
+            var listADCSiteAudits = new List<ADCSiteAudit>();
+            var hasChanges = false;
+
+            foreach (AuditStepType step in Enum.GetValues(typeof(AuditStepType)))
+            {
+                bool addStep = false;
+
+                switch (cycleType)
+                {
+                    case AuditCycleType.Initial:
+                        if (step == AuditStepType.Stage1 
+                            || step == AuditStepType.Stage2
+                            || step == AuditStepType.Surveillance1
+                            || step == AuditStepType.Surveillance2
+                            || (step == AuditStepType.Surveillance3 
+                                && periodicity == AuditCyclePeriodicityType.Biannual)
+                            || (step == AuditStepType.Surveillance4
+                                && periodicity == AuditCyclePeriodicityType.Biannual)
+                            || (step == AuditStepType.Surveillance5
+                                && periodicity == AuditCyclePeriodicityType.Biannual))
+                            addStep = true;
+                        break;
+                    case AuditCycleType.Recertificacion:
+                        if (step == AuditStepType.Recertification
+                            || step == AuditStepType.Surveillance1
+                            || step == AuditStepType.Surveillance2
+                            || (step == AuditStepType.Surveillance3
+                                && periodicity == AuditCyclePeriodicityType.Biannual)
+                            || (step == AuditStepType.Surveillance4
+                                && periodicity == AuditCyclePeriodicityType.Biannual)
+                            || (step == AuditStepType.Surveillance5
+                                && periodicity == AuditCyclePeriodicityType.Biannual))
+                            addStep = true;
+                        break;
+                    case AuditCycleType.Transfer:
+                        if ((step == AuditStepType.Transfer
+                            || step == AuditStepType.Recertification
+                            || step == AuditStepType.Surveillance1
+                            || step == AuditStepType.Surveillance2
+                            || (step == AuditStepType.Surveillance3
+                                && periodicity == AuditCyclePeriodicityType.Biannual)
+                            || (step == AuditStepType.Surveillance4
+                                && periodicity == AuditCyclePeriodicityType.Biannual)
+                            || (step == AuditStepType.Surveillance5
+                                && periodicity == AuditCyclePeriodicityType.Biannual))
+                            && step >= initialStep)
+                            addStep = true;
+                        break;
+                }
+
+                if (addStep)
+                {
+                    var adcStepAudit = new ADCSiteAudit()
+                    {
+                        ID = Guid.NewGuid(),
+                        ADCSiteID = adcSite.ID,
+                        Value = false,
+                        AuditStep = step,
+                        Created = DateTime.UtcNow,
+                        Updated = DateTime.UtcNow,
+                        UpdatedUser = "system",
+                    };
+
+                    adcSiteAuditRepository.Add(adcStepAudit);
+                    listADCSiteAudits.Add(adcStepAudit);
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
+            {
+                try
+                {
+                    await adcSiteAuditRepository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ADCService.AddADCSiteAuditsAsync: {ex.Message}");
+                }
+            }
+
+            return listADCSiteAudits;
+        } // AddADCSiteAuditsAsync
 
         /// <summary>
         /// Calcula los valores para un ADCSite tanto su numero de empleados como

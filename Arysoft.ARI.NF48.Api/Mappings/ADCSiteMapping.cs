@@ -49,6 +49,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,
+                ADCSiteAudits = item.ADCSiteAudits != null
+                    ? ADCSiteAuditMapping.ADCSiteAuditToListDto(item.ADCSiteAudits).ToList()
+                    : null,
                 Alerts = ADCSiteService.GetAlerts(item),
                 IsMultiStandard = ADCSiteService.IsMultiStandard(item.ID)
             };
@@ -82,6 +85,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
+                    : null,
+                ADCSiteAudits = item.ADCSiteAudits != null
+                    ? ADCSiteAuditMapping.ADCSiteAuditToListDto(item.ADCSiteAudits).ToList()
                     : null,
                 Alerts = ADCSiteService.GetAlerts(item),
                 IsMultiStandard = ADCSiteService.IsMultiStandard(item.ID)

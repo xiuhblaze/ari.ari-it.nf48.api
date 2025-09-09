@@ -17,6 +17,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? EndDate { get; set; }
 
+        public AuditCyclePeriodicityType? Periodicity { get; set; }
+
         public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
@@ -43,6 +45,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }
+
+        public AuditCyclePeriodicityType? Periodicity { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -88,6 +92,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [Required]
         public DateTime? EndDate { get; set; }
+
+        public AuditCyclePeriodicityType? Periodicity { get; set; }
 
         [StringLength(1000)]
         public string ExtraInfo { get; set; }

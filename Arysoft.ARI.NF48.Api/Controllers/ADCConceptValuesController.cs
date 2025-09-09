@@ -64,7 +64,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpPost]
         [ResponseType(typeof(ApiResponse<ADCConceptValueItemDetailDto>))]
-        public async Task<IHttpActionResult> PostADCConceptValue(ADCConceptValueItemCreateDto itemCreateDto)
+        public async Task<IHttpActionResult> PostADCConceptValue([FromBody] ADCConceptValueItemCreateDto itemCreateDto)
         {
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));

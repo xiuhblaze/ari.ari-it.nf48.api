@@ -36,6 +36,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<ADCConceptValue> ADCConceptValues { get; set; }
 
+        public virtual ICollection<ADCSiteAudit> ADCSiteAudits { get; set; }
+
         // NOT MAPPED
 
         public List<ADCSiteAlertType> Alerts { get; set; }

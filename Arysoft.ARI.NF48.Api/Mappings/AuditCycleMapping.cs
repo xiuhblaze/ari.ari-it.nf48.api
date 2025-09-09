@@ -29,6 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Name = item.Name,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
+                Periodicity = item.Periodicity,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 OrganizationName = item.Organization != null
@@ -64,6 +65,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Name = item.Name,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
+                Periodicity = item.Periodicity,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
@@ -106,6 +108,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Name = itemDto.Name,
                 StartDate = itemDto.StartDate,
                 EndDate = itemDto.EndDate,
+                Periodicity = itemDto.Periodicity,
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
