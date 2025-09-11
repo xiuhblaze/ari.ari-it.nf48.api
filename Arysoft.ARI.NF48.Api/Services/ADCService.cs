@@ -449,12 +449,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
 
                 // Agregar los ADCSiteAudits si no existen
-                var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
-                    .FirstOrDefault(s => s.ID == appForm.StandardID);
-                await AddADCSiteAuditsAsync(adcSite, 
-                    currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing,
-                    currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing,
-                    appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing);
+                await AddADCSiteAuditsAsync(adcSite, appForm);
             } // foreach site
 
             await adcSiteRepository.SaveChangesAsync();
@@ -502,14 +497,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 // Agregar los ADCConceptValues si no existen
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+                // Agrega los ADCSiteAudits si no existen
+                await AddADCSiteAuditsAsync(adcSite, appForm);
 
-                // Agregar los ADCSiteAudits si no existen
-                var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
-                    .FirstOrDefault(s => s.ID == appForm.StandardID);
-                await AddADCSiteAuditsAsync(adcSite,
-                    currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing,
-                    currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing,
-                    appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing);
             } // foreach site
 
             await adcSiteRepository.SaveChangesAsync();
@@ -671,12 +661,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             return listADCConceptValues;
         } // RegisterADCConceptsAsync
 
-        private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(
-            ADCSite adcSite, 
-            AuditCycleType cycleType, 
-            AuditStepType initialStep,
-            AuditCyclePeriodicityType periodicity)
+        private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm)
         {
+            var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
+                .FirstOrDefault(s => s.StandardID == appForm.StandardID)
+                ?? throw new BusinessException("The current standard was not found in audit cycle");
+
+            var cycleType = currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing;
+            var initialStep = currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing;
+            var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
+
             if (cycleType == AuditCycleType.Nothing 
                 || (cycleType == AuditCycleType.Transfer && initialStep == AuditStepType.Nothing))
                 throw new BusinessException("The Audit Cycle Type or Initial Step are not valid, can't be generate the ADCSiteAudits.");
@@ -730,7 +724,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                                 && periodicity == AuditCyclePeriodicityType.Biannual)
                             || (step == AuditStepType.Surveillance5
                                 && periodicity == AuditCyclePeriodicityType.Biannual))
-                            && step >= initialStep)
+                            && (step >= initialStep 
+                                || initialStep == AuditStepType.Surveillance1 
+                                || initialStep == AuditStepType.Surveillance2))
                             addStep = true;
                         break;
                 }
@@ -743,6 +739,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         ADCSiteID = adcSite.ID,
                         Value = false,
                         AuditStep = step,
+                        Status = StatusType.Active,
                         Created = DateTime.UtcNow,
                         Updated = DateTime.UtcNow,
                         UpdatedUser = "system",

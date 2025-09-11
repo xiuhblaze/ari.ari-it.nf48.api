@@ -87,7 +87,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,
                 ADCSiteAudits = item.ADCSiteAudits != null
-                    ? ADCSiteAuditMapping.ADCSiteAuditToListDto(item.ADCSiteAudits).ToList()
+                    ? ADCSiteAuditMapping.ADCSiteAuditToListDto(item.ADCSiteAudits
+                        .OrderBy(asa => asa.AuditStep))
+                    .ToList()
                     : null,
                 Alerts = ADCSiteService.GetAlerts(item),
                 IsMultiStandard = ADCSiteService.IsMultiStandard(item.ID)
