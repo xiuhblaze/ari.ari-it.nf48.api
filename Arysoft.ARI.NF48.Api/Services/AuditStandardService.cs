@@ -149,13 +149,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.StandardID = item.StandardID;
             }
 
-            // - Que no esté duplicado el standard en el mismo audit
-            // - Que el standard no este asignado con otra auditoria del mismo
             //   ciclo y mismo step
             // - Si al menos un standard en su Step es de tipo special, todos deben de ser igual
             //   DUDA: Cuando es una auditoria especial, se seleccionan Standares a revisar?
             //         R: Si se seleccionan los standares y se marcan como special
 
+            // - Que no esté duplicado el standard en el mismo audit
+            if (foundItem.Audit.AuditStandards.Any(x => 
+                x.StandardID == item.StandardID && x.ID != item.ID))
+                throw new BusinessException("The standard is already assigned to this audit");
+
+            // - Que el standard no este asignado con otra auditoria del mismo
             if (item.Status == StatusType.Active 
                 && foundItem.Audit != null 
                 && foundItem.Audit.Status != AuditStatusType.Nothing
@@ -172,6 +176,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The standard with this step is already assigned to another audit");
 
             }
+
             // Assigning values
 
             foundItem.Step = item.Step;

@@ -449,7 +449,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
 
                 // Agregar los ADCSiteAudits si no existen
-                await AddADCSiteAuditsAsync(adcSite, appForm);
+                await AddADCSiteAuditsAsync(adcSite, appForm, appForm.Sites.Count > 1);
             } // foreach site
 
             await adcSiteRepository.SaveChangesAsync();
@@ -498,7 +498,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 // Agregar los ADCConceptValues si no existen
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
                 // Agrega los ADCSiteAudits si no existen
-                await AddADCSiteAuditsAsync(adcSite, appForm);
+                await AddADCSiteAuditsAsync(adcSite, appForm, appForm.Sites.Count > 1);
 
             } // foreach site
 
@@ -661,7 +661,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             return listADCConceptValues;
         } // RegisterADCConceptsAsync
 
-        private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm)
+        private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm, bool isMultisite)
         {
             var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
                 .FirstOrDefault(s => s.StandardID == appForm.StandardID)
@@ -680,76 +680,157 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var adcSiteAuditRepository = new ADCSiteAuditRepository();
             var listADCSiteAudits = new List<ADCSiteAudit>();
+            var stepList = new List<AuditStepType>();
             var hasChanges = false;
 
-            foreach (AuditStepType step in Enum.GetValues(typeof(AuditStepType)))
+            switch (cycleType)
             {
-                bool addStep = false;
-
-                switch (cycleType)
-                {
-                    case AuditCycleType.Initial:
-                        if (step == AuditStepType.Stage1 
-                            || step == AuditStepType.Stage2
-                            || step == AuditStepType.Surveillance1
-                            || step == AuditStepType.Surveillance2
-                            || (step == AuditStepType.Surveillance3 
-                                && periodicity == AuditCyclePeriodicityType.Biannual)
-                            || (step == AuditStepType.Surveillance4
-                                && periodicity == AuditCyclePeriodicityType.Biannual)
-                            || (step == AuditStepType.Surveillance5
-                                && periodicity == AuditCyclePeriodicityType.Biannual))
-                            addStep = true;
-                        break;
-                    case AuditCycleType.Recertificacion:
-                        if (step == AuditStepType.Recertification
-                            || step == AuditStepType.Surveillance1
-                            || step == AuditStepType.Surveillance2
-                            || (step == AuditStepType.Surveillance3
-                                && periodicity == AuditCyclePeriodicityType.Biannual)
-                            || (step == AuditStepType.Surveillance4
-                                && periodicity == AuditCyclePeriodicityType.Biannual)
-                            || (step == AuditStepType.Surveillance5
-                                && periodicity == AuditCyclePeriodicityType.Biannual))
-                            addStep = true;
-                        break;
-                    case AuditCycleType.Transfer:
-                        if ((step == AuditStepType.Transfer
-                            || step == AuditStepType.Recertification
-                            || step == AuditStepType.Surveillance1
-                            || step == AuditStepType.Surveillance2
-                            || (step == AuditStepType.Surveillance3
-                                && periodicity == AuditCyclePeriodicityType.Biannual)
-                            || (step == AuditStepType.Surveillance4
-                                && periodicity == AuditCyclePeriodicityType.Biannual)
-                            || (step == AuditStepType.Surveillance5
-                                && periodicity == AuditCyclePeriodicityType.Biannual))
-                            && (step >= initialStep 
-                                || initialStep == AuditStepType.Surveillance1 
-                                || initialStep == AuditStepType.Surveillance2))
-                            addStep = true;
-                        break;
-                }
-
-                if (addStep)
-                {
-                    var adcStepAudit = new ADCSiteAudit()
+                case AuditCycleType.Initial:
+                    stepList.Add(AuditStepType.Stage1);
+                    stepList.Add(AuditStepType.Stage2);
+                    stepList.Add(AuditStepType.Surveillance1);
+                    stepList.Add(AuditStepType.Surveillance2);
+                    if (periodicity == AuditCyclePeriodicityType.Biannual)
                     {
-                        ID = Guid.NewGuid(),
-                        ADCSiteID = adcSite.ID,
-                        Value = false,
-                        AuditStep = step,
-                        Status = StatusType.Active,
-                        Created = DateTime.UtcNow,
-                        Updated = DateTime.UtcNow,
-                        UpdatedUser = "system",
-                    };
-
-                    adcSiteAuditRepository.Add(adcStepAudit);
-                    listADCSiteAudits.Add(adcStepAudit);
-                    hasChanges = true;
-                }
+                        stepList.Add(AuditStepType.Surveillance3);
+                        stepList.Add(AuditStepType.Surveillance4);
+                        stepList.Add(AuditStepType.Surveillance5);
+                    }
+                    break;
+                case AuditCycleType.Recertificacion:
+                    stepList.Add(AuditStepType.Recertification);
+                    stepList.Add(AuditStepType.Surveillance1);
+                    stepList.Add(AuditStepType.Surveillance2);
+                    if (periodicity == AuditCyclePeriodicityType.Biannual)
+                    {
+                        stepList.Add(AuditStepType.Surveillance3);
+                        stepList.Add(AuditStepType.Surveillance4);
+                        stepList.Add(AuditStepType.Surveillance5);
+                    }
+                    break;
+                case AuditCycleType.Transfer:
+                    switch (initialStep)
+                    {
+                        case AuditStepType.Recertification:
+                            stepList.Add(AuditStepType.Recertification);
+                            stepList.Add(AuditStepType.Surveillance1);
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                        case AuditStepType.Surveillance1:
+                            stepList.Add(AuditStepType.Surveillance1);
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                        case AuditStepType.Surveillance2:
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                    }
+                    break;
             }
+
+            foreach (AuditStepType step in stepList)
+            {   
+                var adcStepAudit = new ADCSiteAudit()
+                {
+                    ID = Guid.NewGuid(),
+                    ADCSiteID = adcSite.ID,
+                    Value = !isMultisite, // si es un solo sitio, por default en true (el sitio recibe todas las auditorias)
+                    AuditStep = step,
+                    Status = StatusType.Active,
+                    Created = DateTime.UtcNow,
+                    Updated = DateTime.UtcNow,
+                    UpdatedUser = "system",
+                };
+                adcSiteAuditRepository.Add(adcStepAudit);
+                listADCSiteAudits.Add(adcStepAudit);
+                hasChanges = true;
+            }
+
+            //foreach (AuditStepType step in Enum.GetValues(typeof(AuditStepType)))
+            //{
+            //    bool addStep = false;
+
+            //    switch (cycleType)
+            //    {
+            //        case AuditCycleType.Initial:
+            //            if (step == AuditStepType.Stage1 
+            //                || step == AuditStepType.Stage2
+            //                || step == AuditStepType.Surveillance1
+            //                || step == AuditStepType.Surveillance2
+            //                || (step == AuditStepType.Surveillance3 
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
+            //                || (step == AuditStepType.Surveillance4
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
+            //                || (step == AuditStepType.Surveillance5
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual))
+            //                addStep = true;
+            //            break;
+            //        case AuditCycleType.Recertificacion:
+            //            if (step == AuditStepType.Recertification
+            //                || step == AuditStepType.Surveillance1
+            //                || step == AuditStepType.Surveillance2
+            //                || (step == AuditStepType.Surveillance3
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
+            //                || (step == AuditStepType.Surveillance4
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
+            //                || (step == AuditStepType.Surveillance5
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual))
+            //                addStep = true;
+            //            break;
+            //        case AuditCycleType.Transfer:
+            //            if ((step == AuditStepType.Transfer
+            //                || step == AuditStepType.Recertification
+            //                || step == AuditStepType.Surveillance1
+            //                || step == AuditStepType.Surveillance2
+            //                || (step == AuditStepType.Surveillance3
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
+            //                || (step == AuditStepType.Surveillance4
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
+            //                || (step == AuditStepType.Surveillance5
+            //                    && periodicity == AuditCyclePeriodicityType.Biannual))
+            //                && (step >= initialStep 
+            //                    || initialStep == AuditStepType.Surveillance1 
+            //                    || initialStep == AuditStepType.Surveillance2))
+            //                addStep = true;
+            //            break;
+            //    }
+
+            //    if (addStep)
+            //    {
+            //        var adcStepAudit = new ADCSiteAudit()
+            //        {
+            //            ID = Guid.NewGuid(),
+            //            ADCSiteID = adcSite.ID,
+            //            Value = false,
+            //            AuditStep = step,
+            //            Status = StatusType.Active,
+            //            Created = DateTime.UtcNow,
+            //            Updated = DateTime.UtcNow,
+            //            UpdatedUser = "system",
+            //        };
+
+            //        adcSiteAuditRepository.Add(adcStepAudit);
+            //        listADCSiteAudits.Add(adcStepAudit);
+            //        hasChanges = true;
+            //    }
+            //}
 
             if (hasChanges)
             {

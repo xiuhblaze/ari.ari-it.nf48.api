@@ -94,6 +94,15 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return await items.AnyAsync();
         } // HasAuditorAudit
 
+        /// <summary>
+        /// Permite saber si ya existe una auditoria en un ciclo con 
+        /// el standard y step indicado
+        /// </summary>
+        /// <param name="auditCycleID"></param>
+        /// <param name="standardID"></param>
+        /// <param name="step"></param>
+        /// <param name="auditExceptionID"></param>
+        /// <returns></returns>
         public async Task<bool> IsAnyStandardStepAuditInAuditCycle(
             Guid auditCycleID,
             Guid standardID,

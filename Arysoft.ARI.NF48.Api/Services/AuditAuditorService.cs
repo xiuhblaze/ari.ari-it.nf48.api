@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Microsoft.Owin.Security.DataHandler.Encoder;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -152,6 +153,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 foundItem.AuditorID = item.AuditorID;
             }
+
+            // - El auditor ya está asignado en la auditoria
+            if (foundItem.Audit.AuditAuditors.Any(a => 
+                a.AuditorID == foundItem.AuditorID && a.ID != item.ID))
+                throw new BusinessException("The auditor is already assigned to this audit");
 
             // - El auditor no puede estar en dos auditorias al mismo tiempo,
             //   si la asiganción del auditor esta activa o se va a activar
