@@ -686,7 +686,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             switch (cycleType)
             {
                 case AuditCycleType.Initial:
-                    stepList.Add(AuditStepType.Stage1);
+                    // stepList.Add(AuditStepType.Stage1);
                     stepList.Add(AuditStepType.Stage2);
                     stepList.Add(AuditStepType.Surveillance1);
                     stepList.Add(AuditStepType.Surveillance2);
