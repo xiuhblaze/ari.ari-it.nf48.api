@@ -269,6 +269,7 @@
     <Compile Include="Controllers\MD5Controller.cs" />
     <Compile Include="Controllers\NotesController.cs" />
     <Compile Include="Controllers\OrganizationStandardsController.cs" />
+    <Compile Include="Controllers\UserSettingsController.cs" />
     <Compile Include="CustomEntities\EmployeesMD5.cs" />
     <Compile Include="CustomEntities\LanguagesList.cs" />
     <Compile Include="Data\AriContext.cs" />
@@ -315,6 +316,7 @@
     <Compile Include="Data\Configurations\SiteConfiguration.cs" />
     <Compile Include="Data\Configurations\StandardConfiguration.cs" />
     <Compile Include="Data\Configurations\UserConfiguration.cs" />
+    <Compile Include="Data\Configurations\UserSettingConfiguration.cs" />
     <Compile Include="Enumerations\ADCConceptEnums.cs" />
     <Compile Include="Enumerations\ADCConceptValueEnums.cs" />
     <Compile Include="Enumerations\ADCEnums.cs" />
@@ -347,6 +349,7 @@
     <Compile Include="Enumerations\StandardEnums.cs" />
     <Compile Include="Enumerations\GeneralEnums.cs" />
     <Compile Include="Enumerations\UserEnums.cs" />
+    <Compile Include="Enumerations\UserSettingEnums.cs" />
     <Compile Include="Exceptions\BusinessException.cs" />
     <Compile Include="Filters\ExcepionHandlingAttribute.cs" />
     <Compile Include="Global.asax.cs">
@@ -385,6 +388,7 @@
     <Compile Include="Mappings\SiteMapping.cs" />
     <Compile Include="Mappings\StandardMapping.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
+    <Compile Include="Mappings\UserSettingMapping.cs" />
     <Compile Include="Models\ADC.cs" />
     <Compile Include="Models\ADCConcept.cs" />
     <Compile Include="Models\ADCConceptValue.cs" />
@@ -438,6 +442,7 @@
     <Compile Include="Models\DTOs\SiteDTOs.cs" />
     <Compile Include="Models\DTOs\StandardDTOs.cs" />
     <Compile Include="Models\DTOs\UserDTOs.cs" />
+    <Compile Include="Models\DTOs\UserSettingDTOs.cs" />
     <Compile Include="Models\MD5.cs" />
     <Compile Include="Models\NaceCode.cs" />
     <Compile Include="Models\Organization.cs" />
@@ -449,6 +454,7 @@
     <Compile Include="Models\Standard.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\Note.cs" />
+    <Compile Include="Models\UserSetting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryFilters\ADCConceptQueryFilters.cs" />
     <Compile Include="QueryFilters\ADCConceptValueQueryFilters.cs" />
@@ -483,6 +489,7 @@
     <Compile Include="QueryFilters\SiteQueryFilters.cs" />
     <Compile Include="QueryFilters\StandardQueryFilters.cs" />
     <Compile Include="QueryFilters\UserQueryFilters.cs" />
+    <Compile Include="QueryFilters\UserSettingQueryFilters.cs" />
     <Compile Include="Repositories\ADCConceptRepository.cs" />
     <Compile Include="Repositories\ADCConceptValueRepository.cs" />
     <Compile Include="Repositories\ADCRepository.cs" />
@@ -514,6 +521,7 @@
     <Compile Include="Repositories\SiteRepository.cs" />
     <Compile Include="Repositories\StandardRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Repositories\UserSettingRepository.cs" />
     <Compile Include="Response\ApiResponse.cs" />
     <Compile Include="Services\ADCConceptService.cs" />
     <Compile Include="Services\ADCConceptValueService.cs" />
@@ -546,6 +554,7 @@
     <Compile Include="Services\SiteService.cs" />
     <Compile Include="Services\StandardService.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Services\UserSettingService.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Tools\CorsMessageHandler.cs" />
     <Compile Include="Tools\Encrypt.cs" />

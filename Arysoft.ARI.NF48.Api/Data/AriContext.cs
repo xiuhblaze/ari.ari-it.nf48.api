@@ -57,6 +57,7 @@ namespace Arysoft.ARI.NF48.Api.Data
             // Módulo de usuarios
             UserConfiguration.Configure(modelBuilder);
             RoleConfiguration.Configure(modelBuilder);
+            UserSettingConfiguration.Configure(modelBuilder);
         }
     }
 }

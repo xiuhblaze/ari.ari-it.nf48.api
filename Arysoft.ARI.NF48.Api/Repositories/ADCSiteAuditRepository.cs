@@ -7,8 +7,6 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class ADCSiteAuditRepository : BaseRepository<ADCSiteAudit>
     {
-        // Aun no se me ocurre nada
-
         public bool ExistsAuditStep(Guid idADCSite, AuditStepType stepType, Guid? adcSiteAuditExceptionID)
         {
             var query = _model.Where(x => 

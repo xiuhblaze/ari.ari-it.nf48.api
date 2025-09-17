@@ -14,6 +14,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             return _model
                 .Include(m => m.Roles)
+                .Include(m => m.Settings)
                 .AsEnumerable();
         } // Gets
 
@@ -26,6 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await query
                 .Include(m => m.Roles)
+                .Include(m => m.Settings)
                 .Where(m => m.ID == id)
                 .FirstOrDefaultAsync();
         } // GetAsync
