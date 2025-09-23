@@ -4,7 +4,7 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 {
     public class StandardQueryFilters : BaseQueryFilters
     {
-        public string Texto { get; set; }
+        public string Text { get; set; }
 
         public StatusType? Status { get; set; }
 
