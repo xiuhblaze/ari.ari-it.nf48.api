@@ -39,6 +39,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
+        public string Description { get; set; }
+
         public string AuditLanguage { get; set; }
 
         public string CurrentCertificationsExpiration { get; set; }
@@ -131,6 +133,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string DesignResponsibilityJustify { get; set; }
 
         // GENERAL
+
+        public string Description { get; set; }
 
         public string AuditLanguage { get; set; }
 
@@ -241,6 +245,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
+        [StringLength(500)]
+        public string Description { get; set; }
+
         [StringLength(2)]
         public string AuditLanguage { get; set; }
 
@@ -288,6 +295,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // AppFormUpdateDto
+
+    public class AppFormDuplicateDto
+    {
+        [Required]
+        public Guid ID { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string UpdatedUser { get; set; }
+    } // AppFormDuplicateDto
 
     public class AppFormDeleteDto
     {

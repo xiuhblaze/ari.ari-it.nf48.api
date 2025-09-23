@@ -1,9 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -30,20 +28,23 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
                 TotalSurveillance = item.TotalSurveillance,
-                TotalRR = item.TotalRR,
-                UserCreate = item.UserCreate,
-                UserReviewer = item.UserReviewer,
+                UserCreates = item.UserCreates,
+                UserReview = item.UserReview,
                 ReviewDate = item.ReviewDate,
                 ReviewComments = item.ReviewComments,
                 ActiveDate = item.ActiveDate,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
+                // INTERNAL
+                HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
                 AppFormOrganizationName = item.AppForm?.Organization?.Name ?? string.Empty,
                 AppFormAuditCycleName = item.AppForm?.AuditCycle?.Name ?? string.Empty,
                 AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
                 NotesCount = item.Notes?.Count() ?? 0,
-                ADCSitesCount = item.ADCSites?.Count() ?? 0
+                ADCSitesCount = item.ADCSites?.Count() ?? 0,
+                // NOT MAPPED
+                Alerts = item.Alerts
             };
         } // ADCToItemListDto
 
@@ -58,9 +59,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
                 TotalSurveillance = item.TotalSurveillance,
-                TotalRR = item.TotalRR,
-                UserCreate = item.UserCreate,
-                UserReviewer = item.UserReviewer,
+                UserCreates = item.UserCreates,
+                UserReview = item.UserReview,
                 ReviewDate = item.ReviewDate,
                 ReviewComments = item.ReviewComments,
                 ActiveDate = item.ActiveDate,
@@ -69,16 +69,24 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
+                // INTERNAL
+                HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
                 AppForm = item.AppForm != null
                     ? AppFormMapping.AppFormToItemListDto(item.AppForm)
                     : null,
                 ADCSites = item.ADCSites != null
-                    ? ADCSiteMapping.ADCSiteToListDto(item.ADCSites).ToList()
+                    ? ADCSiteMapping.ADCSiteToListDto(
+                        item.ADCSites.OrderByDescending(x => x.Site?.IsMainSite)
+                            .ThenBy(x => x.Site?.Description)
+                        ).ToList()
                     : null,
                 Notes = item.Notes != null
-                    ? NoteMapping.NotesToListDto(item.Notes).ToList()
-                    : null
+                    ? NoteMapping.NotesToListDto(
+                        item.Notes.OrderByDescending(n => n.Created)
+                        ).ToList()
+                    : null,
+                Alerts = item.Alerts
             };
         } // ADCToItemDetailDto
 
@@ -100,13 +108,27 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalInitial = itemDto.TotalInitial,
                 TotalMD11 = itemDto.TotalMD11,
                 TotalSurveillance = itemDto.TotalSurveillance,
-                TotalRR = itemDto.TotalRR,
                 ReviewComments = itemDto.ReviewComments,                
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemUpdateDtoToADC
+
+        public static ADC ItemUpdateWithListDtoToADC(ADCWithSiteListUpdateDto itemDto)
+        {
+            var item = ItemUpdateDtoToADC(itemDto.ADC);
+
+            if (itemDto.ADCSites != null)
+            {
+                foreach (var siteDto in itemDto.ADCSites)
+                {
+                    item.ADCSites.Add(ADCSiteMapping.ItemUpdateWithListDtoToADCSite(siteDto));
+                }
+            }
+
+            return item;
+        } // ItemUpdateAllDtoToADC
 
         public static ADC ItemDeleteDtoToADC(ADCDeleteDto itemDto)
         {

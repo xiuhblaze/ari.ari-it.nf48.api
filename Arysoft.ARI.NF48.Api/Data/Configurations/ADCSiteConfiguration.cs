@@ -20,6 +20,14 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<ADCSite>()
+                .Property(m => m.MD11Filename)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<ADCSite>()
+                .Property(m => m.MD11UploadedBy)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<ADCSite>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(500);
 
@@ -47,6 +55,20 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .WithRequired(cv => cv.ADCSite)
                 .HasForeignKey(cv => cv.ADCSiteID)
                 .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<ADCSite>()
+                .HasMany(s => s.ADCSiteAudits)
+                .WithRequired(a => a.ADCSite)
+                .HasForeignKey(a => a.ADCSiteID)
+                .WillCascadeOnDelete(true);
+
+            // NOT MAPPED
+
+            modelBuilder.Entity<ADCSite>()
+                .Ignore(m => m.Alerts); // Not mapped property
+
+            modelBuilder.Entity<ADCSite>()
+                .Ignore(m => m.IsMultiStandard); // Not mapped property
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Arysoft.ARI.NF48.Api
             config.EnableCors(corsDev);
 
             // CORS - Producción
-            //var corsProduction = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,http://cortana.im-prove.com.mx", "*", "*");
+            //var corsProduction = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,http://cortana.im-prove.com.mx,http://ariit.im-prove.com.mx", "*", "*");
             //config.EnableCors(corsProduction);
 
             // Rutas de Web API

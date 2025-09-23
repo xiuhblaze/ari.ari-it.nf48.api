@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -12,6 +13,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid ADCSiteID { get; set; }
 
+        public bool? CheckValue { get; set; }
+
         public decimal? Value { get; set; }
 
         public string Justification { get; set; }
@@ -20,7 +23,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string JustificationApproved { get; set; }
 
-        public ADCConceptUnitType ValueUnit { get; set; }
+        public ADCConceptUnitType? ValueUnit { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -39,6 +42,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid ADCSiteID { get; set; }
 
+        public bool? CheckValue { get; set; }
+
         public decimal? Value { get; set; }
 
         public string Justification { get; set; }
@@ -47,7 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string JustificationApproved { get; set; }
 
-        public ADCConceptUnitType ValueUnit { get; set; }
+        public ADCConceptUnitType? ValueUnit { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -83,6 +88,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public Guid ID { get; set; }
 
         [Required]
+        public bool? CheckValue { get; set; }
+
         public decimal? Value { get; set; }
 
         [StringLength(500)]
@@ -93,6 +100,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(500)]
         public string JustificationApproved { get; set; }
 
+        public ADCConceptUnitType? ValueUnit { get; set; }
+
         [Required]
         public StatusType Status { get; set; }
 
@@ -100,6 +109,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCConceptValueItemUpdateDto
+
+    public class ADCConceptValueListUpdateDto
+    { 
+        [Required]
+        public ICollection<ADCConceptValueItemUpdateDto> Items { get; set; }
+    } // ADCConceptValueListUpdateDto
 
     public class ADCConceptValueItemDeleteDto
     {

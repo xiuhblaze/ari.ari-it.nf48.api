@@ -23,9 +23,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalRR { get; set; }
 
-        public string UserCreate { get; set; }
+        public string UserCreates { get; set; }
 
-        public string UserReviewer { get; set; }
+        public string UserReview { get; set; }
 
         public DateTime? ReviewDate { get; set; }
 
@@ -36,6 +36,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string ExtraInfo { get; set; }
 
         public ADCStatusType Status { get; set; }
+
+        // INTERNAL
+
+        public string HistoricalDataJSON { get; set; }
 
         // RELATIONS
 
@@ -48,6 +52,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public int NotesCount { get; set; }
 
         public int ADCSitesCount { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCAlertType> Alerts { get; set; }
+
     } // ADCItemListDto
 
     public class ADCItemDetailDto
@@ -68,9 +77,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalRR { get; set; }
 
-        public string UserCreate { get; set; }
+        public string UserCreates { get; set; }
 
-        public string UserReviewer { get; set; }
+        public string UserReview { get; set; }
 
         public DateTime? ReviewDate { get; set; }
 
@@ -88,6 +97,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
+        // INTERNAL
+
+        public string HistoricalDataJSON { get; set; }
+
         // RELATIONS
 
         public AppFormItemListDto AppForm { get; set; }
@@ -95,6 +108,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ICollection<ADCSiteItemListDto> ADCSites { get; set; }
 
         public ICollection<NoteItemDto> Notes { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCAlertType> Alerts { get; set; }
+
     } // ADCItemDetailDto
 
     public class ADCCreateDto
@@ -121,8 +139,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalSurveillance { get; set; }
         
-        public decimal? TotalRR { get; set; }
-
         [StringLength(1000)]
         public string ReviewComments { get; set; }
 
@@ -135,6 +151,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCUpdateDto
+
+    public class ADCWithSiteListUpdateDto
+    {
+        [Required]
+        public ADCUpdateDto ADC { get; set; }
+
+        [Required]
+        public List<ADCSiteWithCVListUpdateDto> ADCSites { get; set; }
+    } // ADCWithSiteListUpdateDto
 
     public class ADCDeleteDto
     {

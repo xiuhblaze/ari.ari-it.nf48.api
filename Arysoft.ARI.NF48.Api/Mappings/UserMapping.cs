@@ -32,9 +32,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     .ToList()
                 : null;
 
+            var userSetting = item.Settings.FirstOrDefault();
+
             return new UserListItemDto
             {
-                ID = item.ID,                
+                ID = item.ID,
                 OwnerID = item.OwnerID,
                 OwnerName = await GetOwnerNameAsync(item.OwnerID, item.Type ?? UserType.Nothing), // "", // Este se debe obtener donde se llame el Mapping
                 Username = item.Username,
@@ -43,8 +45,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Type = item.Type ?? UserType.Nothing,
                 LastAccess = item.LastAccess,
                 LastPasswordChange = item.LastPasswordChange,
-                Status = item.Status,                
-                Roles = roles
+                Status = item.Status,
+                Roles = roles,
+                Settings = userSetting?.Settings ?? string.Empty
             };
         } // UserToItemListDto
 
@@ -56,6 +59,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         && r.Status != StatusType.Deleted))
                     .ToList()
                 : null;
+
+            var userSetting = item.Settings.FirstOrDefault();
 
             return new UserDetailDto
             {
@@ -73,7 +78,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                Roles = roles
+                Roles = roles,
+                Settings = userSetting != null
+                    ? UserSettingMapping.UserSettingToItemDto(userSetting)
+                    : null
             };
         } // UserToDetailDto
 

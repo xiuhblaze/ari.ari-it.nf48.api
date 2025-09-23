@@ -41,6 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
+                Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,
@@ -75,10 +76,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? item.NaceCodes.Select(n => n.Description).ToList()
                     : new List<string>(),
                 Contacts = item.Contacts != null
-                    ? item.Contacts.Select(c => Tools.Strings.FullName(c.FirstName, c.MiddleName, c.LastName)).ToList()
+                    ? item.Contacts
+                        .OrderByDescending(c => c.IsMainContact)
+                            .ThenBy(c => c.FirstName)
+                        .Select(c => Tools.Strings.FullName(c.FirstName, c.MiddleName, c.LastName)).ToList()
                     : new List<string>(),
                 Sites = item.Sites != null
-                    ? item.Sites.Select(s => s.Description).ToList()
+                    ? item.Sites
+                        .OrderByDescending(s => s.IsMainSite)
+                            .ThenBy(s => s.Description)
+                        .Select(s => s.Description)
+                        .ToList()
                     : new List<string>(),
                 EmployeesCount = item.Sites != null
                     ? item.Sites.Where(i => i.Status == StatusType.Active)
@@ -114,6 +122,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
+                Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,
@@ -151,13 +160,21 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? NaceCodeMapping.NaceCodeToListDto(item.NaceCodes).ToList()
                     : null,
                 Contacts = item.Contacts != null
-                    ? ContactMapping.ContactToListDto(item.Contacts).ToList()
+                    ? ContactMapping.ContactToListDto(
+                        item.Contacts.OrderByDescending(c => c.IsMainContact)
+                            .ThenBy(c => c.FirstName)
+                        ).ToList()
                     : null,
                 Sites = item.Sites != null
-                    ? SiteMapping.SiteToListDto(item.Sites).ToList()
+                    ? SiteMapping.SiteToListDto(
+                        item.Sites.OrderByDescending(s => s.IsMainSite)
+                            .ThenBy(s => s.Description)
+                        ).ToList()
                     : null,
                 Notes = item.Notes != null
-                    ? NoteMapping.NotesToListDto(item.Notes).ToList()
+                    ? NoteMapping.NotesToListDto(
+                        item.Notes.OrderByDescending(n => n.Created)
+                        ).ToList()
                     : null
             };
         } // AppFormToItemDetailDto
@@ -190,6 +207,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // GENERAL
+                Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,

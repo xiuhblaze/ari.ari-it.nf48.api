@@ -16,4 +16,11 @@
         DateDesc,
         StatusDesc
     } // AuditCycleOrderType
+
+    public enum AuditCyclePeriodicityType
+    {
+        Nothing,
+        Annual,     // Anual
+        Biannual    // Semestral
+    } // AuditCyclePeriodicityType
 }

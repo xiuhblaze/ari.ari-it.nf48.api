@@ -224,6 +224,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : StatusType.Deleted;
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
+
+                _repository.Update(foundItem);
             }
 
             // Execute queries

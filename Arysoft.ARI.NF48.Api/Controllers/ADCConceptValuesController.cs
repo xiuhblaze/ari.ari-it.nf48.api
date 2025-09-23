@@ -8,6 +8,7 @@ using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -63,7 +64,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpPost]
         [ResponseType(typeof(ApiResponse<ADCConceptValueItemDetailDto>))]
-        public async Task<IHttpActionResult> PostADCConceptValue(ADCConceptValueItemCreateDto itemCreateDto)
+        public async Task<IHttpActionResult> PostADCConceptValue([FromBody] ADCConceptValueItemCreateDto itemCreateDto)
         {
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
@@ -95,6 +96,25 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // PutADCConceptValue
+
+        [HttpPut]
+        [Route("api/ADCConceptValues/list")]
+        [ResponseType(typeof(ApiResponse<ADCConceptValueItemListDto>))]
+        public async Task<IHttpActionResult> PutADCConceptValueList([FromBody] ADCConceptValueListUpdateDto itemsUpdateDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            var items = ADCConceptValueMapping
+                .UpdateListDtoToADCConceptValues(itemsUpdateDto);
+            var resultItems = await _service.UpdateListAsync(items.ToList());
+            var itemsDto = ADCConceptValueMapping
+                .ADCConceptValueToListDto(resultItems);
+
+            var response = new ApiResponse<IEnumerable<ADCConceptValueItemListDto>>(itemsDto);
+
+            return Ok(response);
+        } // PutADCConceptValueList
 
         [HttpDelete]
         [ResponseType(typeof(ApiResponse<bool>))]

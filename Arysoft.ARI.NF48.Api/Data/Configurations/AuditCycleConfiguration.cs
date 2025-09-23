@@ -42,11 +42,13 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            modelBuilder.Entity<AuditCycle>()
-                .HasMany(ac => ac.Audits)
-                .WithRequired(a => a.AuditCycle)
-                .HasForeignKey(a => a.AuditCycleID)
-                .WillCascadeOnDelete(true);
+            // xBlaze: No se puede crear una auditoria si el ciclo es temporal
+            //         y no se puede eliminar un ciclo que no sea temporal
+            //modelBuilder.Entity<AuditCycle>()
+            //    .HasMany(ac => ac.Audits)
+            //    .WithRequired(a => a.AuditCycle)
+            //    .HasForeignKey(a => a.AuditCycleID)
+            //    .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<AuditCycle>()
                 .HasMany(ac => ac.AuditCycleStandards)

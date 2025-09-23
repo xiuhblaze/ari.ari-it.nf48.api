@@ -4,14 +4,10 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
-using Arysoft.ARI.NF48.Api.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
-using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -135,39 +131,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to Update was not found");
 
-            // Validations
-
-            if (item.ID == null || item.ID == Guid.Empty)
-                throw new BusinessException("The ID is required");
-
-            // - validar contra ADCConcept, que no se salga de los rangos indicados
-            if (foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Increase != null)
-            {
-                // Ver que no se pase del incremento maximo permitido
-                if (item.Value > foundItem.ADCConcept.Increase)
-                    throw new BusinessException("The Value exceeds the maximum allowed for this Concept");
-            }
-            else if (!foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Decrease != null)
-            {
-                // Ver que no se pase del decremento maximo permitido
-                if (item.Value > foundItem.ADCConcept.Decrease)
-                    throw new BusinessException("The Value exceeds the minimum allowed for this Concept");
-            }
-
-            // Set Values
-
-            foundItem.Value = item.Value;
-            foundItem.Justification = item.Justification;
-            foundItem.ValueApproved = item.ValueApproved;
-            foundItem.JustificationApproved = item.JustificationApproved;
-            foundItem.ValueUnit = item.ValueUnit;
-            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
-                ? StatusType.Active
-                : item.Status != StatusType.Nothing
-                    ? item.Status
-                    : foundItem.Status;
-            foundItem.Updated = DateTime.UtcNow;
-            foundItem.UpdatedUser = item.UpdatedUser;
+            ValidateUpdateItem(item, foundItem);
+            SetValuesUpdateItem(item, foundItem);
 
             // Execute queries
 
@@ -183,6 +148,47 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
+
+        /// <summary>
+        /// Obtiene una lista de items a actualizar, valida cada uno de ellos
+        /// y los actualiza en la base de datos.        
+        /// </summary>
+        /// <param name="items">Lista de items a actualizar</param>
+        /// <returns>Lista de elementos actualizados incluyendo todos los valores de la bdd</returns>        
+        public async Task<List<ADCConceptValue>> UpdateListAsync(List<ADCConceptValue> items)
+        {
+            if (!(items?.Any() ?? false)) // Valida si la lista es nula o vacía
+                throw new BusinessException("The list of ADC Concept Values to Update is empty");
+
+            var areUpdatedItems = false;
+            var updatedItems = new List<ADCConceptValue>();
+
+            foreach (var item in items)
+            {
+                var foundItem = await _repository.GetAsync(item.ID)
+                    ?? throw new BusinessException($"One of the records (ADC Concept Value) to Update was not found: { item.ID }");
+
+                ValidateUpdateItem(item, foundItem);
+                SetValuesUpdateItem(item, foundItem);
+                _repository.Update(foundItem);
+                areUpdatedItems = true;
+                updatedItems.Add(foundItem);
+            }
+
+            if (areUpdatedItems)
+            {
+                try
+                {
+                    await _repository.SaveChangesAsync();                    
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ADCConceptValueService.UpdateListAsync: {ex.Message}");
+                }
+            }
+
+            return updatedItems;
+        } // UpdateListAsync
 
         public async Task DeleteAsync(ADCConceptValue item)
         {
@@ -218,6 +224,52 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 throw new BusinessException($"ADCConceptValueService.DeleteAsync: {ex.Message}");
             }
-        }
+        } // DeleteAsync
+
+        // PRIVATE
+
+        private void ValidateUpdateItem(ADCConceptValue item,ADCConceptValue foundItem)
+        {
+            // - validar contra ADCConcept, que no se salga de los rangos indicados UPDATE: Validarlo junto con CheckValue
+            //if (foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Increase != null)
+            //{
+            //    // Ver que no se pase del incremento maximo permitido
+            //    if (item.Value > foundItem.ADCConcept.Increase)
+            //        throw new BusinessException("The Value exceeds the maximum allowed for this Concept");
+            //}
+            //else if (!foundItem.ADCConcept.WhenTrue ?? false && foundItem.ADCConcept.Decrease != null)
+            //{
+            //    // HACK: Update (xBlaze:20250710) - El decremento se va a medir en valores de 5, 10, 15 y 20% para todos!
+            //    // Ver que no se pase del decremento maximo permitido
+            //    if (item.Value > foundItem.ADCConcept.Decrease)
+            //        throw new BusinessException("The Value exceeds the minimum allowed for this Concept");
+            //}
+
+            // TODO: - validar si el checkValue coincida con el incremento o decremento correspondiente
+
+        } // ValidateUpdateItem
+
+        /// <summary>
+        /// Asigna los valores que se van a actualizar en el item encontrado
+        /// </summary>
+        /// <param name="item">Nuevos valores</param>
+        /// <param name="foundItem">Item encontrado</param>
+        private void SetValuesUpdateItem(ADCConceptValue item, ADCConceptValue foundItem)
+        {
+
+            foundItem.CheckValue = item.CheckValue;
+            foundItem.Value = item.Value;
+            foundItem.Justification = item.Justification;
+            foundItem.ValueApproved = item.ValueApproved;
+            foundItem.JustificationApproved = item.JustificationApproved;
+            foundItem.ValueUnit = item.ValueUnit;
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = item.UpdatedUser;
+        } // SetValuesUpdateItem
     }
 }

@@ -29,12 +29,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Filters
 
-            if (!string.IsNullOrEmpty(filters.Texto))
+            if (!string.IsNullOrEmpty(filters.Text))
             {
-                filters.Texto = filters.Texto.Trim().ToLower();
+                filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(s =>
-                    (s.Name != null && s.Name.ToLower().Contains(filters.Texto))
-                    || (s.Description != null && s.Description.ToLower().Contains(filters.Texto))
+                    (s.Name != null && s.Name.ToLower().Contains(filters.Text))
+                    || (s.Description != null && s.Description.ToLower().Contains(filters.Text))
                 );
             }
 

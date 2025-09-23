@@ -23,6 +23,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 ADCConceptID = item.ADCConceptID,
                 ADCSiteID = item.ADCSiteID,
+                CheckValue = item.CheckValue,
                 Value = item.Value,
                 Justification = item.Justification,
                 ValueApproved = item.ValueApproved,
@@ -43,6 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 ADCConceptID = item.ADCConceptID,
                 ADCSiteID = item.ADCSiteID,
+                CheckValue = item.CheckValue,
                 Value = item.Value,
                 Justification = item.Justification,
                 ValueApproved = item.ValueApproved,
@@ -71,19 +73,33 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemCreateDtoToADCConceptValue
 
-        public static ADCConceptValue ItemUpdateDtoToADCConceptValue( ADCConceptValueItemUpdateDto itemUpdateDto)
+        public static ADCConceptValue ItemUpdateDtoToADCConceptValue(ADCConceptValueItemUpdateDto itemUpdateDto)
         {
             return new ADCConceptValue
             {
                 ID = itemUpdateDto.ID,
+                CheckValue = itemUpdateDto.CheckValue,
                 Value = itemUpdateDto.Value,
                 Justification = itemUpdateDto.Justification,
                 ValueApproved = itemUpdateDto.ValueApproved,
                 JustificationApproved = itemUpdateDto.JustificationApproved,
+                ValueUnit = itemUpdateDto.ValueUnit,
                 Status = itemUpdateDto.Status,
                 UpdatedUser = itemUpdateDto.UpdatedUser
             };
         } // ItemUpdateDtoToADCConceptValue
+
+        public static IEnumerable<ADCConceptValue> UpdateListDtoToADCConceptValues(ADCConceptValueListUpdateDto itemsUpdateDto)
+        {
+            var items = new List<ADCConceptValue>();
+
+            foreach (var itemUpdateDto in itemsUpdateDto.Items)
+            {
+                items.Add(ItemUpdateDtoToADCConceptValue(itemUpdateDto));
+            }
+
+            return items;
+        } // UpdateListDtoToADCConceptValues
 
         public static ADCConceptValue ItemDeleteDtoToADCConceptValue(ADCConceptValueItemDeleteDto itemDeleteDto)
         {

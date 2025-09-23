@@ -28,6 +28,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public StatusType Status { get; set; }
 
         public ICollection<RoleItemListDto> Roles { get; set; }
+
+        public string Settings { get; set; }
+
     } // UserListItemDto
 
     public class UserDetailDto
@@ -61,6 +64,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
 
         public ICollection<RoleItemListDto> Roles { get; set; }
+
+        public UserSettingItemDto Settings { get; set; }
+
     } // UserDetailDto
 
     public class UserPostDto

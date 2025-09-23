@@ -29,5 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<Role> Roles { get; set; }
 
         public virtual ICollection<Note> Notes { get; set; }
+
+        public virtual ICollection<UserSetting> Settings { get; set; }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -17,15 +15,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? InitialMD5 { get; set; }
 
-        public int? Employees { get; set; }
+        public int? NoEmployees { get; set; }
 
         public decimal? TotalInitial { get; set; }
 
-        public decimal? MD11 { get; set; }
+        public decimal? MD11 { get; set; } // Ahora se va a manejar como porcentaje
+
+        public string MD11Filename { get; set; }
+
+        public string MD11UploadedBy { get; set; }
+
+        public decimal? Total { get; set; }
 
         public decimal? Surveillance { get; set; }
-
-        public decimal? RR { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -37,7 +39,18 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SiteDescription { get; set; }
 
-        public int ADCConceptValuesCount { get; set; }
+        public string SiteAddress { get; set; }
+
+        public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
+
+        public ICollection<ADCSiteAuditItemDto> ADCSiteAudits { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCSiteAlertType> Alerts { get; set; }
+
+        public bool IsMultiStandard { get; set; }
+
     } // ADCSiteItemListDto
 
     public class ADCSiteItemDetailDto
@@ -50,15 +63,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? InitialMD5 { get; set; }
 
-        public int? Employees { get; set; }
+        public int? NoEmployees { get; set; }
 
         public decimal? TotalInitial { get; set; }
 
         public decimal? MD11 { get; set; }
 
-        public decimal? Surveillance { get; set; }
+        public string MD11Filename { get; set; }
 
-        public decimal? RR { get; set; }
+        public string MD11UploadedBy { get; set; }
+
+        public decimal? Total { get; set; }
+
+        public decimal? Surveillance { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -77,6 +94,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public SiteItemListDto Site { get; set; }
 
         public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
+
+        public ICollection<ADCSiteAuditItemDto> ADCSiteAudits { get; set; }
+
+        // NOT MAPPED
+
+        public List<ADCSiteAlertType> Alerts { get; set; }
+
+        public bool IsMultiStandard { get; set; }
+
     } // ADCSiteItemDetailDto
 
     public class ADCSiteItemCreateDto
@@ -90,18 +116,20 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     } // ADCSiteItemCreateDto
 
     public class ADCSiteItemUpdateDto
-    { 
+    {
         [Required]
         public Guid ID { get; set; }
 
         [Required]
         public Guid SiteID { get; set; }
 
+        public decimal? TotalInitial { get; set; }
+
         public decimal? MD11 { get; set; }
 
-        public decimal? Surveillance { get; set; }
+        public decimal? Total { get; set; }
 
-        public decimal? RR { get; set; }
+        public decimal? Surveillance { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -112,6 +140,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCSiteItemUpdateDto
+
+    public class ADCSiteListUpdateDto
+    { 
+        [Required]
+        public List<ADCSiteItemUpdateDto> Items { get; set; }
+    } // ADCSiteListUpdateDto
+
+    public class ADCSiteWithCVListUpdateDto
+    {
+        [Required]
+        public ADCSiteItemUpdateDto ADCSite { get; set; }
+
+        [Required]
+        public List<ADCConceptValueItemUpdateDto> ADCConceptValues { get; set; }
+    } // ADCSiteWithCVListUpdateDto
 
     public class ADCSiteItemDeleteDto
     {

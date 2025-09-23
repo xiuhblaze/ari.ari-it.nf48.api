@@ -14,10 +14,16 @@
 
     public enum ADCOrderType
     {
-        Nothing,    // No ordenar
-        Description, // Ordenar por descripción
-        Created,    // Ordenar por fecha de creación
+        Nothing,        // No ordenar
+        Description,    // Ordenar por descripción
+        Created,        // Ordenar por fecha de creación
         DescriptionDesc,
         CreatedDesc,
+    }
+
+    public enum ADCAlertType { 
+        Nothing,            // No hay alerta
+        EmployeesMistmatch, // Alerta de discrepancia en el número de empleados
+        SitesMistmatch,     // Alerta de discrepancia en el número de sitios
     }
 }

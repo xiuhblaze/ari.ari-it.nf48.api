@@ -64,7 +64,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Description);
                     break;
                 case SiteOrderType.IsMainSite:
-                    items = items.OrderBy(e => e.IsMainSite)
+                    items = items.OrderByDescending(e => e.IsMainSite)
                         .ThenBy(e => e.Description);
                     break;
                 case SiteOrderType.Status:
@@ -77,7 +77,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Description);
                     break;
                 case SiteOrderType.IsMainSiteDesc:
-                    items = items.OrderByDescending(e => e.IsMainSite)
+                    items = items.OrderBy(e => e.IsMainSite)
                         .ThenByDescending(e => e.Description);
                     break;
                 case SiteOrderType.StatusDesc:
@@ -87,7 +87,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Updated);
                     break;
                 default:
-                    items = items.OrderBy(e => e.IsMainSite)
+                    items = items.OrderByDescending(e => e.IsMainSite)
                         .ThenBy(e => e.Description);
                     break;
             }

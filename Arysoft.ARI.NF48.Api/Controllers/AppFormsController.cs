@@ -74,6 +74,21 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PostAppForm
 
+        [HttpPost]
+        [Route("api/AppForms/Duplicate")]
+        [ResponseType(typeof(ApiResponse<AppFormItemDetailDto>))]
+        public async Task<IHttpActionResult> DuplicateAppForm([FromBody] AppFormDuplicateDto itemDuplicateDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            var newItem = await _service.DuplicateAsync(itemDuplicateDto.ID, itemDuplicateDto.UpdatedUser);
+            var itemDto = AppFormMapping.AppFormToItemDetailDto(newItem);
+            var response = new ApiResponse<AppFormItemDetailDto>(itemDto);
+
+            return Ok(response);
+        } // DuplicateAppForm
+
         [HttpPut]
         [ResponseType(typeof(ApiResponse<AppFormItemDetailDto>))]
         public async Task<IHttpActionResult> PutAppForm(Guid id, [FromBody] AppFormUpdateDto itemEditDto)

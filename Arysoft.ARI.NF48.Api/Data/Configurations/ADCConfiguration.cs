@@ -24,11 +24,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<ADC>()
-                .Property(m => m.UserCreate)
+                .Property(m => m.UserCreates)
                 .HasMaxLength(50);
 
             modelBuilder.Entity<ADC>()
-                .Property(m => m.UserReviewer)
+                .Property(m => m.UserReview)
                 .HasMaxLength(50);
 
             modelBuilder.Entity<ADC>()
@@ -74,6 +74,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .WithOptional()
                 .HasForeignKey(m => m.OwnerID)
                 .WillCascadeOnDelete(true);
+
+            // NOT MAPPED
+
+            modelBuilder.Entity<ADC>()
+                .Ignore(m => m.Alerts); // Not mapped property
         }
     }
 }

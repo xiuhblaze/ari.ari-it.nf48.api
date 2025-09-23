@@ -18,7 +18,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public UserService()
         {
-            _userRepository = new UserRepository();;
+            _userRepository = new UserRepository();
         }
 
         // METHODS

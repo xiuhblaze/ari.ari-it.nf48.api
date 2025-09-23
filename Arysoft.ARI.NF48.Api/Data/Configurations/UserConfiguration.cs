@@ -66,6 +66,12 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .WithOptional()
                 .HasForeignKey(n => n.OwnerID)
                 .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Settings)
+                .WithRequired(s => s.User)
+                .HasForeignKey(s => s.UserID)
+                .WillCascadeOnDelete(true);
         } // Configure
     }
 }
