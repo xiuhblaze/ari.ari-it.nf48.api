@@ -28,7 +28,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             if (onlyActive)
                 items = items.Where(m => m.Status == StatusType.Active);
             else
-                items = items.Where(m => m.Status != StatusType.Deleted && m.Status != StatusType.Nothing);
+                items = items.Where(m => m.Status < StatusType.Deleted);
 
             return await items.AnyAsync();
         } // IsStandardInCycleAsync

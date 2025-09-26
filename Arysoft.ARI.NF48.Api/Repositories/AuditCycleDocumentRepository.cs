@@ -27,5 +27,22 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await items.AnyAsync();
         } // IsDocumentTypeInCycleActive
+
+        /// <summary>
+        /// Busca si existe algun documento de un estándar en un ciclo de auditoría
+        /// </summary>
+        /// <param name="standardID"></param>
+        /// <param name="auditCycleID"></param>
+        /// <returns></returns>
+        public async Task<bool> IsAnyStandardDocumentInAuditCycleAsync(Guid standardID, Guid auditCycleID)
+        { 
+            var items = _model
+                .Where(m =>
+                    m.StandardID == standardID
+                    && m.AuditCycleID == auditCycleID
+                );
+            return await items.AnyAsync();
+
+        } // IsAnyStandardDocumentInAuditCycleAsync
     }
 }

@@ -123,22 +123,28 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
+            // HACK: Validar el step de acuerdo al CycleType plano asignarlo automáticamente
             if (item.InitialStep == AuditStepType.Nothing)
                 throw new BusinessException("An initial step is required");
 
             if (item.CycleType == AuditCycleType.Nothing)
                 throw new BusinessException("A cycle type is required");
+                        
+            if (foundItem.Status == StatusType.Nothing) // Es es nuevo...
+            {
+                // Validar que traiga el standard
+                if (item.StandardID == null || item.StandardID == Guid.Empty)
+                    throw new BusinessException("A standard is required");
+            }
 
             // - Que no haya una asignación en este ciclo del mismo standard
-            if (await _repository.IsStandardInCycleAsync(item.AuditCycleID, (Guid)item.StandardID, item.ID))
+            if (await _repository.IsStandardInCycleAsync(foundItem.AuditCycleID, item.StandardID.Value, item.ID))
                 throw new BusinessException("There is already a current standard in this cycle");
 
-            // Assigning values
-
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-
-            // - Que no exista otro el standard en ciclo activo y si el ciclo no es activo,
+            // - Que no exista el standard en otro ciclo activo y si el ciclo no es activo,
             //   permitir agregarlo
+            //   HACK: Actualizarlo para que no se sobrepongan las fechas del ciclo
+            //   y de ahi permitirlo o no (xBlaze: 20250926)
             if (foundItem.Status != item.Status 
                 && item.Status == StatusType.Active
                 && foundItem.AuditCycle.Status == StatusType.Active
@@ -146,9 +152,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 if (await _repository.IsStandardActiveInOrganizationAnyAuditCycleAsync(foundItem.AuditCycle.OrganizationID, (Guid)item.StandardID, item.ID))
                     throw new BusinessException("There is already a current standard in another active cycle");
-            }   
+            }
 
-            foundItem.StandardID = item.StandardID;
+            // Assigning values
+
+            if (foundItem.Status == StatusType.Nothing) // Solo si es nuevo, se asigna el standard
+            { 
+                foundItem.StandardID = item.StandardID;
+            }
             foundItem.InitialStep = item.InitialStep;
             foundItem.CycleType = item.CycleType;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
@@ -180,6 +191,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == StatusType.Deleted)
             {
+                // - Validar que no existan documentos o auditorias asociadas al
+                //   standard en el ciclo
+                if (await IsAnyItemInStandardAuditCycle(foundItem))
+                    throw new BusinessException("There are items associated with this standard in the audit cycle");
+
                 _repository.Delete(foundItem);
             }
             else
@@ -202,5 +218,25 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditCycleStandard.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // PRIVATE METHODS
+
+        private async Task<bool> IsAnyItemInStandardAuditCycle(AuditCycleStandard item)        {
+            var auditCycleDocumentsRepository = new AuditCycleDocumentRepository();
+            var auditsRepository = new AuditRepository();
+
+            // - Validar que no existan documentos en AuditCycleDocuments
+            if (await auditCycleDocumentsRepository
+                .IsAnyStandardDocumentInAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
+                return true;
+            //throw new BusinessException("There are documents associated with this standard in the audit cycle");
+
+            // - Validar que no existan auditorias en AuditStandards
+            if (await auditsRepository
+                .IsAnyStandardInAuditForAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
+                return true;
+
+            return false;
+        } // IsAnyItemInStandardAuditCycle
     }
 }
