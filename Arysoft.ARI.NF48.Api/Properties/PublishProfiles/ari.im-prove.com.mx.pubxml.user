@@ -7,7 +7,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAfu8jPzzWbkqFf297Rc8tuwAAAAACAAAAAAAQZgAAAAEAACAAAABrGp35QT4202ForIuBQXNLsChpFtCeBLD8jrid0avHqAAAAAAOgAAAAAIAACAAAAAOSg9B039YgW9Nl78bSnZtSzmr8hfTJQKZcqNlmTEORDAAAAAeaVtku+7590N2FCdftZJFmnvPa0Iwa6TDcmBoTGFYnR7U9GjTl5JGHrwXj+epBxtAAAAA4/L//xc1pSkEYjG9I2CVprZ9Sj7a+xUzJWC8spTMe7E7r6G7zuuJuIG+sFCfVrfxacoxcUENKfbRKt4wRosxjw==</EncryptedPassword>
     <_PublishTargetUrl>ftp://107.180.9.117/ari.im-prove.com.mx</_PublishTargetUrl>
-    <History>True|2025-09-26T15:34:03.1516994Z||;True|2025-09-11T17:40:12.8332968-06:00||;True|2025-09-04T13:50:01.8114033-06:00||;True|2025-09-01T16:57:18.9180500-06:00||;True|2025-06-11T11:14:15.8071051-06:00||;True|2025-06-11T10:44:39.2597365-06:00||;True|2025-05-27T08:29:46.1769223-06:00||;True|2025-04-22T13:05:57.4785188-06:00||;False|2025-04-17T12:42:37.4937523-06:00||;True|2025-04-16T08:11:01.4641211-06:00||;True|2025-03-12T10:01:23.2033928-06:00||;True|2025-03-05T09:28:36.7177086-06:00||;True|2025-03-05T08:30:18.0266058-06:00||;True|2025-02-20T17:04:13.4801160-06:00||;True|2025-02-20T12:35:45.9721409-06:00||;True|2025-02-11T17:35:57.9912356-06:00||;True|2025-02-04T13:04:11.4855192-06:00||;True|2025-01-30T17:25:48.4350506-06:00||;True|2025-01-28T17:53:50.1074118-06:00||;True|2025-01-28T17:47:48.0597721-06:00||;True|2024-12-19T14:08:13.6351859-06:00||;True|2024-12-18T15:59:30.5435606-06:00||;</History>
+    <History>True|2025-09-30T20:02:56.1156888Z||;True|2025-09-26T09:34:03.1516994-06:00||;True|2025-09-11T17:40:12.8332968-06:00||;True|2025-09-04T13:50:01.8114033-06:00||;True|2025-09-01T16:57:18.9180500-06:00||;True|2025-06-11T11:14:15.8071051-06:00||;True|2025-06-11T10:44:39.2597365-06:00||;True|2025-05-27T08:29:46.1769223-06:00||;True|2025-04-22T13:05:57.4785188-06:00||;False|2025-04-17T12:42:37.4937523-06:00||;True|2025-04-16T08:11:01.4641211-06:00||;True|2025-03-12T10:01:23.2033928-06:00||;True|2025-03-05T09:28:36.7177086-06:00||;True|2025-03-05T08:30:18.0266058-06:00||;True|2025-02-20T17:04:13.4801160-06:00||;True|2025-02-20T12:35:45.9721409-06:00||;True|2025-02-11T17:35:57.9912356-06:00||;True|2025-02-04T13:04:11.4855192-06:00||;True|2025-01-30T17:25:48.4350506-06:00||;True|2025-01-28T17:53:50.1074118-06:00||;True|2025-01-28T17:47:48.0597721-06:00||;True|2024-12-19T14:08:13.6351859-06:00||;True|2024-12-18T15:59:30.5435606-06:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -60,13 +60,13 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>01/09/2024 18:25:12</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Help/Index.cshtml">
-      <publishTime>04/06/2025 16:20:58</publishTime>
+      <publishTime>06/04/2025 16:20:58</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Help/ResourceModel.cshtml">
       <publishTime>01/09/2024 18:25:11</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Shared/_Layout.cshtml">
-      <publishTime>04/06/2025 16:20:58</publishTime>
+      <publishTime>06/04/2025 16:20:58</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Web.config">
       <publishTime>05/16/2025 08:24:59</publishTime>
@@ -75,16 +75,16 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/16/2025 08:24:59</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.dll">
-      <publishTime>10/09/2013 10:29:20</publishTime>
+      <publishTime>09/10/2013 10:29:20</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.pdb">
-      <publishTime>10/09/2013 10:29:20</publishTime>
+      <publishTime>09/10/2013 10:29:20</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.dll">
-      <publishTime>09/26/2025 09:30:16</publishTime>
+      <publishTime>09/30/2025 13:59:32</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.pdb">
-      <publishTime>09/26/2025 09:30:16</publishTime>
+      <publishTime>09/30/2025 13:59:32</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -108,7 +108,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/16/2025 08:25:03</publishTime>
     </File>
     <File Include="bin/es/System.Web.Optimization.resources.dll">
-      <publishTime>11/02/2014 09:28:40</publishTime>
+      <publishTime>02/11/2014 09:28:40</publishTime>
     </File>
     <File Include="bin/es/System.Web.Razor.resources.dll">
       <publishTime>05/16/2025 08:25:04</publishTime>
@@ -333,7 +333,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/16/2025 08:25:03</publishTime>
     </File>
     <File Include="bin/System.Web.Optimization.dll">
-      <publishTime>11/02/2014 09:26:04</publishTime>
+      <publishTime>02/11/2014 09:26:04</publishTime>
     </File>
     <File Include="bin/System.Web.Razor.dll">
       <publishTime>05/16/2025 08:25:04</publishTime>
@@ -459,7 +459,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/16/2025 08:25:57</publishTime>
     </File>
     <File Include="Content/Site.css">
-      <publishTime>04/06/2025 16:20:58</publishTime>
+      <publishTime>06/04/2025 16:20:58</publishTime>
     </File>
     <File Include="favicon.ico">
       <publishTime>01/17/2023 23:16:07</publishTime>
@@ -561,13 +561,13 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/16/2025 08:24:59</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>04/06/2025 16:20:58</publishTime>
+      <publishTime>06/04/2025 16:20:58</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>01/17/2023 23:16:07</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>04/06/2025 16:20:58</publishTime>
+      <publishTime>06/04/2025 16:20:58</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>01/17/2023 23:16:07</publishTime>
@@ -576,7 +576,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>01/17/2023 23:16:07</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>09/26/2025 09:30:42</publishTime>
+      <publishTime>09/30/2025 13:59:40</publishTime>
     </File>
   </ItemGroup>
 </Project>

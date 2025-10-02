@@ -229,7 +229,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (await auditCycleDocumentsRepository
                 .IsAnyStandardDocumentInAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
                 return true;
-            //throw new BusinessException("There are documents associated with this standard in the audit cycle");
 
             // - Validar que no existan auditorias en AuditStandards
             if (await auditsRepository

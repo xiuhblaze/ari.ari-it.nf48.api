@@ -1,37 +1,126 @@
-# Archivos de compilación
-bin/
-obj/
-Arysoft.ARI.NF48.Api/bin/
-Arysoft.ARI.NF48.Api/obj/
+# ============================================
+# Archivos de compilación y salida de .NET
+# ============================================
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+bld/
 *.exe
 *.dll
 *.pdb
+*.ilk
+*.lib
+*.exp
 
-# Archivos de configuración y caché de usuario
-*.config
+# ============================================
+# Archivos de configuración de usuario
+# ============================================
 *.user
-*.vs/
-Arysoft.ARI.NF48.Api/*.vs/
-
-# Paquetes y dependencias
-packages/
-*.nupkg
-
-# Logs y datos temporales
-*.log
-*.cache
-*.tmp
-
-# Archivos generados por VS
-.vscode/
-.vs/
+*.userosscache
 *.suo
 *.userprefs
 
-# Archivos de publicación y despliegue
+# ============================================
+# Visual Studio
+# ============================================
+.vs/
+*.sln.docstates
+*.vspscc
+*.vssscc
+$tf/
+
+# ============================================
+# Paquetes NuGet
+# ============================================
+packages/
+*.nupkg
+*.snupkg
+
+# ============================================
+# Entity Framework
+# ============================================
+# Migraciones generadas automáticamente (opcional, depende de tu flujo)
+# Migrations/*.cs
+# Normalmente las migraciones SÍ van al repo
+
+# Archivos de base de datos local/desarrollo
+*.mdf
+*.ldf
+*.ndf
+App_Data/*.mdf
+App_Data/*.ldf
+
+# Archivos de contexto generados (si usas Database First)
+*.edmx.diagram
+*.edmx.sql
+
+# ============================================
+# Web API específico
+# ============================================
+# Archivos de Swagger/OpenAPI generados
+swagger.json
+swagger.yaml
+
+# Área de trabajo de Postman (si la usas localmente)
+*.postman_environment.json
+
+# ============================================
+# Archivos de transformación y publicación
+# ============================================
+*.Publish.xml
+*.pubxml.user
 publish/
 app.publish/
+PublishProfiles/
+*.pubxml
+*.publishproj
+FolderProfile.pubxml
 
-# Ignorar información sensible y credenciales
+# ============================================
+# Logs y archivos temporales
+# ============================================
+*.log
+*.cache
+*.tmp
+*.temp
+[Tt]emp/
+logs/
+App_Data/Logs/
+
+# ============================================
+# Archivos específicos del proyecto
+# ============================================
+Arysoft.ARI.NF48.Api/Files/
+
+# ============================================
+# Información sensible (CRÍTICO)
+# ============================================
+# Connection strings
+connectionstrings.config
+*.connectionstrings.config
+
+# Configuraciones sensibles
 secrets.json
-appsettings.json
+appsettings.*.json
+
+# Keys de API y JWT
+*.key
+*.pfx
+*.p12
+
+# IMPORTANTE: 
+# Mantén Web.config en el repo con valores dummy
+# Usa Web.Debug.config y Web.Release.config para transformaciones
+# Separa connection strings en archivo externo (connectionstrings.config)
+
+# ============================================
+# Archivos de testing (si aplica)
+# ============================================
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
