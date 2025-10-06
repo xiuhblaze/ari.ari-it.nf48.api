@@ -134,10 +134,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<ADC> AddAsync(ADC item)
         {
+            var _appFormRepository = new AppFormRepository();
+
             // Validations
 
             if (item.AppFormID == null || item.AppFormID == Guid.Empty)            
-                throw new BusinessException("The AppForm ID is required.");
+                throw new BusinessException("The Application Form ID is required.");
 
             // Validar que el AppForm no tenga un ADC
 
@@ -147,6 +149,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Set default values
             
             item.ID = Guid.NewGuid();
+            item.AuditCycleID = await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
             item.UserCreates = item.UpdatedUser;
             item.Status = ADCStatusType.New;
             item.Created = DateTime.UtcNow;

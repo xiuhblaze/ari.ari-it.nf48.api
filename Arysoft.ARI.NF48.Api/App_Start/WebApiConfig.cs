@@ -14,7 +14,7 @@ namespace Arysoft.ARI.NF48.Api
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
             // CORS - Desarrollo
-            var corsDev = new EnableCorsAttribute("http://localhost:5173", "*", "*");
+            var corsDev = new EnableCorsAttribute("http://localhost:5173,http://localhost:82", "*", "*");
             config.EnableCors(corsDev);
 
             // CORS - Producción

@@ -102,16 +102,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            //modelBuilder.Entity<AppForm>() // Ver si jala esta madre!
-            //    .HasOptional(m => m.UserSales)
-            //    .WithMany()
-            //    .HasForeignKey(m => m.UserSalesID);
-
-            //modelBuilder.Entity<AppForm>() // Esta también
-            //    .HasOptional(m => m.UserReviewer)
-            //    .WithMany()
-            //    .HasForeignKey(m => m.UserReviewerID);
-
             modelBuilder.Entity<AppForm>()
                 .HasMany(m => m.Notes)
                 .WithOptional()

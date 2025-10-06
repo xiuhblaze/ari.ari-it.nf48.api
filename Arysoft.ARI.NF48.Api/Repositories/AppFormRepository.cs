@@ -10,6 +10,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class AppFormRepository : BaseRepository<AppForm>
     {
+        public async Task<Guid> GetAuditCycleIDAsync(Guid appFormID)
+        {
+            return await _model
+                .Where(m => m.ID == appFormID)
+                .Select(m => m.AuditCycleID)
+                .FirstOrDefaultAsync();
+        } // GetAuditCycleIDAsync
+
         public async Task<bool> IsThereValidAppFormAsync(Guid auditCycleID, Guid standardID)
         {
             return await _model

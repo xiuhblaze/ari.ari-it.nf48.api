@@ -311,10 +311,13 @@
     <Compile Include="Data\Configurations\OrganizationConfiguration.cs" />
     <Compile Include="Data\Configurations\CompanyConfiguration.cs" />
     <Compile Include="Data\Configurations\OrganizationStandardConfiguration.cs" />
+    <Compile Include="Data\Configurations\ProposalConfiguration.cs" />
+    <Compile Include="Data\Configurations\ProposalSiteConfiguration.cs" />
     <Compile Include="Data\Configurations\RoleConfiguration.cs" />
     <Compile Include="Data\Configurations\ShiftConfiguration.cs" />
     <Compile Include="Data\Configurations\SiteConfiguration.cs" />
     <Compile Include="Data\Configurations\StandardConfiguration.cs" />
+    <Compile Include="Data\Configurations\StandardTemplateConfiguration.cs" />
     <Compile Include="Data\Configurations\UserConfiguration.cs" />
     <Compile Include="Data\Configurations\UserSettingConfiguration.cs" />
     <Compile Include="Enumerations\ADCConceptEnums.cs" />
@@ -343,6 +346,7 @@
     <Compile Include="Enumerations\NoteEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
     <Compile Include="Enumerations\OrganizationStandardEnums.cs" />
+    <Compile Include="Enumerations\ProposalEnums.cs" />
     <Compile Include="Enumerations\RoleEnums.cs" />
     <Compile Include="Enumerations\ShiftEnums.cs" />
     <Compile Include="Enumerations\SiteEnums.cs" />
@@ -448,10 +452,13 @@
     <Compile Include="Models\Organization.cs" />
     <Compile Include="Models\Company.cs" />
     <Compile Include="Models\OrganizationStandard.cs" />
+    <Compile Include="Models\Proposal.cs" />
+    <Compile Include="Models\ProposalSite.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Shift.cs" />
     <Compile Include="Models\Site.cs" />
     <Compile Include="Models\Standard.cs" />
+    <Compile Include="Models\StandardTemplate.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\Note.cs" />
     <Compile Include="Models\UserSetting.cs" />

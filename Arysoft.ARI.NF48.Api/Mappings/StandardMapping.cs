@@ -45,10 +45,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? item.CatAuditorDocuments
                         .Where(cad => cad.Status != StatusType.Nothing).Count()
                     : 0,
-                CertificatesCount = item.Certificates != null
-                    ? item.Certificates
-                        .Where(c => c.Status != CertificateStatusType.Nothing).Count()
-                    : 0,
+                //CertificatesCount = item.Certificates != null
+                //    ? item.Certificates
+                //        .Where(c => c.Status != CertificateStatusType.Nothing).Count()
+                //    : 0,
                 OrganizationsCount = item.OrganizationStandards != null
                     ? item.OrganizationStandards
                         .Where(os => os.Status == StatusType.Active).Count()
@@ -82,10 +82,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? CatAuditorDocumentMapping.CatAuditorDocumentToListDto(item.CatAuditorDocuments
                         .Where(i => i.Status != StatusType.Nothing))
                     : null,
-                Certificates = item.Certificates != null
-                    ? CertificateMapping.CertificatesToListDto(item.Certificates
-                        .Where(c => c.Status != CertificateStatusType.Nothing))
-                    : null,
+                //Certificates = item.Certificates != null
+                //    ? CertificateMapping.CertificatesToListDto(item.Certificates
+                //        .Where(c => c.Status != CertificateStatusType.Nothing))
+                //    : null,
                 Organizations = item.OrganizationStandards != null
                     ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status >= StatusType.Nothing))

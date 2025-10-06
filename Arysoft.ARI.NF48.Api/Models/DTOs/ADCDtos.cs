@@ -9,6 +9,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public Guid AuditCycleID { get; set; }
+
         public Guid AppFormID { get; set; }
 
         public string Description { get; set; }
@@ -43,9 +45,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
+        public string AuditCycleName { get; set; }
+
         public string AppFormOrganizationName { get; set; }
 
-        public string AppFormAuditCycleName { get; set; }
+        public string AppFormAuditCycleName { get; set; } // Posiblemente lo vaya a eliminar
 
         public string AppFormStandardName { get; set; }
 
@@ -62,6 +66,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class ADCItemDetailDto
     {
         public Guid ID { get; set; }
+
+        public Guid AuditCycleID { get; set; }
 
         public Guid AppFormID { get; set; }
 
@@ -103,6 +109,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
+        public AuditCycleItemListDto AuditCycle { get; set; }
+
         public AppFormItemListDto AppForm { get; set; }
 
         public ICollection<ADCSiteItemListDto> ADCSites { get; set; }
@@ -119,6 +127,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         [Required]
         public Guid AppFormID { get; set; }
+
+        [Required]
+        public Guid AuditCycleID { get; set; }
 
         [Required]
         [StringLength(50)]

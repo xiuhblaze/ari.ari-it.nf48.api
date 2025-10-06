@@ -30,4 +30,13 @@
         True,
         False
     }
+
+    public enum CurrencyCodeType
+    {
+        Nothing,
+        USD,
+        MXN,
+        EUR,
+        Other
+    }
 }

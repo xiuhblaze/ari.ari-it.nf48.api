@@ -22,6 +22,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADCItemListDto
             {
                 ID = item.ID,
+                AuditCycleID = item.AuditCycleID,
                 AppFormID = item.AppFormID,
                 Description = item.Description,
                 TotalEmployees = item.TotalEmployees,
@@ -38,6 +39,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // INTERNAL
                 HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
+                AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
                 AppFormOrganizationName = item.AppForm?.Organization?.Name ?? string.Empty,
                 AppFormAuditCycleName = item.AppForm?.AuditCycle?.Name ?? string.Empty,
                 AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
@@ -53,6 +55,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADCItemDetailDto
             {
                 ID = item.ID,
+                AuditCycleID = item.AuditCycleID,
                 AppFormID = item.AppFormID,
                 Description = item.Description,
                 TotalEmployees = item.TotalEmployees,
@@ -72,6 +75,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // INTERNAL
                 HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
+                AuditCycle = item.AuditCycle != null
+                    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
+                    : null,
                 AppForm = item.AppForm != null
                     ? AppFormMapping.AppFormToItemListDto(item.AppForm)
                     : null,
@@ -95,6 +101,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADC
             {
                 AppFormID = itemDto.AppFormID,
+                AuditCycleID = itemDto.AuditCycleID,
                 UpdatedUser = itemDto.UpdatedUser,
             };
         } // ItemCreateDtoToADC

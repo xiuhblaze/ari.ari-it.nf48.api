@@ -80,7 +80,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual Standard Standard { get; set; }
 
-        public virtual ICollection<ADC> ADCs { get; set; }
+        public virtual ICollection<ADC> ADCs { get; set; } // Solo va a ser un ADC
+
+        public virtual ICollection<Proposal> Proposals { get; set; } // Solo va a ser una propuesta
 
         public virtual ICollection<Contact> Contacts { get; set; }
 

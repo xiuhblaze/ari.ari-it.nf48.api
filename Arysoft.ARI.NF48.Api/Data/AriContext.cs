@@ -39,6 +39,11 @@ namespace Arysoft.ARI.NF48.Api.Data
             MD5Configuration.Configure(modelBuilder);
             ADCSiteAuditConfiguration.Configure(modelBuilder);
 
+            // Módulo de Propuestas
+
+            ProposalConfiguration.Configure(modelBuilder);
+            ProposalSiteConfiguration.Configure(modelBuilder);
+
             // Módulo de Auditorias
             AuditCycleConfiguration.Configure(modelBuilder);
             AuditCycleDocumentConfiguration.Configure(modelBuilder);
@@ -53,6 +58,7 @@ namespace Arysoft.ARI.NF48.Api.Data
             NaceCodeConfiguration.Configure(modelBuilder);
             NoteConfiguration.Configure(modelBuilder);
             StandardConfiguration.Configure(modelBuilder);
+            StandardTemplateConfiguration.Configure(modelBuilder);
 
             // Módulo de usuarios
             UserConfiguration.Configure(modelBuilder);

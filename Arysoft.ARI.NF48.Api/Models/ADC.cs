@@ -8,6 +8,8 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid AppFormID { get; set; }
 
+        public Guid AuditCycleID { get; set; }
+
         public string Description { get; set; }
 
         public int? TotalEmployees { get; set; }
@@ -40,9 +42,13 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
+        public virtual AuditCycle AuditCycle { get; set; }
+
         public virtual AppForm AppForm { get; set; }
 
         public virtual ICollection<ADCSite> ADCSites { get; set; }
+
+        public virtual ICollection<Proposal> Proposals { get; set; } // Solo va a ser una propuesta
 
         public virtual ICollection<Note> Notes { get; set; }
 

@@ -16,6 +16,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnName("ADCID");
 
             modelBuilder.Entity<ADC>()
+                .Property(m => m.AuditCycleID)
+                .IsRequired();
+
+            modelBuilder.Entity<ADC>()
                 .Property(m => m.AppFormID)
                 .IsRequired();
 

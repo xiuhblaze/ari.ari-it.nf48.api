@@ -21,10 +21,12 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<CatAuditorDocument> CatAuditorDocuments { get; set; }
 
-        public virtual ICollection<Certificate> Certificates { get; set; }
+        // public virtual ICollection<Certificate> Certificates { get; set; }
 
         public virtual ICollection<OrganizationStandard> OrganizationStandards { get; set; }
 
         public virtual ICollection<ADCConcept> ADCConcepts { get; set; }
+
+        public virtual ICollection<StandardTemplate> StandardTemplates { get; set; }
     }
 }
