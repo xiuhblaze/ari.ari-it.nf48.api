@@ -9,12 +9,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class StandardRepository : BaseRepository<Standard>
     {
-        public async Task<bool> ExistNameAsync(string name, Guid idException)
+        public async Task<bool> ExistNameAsync(string name, Guid exceptionID)
         {
             return await _model
                 .Where(m => 
                     m.Name.ToUpper() == name.ToUpper().Trim()
-                    && m.ID != idException
+                    && m.ID != exceptionID
                 ).AnyAsync();
         } // ExistNameAsync
 
@@ -31,5 +31,38 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         //        _model.Remove(item);
         //    }
         //} // DeleteTmpByUser
+
+        /// <summary>
+        /// Verifica si el estandar tiene alguna asociacion
+        /// (Organizaciones, Auditores, AppForms, AuditCycles, Audits,
+        /// Documents, RiskLevels, Auditor documents, etc)
+        /// - Creo que con los básicos es suficiente
+        /// </summary>
+        /// <param name="standardID">ID del standard a validar</param>
+        /// <returns></returns>
+        public async Task<bool> IsAnyAssociationAsync(Guid standardID)
+        {
+            if (await _context.Set<StandardTemplate>()
+                .Where(st => st.StandardID == standardID
+                    && st.Status != StatusType.Nothing)
+                .AnyAsync()) return true;
+
+            if (await _context.Set<OrganizationStandard>()
+                .Where(st => st.StandardID == standardID
+                    && st.Status != StatusType.Nothing)
+                .AnyAsync()) return true;
+
+            if (await _context.Set<AuditorStandard>()
+                .Where(st => st.StandardID == standardID
+                    && st.Status != StatusType.Nothing)
+                .AnyAsync()) return true;
+
+            if (await _context.Set<AuditStandard>()
+                .Where(st => st.StandardID == standardID
+                    && st.Status != StatusType.Nothing)
+                .AnyAsync()) return true;
+
+            return false;
+        } // IsAnyAssociationAsync
     }
 }

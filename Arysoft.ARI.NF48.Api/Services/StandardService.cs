@@ -101,9 +101,16 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Excecute queries
 
-            await _standardRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-            _standardRepository.Add(item);
-            await _standardRepository.SaveChangesAsync();
+            try 
+            { 
+                await _standardRepository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _standardRepository.Add(item);
+                await _standardRepository.SaveChangesAsync();
+            } 
+            catch (Exception ex) 
+            { 
+                throw new BusinessException($"StandardService.AddAsync: {ex.Message}");
+            }
 
             return item;
         } // AddAsync
@@ -157,7 +164,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == StatusType.Deleted)
             {
-                // HACK: Validations
+                // Validations
+                if (await _standardRepository.IsAnyAssociationAsync(foundItem.ID))
+                    throw new BusinessException("The standard has associations with other records and cannot be deleted.");
 
                 _standardRepository.Delete(foundItem);
             }
@@ -172,7 +181,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _standardRepository.Update(foundItem);
             }
 
-            _standardRepository.SaveChanges();
+            try
+            { 
+                _standardRepository.SaveChanges();
+            }
+            catch (Exception ex) 
+            { 
+                throw new BusinessException($"StandardService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }

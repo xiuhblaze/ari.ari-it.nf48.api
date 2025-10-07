@@ -24,13 +24,25 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string SignerPosition { get; set; }
 
+        public DateTime? SendToSignDate { get; set; }
+
         public string SigendFilename { get; set; }
 
         public CurrencyCodeType? CurrencyCode { get; set; }
 
-        public string HistoricalDataJSON { get; set; }
+        public string UserCreates { get; set; }     // Usuario que crea la Propuesta
+
+        public string UserReview { get; set; }      // Usuario que revisa y aprueba la Propuesta
+
+        public DateTime? ReviewDate { get; set; }   // Fecha en que se envió a revisión por parte del creador o editor
+
+        public DateTime? ActiveDate { get; set; }   // Fecha de activación de la Propuesta por parte del revisor
 
         public new ProposalStatusType Status { get; set; }
+
+        // INTERNAL
+
+        public string HistoricalDataJSON { get; set; }
 
         // RELATIONS
 

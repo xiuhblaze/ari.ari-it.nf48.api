@@ -9,7 +9,9 @@ namespace Arysoft.ARI.NF48.Api.Tools
         {
             var message = string.Join(" | ", modelState.Values
                     .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage));
+                    .Select(e => string.IsNullOrEmpty(e.ErrorMessage)
+                        ? e.Exception?.Message 
+                        : e.ErrorMessage));
             
             return message;
         } // GetModelStateErrors

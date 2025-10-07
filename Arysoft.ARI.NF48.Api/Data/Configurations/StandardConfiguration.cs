@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
+using System;
 using System.Data.Entity;
 
 namespace Arysoft.ARI.NF48.Api.Data.Configurations
@@ -39,6 +40,15 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            // RELATIONS
+
+            modelBuilder.Entity<Standard>()
+                .HasMany<StandardTemplate>(m => m.StandardTemplates)
+                .WithRequired(t => t.Standard)
+                .HasForeignKey<Guid>(m => m.StandardID)
+                .WillCascadeOnDelete(false);
+
         } // Configure
     }
 }

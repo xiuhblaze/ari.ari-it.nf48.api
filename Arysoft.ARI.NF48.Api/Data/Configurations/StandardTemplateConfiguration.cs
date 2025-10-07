@@ -50,13 +50,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
-            // RELATIONS
-            
-            modelBuilder.Entity<Models.StandardTemplate>()
-                .HasRequired<Models.Standard>(m => m.Standard)
-                .WithMany(t => t.StandardTemplates)
-                .HasForeignKey<Guid>(m => m.StandardID)
-                .WillCascadeOnDelete(false);
         } // Configure
     }
 }

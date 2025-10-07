@@ -33,10 +33,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                //ApplicationsCount = item.Applications != null 
-                //    ? item.Applications
-                //        .Where(app => app.Status != ApplicationStatusType.Nothing).Count()
-                //    : 0,
                 AuditorsCount = item.AuditorStandards != null
                     ? item.AuditorStandards
                         .Where(aus => aus.Status == StatusType.Active).Count()
@@ -70,10 +66,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                //Applications = item.Applications != null
-                //    ? ApplicationMapping.ApplicationsToListDto(item.Applications
-                //        .Where(a => a.Status != ApplicationStatusType.Nothing))
-                //    : null,
                 Auditors = item.AuditorStandards != null
                     ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards
                         .Where(aus => aus.Status >= StatusType.Nothing))
@@ -103,16 +95,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static Standard ItemEditDtoToStandard(StandardPutDto itemDto) 
         {
-            var item = new Standard();
-
-            item.ID = itemDto.ID;
-            item.Name = itemDto.Name;
-            item.Description = itemDto.Description;
-            item.MaxReductionDays = itemDto.MaxReductionDays;
-            item.SalesMaxReductionDays = itemDto.SalesMaxReductionDays;
-            item.StandardBase = itemDto.StandardBase;
-            item.Status = itemDto.Status;
-            item.UpdatedUser = itemDto.UpdatedUser;
+            var item = new Standard
+            {
+                ID = itemDto.ID,
+                Name = itemDto.Name,
+                Description = itemDto.Description,
+                MaxReductionDays = itemDto.MaxReductionDays,
+                SalesMaxReductionDays = itemDto.SalesMaxReductionDays,
+                StandardBase = itemDto.StandardBase,
+                Status = itemDto.Status,
+                UpdatedUser = itemDto.UpdatedUser
+            };
 
             return item;
         } // ItemEditDtoToStandard

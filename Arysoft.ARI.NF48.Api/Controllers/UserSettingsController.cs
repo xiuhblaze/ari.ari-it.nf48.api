@@ -8,9 +8,6 @@ using Arysoft.ARI.NF48.Api.Services;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -69,7 +66,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> PostUserSetting([FromBody] UserSettingCreateDto itemCreateDto)
         {
             if (!ModelState.IsValid)
-                throw new Exceptions.BusinessException(Strings.GetModelStateErrors(ModelState));
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             var item = UserSettingMapping
                 .ItemCreateDtoToUserSetting(itemCreateDto);
@@ -85,7 +82,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> PutUserSetting(Guid id, [FromBody] UserSettingUpdateDto itemUpdateDto)
         {
             if (!ModelState.IsValid)
-                throw new Exceptions.BusinessException(Strings.GetModelStateErrors(ModelState));
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             if (id != itemUpdateDto.ID)
                 throw new BusinessException("ID mismatch");
@@ -104,7 +101,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> DeleteUserSetting(Guid id, [FromBody] UserSettingDeleteDto itemDeleteDto)
         {
             if (!ModelState.IsValid)
-                throw new Exceptions.BusinessException(Strings.GetModelStateErrors(ModelState));
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             if (id != itemDeleteDto.ID)
                 throw new BusinessException("ID mismatch");

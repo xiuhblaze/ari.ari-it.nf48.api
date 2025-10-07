@@ -269,6 +269,7 @@
     <Compile Include="Controllers\MD5Controller.cs" />
     <Compile Include="Controllers\NotesController.cs" />
     <Compile Include="Controllers\OrganizationStandardsController.cs" />
+    <Compile Include="Controllers\StandardTemplatesController.cs" />
     <Compile Include="Controllers\UserSettingsController.cs" />
     <Compile Include="CustomEntities\EmployeesMD5.cs" />
     <Compile Include="CustomEntities\LanguagesList.cs" />
@@ -352,6 +353,7 @@
     <Compile Include="Enumerations\SiteEnums.cs" />
     <Compile Include="Enumerations\StandardEnums.cs" />
     <Compile Include="Enumerations\GeneralEnums.cs" />
+    <Compile Include="Enumerations\StandardTemplateEnums.cs" />
     <Compile Include="Enumerations\UserEnums.cs" />
     <Compile Include="Enumerations\UserSettingEnums.cs" />
     <Compile Include="Exceptions\BusinessException.cs" />
@@ -391,6 +393,7 @@
     <Compile Include="Mappings\ShiftMapping.cs" />
     <Compile Include="Mappings\SiteMapping.cs" />
     <Compile Include="Mappings\StandardMapping.cs" />
+    <Compile Include="Mappings\StandardTemplateMapping.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Mappings\UserSettingMapping.cs" />
     <Compile Include="Models\ADC.cs" />
@@ -416,7 +419,7 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\DTOs\ADCConceptDTOs.cs" />
     <Compile Include="Models\DTOs\ADCConceptValueDTOs.cs" />
-    <Compile Include="Models\DTOs\ADCDtos.cs" />
+    <Compile Include="Models\DTOs\ADCDTOs.cs" />
     <Compile Include="Models\DTOs\ADCSiteAuditDTOs.cs" />
     <Compile Include="Models\DTOs\ADCSiteDTOs.cs" />
     <Compile Include="Models\DTOs\AppFormDTOs.cs" />
@@ -445,6 +448,7 @@
     <Compile Include="Models\DTOs\ShiftDTOs.cs" />
     <Compile Include="Models\DTOs\SiteDTOs.cs" />
     <Compile Include="Models\DTOs\StandardDTOs.cs" />
+    <Compile Include="Models\DTOs\StandardTemplateDTOs.cs" />
     <Compile Include="Models\DTOs\UserDTOs.cs" />
     <Compile Include="Models\DTOs\UserSettingDTOs.cs" />
     <Compile Include="Models\MD5.cs" />
@@ -491,10 +495,12 @@
     <Compile Include="QueryFilters\NoteQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationStandardQueryFilters.cs" />
+    <Compile Include="QueryFilters\ProposalQueryFilters.cs" />
     <Compile Include="QueryFilters\RoleQueryFilters.cs" />
     <Compile Include="QueryFilters\ShiftQueryFilters.cs" />
     <Compile Include="QueryFilters\SiteQueryFilters.cs" />
     <Compile Include="QueryFilters\StandardQueryFilters.cs" />
+    <Compile Include="QueryFilters\StandardTemplateQueryFilters.cs" />
     <Compile Include="QueryFilters\UserQueryFilters.cs" />
     <Compile Include="QueryFilters\UserSettingQueryFilters.cs" />
     <Compile Include="Repositories\ADCConceptRepository.cs" />
@@ -523,10 +529,12 @@
     <Compile Include="Repositories\NaceCodeRepository.cs" />
     <Compile Include="Repositories\OrganizationRepository.cs" />
     <Compile Include="Repositories\OrganizationStandardRepository.cs" />
+    <Compile Include="Repositories\ProposalRepository.cs" />
     <Compile Include="Repositories\RoleRepository.cs" />
     <Compile Include="Repositories\ShiftRepository.cs" />
     <Compile Include="Repositories\SiteRepository.cs" />
     <Compile Include="Repositories\StandardRepository.cs" />
+    <Compile Include="Repositories\StandardTemplateRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Repositories\UserSettingRepository.cs" />
     <Compile Include="Response\ApiResponse.cs" />
@@ -556,10 +564,12 @@
     <Compile Include="Services\NoteService.cs" />
     <Compile Include="Services\OrganizationService.cs" />
     <Compile Include="Services\OrganizationStandardService.cs" />
+    <Compile Include="Services\ProposalService.cs" />
     <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\ShiftService.cs" />
     <Compile Include="Services\SiteService.cs" />
     <Compile Include="Services\StandardService.cs" />
+    <Compile Include="Services\StandardTemplateService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\UserSettingService.cs" />
     <Compile Include="Startup.cs" />

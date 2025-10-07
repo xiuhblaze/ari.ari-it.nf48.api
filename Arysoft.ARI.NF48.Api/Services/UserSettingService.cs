@@ -5,10 +5,8 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -128,14 +126,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to Update was not found");
 
-            // Validations
-
-            // - No se me ocurre ninguna
+            // Validations goes here
 
             // Set values
 
             foundItem.Settings = item.Settings;
-            foundItem.Status = item.Status;
+            foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
+                ? StatusType.Active
+                : item.Status != StatusType.Nothing
+                    ? item.Status
+                    : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
 
