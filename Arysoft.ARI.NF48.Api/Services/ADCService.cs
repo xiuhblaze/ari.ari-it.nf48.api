@@ -749,12 +749,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             foreach (AuditStepType step in stepList)
-            {   
+            {
+                var currentSite = appForm.Sites
+                    .Where(s => s.ID == adcSite.SiteID)
+                    .FirstOrDefault() ?? new Site();
+
                 var adcStepAudit = new ADCSiteAudit()
                 {
                     ID = Guid.NewGuid(),
                     ADCSiteID = adcSite.ID,
-                    Value = !isMultisite, // si es un solo sitio, por default en true (el sitio recibe todas las auditorias)
+                    Value = !isMultisite || currentSite.IsMainSite, // si es un solo sitio o es el principal, por default en true (el sitio recibe todas las auditorias)
                     AuditStep = step,
                     Status = StatusType.Active,
                     Created = DateTime.UtcNow,

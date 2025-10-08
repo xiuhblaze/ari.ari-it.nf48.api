@@ -22,4 +22,11 @@
         CreatedDesc,
         StatusDesc,
     } // ProposalOrderType
+
+    public enum ProposalAlertType
+    { 
+        Nothing,
+        ScopeMistmatch,
+        EmployeesMistmatch,
+    }
 }

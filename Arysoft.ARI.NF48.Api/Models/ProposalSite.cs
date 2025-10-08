@@ -18,7 +18,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public virtual Proposal Proposal { get; set; }
+        //public virtual Proposal Proposal { get; set; }
 
         public virtual Site Site { get; set; }
     }

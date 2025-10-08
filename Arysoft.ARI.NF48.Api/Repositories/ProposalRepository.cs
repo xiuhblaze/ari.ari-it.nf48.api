@@ -27,7 +27,41 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         } // ADCHasValidProposalAsync
 
         // - Valida que el appform, auditcycle y la organization esten activos, o algo así
-        // TODO: public async Task<bool> HasValidParentsAsync(Guid id)
+        public async Task<bool> HasValidParentsAsync(Proposal item)
+        {
+            var auditCycle = await _context.Set<AuditCycle>()
+                .Include(ac => ac.Organization)
+                .Where(ac => ac.ID == item.AuditCycleID)
+                .FirstOrDefaultAsync();
+            if (auditCycle == null) 
+                return false;
+            if (auditCycle.Status != StatusType.Active 
+                && auditCycle.Status != StatusType.Inactive) 
+                return false;
+            if (auditCycle.Organization == null) 
+                return false;
+            if (auditCycle.Organization.Status != OrganizationStatusType.Applicant
+                && auditCycle.Organization.Status !=  OrganizationStatusType.Active)
+                return false;
+
+            var appForm = await _context.Set<AppForm>()
+                .Where(af => af.ID == item.AppFormID)
+                .FirstOrDefaultAsync();
+            if (appForm == null) 
+                return false;
+            if (appForm.Status != AppFormStatusType.Active) 
+                return false;
+
+            var adc = await _context.Set<ADC>()
+                .Where(a => a.ID == item.ADCID)
+                .FirstOrDefaultAsync();
+            if (adc == null) 
+                return false;
+            if (adc.Status != ADCStatusType.Active) 
+                return false;
+
+            return true;
+        } // HasValidParentsAsync
 
         /// <summary>
         /// Elimina temporales creados por el usuario, funcion sobreescrita

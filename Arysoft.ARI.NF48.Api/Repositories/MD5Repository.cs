@@ -44,5 +44,27 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return item?.Days ?? 0;
         } // GetDaysAsync
+
+        /// <summary>
+        ///  Obtiene el registro MD5 dado el numero de empleados
+        /// </summary>
+        /// <param name="employees"></param>
+        /// <returns></returns>
+        public async Task<MD5> GetByEmployeesAsync(int employees)
+        {
+            var mD5Maximum = await _model
+                .OrderByDescending(m => m.EndValue)
+                .FirstOrDefaultAsync();
+
+            if (mD5Maximum.EndValue < employees)
+            {
+                return mD5Maximum;
+            }
+
+            return await _model
+                .Where(m => m.StartValue <= employees && m.EndValue >= employees
+                    && m.Status == StatusType.Active)
+                .FirstOrDefaultAsync();
+        } // GetByEmployees
     }
 }

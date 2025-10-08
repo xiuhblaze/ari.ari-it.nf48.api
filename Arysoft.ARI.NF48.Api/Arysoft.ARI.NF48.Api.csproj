@@ -389,6 +389,7 @@
     <Compile Include="Mappings\NoteMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
     <Compile Include="Mappings\OrganizationStandardMapping.cs" />
+    <Compile Include="Mappings\ProposalMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
     <Compile Include="Mappings\ShiftMapping.cs" />
     <Compile Include="Mappings\SiteMapping.cs" />
@@ -444,6 +445,7 @@
     <Compile Include="Models\DTOs\NoteDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationStandardDTOs.cs" />
+    <Compile Include="Models\DTOs\ProposalDTOs.cs" />
     <Compile Include="Models\DTOs\RoleDTOs.cs" />
     <Compile Include="Models\DTOs\ShiftDTOs.cs" />
     <Compile Include="Models\DTOs\SiteDTOs.cs" />

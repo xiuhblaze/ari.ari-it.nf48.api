@@ -1,9 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Data.Configurations
 {
@@ -48,6 +44,14 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Proposal>()
+                .Property(m => m.UserCreates)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Proposal>()
+                .Property(m => m.UserReview)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Proposal>()
                 .Property(m => m.Status)
                 .IsRequired();
 
@@ -66,17 +70,22 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            modelBuilder.Entity<Proposal>()
-                .HasMany(m => m.ProposalSites)
-                .WithRequired(m => m.Proposal)
-                .HasForeignKey(m => m.ProposalID)
-                .WillCascadeOnDelete(true);
+            //modelBuilder.Entity<Proposal>()
+            //    .HasMany(m => m.ProposalSites)
+            //    .WithRequired(m => m.Proposal)
+            //    .HasForeignKey(m => m.ProposalID)
+            //    .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<AppForm>()
                 .HasMany(m => m.Notes)
                 .WithOptional()
                 .HasForeignKey(m => m.OwnerID)
                 .WillCascadeOnDelete(true);
+
+            // NOT MAPPED
+
+            modelBuilder.Entity<Proposal>()
+                .Ignore(p => p.Alerts); // Not mapped property
 
         } // Configure
     }

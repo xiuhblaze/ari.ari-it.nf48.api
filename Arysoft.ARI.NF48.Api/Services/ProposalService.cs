@@ -86,6 +86,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
             }
 
+            // - Analizar alertas de cambio de alcance o empleados
+
             // Pagination
 
             var pagedItems = PagedList<Proposal>
@@ -96,24 +98,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Proposal> GetAsync(Guid id, bool asNoTracking = false)
         {
+            // - Analizar alertas de cambio de alcance o empleados
             return await _repository.GetAsync(id, asNoTracking);
         } // GetAsync
 
         public async Task<Proposal> CreateAsync(Proposal item)
         {
-            // Validations
-
-            // - Validar que el ADC no tenga una propuesta valida
-            if (await _repository.ADCHasValidProposalAsync(item.ADCID))
-                throw new BusinessException("The ADC already has a valid proposal.");
-
-            // - Validar que el appform, auditcycle y la organization esten activos, o algo así
-
-            item.ID = Guid.NewGuid();
-            item.UserCreates = item.UpdatedUser;
-            item.Created = DateTime.UtcNow;
-            item.Updated = DateTime.UtcNow;
-            item.Status = ProposalStatusType.Nothing;
+            await ValidateNewItemAsync(item);
+            item = await SetValuesForCreateAsync(item);
 
             // Excecute queries
 
@@ -142,7 +134,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             ValidateUpdatedItem(item, foundItem);
-            SetValuesForUpdate(item, foundItem);
+            foundItem = SetValuesForUpdate(item, foundItem);
 
             try 
             { 
@@ -190,6 +182,50 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE FUNCTIONS
 
+        // Create 
+
+        private async Task ValidateNewItemAsync(Proposal item)
+        {
+            // Validations
+            
+            // - Validar que el ADC no tenga otra propuesta valida
+            if (await _repository.ADCHasValidProposalAsync(item.ADCID))
+                throw new BusinessException("The ADC already has a valid proposal.");
+            
+            // - Validar que el appform, auditcycle y la organization esten activos, o algo así
+            if (await _repository.HasValidParentsAsync(item))
+                throw new BusinessException("The Organization, Audit cycle, App form or ADC records are not valid.");
+
+        } // ValidateNewItem
+
+        private async Task<Proposal> SetValuesForCreateAsync(Proposal item)
+        {
+            var _appformRepository = new AppFormRepository();
+            var _adcRepository = new ADCRepository();
+            var _md5Repository = new MD5Repository();
+
+            var appForm = await _appformRepository.GetAsync(item.AppFormID)
+                ?? throw new BusinessException("App Form record not found");
+            var adc = await _adcRepository.GetAsync(item.ADCID)
+                ?? throw new BusinessException("ADC record not found");
+            var md5 = await _md5Repository.GetByEmployeesAsync(adc.TotalEmployees ?? 0);
+
+            item.ID = Guid.NewGuid();
+
+            item.ActivitiesScope = appForm.ActivitiesScope;
+            item.TotalEmployees = adc.TotalEmployees;
+            item.MD5ID = md5.ID;
+
+            item.UserCreates = item.UpdatedUser;
+            item.Created = DateTime.UtcNow;
+            item.Updated = DateTime.UtcNow;
+            item.Status = ProposalStatusType.Nothing;
+
+            return item;
+        } // SetValuesForCreateAsync
+
+        // Update
+
         private void ValidateUpdatedItem(Proposal item, Proposal foundItem)
         {
 
@@ -224,7 +260,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         } // ValidateUpdatedItem
 
-        private void SetValuesForUpdate(Proposal item, Proposal foundItem)
+        private Proposal SetValuesForUpdate(Proposal item, Proposal foundItem)
         {
             // Si cambia el status, según el cambio asignar...
             if (foundItem.Status != item.Status)
@@ -265,6 +301,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
+
+            return foundItem;
         } // SetValuesForUpdate
 
         private string GetHistoricalDataJSON(Proposal item)
@@ -290,14 +328,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                     TotalMD11 = 0,
                     TotalSurveillance = 0,                    
                 },
-                Sites = item.ProposalSites?
-                    .Where(ps => ps.Status == StatusType.Active)
-                    .Select(ps => new { 
-                        Description = "",
-                        IsMainSite = false,
-                        Address = "",
-                        Country = ""
-                    })
+                //Sites = item.ProposalSites?
+                //    .Where(ps => ps.Status == StatusType.Active)
+                //    .Select(ps => new { 
+                //        Description = "",
+                //        IsMainSite = false,
+                //        Address = "",
+                //        Country = ""
+                //    })
             };
 
             return JsonSerializer.Serialize(historicalData);

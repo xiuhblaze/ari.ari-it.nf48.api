@@ -14,9 +14,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? MD5ID { get; set; }
 
-        public string ActivitiesScope { get; set; }
+        public string ActivitiesScope { get; set; } // Para detectar si se modifica el alcance
 
-        public int? TotalEmployees { get; set; }
+        public int? TotalEmployees { get; set; } // Para detectar si se modifica el número de empleados
 
         public string Justification { get; set; }
 
@@ -54,8 +54,10 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual MD5 MD5 { get; set; }
 
-        public virtual ICollection<ProposalSite> ProposalSites { get; set; }
+        // public virtual ICollection<ProposalSite> ProposalSites { get; set; }
 
         public virtual ICollection<Note> Notes { get; set; }
+
+        public List<ProposalAlertType> Alerts { get; set; }
     }
 }
