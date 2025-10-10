@@ -3,7 +3,6 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -34,16 +33,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Justification = item.Justification,
                 SignerName = item.SignerName,
                 SignerPosition = item.SignerPosition,
-                SendToSignDate = item.SendToSignDate,
-                SigendFilename = item.SigendFilename,
+                SignedFilename = item.SignedFilename,
                 CurrencyCode = item.CurrencyCode,
-                UserCreates = item.UserCreates,
-                UserReview = item.UserReview,
-                ReviewDate = item.ReviewDate,
-                ActiveDate = item.ActiveDate,
-                Status = item.Status,
                 // INTERNAL
+                CreatedBy = item.CreatedBy,
+                ReviewDate = item.ReviewDate,
+                ApprovalDate = item.ApprovalDate,
+                SignRequestDate = item.SignRequestDate,
                 HistoricalDataJSON = item.HistoricalDataJSON,
+                Status = item.Status,
                 // RELATIONS
                 OrganizationName = item.AuditCycle?.Organization?.Name ?? string.Empty,
                 AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
@@ -70,20 +68,19 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalEmployees = item.TotalEmployees,
                 Justification = item.Justification,
                 SignerName = item.SignerName,
-                SignerPosition = item.SignerPosition,
-                SendToSignDate = item.SendToSignDate,
-                SigendFilename = item.SigendFilename,
+                SignerPosition = item.SignerPosition,                
+                SignedFilename = item.SignedFilename,
                 CurrencyCode = item.CurrencyCode,
-                UserCreates = item.UserCreates,
-                UserReview = item.UserReview,
+                // INTERNAL
+                CreatedBy = item.CreatedBy,
                 ReviewDate = item.ReviewDate,
-                ActiveDate = item.ActiveDate,
+                ApprovalDate = item.ApprovalDate,
+                SignRequestDate = item.SignRequestDate,
+                HistoricalDataJSON = item.HistoricalDataJSON,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                // INTERNAL
-                HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
                 AuditCycle = item.AuditCycle != null
                     ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)

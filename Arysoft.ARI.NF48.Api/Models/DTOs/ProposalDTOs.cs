@@ -17,9 +17,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? MD5ID { get; set; }
 
-        public string ActivitiesScope { get; set; } // Para detectar si se modifica el alcance
+        public string ActivitiesScope { get; set; }
 
-        public int? TotalEmployees { get; set; } // Para detectar si se modifica el número de empleados
+        public int? TotalEmployees { get; set; }
 
         public string Justification { get; set; }
 
@@ -27,25 +27,23 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SignerPosition { get; set; }
 
-        public DateTime? SendToSignDate { get; set; }
-
-        public string SigendFilename { get; set; }
+        public string SignedFilename { get; set; }
 
         public CurrencyCodeType? CurrencyCode { get; set; }
 
-        public string UserCreates { get; set; }     // Usuario que crea la Propuesta
-
-        public string UserReview { get; set; }      // Usuario que revisa y aprueba la Propuesta
-
-        public DateTime? ReviewDate { get; set; }   // Fecha en que se envió a revisión por parte del creador o editor
-
-        public DateTime? ActiveDate { get; set; }   // Fecha de activación de la Propuesta por parte del revisor
-
-        public ProposalStatusType Status { get; set; }
-
         // INTERNAL
 
+        public string CreatedBy { get; set; }
+
+        public DateTime? ReviewDate { get; set; }
+
+        public DateTime? ApprovalDate { get; set; }
+
+        public DateTime? SignRequestDate { get; set; }
+
         public string HistoricalDataJSON { get; set; }
+
+        public ProposalStatusType Status { get; set; }
 
         // RELATIONS
 
@@ -89,17 +87,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? SendToSignDate { get; set; }
 
-        public string SigendFilename { get; set; }
+        public string SignedFilename { get; set; }
 
         public CurrencyCodeType? CurrencyCode { get; set; }
 
-        public string UserCreates { get; set; }     // Usuario que crea la Propuesta
+        // INTERNAL
 
-        public string UserReview { get; set; }      // Usuario que revisa y aprueba la Propuesta
+        public string CreatedBy { get; set; }
 
-        public DateTime? ReviewDate { get; set; }   // Fecha en que se envió a revisión por parte del creador o editor
+        public DateTime? ReviewDate { get; set; }
 
-        public DateTime? ActiveDate { get; set; }   // Fecha de activación de la Propuesta por parte del revisor
+        public DateTime? ApprovalDate { get; set; }
+
+        public DateTime? SignRequestDate { get; set; }
+
+        public string HistoricalDataJSON { get; set; }
 
         public ProposalStatusType Status { get; set; }
 
@@ -108,10 +110,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
-
-        // INTERNAL
-
-        public string HistoricalDataJSON { get; set; }
 
         // RELATIONS
 

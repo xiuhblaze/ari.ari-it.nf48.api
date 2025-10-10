@@ -269,6 +269,8 @@
     <Compile Include="Controllers\MD5Controller.cs" />
     <Compile Include="Controllers\NotesController.cs" />
     <Compile Include="Controllers\OrganizationStandardsController.cs" />
+    <Compile Include="Controllers\ProposalAuditsController.cs" />
+    <Compile Include="Controllers\ProposalsController.cs" />
     <Compile Include="Controllers\StandardTemplatesController.cs" />
     <Compile Include="Controllers\UserSettingsController.cs" />
     <Compile Include="CustomEntities\EmployeesMD5.cs" />
@@ -313,7 +315,7 @@
     <Compile Include="Data\Configurations\CompanyConfiguration.cs" />
     <Compile Include="Data\Configurations\OrganizationStandardConfiguration.cs" />
     <Compile Include="Data\Configurations\ProposalConfiguration.cs" />
-    <Compile Include="Data\Configurations\ProposalSiteConfiguration.cs" />
+    <Compile Include="Data\Configurations\ProposalAuditConfiguration.cs" />
     <Compile Include="Data\Configurations\RoleConfiguration.cs" />
     <Compile Include="Data\Configurations\ShiftConfiguration.cs" />
     <Compile Include="Data\Configurations\SiteConfiguration.cs" />
@@ -347,6 +349,7 @@
     <Compile Include="Enumerations\NoteEnums.cs" />
     <Compile Include="Enumerations\OrganizationEnums.cs" />
     <Compile Include="Enumerations\OrganizationStandardEnums.cs" />
+    <Compile Include="Enumerations\ProposalAuditEnums.cs" />
     <Compile Include="Enumerations\ProposalEnums.cs" />
     <Compile Include="Enumerations\RoleEnums.cs" />
     <Compile Include="Enumerations\ShiftEnums.cs" />
@@ -389,6 +392,7 @@
     <Compile Include="Mappings\NoteMapping.cs" />
     <Compile Include="Mappings\OrganizationMapping.cs" />
     <Compile Include="Mappings\OrganizationStandardMapping.cs" />
+    <Compile Include="Mappings\ProposalAuditMapping.cs" />
     <Compile Include="Mappings\ProposalMapping.cs" />
     <Compile Include="Mappings\RoleMapping.cs" />
     <Compile Include="Mappings\ShiftMapping.cs" />
@@ -445,6 +449,7 @@
     <Compile Include="Models\DTOs\NoteDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationDTOs.cs" />
     <Compile Include="Models\DTOs\OrganizationStandardDTOs.cs" />
+    <Compile Include="Models\DTOs\ProposalAuditDTOs.cs" />
     <Compile Include="Models\DTOs\ProposalDTOs.cs" />
     <Compile Include="Models\DTOs\RoleDTOs.cs" />
     <Compile Include="Models\DTOs\ShiftDTOs.cs" />
@@ -459,7 +464,7 @@
     <Compile Include="Models\Company.cs" />
     <Compile Include="Models\OrganizationStandard.cs" />
     <Compile Include="Models\Proposal.cs" />
-    <Compile Include="Models\ProposalSite.cs" />
+    <Compile Include="Models\ProposalAudit.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Shift.cs" />
     <Compile Include="Models\Site.cs" />
@@ -497,6 +502,7 @@
     <Compile Include="QueryFilters\NoteQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationQueryFilters.cs" />
     <Compile Include="QueryFilters\OrganizationStandardQueryFilters.cs" />
+    <Compile Include="QueryFilters\ProposalAuditQueryFilters.cs" />
     <Compile Include="QueryFilters\ProposalQueryFilters.cs" />
     <Compile Include="QueryFilters\RoleQueryFilters.cs" />
     <Compile Include="QueryFilters\ShiftQueryFilters.cs" />
@@ -531,6 +537,7 @@
     <Compile Include="Repositories\NaceCodeRepository.cs" />
     <Compile Include="Repositories\OrganizationRepository.cs" />
     <Compile Include="Repositories\OrganizationStandardRepository.cs" />
+    <Compile Include="Repositories\ProposalAuditRepository.cs" />
     <Compile Include="Repositories\ProposalRepository.cs" />
     <Compile Include="Repositories\RoleRepository.cs" />
     <Compile Include="Repositories\ShiftRepository.cs" />
@@ -566,6 +573,7 @@
     <Compile Include="Services\NoteService.cs" />
     <Compile Include="Services\OrganizationService.cs" />
     <Compile Include="Services\OrganizationStandardService.cs" />
+    <Compile Include="Services\ProposalAuditService.cs" />
     <Compile Include="Services\ProposalService.cs" />
     <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\ShiftService.cs" />

@@ -128,8 +128,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid AppFormID { get; set; }
 
-        [Required]
-        public Guid AuditCycleID { get; set; }
+        //[Required]
+        //public Guid AuditCycleID { get; set; }
 
         [Required]
         [StringLength(50)]

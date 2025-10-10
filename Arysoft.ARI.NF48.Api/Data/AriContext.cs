@@ -42,7 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Data
             // Módulo de Propuestas
 
             ProposalConfiguration.Configure(modelBuilder);
-            ProposalSiteConfiguration.Configure(modelBuilder);
+            ProposalAuditConfiguration.Configure(modelBuilder);
 
             // Módulo de Auditorias
             AuditCycleConfiguration.Configure(modelBuilder);

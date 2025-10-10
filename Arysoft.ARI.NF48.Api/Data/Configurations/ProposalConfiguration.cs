@@ -40,15 +40,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(100);
 
             modelBuilder.Entity<Proposal>()
-                .Property(m => m.SigendFilename)
+                .Property(m => m.SignedFilename)
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Proposal>()
-                .Property(m => m.UserCreates)
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<Proposal>()
-                .Property(m => m.UserReview)
+                .Property(m => m.CreatedBy)
                 .HasMaxLength(50);
 
             modelBuilder.Entity<Proposal>()
@@ -70,13 +66,13 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             // RELATIONS
 
-            //modelBuilder.Entity<Proposal>()
-            //    .HasMany(m => m.ProposalSites)
-            //    .WithRequired(m => m.Proposal)
-            //    .HasForeignKey(m => m.ProposalID)
-            //    .WillCascadeOnDelete(true);
+            modelBuilder.Entity<Proposal>()
+                .HasMany(m => m.ProposalAudits)
+                .WithRequired(m => m.Proposal)
+                .HasForeignKey(m => m.ProposalID)
+                .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<AppForm>()
+            modelBuilder.Entity<Proposal>()
                 .HasMany(m => m.Notes)
                 .WithOptional()
                 .HasForeignKey(m => m.OwnerID)

@@ -1,5 +1,4 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
-using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
@@ -11,9 +10,6 @@ using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -115,7 +111,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (string.IsNullOrEmpty(data))
                 throw new BusinessException("No data");
 
-            StandardTemplateUpdateDto itemUpdateDto = JsonConvert.DeserializeObject<StandardTemplateUpdateDto>(data)
+            StandardTemplateUpdateDto itemUpdateDto = JsonConvert
+                .DeserializeObject<StandardTemplateUpdateDto>(data)
                 ?? throw new BusinessException("Can't read data object");
 
             var item = await _service.GetAsync(itemUpdateDto.ID)

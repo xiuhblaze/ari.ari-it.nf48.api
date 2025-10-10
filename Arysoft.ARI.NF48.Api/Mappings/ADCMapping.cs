@@ -101,7 +101,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADC
             {
                 AppFormID = itemDto.AppFormID,
-                AuditCycleID = itemDto.AuditCycleID,
+                //AuditCycleID = itemDto.AuditCycleID,
                 UpdatedUser = itemDto.UpdatedUser,
             };
         } // ItemCreateDtoToADC

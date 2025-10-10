@@ -158,7 +158,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // PutADCSiteList
 
         [HttpDelete]
-        [ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]
+        [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteADCSite(Guid id, [FromBody] ADCSiteItemDeleteDto itemDeleteDto)
         {
             if (!ModelState.IsValid)

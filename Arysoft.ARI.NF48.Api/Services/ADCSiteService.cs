@@ -141,7 +141,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             if (item.ADCID == null || item.ADCID == Guid.Empty)
-                throw new ArgumentException("The ADC ID is required.");
+                throw new BusinessException("The ADC ID is required.");
 
             // Assigning values
 

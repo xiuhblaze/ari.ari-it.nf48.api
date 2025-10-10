@@ -99,6 +99,8 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<Proposal> GetAsync(Guid id, bool asNoTracking = false)
         {
             // - Analizar alertas de cambio de alcance o empleados
+            // - Actualizar MD5, ActivitiesScope y TotalEmployees si es necesario
+
             return await _repository.GetAsync(id, asNoTracking);
         } // GetAsync
 
@@ -121,7 +123,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // 1. Agregar los sitios del proposal
-            // 2. Agregar los datos del appform y adc necesarios
+            // 2. Agregar los datos del appform y adc necesarios -YA
 
             return item;
         } // CreateAsync
@@ -216,7 +218,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.TotalEmployees = adc.TotalEmployees;
             item.MD5ID = md5.ID;
 
-            item.UserCreates = item.UpdatedUser;
+            item.CreatedBy = item.UpdatedUser;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
             item.Status = ProposalStatusType.Nothing;
@@ -250,6 +252,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                             throw new BusinessException("The proposal can only be sent if it has been approved.");
                         break;
                     case ProposalStatusType.Active:
+                        // Validar que otra propuesa del mismo ciclo no esté activa
                         if (foundItem.Status != ProposalStatusType.Sended)
                             throw new BusinessException("The proposal can only be active if the client signed it.");
                         break;
@@ -268,17 +271,19 @@ namespace Arysoft.ARI.NF48.Api.Services
                 switch (item.Status)
                 {
                     case ProposalStatusType.Review:
+                        foundItem.ReviewDate = DateTime.UtcNow;                        
+                        break;
+                    case ProposalStatusType.Rejected:
                         foundItem.ReviewDate = DateTime.UtcNow;
-                        foundItem.UserReview = item.UpdatedUser;
                         break;
                     case ProposalStatusType.Sended:
                         if(string.IsNullOrEmpty(item.SignerName)
                             || string.IsNullOrEmpty(item.SignerPosition))
                             throw new BusinessException("The signatory's name and position are required before submitting the proposal.");
-                        foundItem.SendToSignDate = DateTime.UtcNow;
+                        foundItem.SignRequestDate = DateTime.UtcNow;
                         break;
                     case ProposalStatusType.Active:
-                        foundItem.ActiveDate = DateTime.UtcNow;
+                        //foundItem.ActiveDate = DateTime.UtcNow;                        
                         break;
                     case ProposalStatusType.Inactive:
                         foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
@@ -286,13 +291,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
-            foundItem.MD5ID = item.MD5ID;
-            foundItem.ActivitiesScope = item.ActivitiesScope;
-            foundItem.TotalEmployees = item.TotalEmployees; //HACK: Considerar si es calculado o se recibe
-            foundItem.Justification = item.Justification;   //HACK: Considerar si es generadp se recibe
+            // foundItem.MD5ID = item.MD5ID;
+            //foundItem.ActivitiesScope = item.ActivitiesScope;
+            //foundItem.TotalEmployees = item.TotalEmployees; //HACK: Considerar si es calculado o se recibe
+            foundItem.Justification = item.Justification;   //HACK: Considerar si es generado o se recibe, creo que lo va a generar el front end para que se acepte visualmente
             foundItem.SignerName = item.SignerName;
             foundItem.SignerPosition = item.SignerPosition;
-            foundItem.SigendFilename = item.SigendFilename;
+            foundItem.SignedFilename = item.SignedFilename;
             foundItem.CurrencyCode = item.CurrencyCode;
             foundItem.Status = foundItem.Status == ProposalStatusType.Nothing && item.Status == ProposalStatusType.Nothing
                 ? ProposalStatusType.New
@@ -304,6 +309,64 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // SetValuesForUpdate
+
+        //private async Task<Proposal> AddProposalAuditsToNewProposalAsync(Proposal proposal)
+        //{
+        //    var proposalAuditRepository = new ProposalAuditRepository();
+        //    var adcRepository = new ADCRepository();
+
+        //    var adc = await adcRepository.GetAsync(proposal.ADCID)
+        //        ?? throw new BusinessException("ADC record not found");
+
+        //    var oneADCSite = adc.ADCSites
+        //        .Where(adcs => adcs.Status == StatusType.Active)
+        //        .FirstOrDefault()
+        //        ?? throw new BusinessException("The ADC has no active sites.");
+
+        //    foreach (var adcSiteAudit in oneADCSite.ADCSiteAudits
+        //        .Where(asa => asa.Status == StatusType.Active))
+        //    {
+        //        var totalDays = 0;
+
+        //        foreach (var adcSite in adc.ADCSites
+        //            .Where(adcs => adcs.Status == StatusType.Active))
+        //        {
+        //            var currAsa = adcSite.ADCSiteAudits
+        //                .Where(asa => asa.Status == StatusType.Active
+        //                    && asa.AuditStep == adcSiteAudit.AuditStep)
+        //                .FirstOrDefault();
+
+        //            // Si es multisiio, tomar el valor de MD11
+
+        //            switch (currAsa.AuditStep)
+        //            { 
+        //                case AuditStepType.Stage1:
+        //                case AuditStepType.Stage2:
+        //                    totalDays += (int)(adcSite.TotalInitial ?? 0);
+        //                    break;
+        //                case AuditStepType.Surveillance1:
+        //                case AuditStepType.Surveillance2:
+        //                case AuditStepType.Surveillance3:
+        //                case AuditStepType.Surveillance4:
+        //                case AuditStepType.Surveillance5:
+        //                    totalDays += (int)(adcSite.Surveillance ?? 0);
+        //                    break;
+        //            }
+        //        }
+
+        //        var proposalAudit = new ProposalAudit
+        //        { 
+        //            ID = Guid.NewGuid(),
+        //            ProposalID = proposal.ID,
+        //            AuditStep = adcSiteAudit.AuditStep,
+        //            TotalAuditDays = totalDays,
+        //            Created = DateTime.UtcNow,
+        //            Updated = DateTime.UtcNow,
+        //            UpdatedUser = proposal.UpdatedUser,
+        //            Status = StatusType.Active
+        //        }
+        //    }
+        //} // AddProposalAuditsToNewProposalAsync
 
         private string GetHistoricalDataJSON(Proposal item)
         {
