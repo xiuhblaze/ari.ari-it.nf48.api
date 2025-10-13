@@ -35,6 +35,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 MD11UploadedBy = item.MD11UploadedBy,
                 Total = item.Total,
                 Surveillance = item.Surveillance,
+                Recertification = item.Recertification,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 ADCDescription = item.ADC != null 
@@ -72,6 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 MD11UploadedBy = item.MD11UploadedBy,
                 Total = item.Total,
                 Surveillance = item.Surveillance,
+                Recertification = item.Recertification,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
@@ -115,6 +117,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 MD11 = itemDto.MD11,
                 Total = itemDto.Total,
                 Surveillance = itemDto.Surveillance,
+                Recertification = itemDto.Recertification,
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

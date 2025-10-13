@@ -29,6 +29,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? Surveillance { get; set; }
 
+        public decimal? Recertification { get; set; }
+
         public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
@@ -76,6 +78,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public decimal? Total { get; set; }
 
         public decimal? Surveillance { get; set; }
+
+        public decimal? Recertification { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -130,6 +134,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public decimal? Total { get; set; }
 
         public decimal? Surveillance { get; set; }
+
+        public decimal? Recertification { get; set; }
 
         public string ExtraInfo { get; set; }
 

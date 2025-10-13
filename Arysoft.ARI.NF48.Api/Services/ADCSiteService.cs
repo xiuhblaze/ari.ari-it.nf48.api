@@ -370,7 +370,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
             foundItem.MD11 = item.MD11;                     // Por lo pronto manual hasta que entienda el MD11
-            foundItem.MD11Filename = String.IsNullOrEmpty(item.MD11Filename)
+            foundItem.MD11Filename = string.IsNullOrEmpty(item.MD11Filename)
                 ? foundItem.MD11Filename
                 : item.MD11Filename;                        // Nombre del archivo de evidencia del MD11
             foundItem.MD11UploadedBy = string.IsNullOrEmpty(item.MD11UploadedBy)
@@ -378,6 +378,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 : item.MD11UploadedBy;                      // Usuario que subió el archivo del MD11
             foundItem.Total = item.Total;                   // Total en días ya sea de TotalInitial o de MD11
             foundItem.Surveillance = item.Surveillance;     // Debe ser una tercera parte del TotalInitial (x)/3
+            foundItem.Recertification = item.Recertification; // Debe reducirse un 33% del TotalInitial pero su reducción no puede ser menor al 50% de Initial MD5
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active

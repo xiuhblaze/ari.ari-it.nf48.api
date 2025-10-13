@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -121,6 +122,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 throw new BusinessException($"ProposalService.CreateAsync: {ex.Message}");
             }
+
+            // item = await AddProposalAuditsToNewProposalAsync(item);
 
             // 1. Agregar los sitios del proposal
             // 2. Agregar los datos del appform y adc necesarios -YA
@@ -326,46 +329,61 @@ namespace Arysoft.ARI.NF48.Api.Services
         //    foreach (var adcSiteAudit in oneADCSite.ADCSiteAudits
         //        .Where(asa => asa.Status == StatusType.Active))
         //    {
-        //        var totalDays = 0;
+        //        decimal totalDays = 0;
 
         //        foreach (var adcSite in adc.ADCSites
         //            .Where(adcs => adcs.Status == StatusType.Active))
         //        {
         //            var currAsa = adcSite.ADCSiteAudits
         //                .Where(asa => asa.Status == StatusType.Active
+        //                    && (asa.Value.HasValue && asa.Value.Value)
         //                    && asa.AuditStep == adcSiteAudit.AuditStep)
         //                .FirstOrDefault();
 
-        //            // Si es multisiio, tomar el valor de MD11
+        //            // Si es multisitio, tomar el valor de MD11
 
         //            switch (currAsa.AuditStep)
-        //            { 
+        //            {
         //                case AuditStepType.Stage1:
         //                case AuditStepType.Stage2:
-        //                    totalDays += (int)(adcSite.TotalInitial ?? 0);
+        //                    totalDays += adcSite.Total ?? 0;
         //                    break;
         //                case AuditStepType.Surveillance1:
         //                case AuditStepType.Surveillance2:
         //                case AuditStepType.Surveillance3:
         //                case AuditStepType.Surveillance4:
         //                case AuditStepType.Surveillance5:
-        //                    totalDays += (int)(adcSite.Surveillance ?? 0);
+        //                    totalDays += adcSite.Surveillance ?? 0;
+        //                    break;
+        //                case AuditStepType.Recertification:
+        //                    //TODO: Calcular RR - esto se va a mover al frontend
+        //                    totalDays += adcSite.Total.HasValue 
+        //                        ? adcSite.Total.Value * 0.67m
+        //                        : 0;
         //                    break;
         //            }
         //        }
 
         //        var proposalAudit = new ProposalAudit
-        //        { 
+        //        {
         //            ID = Guid.NewGuid(),
         //            ProposalID = proposal.ID,
         //            AuditStep = adcSiteAudit.AuditStep,
         //            TotalAuditDays = totalDays,
+        //            Status = StatusType.Active,
         //            Created = DateTime.UtcNow,
         //            Updated = DateTime.UtcNow,
         //            UpdatedUser = proposal.UpdatedUser,
-        //            Status = StatusType.Active
-        //        }
+        //        };
         //    }
+
+
+
+
+
+
+
+
         //} // AddProposalAuditsToNewProposalAsync
 
         private string GetHistoricalDataJSON(Proposal item)

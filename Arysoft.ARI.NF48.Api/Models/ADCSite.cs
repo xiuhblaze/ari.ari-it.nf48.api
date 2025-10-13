@@ -22,9 +22,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string MD11UploadedBy { get; set; }
 
-        public decimal? Total { get; set; }         // Total en días ya sea de TotalInitial o de MD11
+        public decimal? Total { get; set; }             // Total en días ya sea de TotalInitial o de MD11
 
-        public decimal? Surveillance { get; set; }
+        public decimal? Surveillance { get; set; }      // Total de días para auditorias de vigilancia
+
+        public decimal? Recertification { get; set; }   // Total de días para auditorias de recertificación
 
         public string ExtraInfo { get; set; }
 
