@@ -150,7 +150,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             
             item.ID = Guid.NewGuid();
             item.AuditCycleID = await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
-            item.UserCreates = item.UpdatedUser;
+            // item.UserCreates = item.UpdatedUser;
             item.Status = ADCStatusType.New;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -276,6 +276,42 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateListAsync
 
+        public async Task<ADC> UpdateProposalIDAsync(Guid adcID, Guid proposalID, string updatedUser)
+        {
+            var proposalRepository = new ProposalRepository();
+
+            if (adcID == Guid.Empty)
+                throw new BusinessException("The ADC ID is required.");
+
+            if (proposalID == Guid.Empty)
+                throw new BusinessException("The Proposal ID is required.");
+
+            var foundItem = await _repository.GetAsync(adcID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            if (foundItem.Status != ADCStatusType.Active)
+                throw new BusinessException("Only Active ADCs can be linked to a Proposal.");
+
+            _ = await proposalRepository.GetAsync(proposalID) // _ = sin objeto, porque no solo quiero saber si existe
+                ?? throw new BusinessException("The Proposal to link was not found.");
+
+            foundItem.ProposalID = proposalID;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = updatedUser;
+
+            try
+            {
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCService.UpdateProposalIDAsync: {ex.Message}");
+            }
+
+            return foundItem;
+        } // UpdateProposalIDAsync
+
         public async Task DeleteAsync(ADC item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
@@ -329,13 +365,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 switch (item.Status) // Si el nuevo status es...
                 {
                     case ADCStatusType.Review:
-                        if (string.IsNullOrEmpty(item.ReviewComments))
-                            throw new BusinessException("Comments are required when send to Review.");
+                        //if (string.IsNullOrEmpty(item.ReviewComments))
+                        //    throw new BusinessException("Comments are required when send to Review.");
                         break;
 
                     case ADCStatusType.Rejected:
-                        if (string.IsNullOrEmpty(item.ReviewComments))
-                            throw new BusinessException("Comments are required when rejected.");
+                        //if (string.IsNullOrEmpty(item.ReviewComments))
+                        //    throw new BusinessException("Comments are required when rejected.");
                         break;
 
                     case ADCStatusType.Active:
@@ -368,17 +404,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 {
                     case ADCStatusType.Review:
                         foundItem.ReviewDate = DateTime.UtcNow;
-                        foundItem.ReviewComments = item.ReviewComments;
+                        // foundItem.ReviewComments = item.ReviewComments;
                         break;
 
                     case ADCStatusType.Rejected:                        
                         foundItem.ReviewDate = DateTime.UtcNow;
-                        foundItem.ReviewComments = item.ReviewComments;
-                        foundItem.UserReview = item.UpdatedUser;
+                        //foundItem.ReviewComments = item.ReviewComments;
+                        //foundItem.UserReview = item.UpdatedUser;
                         break;
 
                     case ADCStatusType.Active:
-                        foundItem.UserReview = item.UpdatedUser;
+                        // foundItem.UserReview = item.UpdatedUser;
                         foundItem.ActiveDate = DateTime.UtcNow;
                         break;
 
@@ -399,7 +435,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.TotalInitial = item.TotalInitial;
             foundItem.TotalMD11 = item.TotalMD11;
             foundItem.TotalSurveillance = item.TotalSurveillance;
-            foundItem.TotalRR = item.TotalRR;
+            foundItem.TotalRecertification = item.TotalRecertification;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == ADCStatusType.Nothing && item.Status == ADCStatusType.Nothing
                 ? ADCStatusType.New

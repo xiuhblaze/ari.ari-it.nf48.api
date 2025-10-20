@@ -28,18 +28,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<ADC>()
-                .Property(m => m.UserCreates)
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<ADC>()
-                .Property(m => m.UserReview)
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<ADC>()
-                .Property(m => m.ReviewComments)
-                .HasMaxLength(1000);
-
-            modelBuilder.Entity<ADC>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(500);
 
@@ -57,15 +45,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             // RELATIONS
-
-            //modelBuilder.Entity<ADC>()
-            //    .HasRequired(adc => adc.AppForm)
-            //    .WithMany()
-            //    .HasForeignKey(adc => adc.AppFormID);
-
-            //modelBuilder.Entity<ADC>()
-            //    .HasIndex(ADC => ADC.AppFormID)
-            //    .IsUnique();
 
             modelBuilder.Entity<ADC>()
                 .HasMany(a => a.ADCSites)

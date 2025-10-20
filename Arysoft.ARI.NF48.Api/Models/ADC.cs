@@ -10,6 +10,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid AuditCycleID { get; set; }
 
+        public Guid? ProposalID { get; set; } 
+
         public string Description { get; set; }
 
         public int? TotalEmployees { get; set; }
@@ -20,15 +22,15 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public decimal? TotalSurveillance { get; set; }
 
-        public decimal? TotalRR { get; set; }
+        public decimal? TotalRecertification { get; set; }
 
-        public string UserCreates { get; set; }     // Usuario que crea el ADC
+        //public string UserCreates { get; set; }     // Usuario que crea el ADC
 
-        public string UserReview { get; set; }      // Usuario que revisa y aprueba el ADC
+        //public string UserReview { get; set; }      // Usuario que revisa y aprueba el ADC
 
         public DateTime? ReviewDate { get; set; }   // Fecha en que se envió a revisión por parte del creador
 
-        public string ReviewComments { get; set; }  // Comentarios del revisor del ADC
+        // public string ReviewComments { get; set; }  // Comentarios del revisor del ADC
 
         public DateTime? ActiveDate { get; set; }   // Fecha de activación del ADC por parte del revisor
 
@@ -48,7 +50,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual ICollection<ADCSite> ADCSites { get; set; }
 
-        public virtual ICollection<Proposal> Proposals { get; set; } // Solo va a ser una propuesta
+        public virtual Proposal Proposal { get; set; }
 
         public virtual ICollection<Note> Notes { get; set; }
 

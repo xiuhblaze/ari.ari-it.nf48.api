@@ -20,18 +20,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<Proposal>()
-                .Property(m => m.AppFormID)
-                .IsRequired();
-
-            modelBuilder.Entity<Proposal>()
-                .Property(m => m.ADCID)
-                .IsRequired();
-
-            modelBuilder.Entity<Proposal>()
-                .Property(m => m.ActivitiesScope)
-                .HasMaxLength(1000);
-
-            modelBuilder.Entity<Proposal>()
                 .Property(m => m.SignerName)
                 .HasMaxLength(150);
 

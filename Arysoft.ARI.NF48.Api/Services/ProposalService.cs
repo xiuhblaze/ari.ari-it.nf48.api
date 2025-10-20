@@ -34,18 +34,17 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (filters.AuditCycleID != null && filters.AuditCycleID != Guid.Empty)
                 items = items.Where(m => m.AuditCycleID == filters.AuditCycleID);
 
-            if (filters.AppFormID != null && filters.AppFormID != Guid.Empty)
-                items = items.Where(m => m.AppFormID == filters.AppFormID);
-
-            if (filters.ADCID != null && filters.ADCID != Guid.Empty)
-                items = items.Where(m => m.ADCID == filters.ADCID);
+            if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
+                items = items.Where(m => 
+                    m.AuditCycle != null 
+                    && m.AuditCycle.OrganizationID == filters.OrganizationID
+                );
 
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
                 items = items.Where(m =>
-                    (m.ActivitiesScope != null && m.ActivitiesScope.ToLower().Contains(filters.Text))
-                    || (m.Justification != null && m.Justification.ToLower().Contains(filters.Text))
+                    (m.Justification != null && m.Justification.ToLower().Contains(filters.Text))
                     || (m.SignerName != null && m.SignerName.ToLower().Contains(filters.Text))
                     || (m.SignerPosition != null && m.SignerPosition.ToLower().Contains(filters.Text))
                     || (m.HistoricalDataJSON != null && m.HistoricalDataJSON.ToLower().Contains(filters.Text))
@@ -87,7 +86,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
             }
 
-            // - Analizar alertas de cambio de alcance o empleados
+            // TODO: Analizar alertas
 
             // Pagination
 
@@ -99,8 +98,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Proposal> GetAsync(Guid id, bool asNoTracking = false)
         {
-            // - Analizar alertas de cambio de alcance o empleados
-            // - Actualizar MD5, ActivitiesScope y TotalEmployees si es necesario
+            // TODO: Analizar alertas 
 
             return await _repository.GetAsync(id, asNoTracking);
         } // GetAsync
@@ -108,7 +106,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<Proposal> CreateAsync(Proposal item)
         {
             await ValidateNewItemAsync(item);
-            item = await SetValuesForCreateAsync(item);
+            item = SetValuesForCreate(item);
 
             // Excecute queries
 
@@ -138,7 +136,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            ValidateUpdatedItem(item, foundItem);
+            await ValidateUpdatedItemAsync(item, foundItem);
             foundItem = SetValuesForUpdate(item, foundItem);
 
             try 
@@ -192,52 +190,33 @@ namespace Arysoft.ARI.NF48.Api.Services
         private async Task ValidateNewItemAsync(Proposal item)
         {
             // Validations
-            
-            // - Validar que el ADC no tenga otra propuesta valida
-            if (await _repository.ADCHasValidProposalAsync(item.ADCID))
-                throw new BusinessException("The ADC already has a valid proposal.");
-            
-            // - Validar que el appform, auditcycle y la organization esten activos, o algo así
-            if (await _repository.HasValidParentsAsync(item))
-                throw new BusinessException("The Organization, Audit cycle, App form or ADC records are not valid.");
+                        
+            // - Validar que el auditcycle y la organization esten activos
+            if (await _repository.HasValidParentsForCreateAsync(item))
+                throw new BusinessException("The Organization, Audit cycle or App form records are not valid.");
 
         } // ValidateNewItem
 
-        private async Task<Proposal> SetValuesForCreateAsync(Proposal item)
-        {
-            var _appformRepository = new AppFormRepository();
-            var _adcRepository = new ADCRepository();
-            var _md5Repository = new MD5Repository();
-
-            var appForm = await _appformRepository.GetAsync(item.AppFormID)
-                ?? throw new BusinessException("App Form record not found");
-            var adc = await _adcRepository.GetAsync(item.ADCID)
-                ?? throw new BusinessException("ADC record not found");
-            var md5 = await _md5Repository.GetByEmployeesAsync(adc.TotalEmployees ?? 0);
-
+        private Proposal SetValuesForCreate(Proposal item)
+        {   
             item.ID = Guid.NewGuid();
-
-            item.ActivitiesScope = appForm.ActivitiesScope;
-            item.TotalEmployees = adc.TotalEmployees;
-            item.MD5ID = md5.ID;
-
             item.CreatedBy = item.UpdatedUser;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
             item.Status = ProposalStatusType.Nothing;
 
             return item;
-        } // SetValuesForCreateAsync
+        } // SetValuesForCreate
 
         // Update
 
-        private void ValidateUpdatedItem(Proposal item, Proposal foundItem)
+        private async Task ValidateUpdatedItemAsync(Proposal item, Proposal foundItem)
         {
 
             // Si cambia el status, según el cambio validar...
             if (foundItem.Status != item.Status)
             {
-                switch (item.Status)
+                switch (item.Status) // Si el nuevo estatus es...
                 {
                     case ProposalStatusType.Review:
                         if (foundItem.Status != ProposalStatusType.New
@@ -245,26 +224,35 @@ namespace Arysoft.ARI.NF48.Api.Services
                             && foundItem.Status != ProposalStatusType.Cancel
                             )
                             throw new BusinessException("The proposal not can't be send to review.");
+                        // Validar que tenga ADC asociados y activos
                         break;
+
                     case ProposalStatusType.Approved:
                         if (foundItem.Status != ProposalStatusType.Review)
-                            throw new BusinessException("The record status can only be changed to Approved from Review.");
+                            throw new BusinessException("The record status can only be changed to Approved from Review.");                        
                         break;
+
                     case ProposalStatusType.Sended:
                         if (foundItem.Status != ProposalStatusType.Approved)
                             throw new BusinessException("The proposal can only be sent if it has been approved.");
+                        
                         break;
+
                     case ProposalStatusType.Active:
                         // Validar que otra propuesa del mismo ciclo no esté activa
                         if (foundItem.Status != ProposalStatusType.Sended)
                             throw new BusinessException("The proposal can only be active if the client signed it.");
                         break;
+
                     case ProposalStatusType.Deleted:
                         throw new BusinessException("The proposal can't be deleted. Use the Delete function");
                 }
             }
 
-        } // ValidateUpdatedItem
+            if (!await _repository.HasValidParentsForUpdateAsync(item))
+                throw new BusinessException("The Organization, Audit cycle, ADC or App form records are not valid.");
+
+        } // ValidateUpdatedItemAsync
 
         private Proposal SetValuesForUpdate(Proposal item, Proposal foundItem)
         {

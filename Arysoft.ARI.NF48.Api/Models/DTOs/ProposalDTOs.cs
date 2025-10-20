@@ -136,12 +136,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required(ErrorMessage = "The Audit Cycle ID is required")]
         public Guid? AuditCycleID { get; set; }
 
-        [Required(ErrorMessage = "The AppForm ID is required")]
-        public Guid? AppFormID { get; set; }
-
-        [Required(ErrorMessage = "The ADC ID is required")]
-        public Guid? ADCID { get; set; }
-
         [Required(ErrorMessage = "The User that creates is required")]
         [StringLength(50, ErrorMessage = "The User name must be less than 50 characters")]
         public string UpdatedUser { get; set; }

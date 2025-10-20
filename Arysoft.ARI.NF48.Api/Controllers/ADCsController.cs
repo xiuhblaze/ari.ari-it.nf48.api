@@ -106,5 +106,48 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // PutUpdateCompleteADC
+
+        [HttpPut()]
+        [Route("api/ADCs/{id}/proposal/{proposalID}")]
+        [ResponseType(typeof(ApiResponse<ADCItemDetailDto>))]
+        public async Task<IHttpActionResult> PutUpdateProposalToADC(Guid id, Guid proposalID, ADCUpdateProposalIDDto itemUpdateDto)
+        {   
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemUpdateDto.ID)
+                throw new BusinessException("ID Mismatch");
+
+            if (proposalID != itemUpdateDto.ProposalID)
+                throw new BusinessException("Proposal ID Mismatch");
+
+            var item = await _service.UpdateProposalIDAsync(
+                itemUpdateDto.ID ?? Guid.Empty,
+                itemUpdateDto.ProposalID ?? Guid.Empty,
+                itemUpdateDto.UpdatedUser);
+            var itemDto = ADCMapping.ADCToItemDetailDto(item);
+            var response = new ApiResponse<ADCItemDetailDto>(itemDto);
+
+            return Ok(response);
+        } // PutUpdateProposalToADC
+
+        [HttpDelete]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> DeleteADC(Guid id, ADCDeleteDto itemDeleteDto)
+        {
+
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDeleteDto.ID)
+                throw new BusinessException("ID Mismatch");
+
+            var item = ADCMapping
+                .ItemDeleteDtoToADC(itemDeleteDto);
+            await _service.DeleteAsync(item);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // DeleteADC
     }
 }
