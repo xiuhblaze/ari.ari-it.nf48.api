@@ -276,32 +276,25 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateListAsync
 
-        public async Task<ADC> UpdateProposalIDAsync(Guid adcID, Guid proposalID, string updatedUser)
+        public async Task<ADC> UpdateProposalIDAsync(ADC item, Guid proposalID, string updatedUser)
         {
-            var proposalRepository = new ProposalRepository();
-
-            if (adcID == Guid.Empty)
+            if (item == null)
                 throw new BusinessException("The ADC ID is required.");
 
             if (proposalID == Guid.Empty)
                 throw new BusinessException("The Proposal ID is required.");
 
-            var foundItem = await _repository.GetAsync(adcID)
-                ?? throw new BusinessException("The record to update was not found");
-
-            if (foundItem.Status != ADCStatusType.Active)
+            
+            if (item.Status != ADCStatusType.Active)
                 throw new BusinessException("Only Active ADCs can be linked to a Proposal.");
 
-            _ = await proposalRepository.GetAsync(proposalID) // _ = sin objeto, porque no solo quiero saber si existe
-                ?? throw new BusinessException("The Proposal to link was not found.");
-
-            foundItem.ProposalID = proposalID;
-            foundItem.Updated = DateTime.UtcNow;
-            foundItem.UpdatedUser = updatedUser;
+            item.ProposalID = proposalID;
+            item.Updated = DateTime.UtcNow;
+            item.UpdatedUser = updatedUser;
 
             try
             {
-                _repository.Update(foundItem);
+                _repository.Update(item);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -309,7 +302,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.UpdateProposalIDAsync: {ex.Message}");
             }
 
-            return foundItem;
+            return item;
         } // UpdateProposalIDAsync
 
         public async Task DeleteAsync(ADC item)

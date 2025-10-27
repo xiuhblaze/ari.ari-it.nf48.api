@@ -179,7 +179,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required(ErrorMessage = "The Proposal ID is required")]
         public Guid? ProposalID { get; set; }
         
-        [Required(ErrorMessage = "The User that updates is required"))]
+        [Required(ErrorMessage = "The User that updates is required")]
         [StringLength(50, ErrorMessage = "The User name must be less than 50 characters")]
         public string UpdatedUser { get; set; }
     }

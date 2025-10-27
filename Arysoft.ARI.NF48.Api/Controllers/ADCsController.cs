@@ -107,29 +107,29 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutUpdateCompleteADC
 
-        [HttpPut()]
-        [Route("api/ADCs/{id}/proposal/{proposalID}")]
-        [ResponseType(typeof(ApiResponse<ADCItemDetailDto>))]
-        public async Task<IHttpActionResult> PutUpdateProposalToADC(Guid id, Guid proposalID, ADCUpdateProposalIDDto itemUpdateDto)
-        {   
-            if (!ModelState.IsValid)
-                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+        //[HttpPut()]
+        //[Route("api/ADCs/{id}/proposal/{proposalID}")]
+        //[ResponseType(typeof(ApiResponse<ADCItemDetailDto>))]
+        //public async Task<IHttpActionResult> PutUpdateProposalToADC(Guid id, Guid proposalID, ADCUpdateProposalIDDto itemUpdateDto)
+        //{   
+        //    if (!ModelState.IsValid)
+        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            if (id != itemUpdateDto.ID)
-                throw new BusinessException("ID Mismatch");
+        //    if (id != itemUpdateDto.ID)
+        //        throw new BusinessException("ID Mismatch");
 
-            if (proposalID != itemUpdateDto.ProposalID)
-                throw new BusinessException("Proposal ID Mismatch");
+        //    if (proposalID != itemUpdateDto.ProposalID)
+        //        throw new BusinessException("Proposal ID Mismatch");
 
-            var item = await _service.UpdateProposalIDAsync(
-                itemUpdateDto.ID ?? Guid.Empty,
-                itemUpdateDto.ProposalID ?? Guid.Empty,
-                itemUpdateDto.UpdatedUser);
-            var itemDto = ADCMapping.ADCToItemDetailDto(item);
-            var response = new ApiResponse<ADCItemDetailDto>(itemDto);
+        //    var item = await _service.UpdateProposalIDAsync(
+        //        itemUpdateDto.ID ?? Guid.Empty,
+        //        itemUpdateDto.ProposalID ?? Guid.Empty,
+        //        itemUpdateDto.UpdatedUser);
+        //    var itemDto = ADCMapping.ADCToItemDetailDto(item);
+        //    var response = new ApiResponse<ADCItemDetailDto>(itemDto);
 
-            return Ok(response);
-        } // PutUpdateProposalToADC
+        //    return Ok(response);
+        //} // PutUpdateProposalToADC
 
         [HttpDelete]
         [ResponseType(typeof(ApiResponse<bool>))]

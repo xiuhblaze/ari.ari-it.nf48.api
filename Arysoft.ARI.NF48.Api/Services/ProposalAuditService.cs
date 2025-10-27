@@ -199,6 +199,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
+
+
         // PRIVATE
 
         private ProposalAudit SetValuesUpdateItem(ProposalAudit item, ProposalAudit foundItem)

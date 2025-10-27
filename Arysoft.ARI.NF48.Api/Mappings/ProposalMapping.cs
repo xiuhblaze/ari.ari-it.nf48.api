@@ -25,11 +25,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = item.ID,
                 AuditCycleID = item.AuditCycleID,
-                AppFormID = item.AppFormID,
-                ADCID = item.ADCID,
-                MD5ID = item.MD5ID,
-                ActivitiesScope = item.ActivitiesScope,
-                TotalEmployees = item.TotalEmployees,
                 Justification = item.Justification,
                 SignerName = item.SignerName,
                 SignerPosition = item.SignerPosition,
@@ -45,11 +40,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // RELATIONS
                 OrganizationName = item.AuditCycle?.Organization?.Name ?? string.Empty,
                 AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
-                AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
-                MD5Range = item.MD5 != null 
-                    ? $"{item.MD5?.StartValue ?? 0}-${item.MD5?.EndValue ?? 0}"
-                    : string.Empty,
-                NotesCount = item.Notes.Count,
+                ProposalAuditsCount = item.ProposalAudits?.Count ?? 0,
+                NotesCount = item.Notes?.Count ?? 0,
                 // NOT MAPPED
                 Alerts = item.Alerts,
             };
@@ -61,11 +53,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = item.ID,
                 AuditCycleID = item.AuditCycleID,
-                AppFormID = item.AppFormID,
-                ADCID = item.ADCID,
-                MD5ID = item.MD5ID,
-                ActivitiesScope = item.ActivitiesScope,
-                TotalEmployees = item.TotalEmployees,
                 Justification = item.Justification,
                 SignerName = item.SignerName,
                 SignerPosition = item.SignerPosition,                
@@ -85,15 +72,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AuditCycle = item.AuditCycle != null
                     ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
                     : null,
-                AppForm = item.AppForm != null
-                    ? AppFormMapping.AppFormToItemListDto(item.AppForm)
-                    : null,
-                ADC = item.ADC != null
-                    ? ADCMapping.ADCToItemListDto(item.ADC)
-                    : null,
-                MD5 = item.MD5 != null
-                    ? MD5Mapping.MD5ToItemListDto(item.MD5)
-                    : null,
                 // PostalAudits
                 Notes = item.Notes != null
                     ? NoteMapping.NotesToListDto(
@@ -110,8 +88,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new Proposal
             {
                 AuditCycleID = itemDto.AuditCycleID ?? Guid.Empty,
-                AppFormID = itemDto.AppFormID ?? Guid.Empty,
-                ADCID = itemDto.ADCID ?? Guid.Empty,
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemCreateDtoToProposal

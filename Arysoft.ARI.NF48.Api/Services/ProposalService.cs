@@ -5,6 +5,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -105,6 +106,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Proposal> CreateAsync(Proposal item)
         {
+            var adcRepository = new ADCRepository();
+            var adcService = new ADCService();
+
             await ValidateNewItemAsync(item);
             item = SetValuesForCreate(item);
 
@@ -121,10 +125,25 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ProposalService.CreateAsync: {ex.Message}");
             }
 
-            // item = await AddProposalAuditsToNewProposalAsync(item);
+            // Agregar los ProposalAudits si solo hay un ADC disponible en el auditcycle
 
-            // 1. Agregar los sitios del proposal
-            // 2. Agregar los datos del appform y adc necesarios -YA
+            if (await adcRepository
+                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 1)
+            {
+                // Agregar los ProposalAudits y asociar en el ADC la propuesta (ProposalID)
+                //var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
+                var adc = await adcRepository.GetADCAvailableByAuditCycleAsync(item.AuditCycleID)
+                    ?? throw new BusinessException("ADC record not found");
+
+                await AddStepsFromADCAsync(item, adc);
+                await CalculateStepsTotalsAsync(item); // FIX: Aqui todavia no existe asignado el ID de proposal en el ADC
+// TODO: Aquí voy... (20251027)
+                await adcService.UpdateProposalIDAsync(adc, item.ID, item.UpdatedUser);
+
+                // Reload item
+                item = await _repository.GetAsync(item.ID)
+                    ?? throw new BusinessException("The Proposal was not found after add audit steps totals");
+            }
 
             return item;
         } // CreateAsync
@@ -183,14 +202,36 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
+        public async Task AddADC(Proposal item, Guid adcID)
+        { 
+            var adcService = new ADCService();
+            var adcRepository = new ADCRepository();
+
+            var foundItem = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("Proposal record not found");
+
+            var adc = await adcRepository.GetAsync(adcID)
+                ?? throw new BusinessException("ADC record not found");
+
+            await AddStepsFromADCAsync(foundItem, adc);
+            await CalculateStepsTotalsAsync(foundItem);
+
+            await adcService.UpdateProposalIDAsync(adc, item.ID, item.UpdatedUser);
+        } // AddADC
+
         // PRIVATE FUNCTIONS
 
         // Create 
 
         private async Task ValidateNewItemAsync(Proposal item)
         {
-            // Validations
-                        
+            var adcRepository = new ADCRepository();
+
+            // - Validar que exista al menos un ADC disponible en el auditcycle para asociar
+            if (await adcRepository
+                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 0)
+                throw new BusinessException("There are no ADCs available to be associated with the proposal.");
+
             // - Validar que el auditcycle y la organization esten activos
             if (await _repository.HasValidParentsForCreateAsync(item))
                 throw new BusinessException("The Organization, Audit cycle or App form records are not valid.");
@@ -301,78 +342,136 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // SetValuesForUpdate
 
-        //private async Task<Proposal> AddProposalAuditsToNewProposalAsync(Proposal proposal)
-        //{
-        //    var proposalAuditRepository = new ProposalAuditRepository();
-        //    var adcRepository = new ADCRepository();
+        private async Task AddStepsFromADCAsync(Proposal proposal, ADC adc)
+        {
+            var adcRepository = new ADCRepository();
+            var proposalAuditRepository = new ProposalAuditRepository();
+            var mainADCSite = adc.ADCSites
+                .Where(adcs => adcs.Status == StatusType.Active
+                    && adcs.Site.IsMainSite)
+                .FirstOrDefault()
+                ?? throw new BusinessException("The ADC does not have the main site");
+            bool hasChanges = false;
 
-        //    var adc = await adcRepository.GetAsync(proposal.ADCID)
-        //        ?? throw new BusinessException("ADC record not found");
+            foreach (var adcSiteAudit in mainADCSite.ADCSiteAudits
+                .Where(asa => asa.Status == StatusType.Active))
+            {
+                if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
 
-        //    var oneADCSite = adc.ADCSites
-        //        .Where(adcs => adcs.Status == StatusType.Active)
-        //        .FirstOrDefault()
-        //        ?? throw new BusinessException("The ADC has no active sites.");
+                // Validar si existe ya el ProposalAudit
+                var proposalAudit = await proposalAuditRepository
+                    .GetByProposalAndStepAsync(proposal.ID, adcSiteAudit.AuditStep ?? AuditStepType.Nothing);
 
-        //    foreach (var adcSiteAudit in oneADCSite.ADCSiteAudits
-        //        .Where(asa => asa.Status == StatusType.Active))
-        //    {
-        //        decimal totalDays = 0;
+                if (proposalAudit == null) // Si no existe, crearlo
+                {
+                    proposalAudit = new ProposalAudit
+                    {
+                        ID = Guid.NewGuid(),
+                        ProposalID = proposal.ID,
+                        AuditStep = adcSiteAudit.AuditStep,
+                        Status = StatusType.Active,
+                        Created = DateTime.UtcNow,
+                        Updated = DateTime.UtcNow,
+                        UpdatedUser = proposal.UpdatedUser
+                    };
+                    proposalAuditRepository.Add(proposalAudit);
+                    hasChanges = true;
+                }
+            }
 
-        //        foreach (var adcSite in adc.ADCSites
-        //            .Where(adcs => adcs.Status == StatusType.Active))
-        //        {
-        //            var currAsa = adcSite.ADCSiteAudits
-        //                .Where(asa => asa.Status == StatusType.Active
-        //                    && (asa.Value.HasValue && asa.Value.Value)
-        //                    && asa.AuditStep == adcSiteAudit.AuditStep)
-        //                .FirstOrDefault();
+            if (hasChanges)
+            {
+                try
+                { 
+                    await proposalAuditRepository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ProposalService.AddStepsFromADCAsync: {ex.Message}");
+                }
+            }
+        } // AddStepsFromADCAsync
 
-        //            // Si es multisitio, tomar el valor de MD11
+        public async Task CalculateStepsTotalsAsync(Proposal proposal)
+        {
+            var proposalAuditRepository = new ProposalAuditRepository();
+            var adcRepository = new ADCRepository();
 
-        //            switch (currAsa.AuditStep)
-        //            {
-        //                case AuditStepType.Stage1:
-        //                case AuditStepType.Stage2:
-        //                    totalDays += adcSite.Total ?? 0;
-        //                    break;
-        //                case AuditStepType.Surveillance1:
-        //                case AuditStepType.Surveillance2:
-        //                case AuditStepType.Surveillance3:
-        //                case AuditStepType.Surveillance4:
-        //                case AuditStepType.Surveillance5:
-        //                    totalDays += adcSite.Surveillance ?? 0;
-        //                    break;
-        //                case AuditStepType.Recertification:
-        //                    //TODO: Calcular RR - esto se va a mover al frontend
-        //                    totalDays += adcSite.Total.HasValue 
-        //                        ? adcSite.Total.Value * 0.67m
-        //                        : 0;
-        //                    break;
-        //            }
-        //        }
+            bool hasChanges = false;
 
-        //        var proposalAudit = new ProposalAudit
-        //        {
-        //            ID = Guid.NewGuid(),
-        //            ProposalID = proposal.ID,
-        //            AuditStep = adcSiteAudit.AuditStep,
-        //            TotalAuditDays = totalDays,
-        //            Status = StatusType.Active,
-        //            Created = DateTime.UtcNow,
-        //            Updated = DateTime.UtcNow,
-        //            UpdatedUser = proposal.UpdatedUser,
-        //        };
-        //    }
+            var proposalAuditSteps = await proposalAuditRepository
+                .GetsByProposalAsync(proposal.ID);
 
+            var adcs = await adcRepository
+                .GetsByProposalAsync(proposal.ID);
 
+            foreach (var proposalAudit in proposalAuditSteps.OrderBy(pas => pas.AuditStep))
+            {
+                var adcSiteList = new List<ADCSite>();
 
+                foreach (var adc in adcs.Where(a => a.Status == ADCStatusType.Active))
+                {
+                    var adcSite = adc.ADCSites
+                        .Where(asite => asite.Status == StatusType.Active
+                            && asite.ADCSiteAudits
+                                .Where(asa => asa.Status == StatusType.Active
+                                    && (asa.Value.HasValue && asa.Value.Value)
+                                    && asa.AuditStep == proposalAudit.AuditStep)
+                                .Any()
+                        ).FirstOrDefault();
 
+                    if (adcSite != null) adcSiteList.Add(adcSite);
+                } // Obteniendo los sites que tienen el step
+                
+                var hasStage1 = false;
 
+                foreach (var adcSite in adcSiteList)
+                {
+                    switch (proposalAudit.AuditStep)
+                    { 
+                        case AuditStepType.Stage1:
+                            proposalAudit.TotalAuditDays = 1;
+                            hasStage1 = true;
+                            break;
+                        case AuditStepType.Stage2:                            
+                            if (hasStage1)
+                                proposalAudit.TotalAuditDays += adcSite.Total - 1 ?? 0;
+                            else
+                                proposalAudit.TotalAuditDays += adcSite.Total ?? 0;
+                            break;
+                        case AuditStepType.Surveillance1:
+                        case AuditStepType.Surveillance2:
+                        case AuditStepType.Surveillance3:
+                        case AuditStepType.Surveillance4:
+                        case AuditStepType.Surveillance5:
+                            proposalAudit.TotalAuditDays += adcSite.Surveillance ?? 0;
+                            break;
+                        case AuditStepType.Recertification:
+                            proposalAudit.TotalAuditDays += adcSite.Recertification ?? 0;
+                            break;
+                    }
+                } // Por cada step, sumar el total de días de ese step
 
+                proposalAudit.Updated = DateTime.UtcNow;
+                proposalAudit.UpdatedUser = proposal.UpdatedUser;
+                proposalAuditRepository.Update(proposalAudit);
+                hasChanges = true;
 
+                // TODO: Falta guardar los datos nuevos y ver si falta algun step para agregarlo
+            }
 
-        //} // AddProposalAuditsToNewProposalAsync
+            if (hasChanges)
+            {
+                try
+                {
+                    await proposalAuditRepository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ProposalService.CalculateStepsTotalsAsync: {ex.Message}");
+                }
+            }   
+        } // CalculateStepsTotalsAsync
 
         private string GetHistoricalDataJSON(Proposal item)
         {

@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,10 +22,58 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(m => m.ADCSites)
                 .Include("ADCSites.Site")
                 .Include("ADCSites.Site.Shifts")
+                .Include("ADCSites.ADSiteAudits")
                 .Include("ADCSites.ADCConceptValues")
                 .Include(m => m.Notes)
                 .FirstOrDefaultAsync(m => m.ID == id);
         } // GetAsync
+
+        public async Task<IEnumerable<ADC>> GetsByProposalAsync(Guid proposalID)
+        {
+            var query = _model
+                .Include(m => m.ADCSites)
+                .Include("ADCSites.ADSiteAudits")
+                .Where(m => m.ProposalID == proposalID);
+
+            return await query.ToListAsync();
+        } // GetsByProposalAsync
+
+        public async Task<int> CountADCsAvailableByAuditCycleAsync(Guid auditCycleID)
+        {
+            var query = _model
+                .Where(m => m.AuditCycleID == auditCycleID
+                    && m.Status == ADCStatusType.Active
+                    && m.ProposalID == null);
+
+            return await query.CountAsync();
+        } // CountADCsByAuditCycle
+
+        /// <summary>
+        /// Obtiene el ID de un ADC disponible (sin propuesta asignada)
+        /// </summary>
+        /// <param name="auditCycleID"></param>
+        /// <returns></returns>
+        public async Task<Guid> GetADCIDAvailableByAuditCycleAsync(Guid auditCycleID)
+        {
+            var query = _model
+                .Where(m => m.AuditCycleID == auditCycleID
+                    && m.Status == ADCStatusType.Active
+                    && m.ProposalID == null);
+            var adc = await query.FirstOrDefaultAsync();
+
+            return adc != null ? adc.ID : Guid.Empty;
+        } // GetADCIDAvailableByAuditCycleAsync
+
+        public async Task<ADC> GetADCAvailableByAuditCycleAsync(Guid auditCycleID)
+        {
+            var query = _model
+                .Where(m => m.AuditCycleID == auditCycleID
+                    && m.Status == ADCStatusType.Active
+                    && m.ProposalID == null);
+            //var adc = await query.FirstOrDefaultAsync();
+
+            return await query.FirstOrDefaultAsync();
+        } // GetADCIDAvailableByAuditCycleAsync
 
         public void UpdateValues(ADC item)
         {

@@ -11,16 +11,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid AuditCycleID { get; set; }
 
-        public Guid AppFormID { get; set; }
-
-        public Guid ADCID { get; set; }
-
-        public Guid? MD5ID { get; set; }
-
-        public string ActivitiesScope { get; set; }
-
-        public int? TotalEmployees { get; set; }
-
         public string Justification { get; set; }
 
         public string SignerName { get; set; }
@@ -51,9 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string AuditCycleName { get; set; }
 
-        public string AppFormStandardName { get; set; }
-
-        public string MD5Range { get; set; }
+        public int ProposalAuditsCount { get; set; }
 
         public int NotesCount { get; set; }
 
@@ -68,16 +56,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public Guid ID { get; set; }
 
         public Guid AuditCycleID { get; set; }
-
-        public Guid AppFormID { get; set; }
-
-        public Guid ADCID { get; set; }
-
-        public Guid? MD5ID { get; set; }
-
-        public string ActivitiesScope { get; set; } // Para detectar si se modifica el alcance
-
-        public int? TotalEmployees { get; set; } // Para detectar si se modifica el número de empleados
 
         public string Justification { get; set; }
 
@@ -115,13 +93,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public AuditCycleItemListDto AuditCycle { get; set; }
 
-        public AppFormItemListDto AppForm { get; set; }
-
-        public ADCItemListDto ADC { get; set; }
-
-        public MD5ItemListDto MD5 { get; set; }
-
-        // ProposalAudits goes here
+        // ProposalAudits goes here - public ICollection<ProposalAuditItemDto> ProposalAudits { get; set; }
 
         public ICollection<NoteItemDto> Notes { get; set; }
 

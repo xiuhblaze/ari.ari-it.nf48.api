@@ -42,7 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // RELATIONS
                 AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
                 AppFormOrganizationName = item.AppForm?.Organization?.Name ?? string.Empty,
-                AppFormAuditCycleName = item.AppForm?.AuditCycle?.Name ?? string.Empty,
+                //AppFormAuditCycleName = item.AppForm?.AuditCycle?.Name ?? string.Empty,
                 AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
                 NotesCount = item.Notes?.Count() ?? 0,
                 ADCSitesCount = item.ADCSites?.Count() ?? 0,
@@ -64,8 +64,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 TotalMD11 = item.TotalMD11,
                 TotalSurveillance = item.TotalSurveillance,
                 TotalRecertification = item.TotalRecertification,
-                //UserCreates = item.UserCreates,
-                //UserReview = item.UserReview,
                 ReviewDate = item.ReviewDate,
                 //ReviewComments = item.ReviewComments,
                 ActiveDate = item.ActiveDate,
