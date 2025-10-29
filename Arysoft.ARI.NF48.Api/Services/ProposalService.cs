@@ -107,8 +107,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<Proposal> CreateAsync(Proposal item)
         {
             var adcRepository = new ADCRepository();
-            var adcService = new ADCService();
-
+            
             await ValidateNewItemAsync(item);
             item = SetValuesForCreate(item);
 
@@ -125,20 +124,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ProposalService.CreateAsync: {ex.Message}");
             }
 
-            // Agregar los ProposalAudits si solo hay un ADC disponible en el auditcycle
-
+            // Agregar los ProposalAudits si solo hay un (1) ADC disponible en el auditcycle
             if (await adcRepository
                 .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 1)
             {
                 // Agregar los ProposalAudits y asociar en el ADC la propuesta (ProposalID)
-                //var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
-                var adc = await adcRepository.GetADCAvailableByAuditCycleAsync(item.AuditCycleID)
-                    ?? throw new BusinessException("ADC record not found");
-
-                await AddStepsFromADCAsync(item, adc);
-                await CalculateStepsTotalsAsync(item); // FIX: Aqui todavia no existe asignado el ID de proposal en el ADC
-// TODO: Aquí voy... (20251027)
-                await adcService.UpdateProposalIDAsync(adc, item.ID, item.UpdatedUser);
+                var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
+                await AddADC(item, adcID);
 
                 // Reload item
                 item = await _repository.GetAsync(item.ID)
@@ -202,6 +194,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
+
+
+        // ADCs
+
         public async Task AddADC(Proposal item, Guid adcID)
         { 
             var adcService = new ADCService();
@@ -214,9 +210,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("ADC record not found");
 
             await AddStepsFromADCAsync(foundItem, adc);
+            await adcService.UpdateProposalIDAsync(adc.ID, item.ID, item.UpdatedUser);
+            
             await CalculateStepsTotalsAsync(foundItem);
 
-            await adcService.UpdateProposalIDAsync(adc, item.ID, item.UpdatedUser);
         } // AddADC
 
         // PRIVATE FUNCTIONS
@@ -228,13 +225,22 @@ namespace Arysoft.ARI.NF48.Api.Services
             var adcRepository = new ADCRepository();
 
             // - Validar que exista al menos un ADC disponible en el auditcycle para asociar
-            if (await adcRepository
-                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 0)
+            var countADCs = await adcRepository
+                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID);
+
+            if (countADCs == 0)
                 throw new BusinessException("There are no ADCs available to be associated with the proposal.");
 
+            if (countADCs == 1)
+            { 
+                // - Validar que no exista otra propuesta activa para el mismo ciclo de auditoría, pues solo hay un ADC
+                if (await _repository.ExistsActiveProposalForAuditCycleAsync(item.AuditCycleID))
+                    throw new BusinessException("There is already an active proposal for the selected audit cycle.");
+            }
+
             // - Validar que el auditcycle y la organization esten activos
-            if (await _repository.HasValidParentsForCreateAsync(item))
-                throw new BusinessException("The Organization, Audit cycle or App form records are not valid.");
+            if (!await _repository.HasValidParentsForCreateAsync(item))
+                throw new BusinessException("The Organization or Audit cycle records are not valid.");
 
         } // ValidateNewItem
 
@@ -253,14 +259,19 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private async Task ValidateUpdatedItemAsync(Proposal item, Proposal foundItem)
         {
-
             // Si cambia el status, según el cambio validar...
             if (foundItem.Status != item.Status)
             {
                 switch (item.Status) // Si el nuevo estatus es...
                 {
+                    case ProposalStatusType.New:
+                        if (foundItem.Status != ProposalStatusType.Nothing)
+                            throw new BusinessException("The record status can only be changed to New when is the first time.");
+                        break;
+
                     case ProposalStatusType.Review:
-                        if (foundItem.Status != ProposalStatusType.New
+                        if (foundItem.Status != ProposalStatusType.Nothing
+                            && foundItem.Status != ProposalStatusType.New
                             && foundItem.Status != ProposalStatusType.Rejected
                             && foundItem.Status != ProposalStatusType.Cancel
                             )
@@ -270,13 +281,17 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                     case ProposalStatusType.Approved:
                         if (foundItem.Status != ProposalStatusType.Review)
-                            throw new BusinessException("The record status can only be changed to Approved from Review.");                        
+                            throw new BusinessException("The record status can only be changed to Approved from Review.");
                         break;
 
                     case ProposalStatusType.Sended:
                         if (foundItem.Status != ProposalStatusType.Approved)
                             throw new BusinessException("The proposal can only be sent if it has been approved.");
-                        
+
+                        if (string.IsNullOrEmpty(item.SignerName)
+                            || string.IsNullOrEmpty(item.SignerPosition))
+                            throw new BusinessException("The signatory's name and position are required before submitting the proposal.");
+
                         break;
 
                     case ProposalStatusType.Active:
@@ -285,13 +300,31 @@ namespace Arysoft.ARI.NF48.Api.Services
                             throw new BusinessException("The proposal can only be active if the client signed it.");
                         break;
 
+                    case ProposalStatusType.Inactive:
+                        if (foundItem.Status != ProposalStatusType.Active)
+                            throw new BusinessException("Only active proposals can be set to inactive.");
+                        break;
+
                     case ProposalStatusType.Deleted:
                         throw new BusinessException("The proposal can't be deleted. Use the Delete function");
                 }
             }
 
-            if (!await _repository.HasValidParentsForUpdateAsync(item))
-                throw new BusinessException("The Organization, Audit cycle, ADC or App form records are not valid.");
+            if (item.Status >= ProposalStatusType.New && string.IsNullOrEmpty(item.Justification))
+                throw new BusinessException("The Justification is required.");
+
+            // Solo si está activa la propuesta, validar ...
+            if (foundItem.Status <= ProposalStatusType.Active)
+            {
+                // - Valida que la Organizacion siga siendo válida
+                // - Valida que el AuditCycle siga siendo válido
+                // - Valida los ADCs asociados sigan siendo válidos
+                // - Valida que los AppForms de los ADCs asociados sigan siendo válidos
+                if (!await _repository.HasValidParentsForUpdateAsync(item))
+                    throw new BusinessException("The Organization or Audit Cycle records are not valid.");
+            }
+
+
 
         } // ValidateUpdatedItemAsync
 
@@ -305,32 +338,39 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case ProposalStatusType.Review:
                         foundItem.ReviewDate = DateTime.UtcNow;                        
                         break;
+
                     case ProposalStatusType.Rejected:
                         foundItem.ReviewDate = DateTime.UtcNow;
                         break;
-                    case ProposalStatusType.Sended:
-                        if(string.IsNullOrEmpty(item.SignerName)
-                            || string.IsNullOrEmpty(item.SignerPosition))
-                            throw new BusinessException("The signatory's name and position are required before submitting the proposal.");
+
+                    case ProposalStatusType.Sended:                        
                         foundItem.SignRequestDate = DateTime.UtcNow;
                         break;
-                    case ProposalStatusType.Active:
-                        //foundItem.ActiveDate = DateTime.UtcNow;                        
-                        break;
+
+                    //case ProposalStatusType.Active:
+                    //    //foundItem.ActiveDate = DateTime.UtcNow;                        
+                    //    break;
+
                     case ProposalStatusType.Inactive:
                         foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
                         break;
                 }
             }
 
-            // foundItem.MD5ID = item.MD5ID;
-            //foundItem.ActivitiesScope = item.ActivitiesScope;
-            //foundItem.TotalEmployees = item.TotalEmployees; //HACK: Considerar si es calculado o se recibe
-            foundItem.Justification = item.Justification;   //HACK: Considerar si es generado o se recibe, creo que lo va a generar el front end para que se acepte visualmente
-            foundItem.SignerName = item.SignerName;
-            foundItem.SignerPosition = item.SignerPosition;
-            foundItem.SignedFilename = item.SignedFilename;
-            foundItem.CurrencyCode = item.CurrencyCode;
+            // Si ya esta activo, esta información no se modifica
+            if (foundItem.Status == ProposalStatusType.Nothing
+                || foundItem.Status == ProposalStatusType.New
+                || foundItem.Status == ProposalStatusType.Review
+                || foundItem.Status == ProposalStatusType.Rejected
+                )
+            { 
+                foundItem.Justification = item.Justification;   //HACK: Considerar si es generado o se recibe, creo que lo va a generar el front end para que se acepte visualmente
+                foundItem.SignerName = item.SignerName;
+                foundItem.SignerPosition = item.SignerPosition;
+                foundItem.SignedFilename = item.SignedFilename;
+                foundItem.CurrencyCode = item.CurrencyCode;
+            }
+
             foundItem.Status = foundItem.Status == ProposalStatusType.Nothing && item.Status == ProposalStatusType.Nothing
                 ? ProposalStatusType.New
                 : item.Status != ProposalStatusType.Nothing
@@ -392,7 +432,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // AddStepsFromADCAsync
 
-        public async Task CalculateStepsTotalsAsync(Proposal proposal)
+        private async Task CalculateStepsTotalsAsync(Proposal proposal)
         {
             var proposalAuditRepository = new ProposalAuditRepository();
             var adcRepository = new ADCRepository();
@@ -427,6 +467,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 foreach (var adcSite in adcSiteList)
                 {
+                    proposalAudit.TotalAuditDays = proposalAudit.TotalAuditDays ?? 0;
                     switch (proposalAudit.AuditStep)
                     { 
                         case AuditStepType.Stage1:

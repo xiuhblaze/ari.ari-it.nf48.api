@@ -40,6 +40,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // RELATIONS
                 OrganizationName = item.AuditCycle?.Organization?.Name ?? string.Empty,
                 AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
+                ADCCount = item.ADCs?.Count ?? 0,
                 ProposalAuditsCount = item.ProposalAudits?.Count ?? 0,
                 NotesCount = item.Notes?.Count ?? 0,
                 // NOT MAPPED
@@ -72,7 +73,16 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AuditCycle = item.AuditCycle != null
                     ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
                     : null,
-                // PostalAudits
+                ADCs = item.ADCs != null
+                    ? ADCMapping.ADCToListDto(
+                        item.ADCs.OrderByDescending(adc => adc.Created)
+                        ).ToList()
+                    : null,
+                ProposalAudits = item.ProposalAudits != null
+                    ? ProposalAuditMapping.ProposalAuditToListDto(
+                        item.ProposalAudits.OrderByDescending(pa => pa.AuditStep)
+                        ).ToList()
+                    : null,
                 Notes = item.Notes != null
                     ? NoteMapping.NotesToListDto(
                         item.Notes.OrderByDescending(n => n.Created)

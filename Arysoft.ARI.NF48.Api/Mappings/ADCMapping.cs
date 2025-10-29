@@ -24,6 +24,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 AuditCycleID = item.AuditCycleID,
                 AppFormID = item.AppFormID,
+                ProposalID = item.ProposalID,
                 Description = item.Description,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
@@ -46,6 +47,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
                 NotesCount = item.Notes?.Count() ?? 0,
                 ADCSitesCount = item.ADCSites?.Count() ?? 0,
+                HasProposal = item.Proposal != null,
                 // NOT MAPPED
                 Alerts = item.Alerts
             };
@@ -58,6 +60,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 AuditCycleID = item.AuditCycleID,
                 AppFormID = item.AppFormID,
+                ProposalID = item.ProposalID,
                 Description = item.Description,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
@@ -86,6 +89,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         item.ADCSites.OrderByDescending(x => x.Site?.IsMainSite)
                             .ThenBy(x => x.Site?.Description)
                         ).ToList()
+                    : null,
+                Proposal = item.Proposal != null
+                    ? ProposalMapping.ProposalToItemListDto(item.Proposal)
                     : null,
                 Notes = item.Notes != null
                     ? NoteMapping.NotesToListDto(

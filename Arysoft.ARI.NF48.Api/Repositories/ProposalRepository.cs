@@ -9,6 +9,22 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class ProposalRepository : BaseRepository<Proposal>
     {
+        public new async Task<Proposal> GetAsync(Guid id, bool asNoTracking = false)
+        {
+            var query = _model.AsQueryable();
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            return await query
+                .Include(m => m.AuditCycle)
+                .Include("AuditCycle.Organization")
+                .Include(m => m.ADCs)
+                .Include(m => m.ProposalAudits)
+                .Include(m => m.Notes)
+                .FirstOrDefaultAsync(m => m.ID == id);
+        } // GetAsync
+
         // Validar que las Propuestas coincidan con los ADC
         // del AuditCycle
 
@@ -19,6 +35,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(ac => ac.Organization)
                 .Where(ac => ac.ID == item.AuditCycleID)
                 .FirstOrDefaultAsync();
+
             if (auditCycle == null) 
                 return false;
             if (auditCycle.Status != StatusType.Active 
@@ -45,6 +62,15 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return true;
         } // HasValidParentsAsync
+
+        public async Task<bool> ExistsActiveProposalForAuditCycleAsync(Guid auditCycleId)
+        {
+            return await _model
+                .Where(p => p.AuditCycleID == auditCycleId
+                            && (p.Status >= ProposalStatusType.New
+                                && p.Status <= ProposalStatusType.Active))
+                .AnyAsync();
+        } // ExistsActiveProposalForAuditCycleAsync
 
         public async Task<bool> HasValidParentsForUpdateAsync(Proposal item)
         {
@@ -90,11 +116,19 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <returns></returns>
         public new async Task DeleteTmpByUserAsync(string username)
         {
-            foreach (var item in await _model
-                .Where(m => m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
-                            && m.Status == ProposalStatusType.Nothing)
-                .ToListAsync())
+            var items = await _model
+                .Include(m => m.ProposalAudits)
+                .Include(m => m.Notes)
+                .Where(m => 
+                    m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
+                    && m.Status == ProposalStatusType.Nothing)
+                .ToListAsync();
+
+            foreach (var item in items)
             {
+                _context.Database.ExecuteSqlCommand( // Para elimar la asocición con los ADCs
+                    "UPDATE ADCs SET ProposalID = NULL WHERE ProposalID = {0}", item.ID);
+
                 _model.Remove(item);
             }
         } // DeleteTmpByUserAsync

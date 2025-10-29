@@ -41,6 +41,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string AuditCycleName { get; set; }
 
+        public int ADCCount { get; set; }
+
         public int ProposalAuditsCount { get; set; }
 
         public int NotesCount { get; set; }
@@ -93,7 +95,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public AuditCycleItemListDto AuditCycle { get; set; }
 
-        // ProposalAudits goes here - public ICollection<ProposalAuditItemDto> ProposalAudits { get; set; }
+        public ICollection<ADCItemListDto> ADCs { get; set; }
+
+        public ICollection<ProposalAuditItemDto> ProposalAudits { get; set; }
 
         public ICollection<NoteItemDto> Notes { get; set; }
 

@@ -22,7 +22,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(m => m.ADCSites)
                 .Include("ADCSites.Site")
                 .Include("ADCSites.Site.Shifts")
-                .Include("ADCSites.ADSiteAudits")
+                .Include("ADCSites.ADCSiteAudits")
                 .Include("ADCSites.ADCConceptValues")
                 .Include(m => m.Notes)
                 .FirstOrDefaultAsync(m => m.ID == id);
@@ -32,7 +32,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             var query = _model
                 .Include(m => m.ADCSites)
-                .Include("ADCSites.ADSiteAudits")
+                .Include("ADCSites.ADCSiteAudits")
                 .Where(m => m.ProposalID == proposalID);
 
             return await query.ToListAsync();
@@ -41,9 +41,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public async Task<int> CountADCsAvailableByAuditCycleAsync(Guid auditCycleID)
         {
             var query = _model
+                .Include(m => m.Proposal)
                 .Where(m => m.AuditCycleID == auditCycleID
                     && m.Status == ADCStatusType.Active
-                    && m.ProposalID == null);
+                    && (m.ProposalID == null 
+                        || (m.Proposal != null && m.Proposal.Status == 0)));
 
             return await query.CountAsync();
         } // CountADCsByAuditCycle
@@ -56,9 +58,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public async Task<Guid> GetADCIDAvailableByAuditCycleAsync(Guid auditCycleID)
         {
             var query = _model
+                .Include(m => m.Proposal)
                 .Where(m => m.AuditCycleID == auditCycleID
                     && m.Status == ADCStatusType.Active
-                    && m.ProposalID == null);
+                    && (m.ProposalID == null
+                        || (m.Proposal != null && m.Proposal.Status == 0)));
             var adc = await query.FirstOrDefaultAsync();
 
             return adc != null ? adc.ID : Guid.Empty;
