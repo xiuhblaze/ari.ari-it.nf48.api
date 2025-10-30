@@ -130,7 +130,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // Agregar los ProposalAudits y asociar en el ADC la propuesta (ProposalID)
                 var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
-                await AddADC(item, adcID);
+                await AddADCAsync(item, adcID);
 
                 // Reload item
                 item = await _repository.GetAsync(item.ID)
@@ -194,11 +194,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
-
-
         // ADCs
 
-        public async Task AddADC(Proposal item, Guid adcID)
+        public async Task AddADCAsync(Proposal item, Guid adcID)
         { 
             var adcService = new ADCService();
             var adcRepository = new ADCRepository();
@@ -209,12 +207,42 @@ namespace Arysoft.ARI.NF48.Api.Services
             var adc = await adcRepository.GetAsync(adcID)
                 ?? throw new BusinessException("ADC record not found");
 
+            // Validar que no este el ADC ya asociado
+            if (adc.ProposalID != null && adc.ProposalID != Guid.Empty)
+                throw new BusinessException("The ADC is already associated with a proposal.");
+
+            // Validar que sea del mismo AuditCycle
+            if (adc.AuditCycleID != foundItem.AuditCycleID)
+                throw new BusinessException("The ADC does not belong to the same Audit Cycle as the proposal.");
+
             await AddStepsFromADCAsync(foundItem, adc);
             await adcService.UpdateProposalIDAsync(adc.ID, item.ID, item.UpdatedUser);
             
             await CalculateStepsTotalsAsync(foundItem);
 
-        } // AddADC
+        } // AddADCAsync
+
+        public async Task RemoveADCAsync(Proposal item, Guid adcID)
+        {
+            var adcService = new ADCService();
+            var adcRepository = new ADCRepository();
+
+            var adc = await adcRepository.GetAsync(adcID)
+                ?? throw new BusinessException("ADC record not found");
+
+            var foundItem = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("Proposal record not found");
+
+            // Validar que no sea un ADC inactivo
+            if (adc.Status > ADCStatusType.Active)
+                throw new BusinessException("The ADC is not active to remove.");
+
+            await adcService.RemoveProposalIDAsync(adcID, item.UpdatedUser);            
+            await RemoveAllStepsAsync(foundItem.ID);
+            await AddAllStepsAsync(foundItem);
+
+            await CalculateStepsTotalsAsync(foundItem);
+        } // RemoveADCAsync
 
         // PRIVATE FUNCTIONS
 
@@ -320,11 +348,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 // - Valida que el AuditCycle siga siendo válido
                 // - Valida los ADCs asociados sigan siendo válidos
                 // - Valida que los AppForms de los ADCs asociados sigan siendo válidos
-                if (!await _repository.HasValidParentsForUpdateAsync(item))
-                    throw new BusinessException("The Organization or Audit Cycle records are not valid.");
+                if (!await _repository.HasValidParentsForUpdateAsync(foundItem))
+                    throw new BusinessException("The Organization, Audit Cycle, App Form or ADC records are not valid.");
             }
-
-
 
         } // ValidateUpdatedItemAsync
 
@@ -382,6 +408,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // SetValuesForUpdate
 
+        // STEPS - ProposalAudits
+
         private async Task AddStepsFromADCAsync(Proposal proposal, ADC adc)
         {
             var adcRepository = new ADCRepository();
@@ -431,6 +459,34 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
         } // AddStepsFromADCAsync
+
+        private async Task AddAllStepsAsync(Proposal proposal)
+        {
+            var adcRepository = new ADCRepository();
+            var adcs = await adcRepository
+                .GetsByProposalAsync(proposal.ID);
+
+            foreach (var adc in adcs.Where(a => a.Status == ADCStatusType.Active))
+            { 
+                await AddStepsFromADCAsync(proposal, adc);
+            }
+        } // AddAllStepsAsync
+
+        private async Task RemoveAllStepsAsync(Guid proposalID)
+        {
+            var proposalAuditRepository = new ProposalAuditRepository();
+
+            try
+            { 
+                await proposalAuditRepository
+                    .RemoveItemsByProposalID(proposalID);
+                await proposalAuditRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ProposalService.RemoveAllStepsAsync: {ex.Message}");
+            }
+        } // RemoveAllSteps
 
         private async Task CalculateStepsTotalsAsync(Proposal proposal)
         {

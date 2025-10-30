@@ -276,35 +276,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateListAsync
 
-        public async Task<ADC> UpdateProposalIDAsync(Guid adcID, Guid proposalID, string updatedUser)
-        {
-            var foundItem = await _repository.GetAsync(adcID)
-                ?? throw new BusinessException("The ADC to update was not found.");
-
-            if (proposalID == Guid.Empty)
-                throw new BusinessException("The Proposal ID is required.");
-
-            
-            if (foundItem.Status != ADCStatusType.Active)
-                throw new BusinessException("Only Active ADCs can be linked to a Proposal.");
-
-            foundItem.ProposalID = proposalID;
-            foundItem.Updated = DateTime.UtcNow;
-            foundItem.UpdatedUser = updatedUser;
-
-            try
-            {
-                _repository.UpdateValues(foundItem);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"ADCService.UpdateProposalIDAsync: {ex.Message}");
-            }
-
-            return foundItem;
-        } // UpdateProposalIDAsync
-
         public async Task DeleteAsync(ADC item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
@@ -339,6 +310,58 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // PROPOSAL
+
+        public async Task UpdateProposalIDAsync(Guid adcID, Guid proposalID, string updatedUser)
+        {
+            var foundItem = await _repository.GetAsync(adcID)
+                ?? throw new BusinessException("The ADC to update was not found.");
+
+            if (proposalID == Guid.Empty)
+                throw new BusinessException("The Proposal ID is required.");
+
+
+            if (foundItem.Status != ADCStatusType.Active)
+                throw new BusinessException("Only Active ADCs can be linked to a Proposal.");
+
+            foundItem.ProposalID = proposalID;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = updatedUser;
+
+            try
+            {
+                _repository.UpdateValues(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCService.UpdateProposalIDAsync: {ex.Message}");
+            }
+        } // UpdateProposalIDAsync
+
+        public async Task RemoveProposalIDAsync(Guid adcID, string updatedUser)
+        {
+            var foundItem = await _repository.GetAsync(adcID)
+                ?? throw new BusinessException("The ADC to update was not found.");
+
+            if (foundItem.Status > ADCStatusType.Active)
+                throw new BusinessException("Only active ADCs can be unliked from a proposal.");
+
+            foundItem.ProposalID = null;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = updatedUser;
+
+            try
+            {
+                _repository.UpdateValues(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCService.RemoveProposalIDAsync: {ex.Message}");
+            }
+        } // RemoveProposalIDAsync
 
         // PRIVATE
 

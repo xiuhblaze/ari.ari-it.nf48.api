@@ -27,5 +27,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             
             return await query.ToListAsync();
         } // GetsByProposalAsync
+
+        public async Task RemoveItemsByProposalID(Guid proposalId)
+        {
+            var items = await _model
+                .Where(pa => pa.ProposalID == proposalId)
+                .ToListAsync();
+
+            _model.RemoveRange(items);
+        } // RemoveItemsByProposalID
     }
 }

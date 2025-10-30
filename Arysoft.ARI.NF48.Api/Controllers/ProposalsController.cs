@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
@@ -135,5 +136,51 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // DeleteProposal
+
+        // ADCs
+
+        [HttpPost]
+        [Route("api/Proposals/{id}/adc")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> AddADC(Guid id, [FromBody] ProposalADCDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.ProposalID)
+                throw new BusinessException("ID mismatch");
+
+            var item = new Proposal
+            {
+                ID = itemDto.ProposalID ?? Guid.Empty,
+                UpdatedUser = itemDto.UpdatedUser
+            };
+            await _service.AddADCAsync(item, itemDto.ADCID ?? Guid.Empty);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // PostProposalAddADC
+
+        [HttpDelete]
+        [Route("api/Proposals/{id}/adc")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> RemoveADC(Guid id, [FromBody] ProposalADCDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.ProposalID)
+                throw new BusinessException("ID mismatch");
+
+            var item = new Proposal
+            {
+                ID = itemDto.ProposalID ?? Guid.Empty,
+                UpdatedUser = itemDto.UpdatedUser
+            };
+            await _service.RemoveADCAsync(item, itemDto.ADCID ?? Guid.Empty);
+            var response = new ApiResponse<bool>(true);
+            
+            return Ok(response);
+        } // PostProposalRemoveADC
     }
 }
