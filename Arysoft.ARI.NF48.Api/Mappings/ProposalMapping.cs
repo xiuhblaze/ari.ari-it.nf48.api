@@ -30,6 +30,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SignerPosition = item.SignerPosition,
                 SignedFilename = item.SignedFilename,
                 CurrencyCode = item.CurrencyCode,
+                ExtraInfo = item.ExtraInfo,
                 // INTERNAL
                 CreatedBy = item.CreatedBy,
                 ReviewDate = item.ReviewDate,
@@ -43,6 +44,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCCount = item.ADCs?.Count ?? 0,
                 ProposalAuditsCount = item.ProposalAudits?.Count ?? 0,
                 NotesCount = item.Notes?.Count ?? 0,
+                Standards = item.ADCs != null
+                    ? item.ADCs
+                        .Select(asd => asd.AppForm.Standard.Name)
+                        .ToList()
+                    : new List<string>(),
                 // NOT MAPPED
                 Alerts = item.Alerts,
             };
@@ -59,6 +65,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SignerPosition = item.SignerPosition,                
                 SignedFilename = item.SignedFilename,
                 CurrencyCode = item.CurrencyCode,
+                ExtraInfo = item.ExtraInfo,
                 // INTERNAL
                 CreatedBy = item.CreatedBy,
                 ReviewDate = item.ReviewDate,
@@ -88,6 +95,42 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         item.Notes.OrderByDescending(n => n.Created)
                         ).ToList()
                     : null,
+                // RELATIONS EXTRA FIELDS
+                Organization = item.AuditCycle?.Organization != null
+                    ? OrganizationMapping.OrganizationToItemProposalDto(item.AuditCycle.Organization)
+                    : null,
+                Sites = item.ADCs != null
+                    ? SiteMapping.SiteToListDto(
+                        item.ADCs
+                            .Where(adc => adc.ADCSites != null)
+                            .SelectMany(adc => adc.ADCSites)
+                            .Select(ads => ads.Site)
+                            .Distinct()
+                            .OrderBy(s => s.IsMainSite)
+                        ).ToList()
+                    : new List<SiteItemListDto>(),
+                Contacts = item.ADCs != null
+                    ? ContactMapping.ContactToListDto(
+                        item.ADCs
+                            .Where(adc => adc.AppForm != null && adc.AppForm.Contacts != null)
+                            .SelectMany(adc => adc.AppForm.Contacts)
+                            .Distinct()
+                            .OrderBy(c => c.FirstName)
+                        ).ToList()
+                    : new List<ContactItemListDto>(),
+                Scopes = item.ADCs != null
+                    ? item.ADCs
+                        .Where(adc => adc.AppForm != null)
+                        .Select(adc => adc.AppForm.ActivitiesScope)
+                        .ToList()
+                    : new List<string>(),
+                TotalEmployees = item.ADCs != null
+                    ? item.ADCs
+                        .Where(adc => adc.TotalEmployees.HasValue)
+                        .Select(adc => adc.TotalEmployees.Value)
+                        .ToList()
+                    : new List<int>(),
+
                 // NOT MAPPED
                 Alerts = item.Alerts
             };
@@ -111,6 +154,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SignerName = itemDto.SignerName,
                 SignerPosition = itemDto.SignerPosition,
                 CurrencyCode = itemDto.CurrencyCode,
+                ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

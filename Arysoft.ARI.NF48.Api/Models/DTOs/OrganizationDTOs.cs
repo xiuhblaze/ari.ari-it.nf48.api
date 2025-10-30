@@ -134,6 +134,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
     }
 
+    public class OrganizationItemProposalDto
+    {
+        public Guid ID { get; set; }
+
+        public string Name { get; set; }
+
+        public string Website { get; set; }
+
+        public string Phone { get; set; }
+
+        public IEnumerable<CompanyItemListDto> Companies { get; set; }
+    } // OrganizationItemProposalDto
+
     public class OrganizationPostDto
     {
         [Required]

@@ -32,6 +32,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Proposal>()
+                .Property(m => m.ExtraInfo)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<Proposal>()
                 .Property(m => m.CreatedBy)
                 .HasMaxLength(50);
 

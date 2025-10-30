@@ -397,6 +397,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.CurrencyCode = item.CurrencyCode;
             }
 
+            foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == ProposalStatusType.Nothing && item.Status == ProposalStatusType.Nothing
                 ? ProposalStatusType.New
                 : item.Status != ProposalStatusType.Nothing

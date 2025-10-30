@@ -169,6 +169,19 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // OrganizationToItemDetailDto
 
+        public static OrganizationItemProposalDto OrganizationToItemProposalDto(Organization item)
+        {
+            return new OrganizationItemProposalDto
+            {
+                ID = item.ID,
+                Name = item.Name,
+                Website = item.Website,
+                Phone = item.Phone,
+                Companies = CompanyMapping.CompanyToListDto(item.Companies
+                    .Where(c => c.Status != StatusType.Nothing))
+            };
+        } // OrganizationToItemProposalDto
+
         public static Organization ItemAddDtoToOrganization(OrganizationPostDto itemDto)
         {
             return new Organization

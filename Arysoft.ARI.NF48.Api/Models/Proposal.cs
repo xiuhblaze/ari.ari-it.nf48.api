@@ -18,6 +18,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public CurrencyCodeType? CurrencyCode { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         // INTERNAL
 
         public string CreatedBy { get; set; }       // Usuario que crea la Propuesta

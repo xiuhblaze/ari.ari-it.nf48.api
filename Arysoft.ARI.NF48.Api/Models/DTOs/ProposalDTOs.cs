@@ -21,6 +21,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public CurrencyCodeType? CurrencyCode { get; set; }
 
+        public string ExtraInfo { get; set; }
+
         // INTERNAL
 
         public string CreatedBy { get; set; }
@@ -47,6 +49,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int NotesCount { get; set; }
 
+        public List<string> Standards { get; set; }
+
         // NOT MAPPED
 
         public List<ProposalAlertType> Alerts { get; set; }
@@ -70,6 +74,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string SignedFilename { get; set; }
 
         public CurrencyCodeType? CurrencyCode { get; set; }
+
+        public string ExtraInfo { get; set; }
 
         // INTERNAL
 
@@ -100,6 +106,25 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ICollection<ProposalAuditItemDto> ProposalAudits { get; set; }
 
         public ICollection<NoteItemDto> Notes { get; set; }
+
+        // RELATIONS EXTRA FIELDS
+
+        public OrganizationItemProposalDto Organization { get; set; }
+
+        // Tienen que ser los seleccionados en los AppForm's
+        public ICollection<SiteItemListDto> Sites { get; set; }
+
+        // Tienen que ser los seleccionados en los AppForm's
+        public ICollection<ContactItemListDto> Contacts { get; set; }
+
+        // Tienen que ser de los AppForm's
+        public ICollection<string> Scopes { get; set; }
+
+        // Tienen que ser de los ADC's
+        public ICollection<int> TotalEmployees { get; set; }
+
+        // Tienen que ser de TODOS los ADC's junto con sus ADCSiteAudits
+        public ICollection<ADCSiteItemListDto> ADCSites { get; set; }
 
         // NOT MAPPED
 
@@ -146,6 +171,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [Required(ErrorMessage = "The currency code is required")]
         public CurrencyCodeType? CurrencyCode { get; set; }
+
+        [StringLength(1000, ErrorMessage = "The exta info must be less than 1000 characters")]
+        public string ExtraInfo { get; set; }
 
         [Required(ErrorMessage = "The Status value is required")]
         public ProposalStatusType Status { get; set; }
