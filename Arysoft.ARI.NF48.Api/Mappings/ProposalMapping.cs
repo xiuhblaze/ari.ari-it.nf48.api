@@ -130,6 +130,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Select(adc => adc.TotalEmployees.Value)
                         .ToList()
                     : new List<int>(),
+                ADCSites = item.ADCs != null
+                    ? ADCSiteMapping.ADCSiteToListDto(item.ADCs
+                        .Where(adc => adc.ADCSites != null)
+                        .SelectMany(adc => adc.ADCSites)).ToList()
+                    : new List<ADCSiteItemListDto>(),
 
                 // NOT MAPPED
                 Alerts = item.Alerts

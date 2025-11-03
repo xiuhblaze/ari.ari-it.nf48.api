@@ -45,6 +45,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string AppFormOrganizationName { get; set; }
 
+        public Guid AppFormStandardID { get; set; }
+
         public string AppFormStandardName { get; set; }
 
         public int NotesCount { get; set; }
