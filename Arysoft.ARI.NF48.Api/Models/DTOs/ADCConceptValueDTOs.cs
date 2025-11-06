@@ -19,9 +19,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Justification { get; set; }
 
-        public decimal? ValueApproved { get; set; }
+        //public decimal? ValueApproved { get; set; }
 
-        public string JustificationApproved { get; set; }
+        //public string JustificationApproved { get; set; }
 
         public ADCConceptUnitType? ValueUnit { get; set; }
 
@@ -30,6 +30,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // RELATIONS
 
         public string ADCConceptDescription { get; set; }
+
+        public bool? ADCConceptWhenTrue { get; set; }
 
         public string ADCSiteDescription { get; set; }
     } // ADCConceptValueItemListDto

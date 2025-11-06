@@ -43,6 +43,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SiteAddress { get; set; }
 
+        public bool? IsMainSite { get; set; }
+
         public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
 
         public ICollection<ADCSiteAuditItemDto> ADCSiteAudits { get; set; }

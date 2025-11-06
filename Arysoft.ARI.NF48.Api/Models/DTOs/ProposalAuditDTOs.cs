@@ -1,6 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -14,6 +13,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public AuditStepType? AuditStep { get; set; }
 
         public decimal? TotalAuditDays { get; set; }
+
+        public decimal? Investment { get; set; }
 
         public decimal? CertificateIssue { get; set; }
 
@@ -46,7 +47,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public Guid? ID { get; set; }
                 
         public decimal? TotalAuditDays { get; set; }
-        
+
+        public decimal? Investment { get; set; }
+
         public decimal? CertificateIssue { get; set; }
         
         public decimal? TotalCost { get; set; }

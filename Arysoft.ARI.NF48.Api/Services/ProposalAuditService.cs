@@ -206,6 +206,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         private ProposalAudit SetValuesUpdateItem(ProposalAudit item, ProposalAudit foundItem)
         {   
             foundItem.TotalAuditDays = item.TotalAuditDays;
+            foundItem.Investment = item.Investment;
             foundItem.CertificateIssue = item.CertificateIssue;
             foundItem.TotalCost = item.TotalCost;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing

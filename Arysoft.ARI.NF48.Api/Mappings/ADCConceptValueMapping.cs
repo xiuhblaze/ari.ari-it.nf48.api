@@ -26,13 +26,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 CheckValue = item.CheckValue,
                 Value = item.Value,
                 Justification = item.Justification,
-                ValueApproved = item.ValueApproved,
-                JustificationApproved = item.JustificationApproved,
+                //ValueApproved = item.ValueApproved,
+                //JustificationApproved = item.JustificationApproved,
                 ValueUnit = item.ValueUnit,
                 Status = item.Status,
                 ADCConceptDescription = item.ADCConcept != null 
                     ? item.ADCConcept.Description 
                     : string.Empty,
+                ADCConceptWhenTrue = item.ADCConcept?.WhenTrue,
                 ADCSiteDescription = item.ADCSite?.Site?.Description ?? string.Empty
             };
         } // ADCConceptValueToItemListDto

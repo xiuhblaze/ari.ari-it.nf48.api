@@ -501,54 +501,61 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var adcs = await adcRepository
                 .GetsByProposalAsync(proposal.ID);
+            var hasStage1 = proposalAuditSteps
+                .Where(pas => pas.AuditStep == AuditStepType.Stage1)
+                .Any();
 
-            foreach (var proposalAudit in proposalAuditSteps.OrderBy(pas => pas.AuditStep))
+            foreach (var proposalAudit in proposalAuditSteps)
             {
                 var adcSiteList = new List<ADCSite>();
 
                 foreach (var adc in adcs.Where(a => a.Status == ADCStatusType.Active))
                 {
-                    var adcSite = adc.ADCSites
+                    var adcSites = adc.ADCSites
                         .Where(asite => asite.Status == StatusType.Active
                             && asite.ADCSiteAudits
                                 .Where(asa => asa.Status == StatusType.Active
                                     && (asa.Value.HasValue && asa.Value.Value)
                                     && asa.AuditStep == proposalAudit.AuditStep)
                                 .Any()
-                        ).FirstOrDefault();
+                        );
 
-                    if (adcSite != null) adcSiteList.Add(adcSite);
+                    if (adcSites != null) {
+                        foreach (var adcSite in adcSites) {
+                            adcSiteList.Add(adcSite);
+                        }
+                    }
                 } // Obteniendo los sites que tienen el step
                 
-                var hasStage1 = false;
-
+                decimal totaAuditDays = 0;
                 foreach (var adcSite in adcSiteList)
                 {
-                    proposalAudit.TotalAuditDays = proposalAudit.TotalAuditDays ?? 0;
+                    //proposalAudit.TotalAuditDays = proposalAudit.TotalAuditDays ?? 0;
                     switch (proposalAudit.AuditStep)
                     { 
                         case AuditStepType.Stage1:
-                            proposalAudit.TotalAuditDays = 1;
-                            hasStage1 = true;
+                            //proposalAudit.TotalAuditDays = 1;
+                            totaAuditDays += 1;
                             break;
                         case AuditStepType.Stage2:                            
                             if (hasStage1)
-                                proposalAudit.TotalAuditDays += adcSite.Total - 1 ?? 0;
+                                totaAuditDays += adcSite.Total - 1 ?? 0;
                             else
-                                proposalAudit.TotalAuditDays += adcSite.Total ?? 0;
+                                totaAuditDays += adcSite.Total ?? 0;
                             break;
                         case AuditStepType.Surveillance1:
                         case AuditStepType.Surveillance2:
                         case AuditStepType.Surveillance3:
                         case AuditStepType.Surveillance4:
                         case AuditStepType.Surveillance5:
-                            proposalAudit.TotalAuditDays += adcSite.Surveillance ?? 0;
+                            totaAuditDays += adcSite.Surveillance ?? 0;
                             break;
                         case AuditStepType.Recertification:
-                            proposalAudit.TotalAuditDays += adcSite.Recertification ?? 0;
+                            totaAuditDays += adcSite.Recertification ?? 0;
                             break;
                     }
                 } // Por cada step, sumar el total de días de ese step
+                proposalAudit.TotalAuditDays = totaAuditDays;
 
                 proposalAudit.Updated = DateTime.UtcNow;
                 proposalAudit.UpdatedUser = proposal.UpdatedUser;

@@ -27,6 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ProposalID = item.ProposalID,
                 AuditStep = item.AuditStep,
                 TotalAuditDays = item.TotalAuditDays,
+                Investment = item.Investment,
                 CertificateIssue = item.CertificateIssue,
                 TotalCost = item.TotalCost,                
                 Status = item.Status,
@@ -52,6 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = itemDto.ID ?? Guid.Empty,
                 TotalAuditDays = itemDto.TotalAuditDays,
+                Investment = itemDto.Investment,
                 CertificateIssue = itemDto.CertificateIssue,
                 TotalCost = itemDto.TotalCost,
                 UpdatedUser = itemDto.UpdatedUser
