@@ -15,6 +15,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? ProposalID { get; set; }
 
+        public CycleYearType? CycleYear { get; set; }
+
         public string Description { get; set; }
 
         public int? TotalEmployees { get; set; }
@@ -70,6 +72,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public Guid AppFormID { get; set; }
 
         public Guid? ProposalID { get; set; }
+
+        public CycleYearType? CycleYear { get; set; }
 
         public string Description { get; set; }
 

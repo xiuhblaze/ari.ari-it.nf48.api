@@ -13,6 +13,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? SiteID { get; set; }
 
+        public Guid? MD5ID { get; set; }
+
         public decimal? InitialMD5 { get; set; }
 
         public int? NoEmployees { get; set; }
@@ -65,6 +67,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? SiteID { get; set; }
 
+        public Guid? MD5ID { get; set; }
+
         public decimal? InitialMD5 { get; set; }
 
         public int? NoEmployees { get; set; }
@@ -98,6 +102,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ADCItemListDto ADC { get; set; }
 
         public SiteItemListDto Site { get; set; }
+
+        public MD5ItemListDto MD5 { get; set; }
 
         public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
 

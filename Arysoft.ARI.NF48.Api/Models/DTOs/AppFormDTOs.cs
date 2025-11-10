@@ -43,6 +43,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string AuditLanguage { get; set; }
 
+        public CycleYearType? CycleYear { get; set; }
+
         public string CurrentCertificationsExpiration { get; set; }
 
         public string CurrentStandards { get; set; }
@@ -59,13 +61,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? SalesDate { get; set; }
 
-        public string SalesComments { get; set; }
-
         public DateTime? ReviewDate { get; set; }
 
         public string ReviewJustification { get; set; }
-
-        public string ReviewComments { get; set; }
 
         public string UserSales { get; set; }
 
@@ -138,6 +136,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string AuditLanguage { get; set; }
 
+        public CycleYearType? CycleYear { get; set; }
+
         public string CurrentCertificationsExpiration { get; set; }
 
         public string CurrentStandards { get; set; }
@@ -154,13 +154,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? SalesDate { get; set; }
 
-        public string SalesComments { get; set; }
-
         public DateTime? ReviewDate { get; set; }
-
-        public string ReviewJustification { get; set; }
-
-        public string ReviewComments { get; set; }
+ // 
+        // public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
 
         public string UserSales { get; set; }
 
@@ -268,26 +264,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string AnyConsultancyBy { get; set; }
 
-        //public DateTime? SalesDate { get; set; }
-
-        [StringLength(1000)]
-        public string SalesComments { get; set; }
-
-        //public DateTime? ReviewDate { get; set; }
-
-        public string ReviewJustification { get; set; }
-
-        [StringLength(1000)]
-        public string ReviewComments { get; set; }
-
-        //[StringLength(50)]    // NO SE VAN A RECIBIR, Se deben calcular con el UpdateUser y el cambio de Status
-        //public string UserSales { get; set; }
-
-        //[StringLength(50)]
-        //public string UserReviewer { get; set; }
-
-        //[StringLength(50)]
-        //public string UserOrganization { get; set; }
+        // INTERNAL
 
         public AppFormStatusType Status { get; set; }
 

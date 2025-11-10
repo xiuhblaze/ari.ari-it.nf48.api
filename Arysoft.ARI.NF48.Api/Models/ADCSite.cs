@@ -10,6 +10,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? SiteID { get; set; }
 
+        public Guid? MD5ID { get; set; }
+
         public decimal? InitialMD5 { get; set; }    // Se obtiene de tabla MD5
             
         public int? NoEmployees { get; set; }       // Se obtiene de Sites
@@ -35,6 +37,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ADC ADC { get; set; }
 
         public virtual Site Site { get; set; }
+
+        public virtual MD5 MD5 { get; set; }
 
         public virtual ICollection<ADCConceptValue> ADCConceptValues { get; set; }
 

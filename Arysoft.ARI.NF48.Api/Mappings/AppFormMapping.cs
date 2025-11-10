@@ -41,6 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
+                CycleYear = item.CycleYear,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,
                 CurrentCertificationsBy = item.CurrentCertificationsBy,
@@ -49,10 +50,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AnyConsultancyBy = item.AnyConsultancyBy,
                 // INTERNAL
                 SalesDate = item.SalesDate,
-                SalesComments = item.SalesComments,
+                //SalesComments = item.SalesComments,
                 ReviewDate = item.ReviewDate,
                 ReviewJustification = item.ReviewJustification,
-                ReviewComments = item.ReviewComments,
+                //ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
                 HistoricalDataJSON = item.HistoricalDataJSON,
@@ -122,6 +123,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
+                CycleYear = item.CycleYear,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,
                 CurrentCertificationsBy = item.CurrentCertificationsBy,
@@ -130,10 +132,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AnyConsultancyBy = item.AnyConsultancyBy,
                 // INTERNAL
                 SalesDate = item.SalesDate,
-                SalesComments = item.SalesComments,
+                // SalesComments = item.SalesComments,
                 ReviewDate = item.ReviewDate,
-                ReviewJustification = item.ReviewJustification,
-                ReviewComments = item.ReviewComments,
+                // ReviewJustification = item.ReviewJustification,
+                // ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
                 HistoricalDataJSON = item.HistoricalDataJSON,
@@ -214,10 +216,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AnyConsultancy = item.AnyConsultancy,
                 AnyConsultancyBy = item.AnyConsultancyBy,
                 //SalesDate = item.SalesDate,
-                SalesComments = item.SalesComments,
+                // SalesComments = item.SalesComments,
                 //ReviewDate = item.ReviewDate,
-                ReviewJustification = item.ReviewJustification,
-                ReviewComments = item.ReviewComments,
+                //ReviewJustification = item.ReviewJustification,
+                //ReviewComments = item.ReviewComments,
                 Status = item.Status,
                 UpdatedUser = item.UpdatedUser
             };

@@ -141,15 +141,25 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.AppFormID == null || item.AppFormID == Guid.Empty)            
                 throw new BusinessException("The Application Form ID is required.");
 
-            // Validar que el AppForm no tenga un ADC
+            var appForm = await _appFormRepository.GetAsync(item.AppFormID)
+                ?? throw new BusinessException("The Application Form was not found.");
 
-            if (await _repository.AppFormHasValidADCAsync(item.AppFormID))
+            // Validar que el AppForm no tenga un ADC
+            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing 
+                && adc.Status < ADCStatusType.Cancel))
                 throw new BusinessException("The Application Form already has a valid ADC");
-            
+
+            // Validar que el AppForm no tenga un CycleYear igual al del appForm valido
+            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing
+                && adc.Status < ADCStatusType.Cancel
+                && adc.CycleYear == appForm.CycleYear))
+                throw new BusinessException("The Application Form already has a ADC with the same Cycle Year");
+
             // Set default values
-            
+
             item.ID = Guid.NewGuid();
-            item.AuditCycleID = await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
+            item.AuditCycleID = appForm.AuditCycleID; // await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
+            item.CycleYear = appForm.CycleYear;
             // item.UserCreates = item.UpdatedUser;
             item.Status = ADCStatusType.New;
             item.Created = DateTime.UtcNow;

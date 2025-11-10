@@ -129,21 +129,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             return await _repository.GetAsync(id);
         } // GetAsync
 
+        /// <summary>
+        /// Genera un registro con la información minima necesaria y en base a ella
+        /// Obtiene el siguiente ciclo disponible para el standard seleccionado
+        /// </summary>
+        /// <param name="item">Elemento con los datos minimos para crear un registro</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task<AppForm> AddAsync(AppForm item)
         {
-            // Validate
 
-            if (string.IsNullOrEmpty(item.UpdatedUser))
-                throw new BusinessException("UpdatedUser is required");
-
-            // - Validar que la organizacion exista y esté activo
-            // - Validar que el ciclo exista y esté activo o inactivo
+            await ValidateCreateAppFormAsync(item);
 
             // Set values
 
             item.ID = Guid.NewGuid();
-            //item.OrganizationID = item.OrganizationID;
-            //item.AuditCycleID = item.AuditCycleID;
             item.Status = AppFormStatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -175,9 +175,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - Asignaciones por status
 
-            if (foundItem.Status == AppFormStatusType.Nothing)
+            if (foundItem.Status == AppFormStatusType.Nothing) // Si es la primera vez...
             {
-                foundItem.StandardID = item.StandardID; // Solo la primera vez se asigna el standard
+                foundItem.StandardID = item.StandardID; // Se asigna el standard
+                foundItem.CycleYear = await _repository.GetNextCycleYearAwait(
+                    foundItem.AuditCycleID, 
+                    item.StandardID ?? Guid.Empty,
+                    foundItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+                );
             }
 
             if (item.Status == AppFormStatusType.Nothing 
@@ -213,16 +218,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                         //}
                         if (foundItem.Status == AppFormStatusType.New)
                         {
-                            if (string.IsNullOrEmpty(item.SalesComments))
-                                throw new BusinessException("Comments is required");
+                            //if (string.IsNullOrEmpty(item.SalesComments))
+                            //    throw new BusinessException("Comments is required");
                             item.SalesDate = DateTime.UtcNow;
                             foundItem.UserSales = item.UpdatedUser;
                         }
 
                         if (foundItem.Status == AppFormStatusType.ApplicantRejected)
                         {
-                            if (string.IsNullOrEmpty(item.ReviewComments))
-                                throw new BusinessException("Review comments is required");
+                            //if (string.IsNullOrEmpty(item.ReviewComments))
+                            //    throw new BusinessException("Review comments is required");
                             item.ReviewDate = DateTime.UtcNow;
                             foundItem.UserReviewer = item.UpdatedUser;
                         }
@@ -231,15 +236,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AppFormStatusType.ApplicantRejected:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-                        if (string.IsNullOrEmpty(item.ReviewComments))
-                            throw new BusinessException("Review comments is required");
+                        //if (string.IsNullOrEmpty(item.ReviewComments))
+                        //    throw new BusinessException("Review comments is required");
                         break;
 
                     case AppFormStatusType.Active:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-                        if (string.IsNullOrEmpty(item.ReviewComments))
-                            throw new BusinessException("Review comments is required");
+                        //if (string.IsNullOrEmpty(item.ReviewComments))
+                        //    throw new BusinessException("Review comments is required");
                         break;
 
                     case AppFormStatusType.Inactive:
@@ -291,10 +296,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
                 // Internal
                 foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
-                foundItem.SalesComments = item.SalesComments;
+                //foundItem.SalesComments = item.SalesComments;
                 foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
                 foundItem.ReviewJustification = item.ReviewJustification;
-                foundItem.ReviewComments = item.ReviewComments;                
+                //foundItem.ReviewComments = item.ReviewComments;                
             }
 
             foundItem.Status = item.Status;
@@ -323,10 +328,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations 
 
             // - Validar que no haya otro appform activo del mismo standard y ciclo
-            if (await _repository.IsThereValidAppFormAsync(originalItem.AuditCycleID, originalItem.StandardID.Value))
+            if (await _repository.ExistsValidAppFormAsync(originalItem.AuditCycleID, originalItem.StandardID.Value))
             {
                 throw new BusinessException("There is already an active application form for the same standard in the selected audit cycle");
             }
+
+            var cycleYear = await _repository.GetNextCycleYearAwait(
+                originalItem.AuditCycleID,
+                originalItem.StandardID ?? Guid.Empty,
+                originalItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+            );
+            if (cycleYear == CycleYearType.Nothing)
+                throw new BusinessException($"The audit cycle has already completed its three years for the {originalItem.Standard.Name} standard");
 
             var newItem = new AppForm
             {
@@ -336,6 +349,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 StandardID = originalItem.StandardID,
                 // General
                 AuditLanguage = originalItem.AuditLanguage,
+                CycleYear = cycleYear,
                 CurrentCertificationsExpiration = originalItem.CurrentCertificationsExpiration,
                 CurrentStandards = originalItem.CurrentStandards,
                 CurrentCertificationsBy = originalItem.CurrentCertificationsBy,
@@ -622,8 +636,54 @@ namespace Arysoft.ARI.NF48.Api.Services
             return JsonConvert.SerializeObject(historicalData);
         } // GetHistoricalDataJSON
 
+        private async Task ValidateCreateAppFormAsync(AppForm newItem)
+        {
+            var organizationRepository = new OrganizationRepository();
+            var auditCycleRepository = new AuditCycleRepository();
+
+            // - Validar que la organizacion exista y esté activo
+            var organization = await organizationRepository.GetAsync(newItem.OrganizationID)
+                ?? throw new BusinessException("The selected organization was not found");
+
+            if (organization.Status != OrganizationStatusType.Active 
+                && organization.Status != OrganizationStatusType.Applicant)
+                throw new BusinessException("The selected organization is not active");
+
+            // - Validar que el ciclo exista y esté activo o inactivo
+            var auditCycle = await auditCycleRepository.GetAsync(newItem.AuditCycleID)
+                ?? throw new BusinessException("The selected audit cycle was not found");
+
+            if (auditCycle.Status != StatusType.Active 
+                && auditCycle.Status != StatusType.Inactive)
+                throw new BusinessException("The selected audit cycle is not valid");
+
+            // Solo si el AuditCycle tiene un solo standard activo, lo valida para 
+            // ver si aun tiene CycleYear's disponibles
+            var auditCycleStandards = auditCycle.AuditCycleStandards
+                .Where(acs => acs.Status == StatusType.Active)
+                .ToList();
+            if (auditCycleStandards.Count() == 1)
+            { 
+                var auditCycleStandard = auditCycleStandards.First();
+                var nextCycleYear = await _repository
+                    .GetNextCycleYearAwait(
+                        newItem.AuditCycleID, 
+                        auditCycleStandard.StandardID ?? Guid.Empty, 
+                        auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+                    );
+
+                if (nextCycleYear == CycleYearType.Nothing)
+                    throw new BusinessException($"The audit cycle has already completed its three years for the { auditCycleStandard.Standard.Name } standard");
+            }
+
+            // TODO: Validar para todos los auditCycleStandards activos que tenga al menos
+            // uno de los standards, un AppForm sin que esté activo para permitir crear uno nuevo
+
+        } // ValidateCreateAppFormAsync
+
         private async Task ValidateAppFormAsync(AppForm newItem, AppForm currentItem)
         {
+            // - Validarque el CycleYear no exista
             // - Solo puede haber un appform activo por ciclo y standard
             // - Validar que el ciclo esté activo - Omitir por ahora -UPDATE xBlaze(20250826): este no, es necesario subir auditorias o documentación estando inactivo
             //   por lo pronto, validar que el ciclo no sea del pasado
@@ -676,16 +736,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("You can't change to this status from Cancel");
             } // El status cambió
 
-            if (_repository.Gets()
-                .Where(m => m.ID != newItem.ID
-                    && m.AuditCycleID == newItem.AuditCycleID
-                    && m.StandardID == newItem.StandardID
-                    && m.Status == AppFormStatusType.Active).Any())
+            if (await _repository
+                .ExistsValidAppFormAsync(
+                    newItem.AuditCycleID, 
+                    newItem.StandardID ?? Guid.Empty,
+                    newItem.ID
+                ))
                 throw new BusinessException("There is already an active Application Form for this cycle and standard");
-
-            //if (currentItem.AuditCycle != null &&
-            //    currentItem.AuditCycle.Status != StatusType.Active)
-            //    throw new BusinessException("The audits cycle is not active");
 
             if (currentItem.AuditCycle != null 
                 && currentItem.AuditCycle.EndDate != null 
@@ -705,10 +762,19 @@ namespace Arysoft.ARI.NF48.Api.Services
                     if (standardItem.Status != StatusType.Active)
                         throw new BusinessException("The selected standard is not active");
 
-                    if (await _repository.IsThereValidAppFormAsync(currentItem.AuditCycleID, newItem.StandardID.Value))
+                    if (await _repository.ExistsValidAppFormAsync(currentItem.AuditCycleID, newItem.StandardID.Value))
                         throw new BusinessException("There is already an active application form for the same standard in the current audit cycle");
                     
-                    // Falta validar que el standard esté asociado en el ciclo
+                    if (!currentItem.AuditCycle.AuditCycleStandards.Where(acs => acs.StandardID == newItem.StandardID).Any())
+                        throw new BusinessException("The selected standard is not associated with the current audit cycle");
+
+                    if (await _repository
+                        .GetNextCycleYearAwait(
+                            currentItem.AuditCycleID, 
+                            newItem.StandardID.Value,
+                            currentItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+                        ) == CycleYearType.Nothing)
+                        throw new BusinessException($"The audit cycle has already completed its three years for the { standardItem.Name } standard");
                 }
                 else // Probablemente aquí no entre nunca
                 {

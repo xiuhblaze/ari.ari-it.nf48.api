@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
 using System.Data.Entity;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,14 +19,89 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync();
         } // GetAuditCycleIDAsync
 
-        public async Task<bool> IsThereValidAppFormAsync(Guid auditCycleID, Guid standardID)
+        public async Task<CycleYearType> GetNextCycleYearAwait(
+            Guid auditCycleID, 
+            Guid standardID,
+            AuditCyclePeriodicityType periodicity
+            )
         {
-            return await _model
-                .AnyAsync(m => m.AuditCycleID == auditCycleID
+            var auditCycleRepository = _context.Set<AuditCycle>();
+
+            var appFormsInCycle = await _model
+                .Where(m => m.AuditCycleID == auditCycleID 
+                    && m.StandardID == standardID
+                    && m.Status > AppFormStatusType.Nothing
+                    && m.Status < AppFormStatusType.Cancel
+                ).OrderBy(m => m.CycleYear)
+                .ToListAsync();
+
+            if (appFormsInCycle.Count == 0)
+                return CycleYearType.FirstYear;
+
+            var lastAppForm = appFormsInCycle
+                .OrderByDescending(m => m.CycleYear)
+                .FirstOrDefault();
+
+            CycleYearType nextCycleYear = CycleYearType.Nothing;
+
+            if (lastAppForm != null)
+            {
+                if (
+                    (lastAppForm.CycleYear == CycleYearType.ThirdYear 
+                        && periodicity == AuditCyclePeriodicityType.Annual)
+                    || (lastAppForm.CycleYear == CycleYearType.MiddleThirdYear
+                        && periodicity == AuditCyclePeriodicityType.Biannual)
+                ) return CycleYearType.Nothing;
+
+                if (periodicity == AuditCyclePeriodicityType.Annual)
+                {
+                    nextCycleYear = (CycleYearType)((int)lastAppForm.CycleYear + 2);
+                }
+                else if (periodicity == AuditCyclePeriodicityType.Biannual)
+                {
+                    nextCycleYear = (CycleYearType)((int)lastAppForm.CycleYear + 1);
+                }
+            }
+
+            return nextCycleYear;
+        } // GetNextCycleYearAwait
+
+        public async Task<bool> ExistsValidAppFormAsync(Guid auditCycleID, Guid standardID, Guid? exeptionID = null)
+        {
+            var query = _model
+                .Where(m => m.AuditCycleID == auditCycleID
                     && m.StandardID == standardID
                     && m.Status > AppFormStatusType.Nothing
                     && m.Status < AppFormStatusType.Inactive);
+
+            if (exeptionID.HasValue)
+            { 
+                query = query.Where(m => m.ID != exeptionID.Value);
+            }
+                
+            return await query.AnyAsync();
         } // IsThereValidAppFormAsync
+
+        public async Task<bool> ExistsValidCycleYearAppForm(
+            Guid auditCycleID, 
+            Guid standardID, 
+            CycleYearType cycleYear,
+            Guid? exceptionID = null)
+        {
+            var query = _model
+                .Where(m => m.AuditCycleID == auditCycleID
+                    && m.StandardID == standardID
+                    && m.CycleYear == cycleYear
+                    && m.Status > AppFormStatusType.Nothing
+                    && m.Status < AppFormStatusType.Inactive);
+
+            if (exceptionID.HasValue)
+            { 
+                query = query.Where(m => m.ID != exceptionID.Value);
+            }
+
+            return await query.AnyAsync();
+        } // ExistsValidCycleYearAppForm
 
         public new void Delete(AppForm item)
         {

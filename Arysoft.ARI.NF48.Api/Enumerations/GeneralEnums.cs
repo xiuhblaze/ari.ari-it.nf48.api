@@ -39,4 +39,15 @@
         EUR,
         Other
     }
+
+    public enum  CycleYearType
+    {
+        Nothing,
+        FirstYear,
+        MiddleFirstYear,
+        SecondYear,
+        MiddleSecondYear,
+        ThirdYear,
+        MiddleThirdYear,
+    }
 }
