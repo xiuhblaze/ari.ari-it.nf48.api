@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Http.Results;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -171,41 +172,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
             
-            //var siteRepository = new SiteRepository();
-            //var md5Repository = new MD5Repository();
-
-            // Validations
-
-            //if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
-            //{ 
-            //    if (item.SiteID == null || item.SiteID == Guid.Empty)
-            //    {
-            //        throw new ArgumentException("The Site ID is required");
-            //    }
-
-            //    foundItem.SiteID = item.SiteID; // Solo se asigna si es nuevo
-            //} // xBlaze Update: Creo que no se va a utilizar, se genera automáticamente
-
-            //if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
-            //{ 
-            //    //var site = await siteRepository.GetAsync(item.SiteID ?? Guid.Empty)
-            //    //    ?? throw new BusinessException("The Site ID does not exist");
-            //    //var employeesCount = site.Shifts != null
-            //    //    ? site.Shifts.Where(s => s.Status == StatusType.Active)
-            //    //        .Sum(s => s.NoEmployees) ?? 0
-            //    //    : 0;
-
-            //    //if (foundItem.NoEmployees != employeesCount) // Cambió el número de empleados, volver a obtener InitialMD5
-            //    //{ 
-            //    //    item.InitialMD5 = await md5Repository.GetDaysAsync(employeesCount);
-            //    //    item.NoEmployees = employeesCount;
-            //    //}
-            //    var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
-
-            //    foundItem.InitialMD5 = employeesMD5.InitialMD5;
-            //    foundItem.NoEmployees = employeesMD5.NoEmployees;
-            //}
-
             // HACK: IMPORTANTE Ver que realmente se va a seguir actualizando despues de que sea Inactive
 
             await ValidateUpdateItemAsync(item, foundItem);
@@ -231,10 +197,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(adcSiteID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            var employeesMD5 = await GetEmployeesMD5Async(foundItem.SiteID ?? Guid.Empty);
+            //var employeesMD5 = await GetEmployeesMD5Async(foundItem.SiteID ?? Guid.Empty);
 
-            foundItem.InitialMD5 = employeesMD5.InitialMD5;
-            foundItem.NoEmployees = employeesMD5.NoEmployees;
+            //foundItem.InitialMD5 = employeesMD5.InitialMD5;
+            //foundItem.NoEmployees = employeesMD5.NoEmployees;
+            var employees = GetEmployees(foundItem.Site ?? new Site());
+            var md5 = await GetMD5ByEmployeesAsync(employees);
+
+            foundItem.MD5ID = md5.ID;
+            foundItem.InitialMD5 = md5.Days; // employeesMD5.InitialMD5;
+            foundItem.NoEmployees = employees;
 
             // Execute queries
 
@@ -363,13 +335,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
             {
                 // NOTA: La mayoria de calculos se va a realizar en el frontend
+                var employees = GetEmployees(foundItem.Site ?? new Site());
+                var md5 = await GetMD5ByEmployeesAsync(employees);
 
-                var employeesMD5 = await GetEmployeesMD5Async(foundItem.SiteID ?? Guid.Empty);
-                var md5Value = await GetMD5ByEmployeesAsync(foundItem.SiteID ?? Guid.Empty);
-
-                //foundItem.MD5ID = md5Value.ID;
-                foundItem.InitialMD5 = employeesMD5.InitialMD5;
-                foundItem.NoEmployees = employeesMD5.NoEmployees;
+                foundItem.MD5ID = md5.ID;
+                foundItem.InitialMD5 = md5.Days;
+                foundItem.NoEmployees = employees;
             }
 
             foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
@@ -414,17 +385,33 @@ namespace Arysoft.ARI.NF48.Api.Services
             };
         } // GetEmployeesMD5Async
 
-        public static async Task<MD5> GetMD5ByEmployeesAsync(Guid siteID)
+        public static int GetEmployees(Site site)
         {
             var siteRepository = new SiteRepository();
-            var md5Repository = new MD5Repository();
-            var site = await siteRepository.GetAsync(siteID)
-                    ?? throw new BusinessException("The Site ID does not exist");
+            //var site = await siteRepository.GetAsync(siteID)
+            //        ?? throw new BusinessException("The Site ID does not exist");
             var employeesCount = site.Shifts != null
                 ? site.Shifts.Where(s => s.Status == StatusType.Active)
                     .Sum(s => s.NoEmployees) ?? 0
                 : 0;
-            var md5Item = await md5Repository.GetByEmployeesAsync(employeesCount);
+
+            return employeesCount;
+        } // GetEmployees
+
+        public static async Task<MD5> GetMD5ByEmployeesAsync(int employees)
+        {
+            if (employees < 0)
+                throw new ArgumentException("The number of employees cannot be negative.");
+
+            //var siteRepository = new SiteRepository();
+            var md5Repository = new MD5Repository();
+            //var site = await siteRepository.GetAsync(siteID)
+            //        ?? throw new BusinessException("The Site ID does not exist");
+            //var employeesCount = site.Shifts != null
+            //    ? site.Shifts.Where(s => s.Status == StatusType.Active)
+            //        .Sum(s => s.NoEmployees) ?? 0
+            //    : 0;
+            var md5Item = await md5Repository.GetByEmployeesAsync(employees);
 
             return md5Item;
         } // GetMD5ByEmployeesAsync

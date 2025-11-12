@@ -32,6 +32,14 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(250);
 
             modelBuilder.Entity<Proposal>()
+                .Property(m => m.ExchangeRate)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Proposal>()
+                .Property(m => m.TaxRate)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<Proposal>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(1000);
 

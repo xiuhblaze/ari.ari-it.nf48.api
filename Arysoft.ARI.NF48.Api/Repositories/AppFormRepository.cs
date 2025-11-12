@@ -3,7 +3,6 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
 using System.Data.Entity;
-using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 

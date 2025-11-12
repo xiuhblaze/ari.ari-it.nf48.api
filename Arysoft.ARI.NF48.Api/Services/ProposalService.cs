@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -390,13 +389,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                 || foundItem.Status == ProposalStatusType.Rejected
                 )
             { 
-                foundItem.Justification = item.Justification;   //HACK: Considerar si es generado o se recibe, creo que lo va a generar el front end para que se acepte visualmente
+                foundItem.Justification = item.Justification;   // Va a ser generado en el frontend
                 foundItem.SignerName = item.SignerName;
                 foundItem.SignerPosition = item.SignerPosition;
-                foundItem.SignedFilename = item.SignedFilename;
                 foundItem.CurrencyCode = item.CurrencyCode;
+                foundItem.ExchangeRate = item.ExchangeRate;
+                foundItem.TaxRate = item.TaxRate;
+                foundItem.IncludeTravelExpenses = item.IncludeTravelExpenses;
             }
 
+            foundItem.SignedFilename = item.SignedFilename; // Considerar si es obligatorio al momenta de pasar a Active
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == ProposalStatusType.Nothing && item.Status == ProposalStatusType.Nothing
                 ? ProposalStatusType.New

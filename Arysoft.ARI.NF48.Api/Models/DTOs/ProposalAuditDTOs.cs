@@ -14,11 +14,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalAuditDays { get; set; }
 
-        public decimal? Investment { get; set; }
+        public decimal? SubTotal { get; set; }
 
         public decimal? CertificateIssue { get; set; }
 
         public decimal? TotalCost { get; set; }
+
+        public decimal? TravelExpenses { get; set; }
+
+        public decimal? TotalFinal { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -34,6 +38,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required(ErrorMessage = "The proposal ID is requierd")]
         public Guid? ProposalID { get; set; }
 
+        [Required(ErrorMessage = "The audit step is requierd")]
         public AuditStepType? AuditStep { get; set; }
 
         [Required(ErrorMessage = "The User that creates is required")]
@@ -45,15 +50,24 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     { 
         [Required(ErrorMessage = "The ID is requierd")]
         public Guid? ID { get; set; }
-                
+
+        [Required(ErrorMessage = "Audit days are required")]
         public decimal? TotalAuditDays { get; set; }
 
-        public decimal? Investment { get; set; }
+        [Required(ErrorMessage = "The subtotal is required for the invesment")]
+        public decimal? SubTotal { get; set; }
 
         public decimal? CertificateIssue { get; set; }
         
         public decimal? TotalCost { get; set; }
-        
+
+        public decimal? TravelExpenses { get; set; }
+
+        public decimal? TotalFinal { get; set; }
+
+        [Required(ErrorMessage = "The status is required")]
+        public StatusType? Status { get; set; }
+
         [Required(ErrorMessage = "The User that updates is required")]
         [StringLength(50, ErrorMessage = "The User name must be less than 50 characters")]
         public string UpdatedUser { get; set; }

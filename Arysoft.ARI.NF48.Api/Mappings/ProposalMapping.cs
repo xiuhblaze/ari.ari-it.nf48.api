@@ -30,6 +30,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SignerPosition = item.SignerPosition,
                 SignedFilename = item.SignedFilename,
                 CurrencyCode = item.CurrencyCode,
+                ExchangeRate = item.ExchangeRate,
+                TaxRate = item.TaxRate,
+                IncludeTravelExpenses = item.IncludeTravelExpenses,
                 ExtraInfo = item.ExtraInfo,
                 // INTERNAL
                 CreatedBy = item.CreatedBy,
@@ -65,6 +68,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SignerPosition = item.SignerPosition,                
                 SignedFilename = item.SignedFilename,
                 CurrencyCode = item.CurrencyCode,
+                ExchangeRate = item.ExchangeRate,
+                TaxRate = item.TaxRate,
+                IncludeTravelExpenses = item.IncludeTravelExpenses,
                 ExtraInfo = item.ExtraInfo,
                 // INTERNAL
                 CreatedBy = item.CreatedBy,
@@ -159,6 +165,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SignerName = itemDto.SignerName,
                 SignerPosition = itemDto.SignerPosition,
                 CurrencyCode = itemDto.CurrencyCode,
+                ExchangeRate = itemDto.ExchangeRate,
+                TaxRate = itemDto.TaxRate,
+                IncludeTravelExpenses = itemDto.IncludeTravelExpenses,
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

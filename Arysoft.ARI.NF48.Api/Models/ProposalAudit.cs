@@ -11,11 +11,15 @@ namespace Arysoft.ARI.NF48.Api.Models
         
         public decimal? TotalAuditDays { get; set; }
 
-        public decimal? Investment { get; set; }
+        public decimal? SubTotal { get; set; }
 
         public decimal? CertificateIssue { get; set; }
 
         public decimal? TotalCost { get; set; }
+
+        public decimal? TravelExpenses { get; set; }
+
+        public decimal? TotalFinal { get; set; }
 
         // RELATIONS
 

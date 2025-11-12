@@ -494,15 +494,19 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foreach(var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
             {
-                var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
+                // var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
+                var employees = ADCSiteService.GetEmployees(site);
+                var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(employees);
+
                 var adcSite = new ADCSite
                 {
                     ID = Guid.NewGuid(),
                     ADCID = item.ID,
                     SiteID = site.ID,
-                    InitialMD5 = employeesMD5.InitialMD5,
-                    NoEmployees = employeesMD5.NoEmployees,
-                    TotalInitial = employeesMD5.InitialMD5,
+                    MD5ID = md5.ID,
+                    InitialMD5 = md5.Days,   //employeesMD5.InitialMD5,
+                    NoEmployees = employees, //employeesMD5.NoEmployees,
+                    TotalInitial = md5.Days, //employeesMD5.InitialMD5,
                     Created = DateTime.UtcNow,
                     Updated = DateTime.UtcNow,
                     UpdatedUser = item.UpdatedUser,
@@ -751,7 +755,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             switch (cycleType)
             {
                 case AuditCycleType.Initial:
-                    // stepList.Add(AuditStepType.Stage1);
+                    stepList.Add(AuditStepType.Stage1);
                     stepList.Add(AuditStepType.Stage2);
                     stepList.Add(AuditStepType.Surveillance1);
                     stepList.Add(AuditStepType.Surveillance2);

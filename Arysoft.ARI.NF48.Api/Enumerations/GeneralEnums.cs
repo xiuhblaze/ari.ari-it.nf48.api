@@ -1,4 +1,6 @@
-﻿namespace Arysoft.ARI.NF48.Api.Enumerations
+﻿using System.Collections.Generic;
+
+namespace Arysoft.ARI.NF48.Api.Enumerations
 {
     public enum StatusType
     {
@@ -37,8 +39,8 @@
         USD,
         MXN,
         EUR,
-        Other
-    }
+        UF          // Unidad de Fomento (Chile)
+    } // CurrencyCodeType
 
     public enum  CycleYearType
     {
@@ -50,4 +52,5 @@
         ThirdYear,
         MiddleThirdYear,
     }
+
 }

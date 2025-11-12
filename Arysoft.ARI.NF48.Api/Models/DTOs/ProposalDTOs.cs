@@ -21,6 +21,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public CurrencyCodeType? CurrencyCode { get; set; }
 
+        public decimal? ExchangeRate { get; set; }
+
+        public decimal? TaxRate { get; set; }
+
+        public bool? IncludeTravelExpenses { get; set; }
+
         public string ExtraInfo { get; set; }
 
         // INTERNAL
@@ -63,6 +69,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid AuditCycleID { get; set; }
 
+        public CycleYearType? CycleYear { get; set; }
+
         public string Justification { get; set; }
 
         public string SignerName { get; set; }
@@ -74,6 +82,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string SignedFilename { get; set; }
 
         public CurrencyCodeType? CurrencyCode { get; set; }
+
+        public decimal? ExchangeRate { get; set; }
+
+        public decimal? TaxRate { get; set; }
+
+        public bool? IncludeTravelExpenses { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -171,6 +185,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [Required(ErrorMessage = "The currency code is required")]
         public CurrencyCodeType? CurrencyCode { get; set; }
+
+        public decimal? ExchangeRate { get; set; }
+
+        [Required(ErrorMessage = "The tax rate is required")]
+        public decimal? TaxRate { get; set; }
+
+        [Required(ErrorMessage = "Indicate whether travel expenses are included")]
+        public bool? IncludeTravelExpenses { get; set; }
 
         [StringLength(1000, ErrorMessage = "The exta info must be less than 1000 characters")]
         public string ExtraInfo { get; set; }

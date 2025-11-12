@@ -78,7 +78,8 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // GetAsync
 
         /// <summary>
-        /// Creo que se van a crear desde la propuesta (Proposal)
+        /// Creo que se van a crear desde la propuesta (Proposal),
+        /// de hecho si, wa bloquear este metodo
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
@@ -86,8 +87,13 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validate 
 
-            if (item.ProposalID == null || item.ProposalID == Guid.Empty)
+            if (item.ProposalID == Guid.Empty)
                 throw new BusinessException("ProposalID is required");
+
+            // - Validar que no esté duplicado el AuditStep dentro de la misma propuesta
+            var existingItem = await _repository.GetByProposalAndStepAsync(item.ProposalID, item.AuditStep ?? AuditStepType.Nothing);
+            if (existingItem != null)
+                throw new BusinessException("The Audit Step is already assigned to this Proposal");
 
             // Assigning values
             item.ID = Guid.NewGuid();
@@ -206,9 +212,11 @@ namespace Arysoft.ARI.NF48.Api.Services
         private ProposalAudit SetValuesUpdateItem(ProposalAudit item, ProposalAudit foundItem)
         {   
             foundItem.TotalAuditDays = item.TotalAuditDays;
-            foundItem.Investment = item.Investment;
+            foundItem.SubTotal = item.SubTotal;
             foundItem.CertificateIssue = item.CertificateIssue;
             foundItem.TotalCost = item.TotalCost;
+            foundItem.TravelExpenses = item.TravelExpenses;
+            foundItem.TotalFinal = item.TotalFinal;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing

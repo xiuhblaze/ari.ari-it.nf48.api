@@ -24,11 +24,23 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasPrecision(5, 2);
 
             modelBuilder.Entity<ProposalAudit>()
+                .Property(m => m.SubTotal)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ProposalAudit>()
                 .Property(m => m.CertificateIssue)
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<ProposalAudit>()
                 .Property(m => m.TotalCost)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ProposalAudit>()
+                .Property(m => m.TravelExpenses)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ProposalAudit>()
+                .Property(m => m.TotalFinal)
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<ProposalAudit>()
