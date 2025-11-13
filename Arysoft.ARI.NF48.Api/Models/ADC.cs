@@ -22,7 +22,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public decimal? TotalMD11 { get; set; }
 
-        public decimal? TotalSurveillance { get; set; }
+        public decimal? TotalSurveillance { get; set; } // Se va a utilizar solo si no es multisitio
 
         public decimal? TotalRecertification { get; set; }
 

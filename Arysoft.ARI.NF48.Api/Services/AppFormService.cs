@@ -8,8 +8,6 @@ using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -99,11 +97,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AppFormOrderType.Organization:
                         items = items.OrderBy(m => m.Organization.Name);
                         break;
+                    case AppFormOrderType.CycleYear:
+                        items = items.OrderBy(m => m.CycleYear);
+                        break;
                     case AppFormOrderType.CreatedDesc:
                         items = items.OrderByDescending(m => m.Created);
                         break;
                     case AppFormOrderType.OrganizationDesc:
                         items = items.OrderByDescending(m => m.Organization.Name);
+                        break;
+                    case AppFormOrderType.CycleYearDesc:
+                        items = items.OrderByDescending(m => m.CycleYear);
                         break;
                     default:
                         items = items.OrderByDescending(m => m.Created);

@@ -21,8 +21,10 @@
         Nothing,
         Created,
         Organization,
+        CycleYear,
         CreatedDesc,
-        OrganizationDesc        
+        OrganizationDesc,
+        CycleYearDesc
     }
 
     public enum AppFormValidityStatusType // TODO: Terminarlo, se va a ocupar luego

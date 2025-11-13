@@ -187,7 +187,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
-
             {
                 throw new BusinessException($"ADCService.AddAsync.Update.ProcesarADCAsync: {ex.Message}");
             }
@@ -203,7 +202,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
-
             {
                 throw new BusinessException($"ADCService.AddAsync.Update.RecalcularTotales: {ex.Message}");
             }
