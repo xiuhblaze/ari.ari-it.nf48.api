@@ -47,6 +47,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public bool? IsMainSite { get; set; }
 
+        public string MD5Range { get; set; }
+
         public ICollection<ADCConceptValueItemListDto> ADCConceptValues { get; set; }
 
         public ICollection<ADCSiteAuditItemDto> ADCSiteAudits { get; set; }

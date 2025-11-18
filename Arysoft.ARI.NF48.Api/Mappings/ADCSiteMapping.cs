@@ -27,6 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 ADCID = item.ADCID,
                 SiteID = item.SiteID,
+                MD5ID = item.MD5ID,
                 InitialMD5 = item.InitialMD5,
                 NoEmployees = item.NoEmployees,
                 TotalInitial = item.TotalInitial,
@@ -48,6 +49,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? item.Site.Address
                     : string.Empty,
                 IsMainSite = item.Site?.IsMainSite,
+                MD5Range = item.MD5 != null
+                    ? $"{item.MD5.StartValue} - {item.MD5.EndValue}"
+                    : string.Empty,
                 ADCConceptValues = item.ADCConceptValues != null
                     ? ADCConceptValueMapping.ADCConceptValueToListDto(item.ADCConceptValues).ToList()
                     : null,
@@ -66,6 +70,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 ADCID = item.ADCID,
                 SiteID = item.SiteID,
+                MD5ID = item.MD5ID,
                 InitialMD5 = item.InitialMD5,
                 NoEmployees = item.NoEmployees,
                 TotalInitial = item.TotalInitial,
@@ -93,6 +98,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? ADCSiteAuditMapping.ADCSiteAuditToListDto(item.ADCSiteAudits
                         .OrderBy(asa => asa.AuditStep))
                     .ToList()
+                    : null,
+                MD5 = item.MD5 != null
+                    ? MD5Mapping.MD5ToItemListDto(item.MD5)
                     : null,
                 Alerts = ADCSiteService.GetAlerts(item),
                 IsMultiStandard = ADCSiteService.IsMultiStandard(item.ID)

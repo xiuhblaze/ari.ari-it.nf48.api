@@ -107,22 +107,26 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 Sites = item.ADCs != null
                     ? SiteMapping.SiteToListDto(
-                        item.ADCs
-                            .Where(adc => adc.ADCSites != null)
-                            .SelectMany(adc => adc.ADCSites)
-                            .Select(ads => ads.Site)
-                            .Distinct()
-                            .OrderBy(s => s.IsMainSite)
-                        ).ToList()
+                            item.ADCs
+                                .Where(adc => adc.ADCSites != null)
+                                .SelectMany(adc => adc.ADCSites)
+                                .Select(ads => ads.Site)
+                                .Distinct()
+                            )
+                        .OrderByDescending(s => s.IsMainSite)
+                        .ThenBy(s => s.Description)
+                        .ToList()
                     : new List<SiteItemListDto>(),
                 Contacts = item.ADCs != null
                     ? ContactMapping.ContactToListDto(
-                        item.ADCs
-                            .Where(adc => adc.AppForm != null && adc.AppForm.Contacts != null)
-                            .SelectMany(adc => adc.AppForm.Contacts)
-                            .Distinct()
-                            .OrderBy(c => c.FirstName)
-                        ).ToList()
+                            item.ADCs
+                                .Where(adc => adc.AppForm != null && adc.AppForm.Contacts != null)
+                                .SelectMany(adc => adc.AppForm.Contacts)
+                                .Distinct()
+                            )
+                        .OrderByDescending(c => c.IsMainContact)
+                        .ThenBy(c => c.FullName)
+                        .ToList()
                     : new List<ContactItemListDto>(),
                 Scopes = item.ADCs != null
                     ? item.ADCs
