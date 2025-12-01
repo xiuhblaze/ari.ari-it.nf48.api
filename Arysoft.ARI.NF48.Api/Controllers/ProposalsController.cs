@@ -120,6 +120,46 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutProposal
 
+        [HttpPut]
+        [Route("api/Proposals/complete")]
+        [ResponseType(typeof(ApiResponse<ProposalItemDetailDto>))]
+        public async Task<IHttpActionResult> PutProposalComplete()
+        {
+            var data = HttpContext.Current.Request.Form["data"];
+            var file = HttpContext.Current.Request.Files.Count > 0
+                ? HttpContext.Current.Request.Files[0]
+                : null;
+            string filename = null;
+
+            if (string.IsNullOrEmpty(data))
+                throw new BusinessException("No data");
+
+            ProposalWithAuditListDto itemUpdateDto = JsonConvert
+                .DeserializeObject<ProposalWithAuditListDto>(data)
+                ?? throw new BusinessException("Can't read data object");
+
+            var foundItem = await _service.GetAsync(itemUpdateDto.Proposal.ID ?? Guid.Empty)
+                ?? throw new BusinessException("Item not found");
+
+            if (file != null)
+            {
+                filename = FileRepository.UploadFile(
+                    file,
+                    $"~/files/{foundItem.AuditCycle.OrganizationID}/Cycles/{foundItem.AuditCycle.ID}/Proposals",
+                    foundItem.ID.ToString(),
+                    new string[] { ".docx", "xlsx", ".pdf", ".jpg", ".png" }
+                );
+            }
+
+            var itemToEdit = ProposalMapping.ItemUpdateWithListDtoToProposal(itemUpdateDto);
+            itemToEdit.SignedFilename = filename ?? foundItem.SignedFilename;
+            var item = await _service.UpdateCompleteAsync(itemToEdit);
+            var itemDto = ProposalMapping.ProposalToItemDetailDto(item);
+            var response = new ApiResponse<ProposalItemDetailDto>(itemDto);
+
+            return Ok(response);
+        } // PutProposalComplete
+
         [HttpDelete]
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteProposal(Guid id, [FromBody] ProposalDeleteDto itemDeleteDto )

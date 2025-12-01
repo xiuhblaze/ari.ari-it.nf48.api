@@ -8,7 +8,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         public Guid ProposalID { get; set; }
 
         public AuditStepType? AuditStep { get; set; }
-        
+
         public decimal? TotalAuditDays { get; set; }
 
         public decimal? SubTotal { get; set; }

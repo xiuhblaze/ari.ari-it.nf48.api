@@ -205,6 +205,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
     } // ProposalUpdateDto
 
+    public class ProposalWithAuditListDto
+    { 
+        public ProposalUpdateDto Proposal { get; set; }
+
+        public List<ProposalAuditUpdateDto> ProposalAudits { get; set; }
+    } // ProposalWithAuditListDto
+
     public class ProposalDeleteDto
     {
         [Required(ErrorMessage = "The ID is required to delete")]

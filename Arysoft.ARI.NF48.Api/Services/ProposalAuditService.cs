@@ -151,7 +151,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foreach (var item in items)
             {
                 var foundItem = await _repository.GetAsync(item.ID)
-                    ?? throw new BusinessException($"One of the records (Proposl Audit) to update was not found: {item.ID}");
+                    ?? throw new BusinessException($"One of the records (Proposal Audit) to update was not found: {item.ID}");
 
                 foundItem = SetValuesUpdateItem(item, foundItem);
 

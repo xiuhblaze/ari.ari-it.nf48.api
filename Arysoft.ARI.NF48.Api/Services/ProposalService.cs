@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
@@ -161,6 +162,47 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return foundItem;
         } // UpdateAsync
+
+        public async Task<Proposal> UpdateCompleteAsync(Proposal item)
+        {
+            var foundItem = await _repository.GetAsync(item.ID)
+                ?? throw new BusinessException("The record does not exist.");
+            var _proposalAuditsService = new ProposalAuditService();
+
+            // Validations
+
+            await ValidateUpdatedItemAsync(item, foundItem);
+            foundItem = SetValuesForUpdate(item, foundItem);
+
+            var listProposalAudits = new List<ProposalAudit>();
+
+            if (item.ProposalAudits?.Any() ?? false)
+            { 
+                listProposalAudits = await _proposalAuditsService
+                    .UpdatedListAsync(item.ProposalAudits.ToList());
+            }
+
+            try
+            {
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ProposalService.UpdateCompleteAsync: {ex.Message}");
+            }
+
+            foundItem.ProposalAudits = listProposalAudits;
+
+            // Recalcular los totales de los steps
+            await CalculateStepsTotalsAsync(foundItem);
+
+            // Reload item
+            foundItem = await _repository.GetAsync(foundItem.ID)
+                ?? throw new BusinessException("The Proposal was not found after update complete");
+            return foundItem;
+
+        } // UpdateCompleteAsync
 
         public async Task DeleteAsync(Proposal item)
         {
@@ -503,9 +545,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var adcs = await adcRepository
                 .GetsByProposalAsync(proposal.ID);
-            var hasStage1 = proposalAuditSteps
-                .Where(pas => pas.AuditStep == AuditStepType.Stage1)
-                .Any();
+            //var hasStage1 = proposalAuditSteps
+            //    .Where(pas => pas.AuditStep == AuditStepType.Stage1)
+            //    .Any();
 
             foreach (var proposalAudit in proposalAuditSteps)
             {
@@ -529,35 +571,39 @@ namespace Arysoft.ARI.NF48.Api.Services
                     }
                 } // Obteniendo los sites que tienen el step
                 
-                decimal totaAuditDays = 0;
+                decimal totalAuditDays = 0;
                 foreach (var adcSite in adcSiteList)
                 {
                     //proposalAudit.TotalAuditDays = proposalAudit.TotalAuditDays ?? 0;
                     switch (proposalAudit.AuditStep)
                     { 
-                        case AuditStepType.Stage1:
-                            //proposalAudit.TotalAuditDays = 1;
-                            totaAuditDays += 1;
+                        //case AuditStepType.Stage1:
+                        //    //proposalAudit.TotalAuditDays = 1;
+                        //    totalAuditDays += 1;
+                        //    break;
+                        case AuditStepType.Stage2:
+                            //if (hasStage1)
+                            //    totalAuditDays += adcSite.Total - 1 ?? 0;
+                            //else
+                            totalAuditDays += adcSite.Total ?? 0;
                             break;
-                        case AuditStepType.Stage2:                            
-                            if (hasStage1)
-                                totaAuditDays += adcSite.Total - 1 ?? 0;
-                            else
-                                totaAuditDays += adcSite.Total ?? 0;
+                        case AuditStepType.Recertification:
+                            totalAuditDays += adcSite.Recertification ?? 0;
                             break;
                         case AuditStepType.Surveillance1:
                         case AuditStepType.Surveillance2:
                         case AuditStepType.Surveillance3:
                         case AuditStepType.Surveillance4:
                         case AuditStepType.Surveillance5:
-                            totaAuditDays += adcSite.Surveillance ?? 0;
-                            break;
-                        case AuditStepType.Recertification:
-                            totaAuditDays += adcSite.Recertification ?? 0;
+                            totalAuditDays += adcSite.Surveillance ?? 0;
                             break;
                     }
                 } // Por cada step, sumar el total de días de ese step
-                proposalAudit.TotalAuditDays = totaAuditDays;
+
+                if (proposalAudit.AuditStep == AuditStepType.Stage2 && totalAuditDays < 2)
+                    totalAuditDays = 2; // Mínimo 2 días para Stage 2
+
+                proposalAudit.TotalAuditDays = totalAuditDays;
 
                 proposalAudit.Updated = DateTime.UtcNow;
                 proposalAudit.UpdatedUser = proposal.UpdatedUser;

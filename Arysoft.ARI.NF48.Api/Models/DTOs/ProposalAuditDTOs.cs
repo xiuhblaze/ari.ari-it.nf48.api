@@ -33,7 +33,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
     }
 
-    public class ProposalAuditCreateDto
+    public class ProposalAuditCreateDto // Creo que no se necesita, se genera desde el Proposal
     {
         [Required(ErrorMessage = "The proposal ID is requierd")]
         public Guid? ProposalID { get; set; }

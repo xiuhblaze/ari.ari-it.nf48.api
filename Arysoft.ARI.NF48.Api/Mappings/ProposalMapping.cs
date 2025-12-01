@@ -178,6 +178,23 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemUpdateDtoToProposal
 
+        public static Proposal ItemUpdateWithListDtoToProposal(ProposalWithAuditListDto itemDto)
+        {
+            var item = ItemUpdateDtoToProposal(itemDto.Proposal);
+
+            if (itemDto.ProposalAudits != null && itemDto.ProposalAudits.Count > 0)
+            {
+                item.ProposalAudits = new List<ProposalAudit>();
+                foreach (var paDto in itemDto.ProposalAudits)
+                {
+                    var pa = ProposalAuditMapping.ItemUpdateDtoToProposalAudit(paDto);
+                    item.ProposalAudits.Add(pa);
+                }
+            }
+
+            return item;
+        } // ItemUpdateWithListDtoToProposal
+
         public static Proposal ItemDeleteDtoToProposal(ProposalDeleteDto itemDto)
         {
             return new Proposal

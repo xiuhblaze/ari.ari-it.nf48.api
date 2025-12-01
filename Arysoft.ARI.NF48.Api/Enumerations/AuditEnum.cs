@@ -1,18 +1,34 @@
 ﻿namespace Arysoft.ARI.NF48.Api.Enumerations
 {
+    //public enum AuditStepType
+    //{
+    //    Nothing,
+    //    Stage1,
+    //    Stage2,             // Inicial
+    //    Surveillance1,
+    //    Surveillance2,
+    //    Recertification,    // Inicial de ciclo
+    //    Transfer,           // Inicial de ciclo de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
+    //    Special,            // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+    //    Surveillance3,      // Solo algunas empresas solicitan auditorias semestrales
+    //    Surveillance4,      // En estos caso es Año 1: rr y S1, año 2: S2 y S3, año 3: S4 y S5
+    //    Surveillance5
+    //}
+
     public enum AuditStepType
     {
         Nothing,
+        PreAudit,           // Etapa previa a la auditoria donde se pueden subir documentos pero no se requiere un orden especifico
         Stage1,
         Stage2,             // Inicial
+        Transfer,           // Inicial de ciclo de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
+        Recertification,    // Inicial de ciclo
         Surveillance1,
         Surveillance2,
-        Recertification,    // Inicial de ciclo
-        Transfer,           // Inicial de ciclo de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
-        Special,            // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
         Surveillance3,      // Solo algunas empresas solicitan auditorias semestrales
         Surveillance4,      // En estos caso es Año 1: rr y S1, año 2: S2 y S3, año 3: S4 y S5
-        Surveillance5
+        Surveillance5,
+        Special,            // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
     }
 
     public enum AuditStatusType
