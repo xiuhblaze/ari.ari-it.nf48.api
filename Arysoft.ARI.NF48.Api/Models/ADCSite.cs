@@ -16,7 +16,7 @@ namespace Arysoft.ARI.NF48.Api.Models
             
         public int? NoEmployees { get; set; }       // Se obtiene de Sites
 
-        public decimal? TotalInitial { get; set; }  // Siempre se redondea hacia arriba
+        public decimal? TotalInitial { get; set; }  // Se calcula con los descuentos a InitialMD5
 
         public decimal? MD11 { get; set; }          // Ahora se va a manejar como porcentaje
 

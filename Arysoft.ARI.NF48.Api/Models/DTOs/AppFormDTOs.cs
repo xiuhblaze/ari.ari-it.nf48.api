@@ -194,10 +194,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class AppFormCreateDto
     {
-        [Required]
+        [Required(ErrorMessage = "The Organization is required")]
         public Guid OrganizationID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "The Audit Cycle is required")]
         public Guid AuditCycleID { get; set; }
 
         [Required]
@@ -246,6 +246,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(2)]
         public string AuditLanguage { get; set; }
+
+        public CycleYearType? CycleYear { get; set; }
 
         [StringLength(100)]
         public string CurrentCertificationsExpiration { get; set; }

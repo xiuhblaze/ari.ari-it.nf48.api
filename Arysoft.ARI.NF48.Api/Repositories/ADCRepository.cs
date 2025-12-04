@@ -79,6 +79,83 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return await query.FirstOrDefaultAsync();
         } // GetADCIDAvailableByAuditCycleAsync
 
+        /// <summary>
+        /// Indica si el ADC asociado al ADCSiteAudit incluye pre-auditoría
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 2024-06-12
+        /// Ultima Modificacion: 2024-06-12
+        /// </remarks>
+        public async Task<bool> IncludePreAuditByADCSiteAuditIDAsync(Guid id)
+        { 
+            var query = _model
+                .Include(m => m.ADCSites)
+                .Include("ADCSites.ADCSiteAudits")
+                .Where(m => m.ADCSites
+                    .Any(s => s.ADCSiteAudits
+                        .Any(a => a.ID == id)));
+
+            var adc = await query.FirstOrDefaultAsync();
+
+            return adc.IncludePreAudit ?? false;
+        } // IncludePreAuditByADCSiteAuditIDAsync
+
+        /// <summary>
+        /// Indica si el tipo de ciclo de auditoría del ADC es el indicado
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cycleType"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 2024-06-12
+        /// Ultima Modificacion: 2024-06-12
+        /// </remarks>
+        public async Task<bool> IsAuditCycleTypeByADCID(Guid id, AuditCycleType cycleType)
+        {
+            var query = _model
+                .Include(m => m.AuditCycle)
+                .Include("AuditCycle.AuditCycleStandards")
+                .Where(m => m.ID == id);
+            var adc = await query.FirstOrDefaultAsync();
+            var auditCycleStandard = adc.AuditCycle
+                .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
+                .FirstOrDefault();
+
+            return auditCycleStandard.CycleType == cycleType;
+        } // IsAuditCycleInitialByADCID
+
+        /// <summary>
+        /// Obtiene el tipo de ciclo de auditoría asociado al ADCSiteAudit por el Standard del ADC
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 2024-06-12
+        /// Ultima Modificacion: 2024-06-12
+        /// </remarks>
+        public async Task<AuditCycleType> GetAuditCycleTypeByADCSiteAuditIDAsync(Guid id)
+        {
+            var query = _model
+                .Include(m => m.ADCSites)
+                .Include("ADCSites.ADCSiteAudits")
+                .Include(m => m.AuditCycle)
+                .Include("AuditCycle.AuditCycleStandards")
+                .Where(m => m.ADCSites
+                    .Any(s => s.ADCSiteAudits
+                        .Any(a => a.ID == id)));
+            var adc = await query.FirstOrDefaultAsync();
+            var auditCycleStandard = adc.AuditCycle
+                .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
+                .FirstOrDefault();
+
+            return auditCycleStandard.CycleType ?? AuditCycleType.Nothing;
+        } // GetAuditCycleTypeByADCIDAsync
+
         public void UpdateValues(ADC item)
         {
             var existing = _context.Set<ADC>().Local

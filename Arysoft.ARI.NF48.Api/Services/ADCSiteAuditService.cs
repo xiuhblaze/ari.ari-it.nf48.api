@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
@@ -119,7 +120,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to Update was not found");
 
-            ValidateUpdateItem(item, foundItem);
+            await ValidateUpdateItemAsync(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
 
             try
@@ -138,21 +139,39 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<List<ADCSiteAudit>> UpdateListAsync(List<ADCSiteAudit> items)
         {
             if (!(items?.Any() ?? false)) // Valida si la lista es nula o vacía
-                throw new BusinessException("The list of ADC Concept Values to Update is empty");
+                throw new BusinessException("The list of ADC Site Audits to Update is empty");
 
             var areUpdatedItems = false;
             var updatedItems = new List<ADCSiteAudit>();
 
             foreach (var item in items)
             {
-                var foundItem = await _repository.GetAsync(item.ID)
-                    ?? throw new BusinessException($"One of the records (ADC Concept Value) to Update was not found: {item.ID }");
+                ADCSiteAudit foundItem;
 
-                ValidateUpdateItem(item, foundItem);
-                SetValuesUpdateItem(item, foundItem);
-                _repository.Update(foundItem);
-                areUpdatedItems = true;
-                updatedItems.Add(foundItem);
+                foundItem = await _repository.GetAsync(item.ID);
+
+                // Solo si es PreAudit, permitir crearlo sino existe
+                if (foundItem == null)
+                {
+                    if (item.AuditStep == AuditStepType.PreAudit)
+                    {
+                        await ValidateUpdateItemAsync(item, new ADCSiteAudit());
+
+                        foundItem = CreatePreAuditItem(item);
+                        _repository.Add(foundItem);
+                        areUpdatedItems = true;
+                    }
+                    else throw new BusinessException($"One of the records (ADC Site Audit) to Update was not found: {item.ID}");
+                }
+                else
+                {
+                    await ValidateUpdateItemAsync(item, foundItem);
+                    SetValuesUpdateItem(item, foundItem);
+                    _repository.Update(foundItem);
+                    areUpdatedItems = true;
+                    updatedItems.Add(foundItem);
+                }
+
             }
 
             if (areUpdatedItems)
@@ -207,8 +226,20 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
-        private void ValidateUpdateItem(ADCSiteAudit item, ADCSiteAudit foundItem)
+        private ADCSiteAudit CreatePreAuditItem(ADCSiteAudit item)
         {
+            item.ID = Guid.NewGuid();
+            item.Status = StatusType.Active;
+            item.Created = DateTime.UtcNow;
+            item.Updated = DateTime.UtcNow;
+
+            return item;
+        } // CreatePreAuditItem
+
+        private async Task ValidateUpdateItemAsync(ADCSiteAudit item, ADCSiteAudit foundItem)
+        {
+            var _adcRepository = new ADCRepository();
+
             // Validations
 
             // - Validar que tenga el AuditStep
@@ -223,6 +254,53 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The Audit Step already exists for that ADCSite");
 
             // - De acuerdo al tipo de AuditCycle, ver si es valido el AuditStep
+            //   Initial: PreAudit, Stage1, Stage2, Surveillance1-5 (aquí se valida que PreAudit sea solo en Initial)
+            //   Recertificacion: Recertification, Surveillance1-5
+            //   Transfer: Transfer, Recertification, Surveillance1-5
+
+            var auditCycleType = await _adcRepository
+                .GetAuditCycleTypeByADCSiteAuditIDAsync(item.ID);
+            switch (auditCycleType)
+            {
+                case AuditCycleType.Initial:
+                    if (item.AuditStep != AuditStepType.PreAudit &&
+                        item.AuditStep != AuditStepType.Stage1 &&
+                        item.AuditStep != AuditStepType.Stage2 &&
+                        item.AuditStep != AuditStepType.Surveillance1 &&
+                        item.AuditStep != AuditStepType.Surveillance2 &&
+                        item.AuditStep != AuditStepType.Surveillance3 &&
+                        item.AuditStep != AuditStepType.Surveillance4 &&
+                        item.AuditStep != AuditStepType.Surveillance5)
+                    {
+                        throw new BusinessException("The Audit Step is not valid for the Initial Audit Cycle.");
+                    }
+                    break;
+                case AuditCycleType.Recertificacion:
+                    if (item.AuditStep != AuditStepType.Recertification &&
+                        item.AuditStep != AuditStepType.Surveillance1 &&
+                        item.AuditStep != AuditStepType.Surveillance2 &&
+                        item.AuditStep != AuditStepType.Surveillance3 &&
+                        item.AuditStep != AuditStepType.Surveillance4 &&
+                        item.AuditStep != AuditStepType.Surveillance5)
+                    {
+                        throw new BusinessException("The Audit Step is not valid for the Recertification Audit Cycle.");
+                    }
+                    break;
+                case AuditCycleType.Transfer:
+                    if (item.AuditStep != AuditStepType.Transfer &&
+                        item.AuditStep != AuditStepType.Recertification &&
+                        item.AuditStep != AuditStepType.Surveillance1 &&
+                        item.AuditStep != AuditStepType.Surveillance2 &&
+                        item.AuditStep != AuditStepType.Surveillance3 &&
+                        item.AuditStep != AuditStepType.Surveillance4 &&
+                        item.AuditStep != AuditStepType.Surveillance5)
+                    {
+                        throw new BusinessException("The Audit Step is not valid for the Transfer Audit Cycle.");
+                    }
+                    break;
+                default:
+                    throw new BusinessException("The Audit Cycle Type is not valid.");
+            }
 
         } // validateUpdateItem 
 
@@ -230,6 +308,10 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             foundItem.Value = item.Value;
             foundItem.AuditStep = item.AuditStep;
+            if (item.AuditStep == AuditStepType.PreAudit)
+                foundItem.PreAuditDays = item.PreAuditDays;
+            if (item.AuditStep == AuditStepType.Stage1)
+                foundItem.Stage1Days = item.Stage1Days;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing

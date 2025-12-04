@@ -28,6 +28,22 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(500);
 
             modelBuilder.Entity<ADC>()
+                .Property(m => m.TotalInitial)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADC>()
+                .Property(m => m.TotalMD11)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADC>()
+                .Property(m => m.TotalSurveillance)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADC>()
+                .Property(m => m.TotalRecertification)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADC>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(500);
 

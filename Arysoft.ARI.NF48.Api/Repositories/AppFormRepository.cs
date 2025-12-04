@@ -18,7 +18,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync();
         } // GetAuditCycleIDAsync
 
-        public async Task<CycleYearType> GetNextCycleYearAwait(
+        public async Task<CycleYearType> GetNextCycleYearAsync(
             Guid auditCycleID, 
             Guid standardID,
             AuditCyclePeriodicityType periodicity
@@ -63,7 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             }
 
             return nextCycleYear;
-        } // GetNextCycleYearAwait
+        } // GetNextCycleYearAsync
 
         public async Task<bool> ExistsValidAppFormAsync(Guid auditCycleID, Guid standardID, Guid? exeptionID = null)
         {

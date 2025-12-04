@@ -142,7 +142,6 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <exception cref="BusinessException"></exception>
         public async Task<AppForm> AddAsync(AppForm item)
         {
-
             await ValidateCreateAppFormAsync(item);
 
             // Set values
@@ -182,12 +181,24 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (foundItem.Status == AppFormStatusType.Nothing) // Si es la primera vez...
             {
                 foundItem.StandardID = item.StandardID; // Se asigna el standard
-                foundItem.CycleYear = await _repository.GetNextCycleYearAwait(
-                    foundItem.AuditCycleID, 
-                    item.StandardID ?? Guid.Empty,
-                    foundItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
-                );
+                // Omitido porque la asignación del CycleYear se hace en el front al crear el appform - xBlaze 20251203
+                //foundItem.CycleYear = await _repository.GetNextCycleYearAwait( 
+                //    foundItem.AuditCycleID, 
+                //    item.StandardID ?? Guid.Empty,
+                //    foundItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+                //);
             }
+
+            // Validar si el CycleYear es valido y no está duplicado
+            if (await _repository.ExistsValidCycleYearAppForm(
+                foundItem.AuditCycleID, 
+                foundItem.StandardID ?? Guid.Empty, 
+                item.CycleYear ?? CycleYearType.Nothing,
+                item.ID
+                ))
+                throw new BusinessException("The selected Cycle Year is already assigned to another Application Form for the same standard in the current audit cycle");
+
+            // TODO: Considerar el validar por fechas de aplicación, que no este el año 2 un año fisico antes que año 1, etc.
 
             if (item.Status == AppFormStatusType.Nothing 
                 || item.Status == AppFormStatusType.SalesReview // xBlaze 20250424: Estos dos últimos para evitar que se utilicen - en el futuro se podrian necesitar
@@ -292,6 +303,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 // General
                 foundItem.Description = item.Description;
                 foundItem.AuditLanguage = item.AuditLanguage;
+                foundItem.CycleYear = item.CycleYear;
                 foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
                 foundItem.CurrentStandards = item.CurrentStandards;
                 foundItem.CurrentCertificationsBy = item.CurrentCertificationsBy;
@@ -337,7 +349,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("There is already an active application form for the same standard in the selected audit cycle");
             }
 
-            var cycleYear = await _repository.GetNextCycleYearAwait(
+            var cycleYear = await _repository.GetNextCycleYearAsync(
                 originalItem.AuditCycleID,
                 originalItem.StandardID ?? Guid.Empty,
                 originalItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
@@ -575,8 +587,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 OrganizationName = item.Organization?.Name,
                 AuditCycleName = item.AuditCycle?.Name,
                 StandardName = item.Standard?.Name,
-                Website = item.Organization?.Website,
-                Phone = item.Organization?.Phone,
+                item.Organization?.Website,
+                item.Organization?.Phone,
                 Companies = item.Organization.Companies
                                     .Where(c => c.Status == StatusType.Active)
                                     .Select(c => new { c.ID, c.Name, c.LegalEntity, c.COID }),
@@ -670,7 +682,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             { 
                 var auditCycleStandard = auditCycleStandards.First();
                 var nextCycleYear = await _repository
-                    .GetNextCycleYearAwait(
+                    .GetNextCycleYearAsync(
                         newItem.AuditCycleID, 
                         auditCycleStandard.StandardID ?? Guid.Empty, 
                         auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
@@ -773,7 +785,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         throw new BusinessException("The selected standard is not associated with the current audit cycle");
 
                     if (await _repository
-                        .GetNextCycleYearAwait(
+                        .GetNextCycleYearAsync(
                             currentItem.AuditCycleID, 
                             newItem.StandardID.Value,
                             currentItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing

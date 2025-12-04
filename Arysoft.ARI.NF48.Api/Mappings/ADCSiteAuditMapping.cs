@@ -26,6 +26,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCSiteID = item.ADCSiteID,
                 Value = item.Value,
                 AuditStep = item.AuditStep,
+                PreAuditDays = item.PreAuditDays,
+                Stage1Days = item.Stage1Days,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -49,6 +51,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Value = itemDto.Value,
                 AuditStep = itemDto.AuditStep,
+                PreAuditDays = itemDto.PreAuditDays,
+                Stage1Days = itemDto.Stage1Days,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

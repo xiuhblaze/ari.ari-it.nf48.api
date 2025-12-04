@@ -209,6 +209,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
+                CycleYear = item.CycleYear,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
                 CurrentStandards = item.CurrentStandards,
                 CurrentCertificationsBy = item.CurrentCertificationsBy,

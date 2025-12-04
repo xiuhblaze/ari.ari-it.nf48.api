@@ -144,6 +144,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             var appForm = await _appFormRepository.GetAsync(item.AppFormID)
                 ?? throw new BusinessException("The Application Form was not found.");
 
+            // Validar que el AppForm sea active
+
+            if (appForm.Status != AppFormStatusType.Active)
+                throw new BusinessException("The Application Form must be Active to create an ADC.");
+
             // Validar que el AppForm no tenga un ADC
             if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing 
                 && adc.Status < ADCStatusType.Cancel))
@@ -159,8 +164,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             item.ID = Guid.NewGuid();
             item.AuditCycleID = appForm.AuditCycleID; // await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
+            item.StandardID = appForm.StandardID ?? Guid.Empty;
             item.CycleYear = appForm.CycleYear;
-            // item.UserCreates = item.UpdatedUser;
             item.Status = ADCStatusType.New;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -217,7 +222,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            ValidateUpdateItem(item, foundItem);
+            await ValidateUpdateItemAsync(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
 
             foundItem.Alerts = await GetAlertsAsync(foundItem);
@@ -247,7 +252,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var _adcSitesService = new ADCSiteService();
 
-            ValidateUpdateItem(item, foundItem);
+            await ValidateUpdateItemAsync(item, foundItem);
             SetValuesUpdateItem(item, foundItem);
 
             foundItem.Alerts = await GetAlertsAsync(foundItem);
@@ -379,7 +384,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <param name="item"></param>
         /// <param name="foundItem"></param>
         /// <exception cref="BusinessException"></exception>
-        private void ValidateUpdateItem(ADC item, ADC foundItem)
+        private async Task ValidateUpdateItemAsync(ADC item, ADC foundItem)
         {
             // Validations
 
@@ -411,6 +416,23 @@ namespace Arysoft.ARI.NF48.Api.Services
                         throw new BusinessException("To delete an ADC, use the Delete method.");
                 }
             }
+
+            // Validar que si se marca IncludePreAudit, el ciclo de auditoria sea Initial y no tenga un registro de 
+            if (item.IncludePreAudit ?? false) {
+
+                if (!await _repository.IsAuditCycleTypeByADCID(foundItem.ID, AuditCycleType.Initial))
+                    throw new BusinessException("The Audit Cycle Type must be Initial to include Pre-Audit.");
+            }
+
+            //var myAuditCycleStandard = foundItem.AppForm.AuditCycle.AuditCycleStandards
+            //    .FirstOrDefault(acs => acs.StandardID == foundItem.StandardID)
+            //    ?? throw new BusinessException("The current standard was not found in audit cycle");
+            //if (!foundItem.AuditCycle.AuditCycleStandards
+            //    .Any(acs => acs.CycleType == AuditCycleType.Initial)
+            //    && (item.IncludePreAudit.HasValue && item.IncludePreAudit.Value))
+            //{
+            //    throw new BusinessException("There is no initial standard cycle for including pre audit");
+            //}
 
         } // ValidateUpdateItem
 

@@ -13,11 +13,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid AppFormID { get; set; }
 
+        public Guid StandardID { get; set; }
+
         public Guid? ProposalID { get; set; }
 
         public CycleYearType? CycleYear { get; set; }
 
         public string Description { get; set; }
+
+        public bool? IncludePreAudit { get; set; }
 
         public int? TotalEmployees { get; set; }
 
@@ -71,11 +75,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid AppFormID { get; set; }
 
+        public Guid StandardID { get; set; }
+
         public Guid? ProposalID { get; set; }
 
         public CycleYearType? CycleYear { get; set; }
 
         public string Description { get; set; }
+
+        public bool? IncludePreAudit { get; set; }
 
         public int? TotalEmployees { get; set; }
 
@@ -87,13 +95,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public decimal? TotalRecertification { get; set; }
 
-        //public string UserCreates { get; set; }
-
-        //public string UserReview { get; set; }
-
         public DateTime? ReviewDate { get; set; }
-
-        // public string ReviewComments { get; set; }
 
         public DateTime? ActiveDate { get; set; }
 
@@ -147,24 +149,33 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(500)]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "Indicate whether pre audit are included")]
+        public bool? IncludePreAudit { get; set; }
+
+        [Required(ErrorMessage = "Total initial is required")]
+        [Range(typeof(decimal), "0", "999.99", ErrorMessage = "Total initial must be 0.00 or greater and at most 999.99")]
         public decimal? TotalInitial { get; set; }
 
+        [Required(ErrorMessage = "TotalMD11 is required")]
+        [Range(typeof(decimal), "0", "999.99", ErrorMessage = "Total MD11 must be 0.00 or greater and at most 999.99")]
         public decimal? TotalMD11 { get; set; }
 
+        [Required(ErrorMessage = "Total surveillance is required")]
+        [Range(typeof(decimal), "0", "999.99", ErrorMessage = "Total surveillance must be 0.00 or greater and at most 999.99")]
         public decimal? TotalSurveillance { get; set; }
 
+        [Required(ErrorMessage = "Total recertification is required")]
+        [Range(typeof(decimal), "0", "999.99", ErrorMessage = "Total recertification must be 0.00 or greater and at most 999.99")]
         public decimal? TotalRecertification { get; set; }
 
-        //[StringLength(1000)]
-        //public string ReviewComments { get; set; }
-
-        [StringLength(500)]
+        [StringLength(500, ErrorMessage = "The extra info must be less than 500 characters")]
         public string ExtraInfo { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "The Status value is required")]
         public ADCStatusType Status { get; set; }
 
-        [StringLength(50)]
+        [Required(ErrorMessage = "The User that updates is required")]
+        [StringLength(50, ErrorMessage = "The User name must be less than 50 characters")]
         public string UpdatedUser { get; set; }
     } // ADCUpdateDto
 

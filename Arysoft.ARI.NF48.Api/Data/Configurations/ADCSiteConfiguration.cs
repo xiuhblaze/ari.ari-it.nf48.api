@@ -20,12 +20,36 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<ADCSite>()
+                .Property(m => m.InitialMD5)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADCSite>()
+                .Property(m => m.TotalInitial)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADCSite>()
+                .Property(m => m.MD11)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADCSite>()
                 .Property(m => m.MD11Filename)
                 .HasMaxLength(250);
 
             modelBuilder.Entity<ADCSite>()
                 .Property(m => m.MD11UploadedBy)
                 .HasMaxLength(50);
+
+            modelBuilder.Entity<ADCSite>()
+                .Property(m => m.Total)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADCSite>()
+                .Property(m => m.Surveillance)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADCSite>()
+                .Property(m => m.Recertification)
+                .HasPrecision(5, 2);
 
             modelBuilder.Entity<ADCSite>()
                 .Property(m => m.ExtraInfo)

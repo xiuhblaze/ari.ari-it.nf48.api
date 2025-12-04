@@ -24,8 +24,16 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<ADCConceptValue>()
+                .Property(m => m.Value)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<ADCConceptValue>()
                 .Property(m => m.Justification)
                 .HasMaxLength(500);
+
+            modelBuilder.Entity<ADCConceptValue>()
+                .Property(m => m.ValueApproved)
+                .HasPrecision(5, 2);
 
             modelBuilder.Entity<ADCConceptValue>()
                 .Property(m => m.JustificationApproved)

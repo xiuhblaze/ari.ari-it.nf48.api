@@ -28,6 +28,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
                 Description = item.Description,
+                IncludePreAudit = item.IncludePreAudit,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
@@ -62,6 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
                 Description = item.Description,
+                IncludePreAudit = item.IncludePreAudit,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
@@ -115,12 +117,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADC
             {
                 ID = itemDto.ID,
-                Description = itemDto.Description,                
+                Description = itemDto.Description,
+                IncludePreAudit = itemDto.IncludePreAudit,
                 TotalInitial = itemDto.TotalInitial,
                 TotalMD11 = itemDto.TotalMD11,
                 TotalSurveillance = itemDto.TotalSurveillance,
-                TotalRecertification = itemDto.TotalRecertification,
-                //ReviewComments = itemDto.ReviewComments,                
+                TotalRecertification = itemDto.TotalRecertification,      
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
