@@ -8,7 +8,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class AuditStandardItemListDto
     {
         public Guid ID { get; set; }
-        
+
+        public Guid? AuditCycleID { get; set; }
+
         public Guid AuditID { get; set; }
         
         public Guid? StandardID { get; set; }
@@ -20,6 +22,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public StatusType Status { get; set; }
 
         // RELATIONS
+
+        public string AuditCycleName { get; set; }
 
         public string AuditDescription { get; set; }
 
@@ -38,6 +42,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public Guid? AuditCycleID { get; set; }
+
         public Guid AuditID { get; set; }
 
         public Guid? StandardID { get; set; }
@@ -55,6 +61,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
 
         // RELATIONS
+
+        public AuditCycleItemListDto AuditCycle { get; set; }
 
         public AuditItemListDto Audit { get; set; }
 
@@ -79,6 +87,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         [Required]
         public Guid ID { get; set; }
+
+        public Guid? AuditCycleID { get; set; }
 
         public Guid? StandardID { get; set; }
 

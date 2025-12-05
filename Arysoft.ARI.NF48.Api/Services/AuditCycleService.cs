@@ -5,6 +5,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -133,36 +134,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            // Validations
-
-            // TODO: Esto se debe de validar al integrar un standard, puede haber
-            //     más de un ciclo activo por organización pero con diferente
-            //     standard
-            // ACTUALIZACION (xb-20250212): Al parecer solo puede haber un ciclo activo por organización, un standard nuevo se agregaria al ciclo
-            // - Validar que las fechas de inicio y termino no se superpongan a otro
-            // ACTUALIZACION (xb-20250225): Nop puede haber más de un ciclo activo por organización, pero no con el mismo standard
-            //if (await _repository.IsAnyCycleBetweenDatesByOrganizationAsync(item.OrganizationID, (DateTime)item.StartDate, (DateTime)item.EndDate))
-            //{
-            //    throw new BusinessException("There is already an audit cycle between the dates provided");
-            //}
-
-            // - StartDate not must be greater than EndDate
-            if (item.StartDate > item.EndDate)
-                throw new BusinessException("The start date must be less than the end date");
+            await ValidateUpdatedItemAsync(item, foundItem);
 
             // Assigning values
 
-            // if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-
-            // Si cambia a ciclo activo, verificar que no exista otro ciclo activo
-            // con el mismo standard
-            if (item.Status == StatusType.Active && foundItem.Status != StatusType.Active)
-            {
-                if (_repository.IsAnyCycleActiveByOrganizationAndStandard(foundItem.OrganizationID, foundItem.AuditCycleStandards, foundItem.ID))
-                    throw new BusinessException("There is a other active cycle with the same standard");
+            if (foundItem.Status == StatusType.Nothing) // Solo si es nuevo...
+            { 
+                foundItem.StandardID = item.StandardID; // ...asignar el standard ID
             }
 
             foundItem.Name = item.Name;
+            foundItem.CycleType = item.CycleType;
+            foundItem.InitialStep = item.InitialStep;
             foundItem.StartDate = item.StartDate;
             foundItem.EndDate = item.EndDate;
             foundItem.Periodicity = item.Periodicity;
@@ -226,5 +209,189 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditCycle.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync 
+
+        public async Task CreateMissingAuditCyclesAsync()
+        {
+            var _auditStandardsRepository = new AuditStandardRepository();
+            var _auditCycleStandardRepository = new AuditCycleStandardRepository();
+
+            var auditStandards = _auditStandardsRepository.Gets()
+                .Where(e => e.AuditCycleID == null)
+                .ToList();
+
+            var errorList = new List<string>();
+            var newCycles = new List<AuditCycle>();
+            var standardsToUpdate = new List<AuditStandard>();
+
+            foreach (var auditStandard in auditStandards)
+            {
+                // Validaciones básicas de existencia
+                if (auditStandard.Audit == null || auditStandard.Audit.OrganizationID == null)
+                {
+                    errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: Audit or OrganizationID is null");
+                    continue;
+                }
+
+                if (auditStandard.Audit.AuditCycle == null || auditStandard.Audit.AuditCycleID == null)
+                {
+                    errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: AuditCycle or AuditCycleID is null");
+                    continue;
+                }
+
+                var auditCycleStandard = _auditCycleStandardRepository.Gets()
+                    .FirstOrDefault(e =>
+                        e.StandardID == auditStandard.StandardID
+                        && e.AuditCycleID == auditStandard.Audit.AuditCycleID);
+
+                if (auditCycleStandard == null)
+                {
+                    errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: No matching AuditCycleStandard found");
+                    continue;
+                }
+
+                var existingCycle = _repository.Gets()
+                    .Where(e =>
+                        e.OrganizationID == (auditStandard.Audit.OrganizationID ?? Guid.Empty)
+                        && e.StandardID == auditStandard.StandardID
+                        && e.StartDate == auditStandard.Audit.AuditCycle.StartDate
+                        && e.EndDate == auditStandard.Audit.AuditCycle.EndDate)
+                    .ToList();
+
+                var preCreatedCycle = newCycles
+                    .Where(e =>
+                        e.OrganizationID == (auditStandard.Audit.OrganizationID ?? Guid.Empty)
+                        && e.StandardID == auditStandard.StandardID
+                        && e.StartDate == auditStandard.Audit.AuditCycle.StartDate
+                        && e.EndDate == auditStandard.Audit.AuditCycle.EndDate)
+                    .ToList();
+
+                if (existingCycle.Count > 0)
+                {
+                    auditStandard.AuditCycleID = existingCycle.First().ID;
+                }
+                else if (preCreatedCycle.Count > 0)
+                {
+                    auditStandard.AuditCycleID = preCreatedCycle.First().ID;
+                }
+                else
+                {
+                    // Crear nuevo ciclo de auditoría
+                    var newAuditCycle = new AuditCycle
+                        {
+                            ID = Guid.NewGuid(),
+                            OrganizationID = auditStandard.Audit.OrganizationID ?? Guid.Empty,
+                            StandardID = auditStandard.StandardID,
+                            Name = auditStandard.Audit.AuditCycle.Name ?? string.Empty,
+                            CycleType = auditCycleStandard.CycleType,
+                            InitialStep = auditCycleStandard.InitialStep,
+                            StartDate = auditStandard.Audit.AuditCycle.StartDate,
+                            EndDate = auditStandard.Audit.AuditCycle.EndDate,
+                            Periodicity = auditStandard.Audit.AuditCycle.Periodicity,
+                            ExtraInfo = auditStandard.Audit.AuditCycle.ExtraInfo,
+                            Status = StatusType.Active,
+                            Created = DateTime.UtcNow,
+                            Updated = DateTime.UtcNow,
+                            UpdatedUser = "system"
+                        };
+
+                    // Validación mínima: si se requiere Start/End para crear el ciclo...
+                    if (newAuditCycle.StartDate == null || newAuditCycle.EndDate == null)
+                    {
+                        errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: StartDate or EndDate is null");
+                        continue;
+                    }
+
+                    newCycles.Add(newAuditCycle);
+                    auditStandard.AuditCycleID = newAuditCycle.ID;
+                }
+
+                // Preparar actualización del AuditStandard para que apunte al nuevo ciclo o al existente                
+                standardsToUpdate.Add(auditStandard);
+            }
+
+            // Guardar todos los nuevos ciclos en un solo SaveChanges (mejor rendimiento)
+            if (newCycles.Count > 0)
+            {
+                try
+                {
+                    foreach (var c in newCycles) _repository.Add(c);
+                    await _repository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    // Si falla aquí, no intentamos actualizar standards (evita inconsistencias)
+                    throw new BusinessException($"CreateMissingAuditCyclesAsync (saving cycles): {ex.Message}");
+                }
+            }
+
+            // Actualizar todos los AuditStandard en un solo SaveChanges
+            if (standardsToUpdate.Count > 0)
+            {
+                try
+                {
+                    foreach (var s in standardsToUpdate) _auditStandardsRepository.Update(s);
+                    await _auditStandardsRepository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"CreateMissingAuditCyclesAsync (updating auditStandards): {ex.Message}");
+                }
+            }
+
+            if (errorList.Count > 0)
+            {
+                throw new BusinessException("Errors found creating missing audit cycles: "
+                    + String.Join("; ", errorList));
+            }
+        } // CreateMissingAuditCycles
+
+        // PRIVATE
+
+        /// <summary>
+        /// Realiza las validaciones necesarias al actualizar un ciclo de auditoría
+        /// </summary>
+        /// <param name="item">Objeto que contiene los datos que se van a actualizar</param>
+        /// <param name="foundItem">Objeto que contiene los datos registrados en la base de datos</param>
+        /// <returns></returns>
+        private async Task ValidateUpdatedItemAsync(AuditCycle item, AuditCycle foundItem)
+        {
+            // Validations
+
+            // - Solo puede haber un ciclo activo por standard y organización
+            // - Que el tipo de ciclo sea en el orden correcto (Initial -> Recertification, o Transfer -> Recertification)
+            // - Si ya cuenta con una Auditoria Inicial o de Recertificacion, validar que tenga las fechas del certificado
+
+
+            if (item.Status == StatusType.Active) { // Si es activo, siempre validar...
+                // Validar que existan las fechas de inicio y fin
+                if (item.StartDate == null)
+                    throw new BusinessException("The start date is required for active cycles");
+
+                if (item.EndDate == null)
+                    throw new BusinessException("The end date is required for active cycles");
+
+                // - Que la fecha de inicio sea menor a la fecha de fin
+                if (item.StartDate > item.EndDate)
+                    throw new BusinessException("The start date must be less than the end date");
+            }
+
+            if (item.Status != foundItem.Status) // Si cambia el status...
+            {
+                switch (item.Status)
+                {
+                    case StatusType.Active:
+                        // Validar que no exista otro ciclo activo con el mismo standard y organización
+                        if (await _repository.IsAnyCycleActiveByOrganizationAndStandardAsync(
+                            foundItem.OrganizationID,
+                            foundItem.StandardID ?? Guid.Empty,
+                            foundItem.ID))
+                        {
+                            throw new BusinessException("There is a other active cycle with the same standard");
+                        }
+                        break;
+                }
+            }
+
+        } // ValidateUpdatedItemAsync
     }
 }

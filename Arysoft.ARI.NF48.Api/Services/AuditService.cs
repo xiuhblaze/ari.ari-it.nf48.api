@@ -34,15 +34,17 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 items = items
                     .Where(e => 
-                        e.AuditCycle != null 
-                        && e.AuditCycle.OrganizationID == filters.OrganizationID
+                        e.OrganizationID == filters.OrganizationID
                     );
             }
 
             if (filters.AuditCycleID != null && filters.AuditCycleID != Guid.Empty)
             {
                 items = items
-                    .Where(e => e.AuditCycleID == filters.AuditCycleID);
+                    .Where(e => e.AuditStandards
+                        .Where(asd => asd.AuditCycleID == filters.AuditCycleID)
+                        .Any()
+                    );
             }
 
             if (filters.AuditorID != null && filters.AuditorID != Guid.Empty)
@@ -231,12 +233,15 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<Audit> AddAsync(Audit item)
         {
             // Validations
-            if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
-                throw new BusinessException("Must first assign an audit cycle");
+            if (item.OrganizationID == null || item.OrganizationID == Guid.Empty)
+                throw new BusinessException("Must first assign an organization");
 
-            var _auditCycleRepository = new AuditCycleRepository();
-            var auditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID)
-                ?? throw new BusinessException("The audit cycle associated is not found");
+            //var _auditCycleRepository = new AuditCycleRepository();
+            //var auditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID)
+            //    ?? throw new BusinessException("The audit cycle associated is not found");
+            var _organizationRepository = new OrganizationRepository();
+            var organization = await _organizationRepository.GetAsync(item.OrganizationID.Value)
+                ?? throw new BusinessException("The organization associated is not found");
 
             // - Validar que el ciclo sea el activo o sea en el futuro
 
@@ -261,7 +266,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 foreach (var i in items)
                 { 
-                    FileRepository.DeleteDirectory($"~/files/organizations/{i.AuditCycle.OrganizationID}/Cycles/{i.AuditCycle.ID}/{i.ID}");
+                    FileRepository.DeleteDirectory($"~/files/organizations/{i.OrganizationID}/Audits/{i.ID}");
                 }
 
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
@@ -328,7 +333,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == AuditStatusType.Deleted)
             {
-                var fileDirectory = $"~/files/organizations/{foundItem.AuditCycle.OrganizationID}/Cycles/{foundItem.AuditCycle.ID}/{foundItem.ID}";
+                var fileDirectory = $"~/files/organizations/{foundItem.OrganizationID}/Audits/{foundItem.ID}";
                 FileRepository.DeleteDirectory(fileDirectory);
 
                 _repository.Delete(foundItem);
@@ -442,26 +447,27 @@ namespace Arysoft.ARI.NF48.Api.Services
             // que sea del mismo sitio, parte que no se ha implementado aun. -xB 20250430
             // ACTUALIZACION: Creo que con validar si es multisitio ya es suficiente
 
-            if (!(newItem.IsMultisite.HasValue && newItem.IsMultisite.Value))
-            {
-                var isAnyAuditStandardStepProgrammed = false;
+            // #CHANGE_CYCLES: Evaluar esta validación una vez se implementen los cambios -xB 20251205
+            //if (!(newItem.IsMultisite.HasValue && newItem.IsMultisite.Value))
+            //{
+            //    var isAnyAuditStandardStepProgrammed = false;
 
-                foreach (var auditStandard in currentItem.AuditStandards
-                    .Where(aus => aus.Status == StatusType.Active))
-                {
-                    if (await _repository.IsAnyStandardStepAuditInAuditCycle(
-                        currentItem.AuditCycleID,
-                        auditStandard.StandardID ?? Guid.Empty,
-                        auditStandard.Step ?? AuditStepType.Nothing,
-                        currentItem.ID))
-                    {
-                        isAnyAuditStandardStepProgrammed = true;
-                        break;
-                    }
-                }
-                if (isAnyAuditStandardStepProgrammed)
-                    throw new BusinessException("At last one standard step is already programmed in another audit");
-            } // IsMultisite
+            //    foreach (var auditStandard in currentItem.AuditStandards
+            //        .Where(aus => aus.Status == StatusType.Active))
+            //    {
+            //        if (await _repository.IsAnyStandardStepAuditInAuditCycle(
+            //            currentItem.AuditCycleID,
+            //            auditStandard.StandardID ?? Guid.Empty,
+            //            auditStandard.Step ?? AuditStepType.Nothing,
+            //            currentItem.ID))
+            //        {
+            //            isAnyAuditStandardStepProgrammed = true;
+            //            break;
+            //        }
+            //    }
+            //    if (isAnyAuditStandardStepProgrammed)
+            //        throw new BusinessException("At last one standard step is already programmed in another audit");
+            //} // IsMultisite
 
             var isAuditorBusy = false;
             foreach (var auditAuditor in currentItem.AuditAuditors

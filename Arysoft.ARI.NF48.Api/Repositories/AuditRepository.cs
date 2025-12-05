@@ -43,7 +43,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 a.StartDate >= initialDate
                 && a.Status != AuditStatusType.Nothing
                 && a.Status < AuditStatusType.Canceled
-                && a.AuditCycle.Status != StatusType.Nothing
+                // && a.AuditCycle.Status != StatusType.Nothing
             );
 
             if (ownerID != null && ownerID != Guid.Empty)
@@ -51,10 +51,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 switch (owner)
                 {
                     case AuditNextAuditOwnerType.Organization:
-                        items = items.Where(a => a.AuditCycle.OrganizationID == ownerID);
+                        items = items.Where(a => a.OrganizationID == ownerID);
                         break;
                     case AuditNextAuditOwnerType.AuditCycle:
-                        items = items.Where(a => a.AuditCycleID == ownerID);
+                        items = items.Where(a => a.AuditStandards
+                            .Where(aas => aas.AuditCycleID == ownerID)
+                            .Any()
+                        );
                         break;
                     case AuditNextAuditOwnerType.Auditor:
                         items = items.Where(a => a.AuditAuditors.Any(aa => aa.AuditorID == ownerID && aa.Status == StatusType.Active));
@@ -109,16 +112,27 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             AuditStepType step,
             Guid? auditExceptionID)
         {
+            //var items = _model
+            //    .Include(a => a.AuditStandards)
+            //    .Where(a =>
+            //        a.AuditCycleID == auditCycleID
+            //        && a.AuditStandards.Any(asd =>
+            //            asd.StandardID == standardID
+            //            && asd.Step == step
+            //            && asd.Status == StatusType.Active)
+            //        && a.Status != AuditStatusType.Nothing
+            //        && a.Status < AuditStatusType.Canceled
+            //    );
+
             var items = _model
                 .Include(a => a.AuditStandards)
-                .Where(a =>
-                    a.AuditCycleID == auditCycleID
-                    && a.AuditStandards.Any(asd =>
-                        asd.StandardID == standardID
-                        && asd.Step == step
-                        && asd.Status == StatusType.Active)
-                    && a.Status != AuditStatusType.Nothing
-                    && a.Status < AuditStatusType.Canceled
+                .Include("AuditStandards.AuditCycle")
+                .Where(a => a.AuditStandards.Where(asd => 
+                    asd.AuditCycleID == auditCycleID
+                    && (asd.AuditCycle != null && asd.AuditCycle.StandardID == standardID) // #CHANGE_CYCLES: Temporal el null, hasta garantizar que todos los AuditStandards tengan un AuditCycle
+                    && asd.Step == step
+                    && asd.Status == StatusType.Active
+                    ).Any()
                 );
 
             if (auditExceptionID != null && auditExceptionID != Guid.Empty)
@@ -137,6 +151,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <param name="standardID"></param>
         /// <param name="auditCycleID"></param>
         /// <returns></returns>
+        [Obsolete("El modelo de AuditCycleStandards ya no va a ser utilizado")]
         public async Task<bool> IsAnyStandardInAuditForAuditCycleAsync(
             Guid standardID,
             Guid auditCycleID
@@ -145,8 +160,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var items = _model
                 .Include(a => a.AuditStandards)
                 .Where(a =>
-                    a.AuditCycleID == auditCycleID
-                    && a.AuditStandards.Any(asd =>
+                    //a.AuditCycleID == auditCycleID
+                    a.AuditStandards.Any(asd =>
                         asd.StandardID == standardID
                         && asd.Status == StatusType.Active)                    
                     && a.Status != AuditStatusType.Nothing

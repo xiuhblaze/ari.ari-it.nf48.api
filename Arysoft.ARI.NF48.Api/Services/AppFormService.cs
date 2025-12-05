@@ -675,22 +675,24 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Solo si el AuditCycle tiene un solo standard activo, lo valida para 
             // ver si aun tiene CycleYear's disponibles
-            var auditCycleStandards = auditCycle.AuditCycleStandards
-                .Where(acs => acs.Status == StatusType.Active)
-                .ToList();
-            if (auditCycleStandards.Count() == 1)
-            { 
-                var auditCycleStandard = auditCycleStandards.First();
-                var nextCycleYear = await _repository
-                    .GetNextCycleYearAsync(
-                        newItem.AuditCycleID, 
-                        auditCycleStandard.StandardID ?? Guid.Empty, 
-                        auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
-                    );
+            // #CHANGE_CYCLES: AuditCycle ya solo va a ser de un solo Standard y CycleYear va a ser registrado manualmente en
+            //                 el AppForm, por lo que esta validación ya no aplica - xBlaze 20251203
+            //var auditCycleStandards = auditCycle.AuditCycleStandards
+            //    .Where(acs => acs.Status == StatusType.Active)
+            //    .ToList();
+            //if (auditCycleStandards.Count() == 1)
+            //{ 
+            //    var auditCycleStandard = auditCycleStandards.First();
+            //    var nextCycleYear = await _repository
+            //        .GetNextCycleYearAsync(
+            //            newItem.AuditCycleID, 
+            //            auditCycleStandard.StandardID ?? Guid.Empty, 
+            //            auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+            //        );
 
-                if (nextCycleYear == CycleYearType.Nothing)
-                    throw new BusinessException($"The audit cycle has already completed its three years for the { auditCycleStandard.Standard.Name } standard");
-            }
+            //    if (nextCycleYear == CycleYearType.Nothing)
+            //        throw new BusinessException($"The audit cycle has already completed its three years for the { auditCycleStandard.Standard.Name } standard");
+            //}
 
             // TODO: Validar para todos los auditCycleStandards activos que tenga al menos
             // uno de los standards, un AppForm sin que esté activo para permitir crear uno nuevo
@@ -781,8 +783,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     if (await _repository.ExistsValidAppFormAsync(currentItem.AuditCycleID, newItem.StandardID.Value))
                         throw new BusinessException("There is already an active application form for the same standard in the current audit cycle");
                     
-                    if (!currentItem.AuditCycle.AuditCycleStandards.Where(acs => acs.StandardID == newItem.StandardID).Any())
-                        throw new BusinessException("The selected standard is not associated with the current audit cycle");
+                    //if (!currentItem.AuditCycle.AuditCycleStandards.Where(acs => acs.StandardID == newItem.StandardID).Any())
+                    //    throw new BusinessException("The selected standard is not associated with the current audit cycle");
 
                     if (await _repository
                         .GetNextCycleYearAsync(

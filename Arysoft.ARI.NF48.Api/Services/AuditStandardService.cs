@@ -159,21 +159,22 @@ namespace Arysoft.ARI.NF48.Api.Services
                             x.StandardID == item.StandardID && x.ID != item.ID))
                             throw new BusinessException("The standard is already assigned to this audit");
 
+                        // // #CHANGE_CYCLES: Evaluar esta validación una vez se implementen los cambios -xBlaze 20251205
                         // - Que el standard no este asignado con otra auditoria del mismo audit cycle
-                        if (foundItem.Audit != null 
-                            && foundItem.Audit.Status != AuditStatusType.Nothing
-                            && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
-                        { 
-                            var auditsRepository = new AuditRepository();
-                            var hasStandard = await auditsRepository.IsAnyStandardStepAuditInAuditCycle(
-                                foundItem.Audit.AuditCycleID,
-                                foundItem.StandardID.Value,
-                                item.Step.Value,
-                                foundItem.Audit.ID
-                            );
-                            if (hasStandard)
-                                throw new BusinessException("The standard with this step is already assigned to another audit");
-                        }
+                        //if (foundItem.Audit != null 
+                        //    && foundItem.Audit.Status != AuditStatusType.Nothing
+                        //    && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
+                        //{ 
+                        //    var auditsRepository = new AuditRepository();
+                        //    var hasStandard = await auditsRepository.IsAnyStandardStepAuditInAuditCycle(
+                        //        foundItem.Audit.AuditCycleID,
+                        //        foundItem.StandardID.Value,
+                        //        item.Step.Value,
+                        //        foundItem.Audit.ID
+                        //    );
+                        //    if (hasStandard)
+                        //        throw new BusinessException("The standard with this step is already assigned to another audit");
+                        //}
                         break;
                 }
             }

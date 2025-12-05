@@ -9,7 +9,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid AuditCycleID { get; set; }
+        public Guid? OrganizationID { get; set; }
+
+        //public Guid AuditCycleID { get; set; }
 
         public string Description { get; set; }
 
@@ -53,7 +55,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     { 
         public Guid ID { get; set; }
 
-        public Guid AuditCycleID { get; set; }
+        public Guid? OrganizationID { get; set; }
+
+        //public Guid AuditCycleID { get; set; }
 
         public string Description { get; set; }
 
@@ -83,7 +87,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public AuditCycleItemListDto AuditCycle { get; set; }
+        public OrganizationItemListDto Organization { get; set; }
+
+        // public AuditCycleItemListDto AuditCycle { get; set; }
 
         public IEnumerable<AuditAuditorItemListDto> Auditors { get; set; }
 
@@ -99,7 +105,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class AuditPostDto
     {
         [Required]
-        public Guid AuditCycleID { get; set; }
+        public Guid OrganizationID { get; set; }
 
         [Required]
         [StringLength(50)]

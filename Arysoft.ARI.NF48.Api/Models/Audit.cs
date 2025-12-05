@@ -6,7 +6,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 {
     public class Audit : BaseModel
     {
-        public Guid AuditCycleID { get; set; }
+        public Guid? OrganizationID { get; set; }
+
+        public Guid AuditCycleID { get; set; }  // #CHANGE_CYCLES: Por eliminar
 
         public string Description { get; set; }
 
@@ -28,7 +30,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public virtual AuditCycle AuditCycle { get; set; }
+        public virtual Organization Organization { get; set; }
+
+        public virtual AuditCycle AuditCycle { get; set; } // #CHANGE_CYCLES: Por eliminar
 
         public virtual ICollection<AuditDocument> AuditDocuments { get; set; }
 

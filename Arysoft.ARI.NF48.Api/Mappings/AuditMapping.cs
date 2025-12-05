@@ -23,7 +23,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditItemListDto
             { 
                 ID = item.ID,
-                AuditCycleID = item.AuditCycleID,
+                OrganizationID = item.OrganizationID,
+                //AuditCycleID = item.AuditCycleID,
                 Description = item.Description,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
@@ -33,12 +34,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IncludeSunday = item.IncludeSunday,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
-                OrganizationName = item.AuditCycle != null && item.AuditCycle.Organization != null
-                    ? item.AuditCycle.Organization.Name
+                OrganizationName = item.Organization != null
+                    ? item.Organization.Name
                     : string.Empty,
-                AuditCycleName = item.AuditCycle != null
-                    ? item.AuditCycle.Name
-                    : string.Empty,
+                //AuditCycleName = item.AuditCycle != null
+                //    ? item.AuditCycle.Name
+                //    : string.Empty,
                 AuditorsCount = item.AuditAuditors != null
                     ? item.AuditAuditors.Where(aa =>
                         aa.Status != StatusType.Nothing
@@ -81,7 +82,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditItemDetailDto
             { 
                 ID = item.ID,
-                AuditCycleID = item.AuditCycleID,
+                OrganizationID = item.OrganizationID,
+                // AuditCycleID = item.AuditCycleID,
                 Description = item.Description,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
@@ -94,9 +96,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                AuditCycle = item.AuditCycle != null
-                    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
+                Organization = item.Organization != null
+                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization)
                     : null,
+                //AuditCycle = item.AuditCycle != null
+                //    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
+                //    : null,
                 Auditors = item.AuditAuditors != null
                     ? AuditAuditorMapping.AuditAuditorToListDto(item.AuditAuditors.Where(aa =>
                         aa.Status != StatusType.Nothing
@@ -129,7 +134,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {
             return new Audit
             { 
-                AuditCycleID = itemDto.AuditCycleID,
+                //AuditCycleID = itemDto.AuditCycleID,
+                OrganizationID = itemDto.OrganizationID,
                 UpdatedUser = itemDto.UpdatedUser,
             };
         } // ItemAddDtoToAudit

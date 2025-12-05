@@ -11,7 +11,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid OrganizationID { get; set; }
 
+        public Guid? StandardID { get; set; }
+
         public string Name { get; set; }
+
+        public AuditCycleType? CycleType { get; set; }
+
+        public AuditStepType? InitialStep { get; set; }
 
         public DateTime? StartDate { get; set; }
 
@@ -29,7 +35,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int AuditsCount { get; set; }
 
-        public IEnumerable<AuditCycleStandardItemListDto> AuditCycleStandards { get; set; }
+        //public IEnumerable<AuditCycleStandardItemListDto> AuditCycleStandards { get; set; }
 
         public int DocumentsCount { get; set; } // No lo veo muy necesario
     } // AuditCycleItemListDto
@@ -40,7 +46,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid OrganizationID { get; set; }
 
+        public Guid? StandardID { get; set; }
+
         public string Name { get; set; }
+
+        public AuditCycleType? CycleType { get; set; }
+
+        public AuditStepType? InitialStep { get; set; }
 
         public DateTime? StartDate { get; set; }
 
@@ -62,9 +74,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public OrganizationItemListDto Organization { get; set; }
 
-        public IEnumerable<AuditItemListDto> Audits { get; set; }
+        public IEnumerable<AuditStandardItemListDto> AuditStandards { get; set; }
 
-        public IEnumerable<AuditCycleStandardItemListDto> AuditCycleStandards { get; set; }
+        // public IEnumerable<AuditItemListDto> Audits { get; set; }
+
+        // public IEnumerable<AuditCycleStandardItemListDto> AuditCycleStandards { get; set; }
 
         public IEnumerable<AuditCycleDocumentItemListDto> AuditCycleDocuments { get; set; }
     } // AuditCycleItemDetailDto
@@ -84,13 +98,18 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid ID { get; set; }
 
+        [Required]
+        public Guid? StandardID { get; set; }
+
         [StringLength(50)]
         public string Name { get; set; }
 
-        [Required]
-        public DateTime? StartDate { get; set; }
+        public AuditCycleType? CycleType { get; set; }
 
-        [Required]
+        public AuditStepType? InitialStep { get; set; }
+
+        public DateTime? StartDate { get; set; }    // Obligatorio hasta que exista el certificado
+
         public DateTime? EndDate { get; set; }
 
         public AuditCyclePeriodicityType? Periodicity { get; set; }

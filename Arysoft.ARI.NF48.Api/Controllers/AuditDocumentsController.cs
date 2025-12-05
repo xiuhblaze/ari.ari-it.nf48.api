@@ -103,9 +103,14 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 if (documentType == null ||documentType == AuditDocumentType.Nothing)
                     throw new BusinessException("DocumentType is required");
 
+                //fileName = FileRepository.UploadFile(
+                //    file,
+                //    $"~/files/organizations/{ item.Audit.AuditCycle.OrganizationID }/Cycles/{item.Audit.AuditCycle.ID}/{item.Audit.ID}",
+                //    documentType.ToString() + "_" + item.ID.ToString()
+                //);
                 fileName = FileRepository.UploadFile(
                     file,
-                    $"~/files/organizations/{ item.Audit.AuditCycle.OrganizationID }/Cycles/{item.Audit.AuditCycle.ID}/{item.Audit.ID}",
+                    $"~/files/organizations/{item.Audit.OrganizationID}/Audits/{item.Audit.ID}",
                     documentType.ToString() + "_" + item.ID.ToString()
                 );
             }

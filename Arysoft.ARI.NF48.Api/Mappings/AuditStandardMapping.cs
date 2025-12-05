@@ -23,11 +23,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditStandardItemListDto
             {
                 ID = item.ID,
+                AuditCycleID = item.AuditCycleID,
                 AuditID = item.AuditID,
                 StandardID = item.StandardID,
                 Step = item.Step,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
+                AuditCycleName = item.AuditCycle != null
+                    ? item.AuditCycle.Name
+                    : string.Empty,
                 AuditDescription = item.Audit != null
                     ? item.Audit.Description
                     : string.Empty,
@@ -54,6 +58,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditStandardItemDetailDto
             {
                 ID = item.ID,
+                AuditCycleID = item.AuditCycleID,
                 AuditID = item.AuditID,
                 StandardID = item.StandardID,
                 Step = item.Step,
@@ -62,6 +67,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
+                AuditCycle = item.AuditCycle != null
+                    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
+                    : null,
                 Audit = item.Audit != null
                     ? AuditMapping.AuditToItemListDto(item.Audit)
                     : null,
@@ -93,7 +101,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AuditStandard
             {
                 ID = itemDto.ID,
-                StandardID = itemDto.StandardID,
+                AuditCycleID = itemDto.AuditCycleID,
+                // StandardID = itemDto.StandardID, // ahora este debe de ser el mismo que el del AuditCycle, no se va a pedir
                 Step = itemDto.Step,
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,

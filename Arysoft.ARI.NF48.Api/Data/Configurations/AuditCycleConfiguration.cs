@@ -50,11 +50,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             //    .HasForeignKey(a => a.AuditCycleID)
             //    .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<AuditCycle>()
-                .HasMany(ac => ac.AuditCycleStandards)
-                .WithRequired(acs => acs.AuditCycle)
-                .HasForeignKey(acs => acs.AuditCycleID)
-                .WillCascadeOnDelete(true);
+            //modelBuilder.Entity<AuditCycle>()
+            //    .HasMany(ac => ac.AuditCycleStandards)
+            //    .WithRequired(acs => acs.AuditCycle)
+            //    .HasForeignKey(acs => acs.AuditCycleID)
+            //    .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<AuditCycle>()
                 .HasMany(ac => ac.AuditCycleDocuments)

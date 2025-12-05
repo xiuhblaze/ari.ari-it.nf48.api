@@ -118,14 +118,14 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             var query = _model
                 .Include(m => m.AuditCycle)
-                .Include("AuditCycle.AuditCycleStandards")
+                // .Include("AuditCycle.AuditCycleStandards")
                 .Where(m => m.ID == id);
             var adc = await query.FirstOrDefaultAsync();
-            var auditCycleStandard = adc.AuditCycle
-                .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
-                .FirstOrDefault();
+            //var auditCycleStandard = adc.AuditCycle
+            //    .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
+            //    .FirstOrDefault();
 
-            return auditCycleStandard.CycleType == cycleType;
+            return adc.AuditCycle.CycleType == cycleType;
         } // IsAuditCycleInitialByADCID
 
         /// <summary>
@@ -144,16 +144,16 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(m => m.ADCSites)
                 .Include("ADCSites.ADCSiteAudits")
                 .Include(m => m.AuditCycle)
-                .Include("AuditCycle.AuditCycleStandards")
+                //.Include("AuditCycle.AuditCycleStandards")
                 .Where(m => m.ADCSites
                     .Any(s => s.ADCSiteAudits
                         .Any(a => a.ID == id)));
             var adc = await query.FirstOrDefaultAsync();
-            var auditCycleStandard = adc.AuditCycle
-                .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
-                .FirstOrDefault();
+            //var auditCycleStandard = adc.AuditCycle
+            //    .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
+            //    .FirstOrDefault();
 
-            return auditCycleStandard.CycleType ?? AuditCycleType.Nothing;
+            return adc.AuditCycle.CycleType ?? AuditCycleType.Nothing;
         } // GetAuditCycleTypeByADCIDAsync
 
         public void UpdateValues(ADC item)

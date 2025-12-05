@@ -231,9 +231,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 return true;
 
             // - Validar que no existan auditorias en AuditStandards
-            if (await auditsRepository
-                .IsAnyStandardInAuditForAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
-                return true;
+            //if (await auditsRepository
+            //    .IsAnyStandardInAuditForAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
+            //    return true;
 
             return false;
         } // IsAnyItemInStandardAuditCycle

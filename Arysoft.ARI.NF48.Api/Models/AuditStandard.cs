@@ -1,12 +1,13 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
     public class AuditStandard : BaseModel
     {
+        public Guid? AuditCycleID { get; set; }
+
         public Guid AuditID { get; set; }
 
         public Guid? StandardID { get; set; }
@@ -16,6 +17,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public string ExtraInfo { get; set; }
 
         // RELATIONS
+
+        public virtual AuditCycle AuditCycle { get; set; }
 
         public virtual Audit Audit { get; set; }
 

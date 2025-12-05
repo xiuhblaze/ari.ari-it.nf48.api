@@ -752,12 +752,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm, bool isMultisite)
         {
-            var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
-                .FirstOrDefault(s => s.StandardID == appForm.StandardID)
-                ?? throw new BusinessException("The current standard was not found in audit cycle");
+            //var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
+            //    .FirstOrDefault(s => s.StandardID == appForm.StandardID)
+            //    ?? throw new BusinessException("The current standard was not found in audit cycle");
 
-            var cycleType = currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing;
-            var initialStep = currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing;
+            var cycleType = appForm.AuditCycle.CycleType ?? AuditCycleType.Nothing; // currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing;
+            var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing; // currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing;
             var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
 
             if (cycleType == AuditCycleType.Nothing 
