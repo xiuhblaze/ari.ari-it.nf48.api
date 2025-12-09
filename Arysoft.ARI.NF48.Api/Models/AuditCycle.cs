@@ -28,6 +28,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual Organization Organization { get; set; }
 
+        public virtual Standard Standard { get; set; }
+
         //public virtual ICollection<Audit> Audits { get; set; }
 
         //public virtual ICollection<AuditCycleStandard> AuditCycleStandards { get; set; }

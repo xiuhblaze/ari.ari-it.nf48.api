@@ -143,7 +143,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 //    : new List<CertificateItemListDto>(),
                 AuditCycles = item.AuditCycles != null
                     ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
-                        .Where(i => i.Status != StatusType.Nothing))
+                        .Where(i => i.Status != StatusType.Nothing)
+                        .OrderByDescending(i => i.Created))
                     : null,
                 Companies = item.Companies != null
                     ? CompanyMapping.CompanyToListDto(item.Companies)

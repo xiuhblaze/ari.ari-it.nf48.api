@@ -245,6 +245,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Attributes\ValidEnumValue.cs" />
     <Compile Include="Controllers\ADCConceptsController.cs" />
     <Compile Include="Controllers\ADCConceptValuesController.cs" />
     <Compile Include="Controllers\ADCsController.cs" />
@@ -647,6 +648,7 @@
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
     <None Include="Properties\PublishProfiles\ari.im-prove.com.mx.pubxml" />
+    <None Include="Properties\PublishProfiles\En local despues de Cycles.pubxml" />
     <None Include="Properties\PublishProfiles\Publicar en local.pubxml" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />

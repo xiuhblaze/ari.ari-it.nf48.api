@@ -125,42 +125,54 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<AuditStandard> UpdateAsync(AuditStandard item)
         {
+            var _auditCycleRepository = new AuditCycleRepository();
+            var _standardRepository = new StandardRepository();
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             // Validations
 
+            var foundStandard = await _standardRepository.GetAsync(item.StandardID.Value)
+                ?? throw new BusinessException("The standard was not found");
+
+            var foundAuditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID.Value)
+                ?? throw new BusinessException("The audit cycle was not found");
+
             // - La primera vez debe de traer el StandardID
             if (foundItem.Status == StatusType.Nothing)
             {
-                if (item.StandardID == null || item.StandardID == Guid.Empty)
-                    throw new BusinessException("The standard must be assigned");
+                //if (item.StandardID == null || item.StandardID == Guid.Empty)
+                //    throw new BusinessException("The standard is missing");
+                if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
+                    throw new BusinessException("The standard is missing");
 
                 // - Validar que el standard esté activo
-                var standardRepository = new StandardRepository();
-
-                var foundStandard = await standardRepository.GetAsync(item.StandardID.Value)
-                    ?? throw new BusinessException("The standard was not found");
-
                 if (foundStandard.Status != StatusType.Active)
                     throw new BusinessException("The standard is not active");
 
-                // Asignando el standard
-                foundItem.StandardID = item.StandardID;
+                // - Validar que el audit cycle esté activo o inactivo
+                if (foundAuditCycle.Status != StatusType.Active 
+                    && foundAuditCycle.Status != StatusType.Inactive)
+                    throw new BusinessException("The audit cycle is not in a valid status");
             }
+
+            // - Que no esté duplicado el standard en el mismo audit
+            var query = _repository.Gets()
+                .Where(x => x.AuditID == foundItem.AuditID
+                    && x.StandardID == foundItem.StandardID
+                    && x.ID != item.ID);
+            if (query.Any())
+                throw new BusinessException("The standard is already assigned to this audit");
 
             if (item.Status != foundItem.Status) // Cambio de estatus
             {
                 switch (item.Status) // Si el nuevo status es...
                 {
                     case StatusType.Active:
-                        // - Que no esté duplicado el standard en el mismo audit
-                        if (foundItem.Audit.AuditStandards.Any(x => 
-                            x.StandardID == item.StandardID && x.ID != item.ID))
-                            throw new BusinessException("The standard is already assigned to this audit");
-
+                        
                         // // #CHANGE_CYCLES: Evaluar esta validación una vez se implementen los cambios -xBlaze 20251205
-                        // - Que el standard no este asignado con otra auditoria del mismo audit cycle
+                        // - Que el standard no este asignado con otra auditoria del mismo audit
+                        //   cycle y el mismo step
                         //if (foundItem.Audit != null 
                         //    && foundItem.Audit.Status != AuditStatusType.Nothing
                         //    && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
@@ -204,6 +216,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             //}
 
             // Assigning values
+
+            if (foundItem.Status == StatusType.Nothing) // Primera vez que se asigna
+            {
+                // Asignando el audit cycle y el standard
+                foundItem.AuditCycleID = item.AuditCycleID.Value;
+                foundItem.StandardID = foundAuditCycle.StandardID; //TODO: Probar esto!!!
+            }
 
             foundItem.Step = item.Step;
             foundItem.ExtraInfo = item.ExtraInfo;

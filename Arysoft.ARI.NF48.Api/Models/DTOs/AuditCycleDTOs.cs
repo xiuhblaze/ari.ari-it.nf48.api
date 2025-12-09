@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Arysoft.ARI.NF48.Api.Attributes;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -32,6 +33,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // RELATIONS
 
         public string OrganizationName { get; set; }
+
+        public string StandardName { get; set; }
 
         public int AuditsCount { get; set; }
 
@@ -74,6 +77,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public OrganizationItemListDto Organization { get; set; }
 
+        public StandardItemListDto Standard { get; set; }
+
         public IEnumerable<AuditStandardItemListDto> AuditStandards { get; set; }
 
         // public IEnumerable<AuditItemListDto> Audits { get; set; }
@@ -101,20 +106,25 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid? StandardID { get; set; }
 
-        [StringLength(50)]
+        [StringLength(50, ErrorMessage = "The audit cycle name ")]
         public string Name { get; set; }
 
+        [Required(ErrorMessage = "The cycle type is required")]
+        [ValidEnumValue(typeof(AuditCycleType))]
         public AuditCycleType? CycleType { get; set; }
 
+        [Required(ErrorMessage = "The initial step is required")]
+        [ValidEnumValue(typeof(AuditStepType))]
         public AuditStepType? InitialStep { get; set; }
 
         public DateTime? StartDate { get; set; }    // Obligatorio hasta que exista el certificado
 
         public DateTime? EndDate { get; set; }
 
+        [ValidEnumValue(typeof(AuditCyclePeriodicityType))]
         public AuditCyclePeriodicityType? Periodicity { get; set; }
 
-        [StringLength(1000)]
+        [StringLength(1000, ErrorMessage = "The extra info must be less than 1000 characters")]
         public string ExtraInfo { get; set; }
 
         [Required]

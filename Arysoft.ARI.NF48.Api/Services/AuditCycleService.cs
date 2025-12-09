@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -164,7 +165,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             {   
                 _repository.Update(foundItem);
                 await _repository.SaveChangesAsync(); // Async para esperar aquí a ver si sucede un error
-
             }
             catch (Exception ex)
             {
@@ -355,12 +355,33 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <returns></returns>
         private async Task ValidateUpdatedItemAsync(AuditCycle item, AuditCycle foundItem)
         {
+            var _standardRepository = new StandardRepository();
+            var _organizationStandardRepository = new OrganizationStandardRepository();
             // Validations
 
             // - Solo puede haber un ciclo activo por standard y organización
             // - Que el tipo de ciclo sea en el orden correcto (Initial -> Recertification, o Transfer -> Recertification)
             // - Si ya cuenta con una Auditoria Inicial o de Recertificacion, validar que tenga las fechas del certificado
 
+            // - Validar que el standard exista
+            var standard = await _standardRepository.GetAsync(item.StandardID ?? Guid.Empty)
+                ?? throw new BusinessException("The standard does not exist");
+
+            var organizationStandard = _organizationStandardRepository.Gets()
+                .FirstOrDefault(e =>
+                    e.OrganizationID == foundItem.OrganizationID
+                    && e.StandardID == item.StandardID)
+                ?? throw new BusinessException("The standard does not belong to the organization");
+
+            if (foundItem.Status == StatusType.Nothing) // Solo si es nuevo...
+            { 
+                if (standard.Status != StatusType.Active)
+                    throw new BusinessException("The standard is not valid");
+
+                // - Validar que el standard pertenezca a la organización
+                if (organizationStandard.Status != StatusType.Active)
+                    throw new BusinessException("The standard is not active for the organization");
+            }
 
             if (item.Status == StatusType.Active) { // Si es activo, siempre validar...
                 // Validar que existan las fechas de inicio y fin

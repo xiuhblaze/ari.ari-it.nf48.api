@@ -38,6 +38,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationName = item.Organization != null
                     ? item.Organization.Name
                     : string.Empty,
+                StandardName = item.StandardID != null && item.Standard != null
+                    ? item.Standard.Name
+                    : string.Empty,
                 AuditsCount = item.AuditStandards != null
                     ? item.AuditStandards.Where(asd => 
                         asd.Audit != null
@@ -81,6 +84,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser,
                 Organization = item.Organization != null
                     ? OrganizationMapping.OrganizationToItemListDto(item.Organization)
+                    : null,
+                Standard = item.StandardID != null && item.Standard != null
+                    ? StandardMapping.StandardToItemListDto(item.Standard)
                     : null,
                 AuditStandards = item.AuditStandards != null
                     ? AuditStandardMapping.AuditStandardToListDto(
