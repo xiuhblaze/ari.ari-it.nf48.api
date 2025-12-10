@@ -132,11 +132,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validations
 
-            var foundStandard = await _standardRepository.GetAsync(item.StandardID.Value)
-                ?? throw new BusinessException("The standard was not found");
-
             var foundAuditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID.Value)
                 ?? throw new BusinessException("The audit cycle was not found");
+
+            var foundStandard = await _standardRepository.GetAsync(foundAuditCycle.StandardID.Value)
+                ?? throw new BusinessException("The standard was not found");
 
             // - La primera vez debe de traer el StandardID
             if (foundItem.Status == StatusType.Nothing)
@@ -144,7 +144,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 //if (item.StandardID == null || item.StandardID == Guid.Empty)
                 //    throw new BusinessException("The standard is missing");
                 if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
-                    throw new BusinessException("The standard is missing");
+                    throw new BusinessException("The standard is missing"); // En el front end esta asociación está como Standard no como AuditCycle, por eso el mensaje
 
                 // - Validar que el standard esté activo
                 if (foundStandard.Status != StatusType.Active)
