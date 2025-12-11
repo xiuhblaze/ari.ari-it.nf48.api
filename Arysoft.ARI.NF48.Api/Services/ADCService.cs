@@ -786,7 +786,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         stepList.Add(AuditStepType.Surveillance5);
                     }
                     break;
-                case AuditCycleType.Recertificacion:
+                case AuditCycleType.Recertification:
                     stepList.Add(AuditStepType.Recertification);
                     stepList.Add(AuditStepType.Surveillance1);
                     stepList.Add(AuditStepType.Surveillance2);

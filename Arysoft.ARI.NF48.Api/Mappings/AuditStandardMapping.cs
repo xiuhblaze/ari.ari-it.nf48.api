@@ -32,6 +32,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AuditCycleName = item.AuditCycle != null
                     ? item.AuditCycle.Name
                     : string.Empty,
+                AuditCycleType = item.AuditCycle != null && item.AuditCycle.CycleType.HasValue
+                    ? item.AuditCycle.CycleType.Value
+                    : AuditCycleType.Nothing,
                 AuditDescription = item.Audit != null
                     ? item.Audit.Description
                     : string.Empty,

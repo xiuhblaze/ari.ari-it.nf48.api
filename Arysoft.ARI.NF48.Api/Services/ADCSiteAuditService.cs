@@ -275,7 +275,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         throw new BusinessException("The Audit Step is not valid for the Initial Audit Cycle.");
                     }
                     break;
-                case AuditCycleType.Recertificacion:
+                case AuditCycleType.Recertification:
                     if (item.AuditStep != AuditStepType.Recertification &&
                         item.AuditStep != AuditStepType.Surveillance1 &&
                         item.AuditStep != AuditStepType.Surveillance2 &&

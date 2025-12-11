@@ -99,7 +99,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - Solo en los status de la auditoria de: [Nothing, Sheduled,
             //   Confirmed] se pueden agregar standards
-            
+
             // Assigning values
 
             item.ID = Guid.NewGuid();
@@ -110,7 +110,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             try
-            { 
+            {
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
@@ -124,96 +124,14 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // AddAsync
 
         public async Task<AuditStandard> UpdateAsync(AuditStandard item)
-        {
-            var _auditCycleRepository = new AuditCycleRepository();
-            var _standardRepository = new StandardRepository();
+        {   
             var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             // Validations
 
-            var foundAuditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID.Value)
-                ?? throw new BusinessException("The audit cycle was not found");
-
-            var foundStandard = await _standardRepository.GetAsync(foundAuditCycle.StandardID.Value)
-                ?? throw new BusinessException("The standard was not found");
-
-            // - La primera vez debe de traer el StandardID
-            if (foundItem.Status == StatusType.Nothing)
-            {
-                //if (item.StandardID == null || item.StandardID == Guid.Empty)
-                //    throw new BusinessException("The standard is missing");
-                if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
-                    throw new BusinessException("The standard is missing"); // En el front end esta asociación está como Standard no como AuditCycle, por eso el mensaje
-
-                // - Validar que el standard esté activo
-                if (foundStandard.Status != StatusType.Active)
-                    throw new BusinessException("The standard is not active");
-
-                // - Validar que el audit cycle esté activo o inactivo
-                if (foundAuditCycle.Status != StatusType.Active 
-                    && foundAuditCycle.Status != StatusType.Inactive)
-                    throw new BusinessException("The audit cycle is not in a valid status");
-            }
-
-            // - Que no esté duplicado el standard en el mismo audit
-            var query = _repository.Gets()
-                .Where(x => x.AuditID == foundItem.AuditID
-                    && x.StandardID == foundItem.StandardID
-                    && x.ID != item.ID);
-            if (query.Any())
-                throw new BusinessException("The standard is already assigned to this audit");
-
-            if (item.Status != foundItem.Status) // Cambio de estatus
-            {
-                switch (item.Status) // Si el nuevo status es...
-                {
-                    case StatusType.Active:
-                        
-                        // // #CHANGE_CYCLES: Evaluar esta validación una vez se implementen los cambios -xBlaze 20251205
-                        // - Que el standard no este asignado con otra auditoria del mismo audit
-                        //   cycle y el mismo step
-                        //if (foundItem.Audit != null 
-                        //    && foundItem.Audit.Status != AuditStatusType.Nothing
-                        //    && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
-                        //{ 
-                        //    var auditsRepository = new AuditRepository();
-                        //    var hasStandard = await auditsRepository.IsAnyStandardStepAuditInAuditCycle(
-                        //        foundItem.Audit.AuditCycleID,
-                        //        foundItem.StandardID.Value,
-                        //        item.Step.Value,
-                        //        foundItem.Audit.ID
-                        //    );
-                        //    if (hasStandard)
-                        //        throw new BusinessException("The standard with this step is already assigned to another audit");
-                        //}
-                        break;
-                }
-            }
-
-            //   ciclo y mismo step
-            // - Si al menos un standard en su Step es de tipo special, todos deben de ser igual
-            //   DUDA: Cuando es una auditoria especial, se seleccionan Standares a revisar?
-            //         R: Si se seleccionan los standares y se marcan como special
-
-
-            // - Que el standard no este asignado con otra auditoria del mismo - se movió al switch de más arriba
-            //if (item.Status == StatusType.Active 
-            //    && foundItem.Audit != null 
-            //    && foundItem.Audit.Status != AuditStatusType.Nothing
-            //    && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
-            //{ 
-            //    var auditsRepository = new AuditRepository();
-            //    var hasStandard = await auditsRepository.IsAnyStandardStepAuditInAuditCycle(
-            //        foundItem.Audit.AuditCycleID,
-            //        foundItem.StandardID.Value,
-            //        item.Step.Value,
-            //        foundItem.Audit.ID
-            //    );
-            //    if (hasStandard)
-            //        throw new BusinessException("The standard with this step is already assigned to another audit");
-
-            //}
+            // - Aquí se hace una asignación única del StandardID > item.StandardID
+            item = await ValidateUpdateItemAsync(item, foundItem);
 
             // Assigning values
 
@@ -221,7 +139,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // Asignando el audit cycle y el standard
                 foundItem.AuditCycleID = item.AuditCycleID.Value;
-                foundItem.StandardID = foundAuditCycle.StandardID; //TODO: Probar esto!!!
+                foundItem.StandardID = item.StandardID; //TODO: Probar esto!!!
             }
 
             foundItem.Step = item.Step;
@@ -237,7 +155,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             try
-            { 
+            {
                 _repository.Update(foundItem);
                 await _repository.SaveChangesAsync();
             }
@@ -282,5 +200,168 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AuditStandardService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // PRIVATE METHODS
+
+        private async Task<AuditStandard> ValidateUpdateItemAsync(AuditStandard item, AuditStandard foundItem)
+        {
+            var _auditCycleRepository = new AuditCycleRepository();
+            var _standardRepository = new StandardRepository();
+
+            var foundAuditCycle = await _auditCycleRepository.GetAsync(item.AuditCycleID.Value)
+                ?? throw new BusinessException("The audit cycle was not found");
+
+            var foundStandard = await _standardRepository.GetAsync(foundAuditCycle.StandardID.Value)
+                ?? throw new BusinessException("The standard was not found");
+
+            // - La primera vez debe de traer el StandardID
+            if (foundItem.Status == StatusType.Nothing)
+            {   
+                if (item.AuditCycleID == null || item.AuditCycleID == Guid.Empty)
+                    throw new BusinessException("The standard is missing"); // En el front end esta asociación está como Standard no como AuditCycle, por eso el mensaje
+
+                // - Validar que el standard esté activo
+                if (foundStandard.Status != StatusType.Active)
+                    throw new BusinessException("The standard is not active");
+
+                // - Validar que el audit cycle esté activo o inactivo
+                if (foundAuditCycle.Status != StatusType.Active
+                    && foundAuditCycle.Status != StatusType.Inactive)
+                    throw new BusinessException("The audit cycle is not in a valid status");
+
+                // Única asignación en esta función
+                item.StandardID = foundAuditCycle.StandardID;
+            }
+
+            // - Que no esté duplicado el standard en el mismo audit
+            var query = _repository.Gets()
+                .Where(x => x.AuditID == foundItem.AuditID
+                    && x.StandardID == foundAuditCycle.StandardID
+                    && x.ID != item.ID);
+            if (query.Any())
+                throw new BusinessException("The standard is already assigned to this audit");
+
+            if (item.Status != foundItem.Status) // Cambio de estatus
+            {
+                switch (item.Status) // Si el nuevo status es...
+                {
+                    case StatusType.Active:
+
+                        // // #CHANGE_CYCLES: Evaluar esta validación una vez se implementen los cambios -xBlaze 20251205
+                        // - Que el standard no este asignado con otra auditoria del mismo audit
+                        //   cycle y el mismo step
+                        //if (foundItem.Audit != null 
+                        //    && foundItem.Audit.Status != AuditStatusType.Nothing
+                        //    && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
+                        //{ 
+                        //    var auditsRepository = new AuditRepository();
+                        //    var hasStandard = await auditsRepository.IsAnyStandardStepAuditInAuditCycle(
+                        //        foundItem.Audit.AuditCycleID,
+                        //        foundItem.StandardID.Value,
+                        //        item.Step.Value,
+                        //        foundItem.Audit.ID
+                        //    );
+                        //    if (hasStandard)
+                        //        throw new BusinessException("The standard with this step is already assigned to another audit");
+                        //}
+                        break;
+                }
+            }
+
+            if (item.Status == StatusType.Active || foundItem.Status == StatusType.Nothing) // Nuevo o activando
+            { 
+                // - Validar que el step no sea null
+                if (item.Step == null || item.Step == AuditStepType.Nothing)
+                    throw new BusinessException("The audit step must be assigned");
+
+                // - Validar que el step no esté en otra auditoria del mismo ciclo
+                if (await _repository.IsAnyStandardStepAuditInAuditCycleAsync(
+                    foundAuditCycle.ID,
+                    foundAuditCycle.StandardID.Value,
+                    item.Step.Value,
+                    foundItem.ID)
+                )
+                    throw new BusinessException("The standard with this step is already assigned to another audit in the same audit cycle");
+
+                // - Validar que el step sea valido para el tipo de ciclo de auditoria
+                AuditStepType stepValue = item.Step.Value;
+                AuditStepType[] allowedSteps;
+
+                switch (foundAuditCycle.CycleType)
+                {
+                    case AuditCycleType.Initial:
+                        allowedSteps = new[]
+                        {
+                            AuditStepType.Stage1,
+                            AuditStepType.Stage2,
+                            AuditStepType.Surveillance1,
+                            AuditStepType.Surveillance2
+                        };
+                        if (foundAuditCycle.Periodicity == AuditCyclePeriodicityType.Biannual)
+                        {
+                            // añadir pasos extra para ciclos semestrales
+                            allowedSteps = allowedSteps.Concat(new[]
+                            {
+                                AuditStepType.Surveillance3,
+                                AuditStepType.Surveillance4,
+                                AuditStepType.Surveillance5
+                            }).ToArray();
+                        }
+                        break;
+
+                    case AuditCycleType.Recertification:
+                        allowedSteps = new[]
+                        {
+                            AuditStepType.Recertification,
+                            AuditStepType.Surveillance1,
+                            AuditStepType.Surveillance2
+                        };
+                        if (foundAuditCycle.Periodicity == AuditCyclePeriodicityType.Biannual)
+                        {
+                            allowedSteps = allowedSteps.Concat(new[]
+                            {
+                                AuditStepType.Surveillance3,
+                                AuditStepType.Surveillance4,
+                                AuditStepType.Surveillance5
+                            }).ToArray();
+                        }
+                        break;
+
+                    case AuditCycleType.Transfer:
+                        allowedSteps = new[]
+                        {
+                            AuditStepType.Transfer,
+                            AuditStepType.Recertification,
+                            AuditStepType.Surveillance1,
+                            AuditStepType.Surveillance2
+                        };
+                        if (foundAuditCycle.Periodicity == AuditCyclePeriodicityType.Biannual)
+                        {
+                            allowedSteps = allowedSteps.Concat(new[]
+                                    {
+                                AuditStepType.Surveillance3,
+                                AuditStepType.Surveillance4,
+                                AuditStepType.Surveillance5
+                            }).ToArray();
+                        }
+                        break;
+
+                    default:
+                        allowedSteps = new AuditStepType[0];
+                        break;
+                }
+
+                if (!allowedSteps.Contains(stepValue))
+                    throw new BusinessException("The audit step is not valid for the audit cycle type");
+            }
+
+            //   ciclo y mismo step
+            // - Si al menos un standard en su Step es de tipo special, todos deben de ser igual
+            //   DUDA: Cuando es una auditoria especial, se seleccionan Standares a revisar?
+            //         R: Si se seleccionan los standares y se marcan como special
+            
+
+            return item;
+        } // ValidateUpdateItemAsync
     }
 }

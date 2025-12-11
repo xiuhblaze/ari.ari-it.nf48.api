@@ -4,7 +4,7 @@
     {
         Nothing,
         Initial,
-        Recertificacion,
+        Recertification,
         Transfer
     } // AuditCycleType
 

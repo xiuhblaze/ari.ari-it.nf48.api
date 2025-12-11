@@ -25,6 +25,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string AuditCycleName { get; set; }
 
+        public AuditCycleType AuditCycleType { get; set; }
+
         public string AuditDescription { get; set; }
 
         public string StandardName { get; set; }
