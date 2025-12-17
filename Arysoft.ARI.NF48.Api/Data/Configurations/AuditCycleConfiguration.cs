@@ -56,11 +56,18 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             //    .HasForeignKey(acs => acs.AuditCycleID)
             //    .WillCascadeOnDelete(true);
 
+            //modelBuilder.Entity<AuditCycle>() // xBlaze: Cambió la estructura de datos por: muchos a muchos
+            //    .HasMany(ac => ac.AuditCycleDocuments)
+            //    .WithRequired(acd => acd.AuditCycle)
+            //    .HasForeignKey(acd => acd.AuditCycleID)
+            //    .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<AuditCycle>()
                 .HasMany(ac => ac.AuditCycleDocuments)
-                .WithRequired(acd => acd.AuditCycle)
-                .HasForeignKey(acd => acd.AuditCycleID)
-                .WillCascadeOnDelete(true);
+                .WithMany(acd => acd.AuditCycles)
+                .Map(e => e.MapLeftKey("AuditCycleID")
+                    .MapRightKey("AuditCycleDocumentID")
+                    .ToTable("AuditCycleDocumentsStandards"));
 
         }
     }

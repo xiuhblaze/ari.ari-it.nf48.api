@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -7,6 +8,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     public class AuditCycleDocumentItemListDto
     {
         public Guid ID { get; set; }
+
+        public Guid OrganizationID { get; set; }
 
         public string Filename { get; set; }
 
@@ -24,16 +27,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public string StandardName { get; set; }
+        public string OrganizationName { get; set; }
+
+        public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
+
     } // AuditCycleDocumentItemListDto
 
     public class AuditCycleDocumentItemDetailDto
     {
         public Guid ID { get; set; }
 
-        public Guid AuditCycleID { get; set; }
+        public Guid OrganizationID { get; set; }
 
-        public Guid? StandardID { get; set; }
+        //public Guid AuditCycleID { get; set; }
+
+        //public Guid? StandardID { get; set; }
 
         public string Filename { get; set; }
 
@@ -57,27 +65,38 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public AuditCycleItemListDto AuditCycle { get; set; }
+        public string OrganizationName { get; set; }
 
-        public StandardItemListDto Standard { get; set; }
+        public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
+
+        // public StandardItemListDto Standard { get; set; }
     } // AuditCycleDocumentItemDetailDto
 
     public class AuditCycleDocumentPostDto
     {
         [Required]
-        public Guid AuditCycleID { get; set; }
+        public Guid OrganizationID { get; set; }
 
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // AuditCycleDocumentPostDto
 
+    public class AuditCycleDocumentEditAuditCycleDto
+    { 
+        [Required]        
+        public Guid AuditCycleDocumentID { get; set; }
+
+        [Required]
+        public Guid AuditCycleID { get; set; }
+    }
+
     public class AuditCycleDocumentPutDto
     {
         [Required]
         public Guid ID { get; set; }
 
-        public Guid? StandardID { get; set; }
+        // public Guid? StandardID { get; set; }
 
         [StringLength(10)]
         public string Version { get; set; }

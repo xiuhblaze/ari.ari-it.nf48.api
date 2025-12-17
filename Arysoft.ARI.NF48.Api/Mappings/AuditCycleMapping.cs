@@ -55,7 +55,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 //            acs.Status != StatusType.Nothing
                 //            && acs.Status != StatusType.Deleted))
                 //    : null,
-                DocumentsCount = item.AuditCycleDocuments != null
+                AuditCycleDocumentsCount = item.AuditCycleDocuments != null
                     ? item.AuditCycleDocuments.Where(acd => 
                         acd.Status != StatusType.Nothing
                         && acd.Status != StatusType.Deleted)

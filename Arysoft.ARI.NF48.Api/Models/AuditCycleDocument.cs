@@ -1,13 +1,16 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
     public class AuditCycleDocument : BaseModel
     {
-        public Guid AuditCycleID { get; set; }
+        public Guid OrganizationID { get; set; }
 
-        public Guid? StandardID { get; set; }
+        //public Guid AuditCycleID { get; set; }
+
+        //public Guid? StandardID { get; set; } // Este es posible que no se necesite o solo informativo
 
         public string Filename { get; set; }
 
@@ -23,8 +26,12 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public virtual AuditCycle AuditCycle { get; set; }
+        public virtual Organization Organization { get; set; }
 
-        public virtual Standard Standard { get; set; }
+        // public virtual AuditCycle AuditCycle { get; set; }
+
+        // public virtual Standard Standard { get; set; }
+
+        public virtual ICollection<AuditCycle> AuditCycles { get; set; }
     } // AuditCycleDocument
 }

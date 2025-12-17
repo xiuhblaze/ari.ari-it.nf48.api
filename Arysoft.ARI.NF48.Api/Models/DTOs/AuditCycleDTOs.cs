@@ -40,7 +40,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         //public IEnumerable<AuditCycleStandardItemListDto> AuditCycleStandards { get; set; }
 
-        public int DocumentsCount { get; set; } // No lo veo muy necesario
+        public int AuditCycleDocumentsCount { get; set; } 
     } // AuditCycleItemListDto
 
     public class AuditCycleItemDetailDto

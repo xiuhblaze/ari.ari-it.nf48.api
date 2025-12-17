@@ -7,6 +7,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
     {   
         public Guid? OrganizationID { get; set; }
 
+        public AuditCycleType? CycleType { get; set; }
+
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }

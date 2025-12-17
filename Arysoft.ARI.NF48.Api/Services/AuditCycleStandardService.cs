@@ -193,8 +193,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // - Validar que no existan documentos o auditorias asociadas al
                 //   standard en el ciclo
-                if (await IsAnyItemInStandardAuditCycle(foundItem))
-                    throw new BusinessException("There are items associated with this standard in the audit cycle");
+                //if (await IsAnyItemInStandardAuditCycle(foundItem))
+                //    throw new BusinessException("There are items associated with this standard in the audit cycle");
 
                 _repository.Delete(foundItem);
             }
@@ -221,21 +221,21 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE METHODS
 
-        private async Task<bool> IsAnyItemInStandardAuditCycle(AuditCycleStandard item)        {
-            var auditCycleDocumentsRepository = new AuditCycleDocumentRepository();
-            var auditsRepository = new AuditRepository();
+        //private async Task<bool> IsAnyItemInStandardAuditCycle(AuditCycleStandard item)        {
+        //    var auditCycleDocumentsRepository = new AuditCycleDocumentRepository();
+        //    var auditsRepository = new AuditRepository();
 
-            // - Validar que no existan documentos en AuditCycleDocuments
-            if (await auditCycleDocumentsRepository
-                .IsAnyStandardDocumentInAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
-                return true;
+        //    // - Validar que no existan documentos en AuditCycleDocuments
+        //    if (await auditCycleDocumentsRepository
+        //        .IsAnyStandardDocumentInAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
+        //        return true;
 
-            // - Validar que no existan auditorias en AuditStandards
-            //if (await auditsRepository
-            //    .IsAnyStandardInAuditForAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
-            //    return true;
+        //    // - Validar que no existan auditorias en AuditStandards
+        //    //if (await auditsRepository
+        //    //    .IsAnyStandardInAuditForAuditCycleAsync(item.StandardID.Value, item.AuditCycleID))
+        //    //    return true;
 
-            return false;
-        } // IsAnyItemInStandardAuditCycle
+        //    return false;
+        //} // IsAnyItemInStandardAuditCycle
     }
 }

@@ -4,7 +4,6 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
-using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +33,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
             {
                 items = items.Where(e => e.OrganizationID == filters.OrganizationID);
-            }   
+            }
+
+            if (filters.CycleType != null && filters.CycleType != AuditCycleType.Nothing)
+            {
+                items = items.Where(e => e.CycleType == filters.CycleType);
+            }
 
             if (filters.StartDate != null)
             {
@@ -94,6 +98,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<AuditCycle> AddAsync(AuditCycle item)
         { 
+            var _organizationRepository = new OrganizationRepository();
+
             // Validations
 
             if (item.OrganizationID == Guid.Empty)
@@ -101,11 +107,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - Validar que la organizacion exista
             // - Validar que la organización tenga un status de activo
-            // - Validar que el standard exista
-            // - Validar que el standard pertenezca a la organizacion
-            // - Validar que el standard tenga un status de activo
-            // - Validar que el usuario exista (no hay que confiarse)
-            // - TODO: Consultar que otro requisito necesita la organización para poder crear un ciclo
+            // - TODO: Analizar que otro requisito necesita la organización para
+            //         poder crear un ciclo
+
+            var organizationFound = await _organizationRepository.GetAsync(item.OrganizationID)
+                ?? throw new BusinessException("The organization does not exist");
+
+            if (organizationFound.Status != OrganizationStatusType.Applicant &&
+                organizationFound.Status != OrganizationStatusType.Active)
+                throw new BusinessException("The organization is not active");
 
             // Assigning values
 
@@ -120,7 +130,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync(); // Async para esperar aquí a ver si sucede un error
-
             }
             catch (Exception ex)
             {
@@ -357,8 +366,12 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var _standardRepository = new StandardRepository();
             var _organizationStandardRepository = new OrganizationStandardRepository();
+
             // Validations
 
+            // - Validar que el standard exista
+            // - Validar que el standard pertenezca a la organizacion
+            // - Validar que el standard tenga un status de activo
             // - Solo puede haber un ciclo activo por standard y organización
             // - Que el tipo de ciclo sea en el orden correcto (Initial -> Recertification, o Transfer -> Recertification)
             // - Si ya cuenta con una Auditoria Inicial o de Recertificacion, validar que tenga las fechas del certificado
@@ -376,7 +389,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (foundItem.Status == StatusType.Nothing) // Solo si es nuevo...
             { 
                 if (standard.Status != StatusType.Active)
-                    throw new BusinessException("The standard is not valid");
+                    throw new BusinessException("The standard is not active");
 
                 // - Validar que el standard pertenezca a la organización
                 if (organizationStandard.Status != StatusType.Active)

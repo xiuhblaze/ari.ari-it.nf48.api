@@ -41,15 +41,23 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (filters.AuditCycleID != null)
             {
-                items = items.Where(e => e.AuditCycleID == filters.AuditCycleID);
+                items = items.Where(e => e.AuditCycles != null 
+                    && e.AuditCycles
+                        .Where(ac => ac.ID == filters.AuditCycleID)
+                        .Any()
+                );
             }
 
             if (filters.StandardID != null)
             {
-                items = items.Where(e => e.StandardID != null && e.StandardID == filters.StandardID);
+                items = items.Where(e => e.AuditCycles != null 
+                    && e.AuditCycles
+                        .Where(ac => ac.StandardID == filters.StandardID)
+                        .Any()
+                );
             }
 
-            if (filters.DocumentType != null && filters.DocumentType != Enumerations.AuditCycleDocumentType.Nothing)
+            if (filters.DocumentType != null && filters.DocumentType != AuditCycleDocumentType.Nothing)
             {
                 items = items.Where(e => e.DocumentType == filters.DocumentType);
             }
@@ -108,8 +116,10 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validations
 
-            if (item.AuditCycleID == Guid.Empty)
-                throw new BusinessException("Audit cycle is required");
+            //if (item.AuditCycleID == Guid.Empty)
+            //    throw new BusinessException("Audit cycle is required");
+            if (item.OrganizationID == Guid.Empty)
+                throw new BusinessException("Organization is required");
 
             // Assigning values
 
@@ -151,7 +161,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            foundItem.StandardID = item.StandardID;
+            // foundItem.StandardID = item.StandardID;
             foundItem.Filename = item.Filename;
             foundItem.Version = item.Version;
             foundItem.DocumentType = item.DocumentType;
@@ -212,5 +222,47 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return true;
         } // DeleteAsync
+
+        // AUDIT CYCLES
+
+        public async Task AddAuditCycleAsync(Guid id, Guid auditCycleID)
+        {
+            var _auditCycleRepository = new AuditCycleRepository();
+
+            // - Validar que el ciclo de auditoría exista
+            // - Validar que todos los AuditCycles sean de la misma organización
+            // - Validar que no se agregue otro ciclo con el mismo standard
+
+            var auditCycle = await _auditCycleRepository.GetAsync(auditCycleID)
+                ?? throw new BusinessException("The audit cycle to assign was not found");
+
+            if (await _repository.IsAnyAuditCycleStandardAsync(id, auditCycle.StandardID ?? Guid.Empty))            
+                throw new BusinessException("The document already has assigned a cycle with the same standard");
+
+            try
+            {
+                await _repository.AddAuditCycleAsync(id, auditCycleID);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditCycleDocumentService.AddAuditCycleAsync: {ex.Message}");
+            }
+        } // AddAuditCycleAsync
+
+        public async Task DelAuditCycleAsync(Guid id, Guid auditCycleID)
+        {
+            // - Validar que el documento se quede con al menos un ciclo de auditoría
+
+            try
+            {
+                await _repository.DelAuditCycleAsync(id, auditCycleID);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AuditCycleDocumentService.DelAuditCycleAsync: {ex.Message}");
+            }
+        } // DelAuditCycleAsync
     }
 }

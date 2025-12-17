@@ -110,7 +110,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 //);
                 fileName = FileRepository.UploadFile(
                     file,
-                    $"~/files/organizations/{item.Audit.OrganizationID}/Audits/{item.Audit.ID}",
+                    $"~/files/organizations/{item.Audit.OrganizationID}/audits/{item.Audit.ID}",
                     documentType.ToString() + "_" + item.ID.ToString()
                 );
             }
