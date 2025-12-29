@@ -18,9 +18,9 @@
     <WebStackScaffolding_LayoutPageFile />
     <WebStackScaffolding_DbContextTypeFullName>Arysoft.ARI.NF48.Api.AriContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsAsyncSelected>True</WebStackScaffolding_IsAsyncSelected>
-    <NameOfLastUsedPublishProfile>C:\comun\source\repos\ari\arysoft.ari.nf48.api\Arysoft.ARI.NF48.Api\Properties\PublishProfiles\En local despues de Cycles.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\comun\source\repos\ari\ari.ari-it.nf48.api\Arysoft.ARI.NF48.Api\Properties\PublishProfiles\api.aarrin.com.pubxml</NameOfLastUsedPublishProfile>
     <WebStackScaffolding_IsViewGenerationSelected>False</WebStackScaffolding_IsViewGenerationSelected>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
