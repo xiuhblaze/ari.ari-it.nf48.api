@@ -209,7 +209,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid StandardID { get; set; }
+        // public Guid StandardID { get; set; } 
 
         // ISO 9K
 

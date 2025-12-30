@@ -194,7 +194,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AppForm
             {
                 ID = item.ID,                
-                StandardID = item.StandardID,
+                // StandardID = item.StandardID,
                 // 9K
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
