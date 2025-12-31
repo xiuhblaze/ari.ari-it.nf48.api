@@ -298,6 +298,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AuditCycleType.Initial:
                         allowedSteps = new[]
                         {
+                            AuditStepType.PreAudit,
                             AuditStepType.Stage1,
                             AuditStepType.Stage2,
                             AuditStepType.Surveillance1,
@@ -357,6 +358,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                         break;
                 }
 
+                // Siempre se permite el step Special
+                allowedSteps = allowedSteps.Concat(new[] { AuditStepType.Special }).ToArray();
+
                 if (!allowedSteps.Contains(stepValue))
                     throw new BusinessException("The audit step is not valid for the audit cycle type");
             }
@@ -365,7 +369,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Si al menos un standard en su Step es de tipo special, todos deben de ser igual
             //   DUDA: Cuando es una auditoria especial, se seleccionan Standares a revisar?
             //         R: Si se seleccionan los standares y se marcan como special
-            
+            // TODO: Falta validar si otros AuditStandard de la misma auditoria son special
+
 
             return item;
         } // ValidateUpdateItemAsync
