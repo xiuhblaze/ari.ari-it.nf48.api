@@ -36,10 +36,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<OrganizationItemListDto>>))]
-        public IHttpActionResult GetOrganizations([FromUri] OrganizationQueryFilters filters)
+        public async Task<IHttpActionResult> GetOrganizations([FromUri] OrganizationQueryFilters filters)
         {
             var items = _organizationService.Gets(filters);
-            var itemsDto = OrganizationMapping.OrganizationToListDto(items);
+            var itemsDto = await OrganizationMapping.OrganizationToListDto(items);
             var response = new ApiResponse<IEnumerable<OrganizationItemListDto>>(itemsDto)
             {
                 Meta = new Metadata
@@ -61,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _organizationService.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
+            var itemDto = await OrganizationMapping.OrganizationToItemDetailDto(item);
             var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -76,7 +76,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToAdd = OrganizationMapping.ItemAddDtoToOrganization(itemAddDto);
             var item = await _organizationService.AddAsync(itemToAdd);
-            var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
+            var itemDto = await OrganizationMapping.OrganizationToItemDetailDto(item);
             var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -143,7 +143,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
 
             item = await _organizationService.UpdateAsync(itemToEdit);
-            var itemDto = OrganizationMapping.OrganizationToItemDetailDto(item);
+            var itemDto = await OrganizationMapping.OrganizationToItemDetailDto(item);
             var response = new ApiResponse<OrganizationItemDetailDto>(itemDto);
 
             return Ok(response);

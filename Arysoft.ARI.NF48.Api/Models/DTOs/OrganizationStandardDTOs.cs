@@ -23,6 +23,18 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public StatusType StandardStatus { get; set; }
 
         public StatusType Status { get; set; }
+
+        // LAST OR ACTIVE AUDIT CYCLE
+        // Devuelve los valores del ultimo ciclo de auditoria o del ciclo activo
+
+        public string AuditCycleName { get; set; }
+
+        public AuditCycleType? AuditCycleType { get; set; }
+
+        public DateTime? AuditCycleStart { get; set; }
+
+        public DateTime? AuditCycleEnd { get; set; }
+
     } // OrganizationStandardItemListDto
 
     public class OrganizationStandardItemDetailDto

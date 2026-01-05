@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
 // using System.Data.Entity.Spatial;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -50,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // SiteToItemListDto
 
-        public static SiteItemDetailDto SiteToItemDetailDto(Site item)
+        public static async Task<SiteItemDetailDto> SiteToItemDetailDto(Site item)
         {
             return new SiteItemDetailDto
             {
@@ -70,7 +71,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status != StatusType.Nothing))
                     : new List<ShiftItemListDto>(),
                 Organization = item.Organization != null
-                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization)
+                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization)
                     : null
             };
         } // SiteToItemDetailDto

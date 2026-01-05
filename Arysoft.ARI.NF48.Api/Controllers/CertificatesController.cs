@@ -61,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = CertificateMapping.CertificateToItemDetailDto(item);
+            var itemDto = await CertificateMapping.CertificateToItemDetailDto(item);
             var response = new ApiResponse<CertificateItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -76,7 +76,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = CertificateMapping.ItemAddDtoToCertificate(itemPostDto);
             item = await _service.AddAsync(item);
-            var itemDto = CertificateMapping.CertificateToItemDetailDto(item);
+            var itemDto = await CertificateMapping.CertificateToItemDetailDto(item);
             var response = new ApiResponse<CertificateItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -149,7 +149,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             }
 
             itemToEdit = await _service.UpdateAsync(itemToEdit);
-            var itemDto = CertificateMapping.CertificateToItemDetailDto(itemToEdit);
+            var itemDto = await CertificateMapping.CertificateToItemDetailDto(itemToEdit);
             var response = new ApiResponse<CertificateItemDetailDto>(itemDto);
 
             return Ok(response);

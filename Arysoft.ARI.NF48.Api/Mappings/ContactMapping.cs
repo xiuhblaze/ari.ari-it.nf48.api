@@ -2,6 +2,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Tools;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -38,7 +39,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ContactToItemListDto
 
-        public static ContactItemDetailDto ContactToItemDetailDto(Contact item)
+        public static async Task<ContactItemDetailDto> ContactToItemDetailDto(Contact item)
         {
             return new ContactItemDetailDto
             {
@@ -60,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Organization = item.Organization != null
-                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization) 
+                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization) 
                     : null
             };
         } // ContactToItemDetailDto

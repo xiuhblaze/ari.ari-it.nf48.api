@@ -396,13 +396,37 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The standard is not active for the organization");
             }
 
-            if (item.Status == StatusType.Active) { // Si es activo, siempre validar...
-                // Validar que existan las fechas de inicio y fin
-                if (item.StartDate == null)
-                    throw new BusinessException("The start date is required for active cycles");
+            // Solo si es Initial no validar hasta que haya una auditoria de ST2 terminada
+            bool validateDates = false;
 
-                if (item.EndDate == null)
-                    throw new BusinessException("The end date is required for active cycles");
+            if (item.CycleType == AuditCycleType.Recertification)
+            {
+                validateDates = true;
+            }
+            else if (item.CycleType == AuditCycleType.Transfer)
+            {
+                validateDates = true;
+            } 
+            else if (item.CycleType == AuditCycleType.Initial)
+            {
+                var _auditRepository = new AuditRepository();
+                // Validar si ya existe una auditoría ST2 terminada para este ciclo
+                var st2Audit = await _auditRepository
+                    .GetAuditStepInAuditCycleAsync(AuditStepType.Stage2, foundItem.ID);
+                if (st2Audit != null && st2Audit.Status >= AuditStatusType.Finished)
+                {
+                    validateDates = true;
+                }
+            }
+
+            if (validateDates)
+            {
+                // Validar que existan las fechas de inicio y fin
+                if (!item.StartDate.HasValue)
+                    throw new BusinessException("The start date is required for the certificate cycle");
+
+                if (!item.EndDate.HasValue)
+                    throw new BusinessException("The end date is required for the certificate cycle");
 
                 // - Que la fecha de inicio sea menor a la fecha de fin
                 if (item.StartDate > item.EndDate)

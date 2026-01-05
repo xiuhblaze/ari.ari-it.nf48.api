@@ -32,10 +32,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<OrganizationStandardItemListDto>>))]
-        public IHttpActionResult GetOrganizationStandards([FromUri] OrganizationStandardQueryFilters filters)
+        public async Task<IHttpActionResult> GetOrganizationStandards([FromUri] OrganizationStandardQueryFilters filters)
         {
             var items = _service.Gets(filters);
-            var itemsDto = OrganizationStandardMapping.OrganizationStandardToListDto(items);
+            var itemsDto = await OrganizationStandardMapping.OrganizationStandardToListDto(items);
             var response = new ApiResponse<IEnumerable<OrganizationStandardItemListDto>>(itemsDto)
             {
                 Meta = new Metadata
@@ -57,7 +57,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = OrganizationStandardMapping.OrganizationStandardToItemDetailDto(item);
+            var itemDto = await OrganizationStandardMapping.OrganizationStandardToItemDetailDto(item);
             var response = new ApiResponse<OrganizationStandardItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -70,7 +70,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = OrganizationStandardMapping.ItemAddDtoToOrganizationStandard(itemPostDto);
             item = await _service.AddAsync(item);
-            var itemDto = OrganizationStandardMapping.OrganizationStandardToItemDetailDto(item);
+            var itemDto = await OrganizationStandardMapping.OrganizationStandardToItemDetailDto(item);
             var response = new ApiResponse<OrganizationStandardItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -86,7 +86,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = OrganizationStandardMapping.ItemEditDtoToOrganizationStandard(itemPutDto);
             item = await _service.UpdateAsync(item);
-            var itemDto = OrganizationStandardMapping.OrganizationStandardToItemDetailDto(item);
+            var itemDto = await OrganizationStandardMapping.OrganizationStandardToItemDetailDto(item);
             var response = new ApiResponse<OrganizationStandardItemDetailDto>(itemDto);
 
             return Ok(response);

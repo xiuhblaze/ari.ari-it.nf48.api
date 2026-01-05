@@ -53,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _siteService.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = SiteMapping.SiteToItemDetailDto(item);
+            var itemDto = await SiteMapping.SiteToItemDetailDto(item);
             var response = new ApiResponse<SiteItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -68,7 +68,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToAdd = SiteMapping.ItemAddDtoToSite(siteDto);
             var item = await _siteService.AddAsync(itemToAdd);
-            var itemDto = SiteMapping.SiteToItemDetailDto(item);
+            var itemDto = await SiteMapping.SiteToItemDetailDto(item);
             var response = new ApiResponse<SiteItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -86,7 +86,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToEdit = SiteMapping.ItemEditDtoToSite(itemEditDto);
             var item = await _siteService.UpdateAsync(itemToEdit);
-            var itemDto = SiteMapping.SiteToItemDetailDto(item);
+            var itemDto = await SiteMapping.SiteToItemDetailDto(item);
             var response = new ApiResponse<SiteItemDetailDto>(itemDto);
                         
             return Ok(response);

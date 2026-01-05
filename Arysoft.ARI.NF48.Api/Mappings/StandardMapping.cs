@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -52,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // StandardToItemListDto
 
-        public static StandardItemDetailDto StandardToItemDetailDto(Standard item)
+        public static async Task<StandardItemDetailDto> StandardToItemDetailDto(Standard item)
         {
             return new StandardItemDetailDto
             {
@@ -79,7 +80,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 //        .Where(c => c.Status != CertificateStatusType.Nothing))
                 //    : null,
                 Organizations = item.OrganizationStandards != null
-                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status >= StatusType.Nothing))
                     : null,
             };
