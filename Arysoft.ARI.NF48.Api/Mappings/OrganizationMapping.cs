@@ -4,24 +4,25 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
     public class OrganizationMapping
     {
-        public static IEnumerable<OrganizationItemListDto> OrganizationToListDto(IEnumerable<Organization> items)
+        public static async Task<IEnumerable<OrganizationItemListDto>> OrganizationToListDto(IEnumerable<Organization> items)
         {
             var itemsDto = new List<OrganizationItemListDto>();
 
             foreach (var item in items)
             {
-                itemsDto.Add(OrganizationToItemListDto(item));
+                itemsDto.Add(await OrganizationToItemListDto(item));
             }
 
             return itemsDto;
         } // OrganizationToListDto 
 
-        public static OrganizationItemListDto OrganizationToItemListDto(Organization item)
+        public static async Task<OrganizationItemListDto> OrganizationToItemListDto(Organization item)
         {
             var auditRepository = new AuditRepository();
             var nextAudit = auditRepository
@@ -113,7 +114,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : string.Empty,
                 SitesEmployeesCount = employeesCount,
                 Standards = item.OrganizationStandards != null
-                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))
                     : null
                 //CertificatesValidityStatus = item.CertificatesValidityStatus
@@ -121,7 +122,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // OrganizationToItemListDto
 
-        public static OrganizationItemDetailDto OrganizationToItemDetailDto(Organization item)
+        public static async Task<OrganizationItemDetailDto> OrganizationToItemDetailDto(Organization item)
         {
             return new OrganizationItemDetailDto
             {
@@ -162,7 +163,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status != StatusType.Nothing))
                     : new List<SiteItemListDto>(),
                 Standards = item.OrganizationStandards != null
-                    ? OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))
                     : null,                
                 //CertificatesValidityStatus = item.CertificatesValidityStatus

@@ -60,7 +60,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 items = items
                     .Where(e => e.AuditStandards != null && e.AuditStandards
-                        .Where(ads => ads.StandardID == filters.StandardID)
+                        .Where(ads => ads.AuditCycle != null && ads.AuditCycle.StandardID == filters.StandardID)
                         .Any()
                     );
             }

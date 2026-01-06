@@ -65,11 +65,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return nextCycleYear;
         } // GetNextCycleYearAsync
 
-        public async Task<bool> ExistsValidAppFormAsync(Guid auditCycleID, Guid standardID, Guid? exeptionID = null)
+        public async Task<bool> ExistsValidAppFormAsync(
+            Guid auditCycleID, 
+            Guid? exeptionID = null
+        )
         {
             var query = _model
                 .Where(m => m.AuditCycleID == auditCycleID
-                    && m.StandardID == standardID
                     && m.Status > AppFormStatusType.Nothing
                     && m.Status < AppFormStatusType.Inactive);
 
@@ -83,13 +85,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         public async Task<bool> ExistsValidCycleYearAppForm(
             Guid auditCycleID, 
-            Guid standardID, 
             CycleYearType cycleYear,
             Guid? exceptionID = null)
         {
             var query = _model
                 .Where(m => m.AuditCycleID == auditCycleID
-                    && m.StandardID == standardID
                     && m.CycleYear == cycleYear
                     && m.Status > AppFormStatusType.Nothing
                     && m.Status < AppFormStatusType.Inactive);

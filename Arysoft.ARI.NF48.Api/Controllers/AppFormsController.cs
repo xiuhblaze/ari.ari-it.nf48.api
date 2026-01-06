@@ -54,7 +54,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = AppFormMapping.AppFormToItemDetailDto(item);
+            var itemDto = await AppFormMapping.AppFormToItemDetailDto(item);
             var response = new ApiResponse<AppFormItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -68,7 +68,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             var item = AppFormMapping.ItemCreateDtoToAppForm(itemAddDto);
-            var itemDto = AppFormMapping.AppFormToItemDetailDto(await _service.AddAsync(item));
+            var itemDto = await AppFormMapping.AppFormToItemDetailDto(await _service.AddAsync(item));
             var response = new ApiResponse<AppFormItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -83,7 +83,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             var newItem = await _service.DuplicateAsync(itemDuplicateDto.ID, itemDuplicateDto.UpdatedUser);
-            var itemDto = AppFormMapping.AppFormToItemDetailDto(newItem);
+            var itemDto = await AppFormMapping.AppFormToItemDetailDto(newItem);
             var response = new ApiResponse<AppFormItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -100,7 +100,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 throw new BusinessException("The ID of the item does not match the ID of the request");
 
             var item = AppFormMapping.ItemUpdateDtoToAppForm(itemEditDto);            
-            var itemDto = AppFormMapping.AppFormToItemDetailDto(await _service.UpdateAsync(item));
+            var itemDto = await AppFormMapping.AppFormToItemDetailDto(await _service.UpdateAsync(item));
             var response = new ApiResponse<AppFormItemDetailDto>(itemDto);
 
             return Ok(response);

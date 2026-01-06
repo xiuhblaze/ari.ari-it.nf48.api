@@ -143,6 +143,31 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return await items.AnyAsync();
         } // IsAnyStandardStepAuditInAuditCycle
 
+        /// <summary>
+        /// Busca si existe alguna auditoría en un ciclo de auditorías con
+        /// el Step indicado y la devuelve, de lo contrario devuelve null
+        /// </summary>
+        /// <param name="step"></param>
+        /// <param name="auditCycleID"></param>
+        /// <returns></returns>
+        public async Task<Audit> GetAuditStepInAuditCycleAsync(
+            AuditStepType step,
+            Guid auditCycleID
+            )
+        {
+            var items = _model
+                .Include(a => a.AuditStandards)
+                .Where(a =>
+                    a.AuditStandards.Any(asd =>
+                        asd.Step == step
+                        && asd.AuditCycleID == auditCycleID
+                        && asd.Status == StatusType.Active)
+                    && a.Status != AuditStatusType.Nothing
+                    && a.Status < AuditStatusType.Canceled
+                );
+
+            return await items.FirstOrDefaultAsync();
+        } // IsAnyAuditInAuditCycleAsync
 
         /// <summary>
         /// Busca si existe alguna auditoría en un ciclo de auditorías con 

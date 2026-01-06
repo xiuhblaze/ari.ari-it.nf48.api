@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
@@ -36,7 +37,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // CompanyToItemListDto
 
-        public static CompanyItemDetailDto CompanyToItemDetailDto(Company item)
+        public static async Task<CompanyItemDetailDto> CompanyToItemDetailDto(Company item)
         {
             return new CompanyItemDetailDto
             {
@@ -50,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Organization = item.Organization != null
-                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization)
+                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization)
                     : null
             };
         } // CompanyToItemDetailDto

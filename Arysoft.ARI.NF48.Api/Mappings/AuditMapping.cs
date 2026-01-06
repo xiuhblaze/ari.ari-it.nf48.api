@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -77,7 +78,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // AuditToItemListDto
 
-        public static AuditItemDetailDto AuditToItemDetailDto(Audit item)
+        public static async Task<AuditItemDetailDto> AuditToItemDetailDto(Audit item)
         {
             return new AuditItemDetailDto
             { 
@@ -97,7 +98,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Organization = item.Organization != null
-                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization)
+                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization)
                     : null,
                 //AuditCycle = item.AuditCycle != null
                 //    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)

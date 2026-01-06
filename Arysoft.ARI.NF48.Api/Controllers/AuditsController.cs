@@ -55,7 +55,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = AuditMapping.AuditToItemDetailDto(item);
+            var itemDto = await AuditMapping.AuditToItemDetailDto(item);
             var response = new ApiResponse<AuditItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -93,7 +93,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [HttpGet]
         [Route("api/Audits/next-audit")]
         [ResponseType(typeof(ApiResponse<AuditItemDetailDto>))]
-        public IHttpActionResult GetNextAudit([FromUri] NextAuditDto valuesDto)
+        public async Task<IHttpActionResult> GetNextAudit([FromUri] NextAuditDto valuesDto)
         {
             var item = _service.GetNextAudit(
                 valuesDto.OwnerID,
@@ -101,7 +101,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 AuditNextAuditOwnerType.Auditor)
                 ?? throw new BusinessException("Item not found");
 
-            var itemDto = AuditMapping.AuditToItemDetailDto(item);
+            var itemDto = await AuditMapping.AuditToItemDetailDto(item);
             var response = new ApiResponse<AuditItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -116,7 +116,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = AuditMapping.ItemAddDtoToAudit(itemAddDto);
             item = await _service.AddAsync(item);
-            var itemDto = AuditMapping.AuditToItemDetailDto(item);
+            var itemDto = await AuditMapping.AuditToItemDetailDto(item);
             var response = new ApiResponse<AuditItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -132,7 +132,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = AuditMapping.ItemEditDtoToAudit(itemEditDto);
             item = await _service.UpdateAsync(item);
-            var itemDto = AuditMapping.AuditToItemDetailDto(item);
+            var itemDto = await AuditMapping.AuditToItemDetailDto(item);
             var response = new ApiResponse<AuditItemDetailDto>(itemDto);
 
             return Ok(response);

@@ -236,7 +236,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Que no esté duplicado el standard en el mismo audit
             var query = _repository.Gets()
                 .Where(x => x.AuditID == foundItem.AuditID
-                    && x.StandardID == foundAuditCycle.StandardID
+                    && x.AuditCycleID == foundAuditCycle.ID
                     && x.ID != item.ID);
             if (query.Any())
                 throw new BusinessException("The standard is already assigned to this audit");
@@ -271,17 +271,23 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status == StatusType.Active || foundItem.Status == StatusType.Nothing) // Nuevo o activando
             { 
                 // - Validar que el step no sea null
-                if (item.Step == null || item.Step == AuditStepType.Nothing)
+                if (!item.Step.HasValue || item.Step == AuditStepType.Nothing)
                     throw new BusinessException("The audit step must be assigned");
 
                 // - Validar que el step no esté en otra auditoria del mismo ciclo
-                if (await _repository.IsAnyStandardStepAuditInAuditCycleAsync(
+                if (await _repository.IsStepInAuditCycleAsync(
                     foundAuditCycle.ID,
-                    foundAuditCycle.StandardID.Value,
                     item.Step.Value,
                     foundItem.ID)
                 )
-                    throw new BusinessException("The standard with this step is already assigned to another audit in the same audit cycle");
+                    throw new BusinessException("The audit step is already assigned to another audit in the same audit cycle");
+                //if (await _repository.IsAnyStandardStepAuditInAuditCycleAsync(
+                //    foundAuditCycle.ID,
+                //    foundAuditCycle.StandardID.Value,
+                //    item.Step.Value,
+                //    foundItem.ID)
+                //)
+                //    throw new BusinessException("The standard with this step is already assigned to another audit in the same audit cycle");
 
                 // - Validar que el step sea valido para el tipo de ciclo de auditoria
                 AuditStepType stepValue = item.Step.Value;
@@ -292,6 +298,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AuditCycleType.Initial:
                         allowedSteps = new[]
                         {
+                            AuditStepType.PreAudit,
                             AuditStepType.Stage1,
                             AuditStepType.Stage2,
                             AuditStepType.Surveillance1,
@@ -351,6 +358,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                         break;
                 }
 
+                // Siempre se permite el step Special
+                allowedSteps = allowedSteps.Concat(new[] { AuditStepType.Special }).ToArray();
+
                 if (!allowedSteps.Contains(stepValue))
                     throw new BusinessException("The audit step is not valid for the audit cycle type");
             }
@@ -359,7 +369,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Si al menos un standard en su Step es de tipo special, todos deben de ser igual
             //   DUDA: Cuando es una auditoria especial, se seleccionan Standares a revisar?
             //         R: Si se seleccionan los standares y se marcan como special
-            
+            // TODO: Falta validar si otros AuditStandard de la misma auditoria son special
+
 
             return item;
         } // ValidateUpdateItemAsync

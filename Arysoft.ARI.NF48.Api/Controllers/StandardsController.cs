@@ -58,7 +58,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _standardService.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = StandardMapping.StandardToItemDetailDto(item);
+            var itemDto = await StandardMapping.StandardToItemDetailDto(item);
             var response = new ApiResponse<StandardItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -74,7 +74,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToAdd = StandardMapping.ItemAddDtoToStandard(itemAddDto);
             var item = await _standardService.AddAsync(itemToAdd);
-            var itemDto = StandardMapping.StandardToItemDetailDto(item);
+            var itemDto = await StandardMapping.StandardToItemDetailDto(item);
             var response = new ApiResponse<StandardItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -93,7 +93,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToEdit = StandardMapping.ItemEditDtoToStandard(itemEditDto);
             var item = await _standardService.UpdateAsync(itemToEdit);
-            var itemDto = StandardMapping.StandardToItemDetailDto(item);
+            var itemDto = await StandardMapping.StandardToItemDetailDto(item);
             var response = new ApiResponse<StandardItemDetailDto>(itemDto);
 
             return Ok(response);

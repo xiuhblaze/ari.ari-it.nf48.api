@@ -114,5 +114,27 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return await query.AnyAsync();
         }
 
+        public async Task<AuditCycle> GetLastOrActiveByStandardAndOrganizationAsync(
+            Guid organizationID,
+            Guid standardID
+            )
+        {
+            var item = await _model
+                .Where(m => m.OrganizationID == organizationID
+                    && m.StandardID == standardID
+                    && m.Status == StatusType.Active)
+                .OrderByDescending(m => m.EndDate)
+                .FirstOrDefaultAsync() 
+            ?? await _model
+                .Where(m => m.OrganizationID == organizationID
+                    && m.StandardID == standardID
+                    && (m.Status == StatusType.Inactive
+                        || m.Status == StatusType.Active))
+                .OrderByDescending(m => m.EndDate)
+                .FirstOrDefaultAsync();
+
+            return item;
+        } // GetLastOrActiveByStandardAndOrganiationAsync
+
     }
 }

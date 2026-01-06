@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -101,7 +102,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // AppFormToItemListDto
 
-        public static AppFormItemDetailDto AppFormToItemDetailDto(AppForm item)
+        public static async Task<AppFormItemDetailDto> AppFormToItemDetailDto(AppForm item)
         {
             return new AppFormItemDetailDto
             {
@@ -145,7 +146,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser,
                 // RELATIONS
                 Organization = item.Organization != null
-                    ? OrganizationMapping.OrganizationToItemListDto(item.Organization)
+                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization)
                     : null,
                 AuditCycle = item.AuditCycle != null
                     ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
@@ -194,7 +195,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AppForm
             {
                 ID = item.ID,                
-                StandardID = item.StandardID,
+                // StandardID = item.StandardID,
                 // 9K
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,

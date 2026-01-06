@@ -56,7 +56,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");            
-            var itemDto = CompanyMapping.CompanyToItemDetailDto(item);
+            var itemDto = await CompanyMapping.CompanyToItemDetailDto(item);
             var response = new ApiResponse<CompanyItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -71,7 +71,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = CompanyMapping.ItemAddDtoToCompany(itemAddDto);
             item = await _service.AddAsync(item);
-            var itemDto = CompanyMapping.CompanyToItemDetailDto(item);
+            var itemDto = await CompanyMapping.CompanyToItemDetailDto(item);
             var response = new ApiResponse<CompanyItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -89,7 +89,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = CompanyMapping.ItemEditDtoToCompany(itemEditDto);            
             item = await _service.UpdateAsync(item);
-            var itemDto = CompanyMapping.CompanyToItemDetailDto(item);
+            var itemDto = await CompanyMapping.CompanyToItemDetailDto(item);
             var response = new ApiResponse<CompanyItemDetailDto>(itemDto);
 
             return Ok(response);

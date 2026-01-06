@@ -58,7 +58,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _contactService.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = ContactMapping.ContactToItemDetailDto(item);
+            var itemDto = await ContactMapping.ContactToItemDetailDto(item);
             var response = new ApiResponse<ContactItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -73,7 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemToAdd = ContactMapping.ItemAddDtoToContact(contactDto);
             var item = await _contactService.AddAsync(itemToAdd);
-            var itemDto = ContactMapping.ContactToItemDetailDto(item);
+            var itemDto = await ContactMapping.ContactToItemDetailDto(item);
             var response = new ApiResponse<ContactItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -190,7 +190,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var itemToEdit = ContactMapping.ItemEditDtoToContact(itemEditDto);
             itemToEdit.PhotoFilename = filename ?? item.PhotoFilename;
             item = await _contactService.UpdateAsync(itemToEdit);
-            var itemDto = ContactMapping.ContactToItemDetailDto(item);
+            var itemDto = await ContactMapping.ContactToItemDetailDto(item);
             var response = new ApiResponse<ContactItemDetailDto>(itemDto);
 
             return Ok(response);
