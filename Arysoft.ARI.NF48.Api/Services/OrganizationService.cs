@@ -66,6 +66,62 @@ namespace Arysoft.ARI.NF48.Api.Services
                 );
             }
 
+            // Filtrado por alertas de ciclos de certificación
+            if (filters.CertificateCycleAlert != null && filters.CertificateCycleAlert != OrganizationCertificateCycleAlertType.Nothing)
+            {
+                DateTime alertDate = DateTime.UtcNow;
+
+                switch (filters.CertificateCycleAlert)
+                {
+                    case OrganizationCertificateCycleAlertType.Active:
+                        items = items.Where(e => e.AuditCycles != null &&
+                            e.AuditCycles
+                                .Where(ac => ac.Status == StatusType.Active)
+                                .Any()
+                        );
+                        break;
+
+                    case OrganizationCertificateCycleAlertType.LastYear:
+                        items = items.Where(e => e.AuditCycles != null
+                            && e.AuditCycles
+                                .Where(ac =>
+                                    ac.Status == StatusType.Active
+                                    && ac.EndDate != null
+                                    && ac.EndDate.Value.AddYears(-1) < alertDate
+                                    && alertDate <= ac.EndDate.Value
+                                )
+                                .Any()
+                        );
+                        break;
+
+                    case OrganizationCertificateCycleAlertType.LeftThreeMonths:
+                        items = items.Where(e => e.AuditCycles != null
+                            && e.AuditCycles
+                                .Where(ac =>
+                                    ac.Status == StatusType.Active
+                                    && ac.EndDate != null
+                                    && ac.EndDate.Value.AddMonths(-3) < alertDate
+                                    && alertDate <= ac.EndDate.Value
+                                )
+                                .Any()
+                        );
+                        break;
+
+                    case OrganizationCertificateCycleAlertType.Expired:
+                        items = items.Where(e => e.AuditCycles != null
+                            && e.AuditCycles
+                                .Where(ac =>
+                                    ac.Status == StatusType.Active
+                                    && ac.EndDate != null
+                                    && ac.EndDate.Value < alertDate
+                                )
+                                .Any()
+                        );
+                        break;
+                }
+            }
+
+            // Status
             if (filters.Status != null && filters.Status != OrganizationStatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);
