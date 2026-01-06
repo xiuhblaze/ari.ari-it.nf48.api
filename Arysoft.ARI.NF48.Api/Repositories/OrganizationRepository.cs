@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class OrganizationRepository : BaseRepository<Organization>
     {
+        public new IEnumerable<Organization> Gets()
+        { 
+            return _model
+                .Include(o => o.AuditCycles)
+                .AsEnumerable();
+        } // Gets
+
         public async Task<Organization> GetAsync(int folio)
         {
             return await _model
