@@ -7,6 +7,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
     {
         public string Text { get; set; }
 
+        public Guid? OrganizationID { get; set; }
+
         public Guid? AuditCycleID { get; set; }
 
         public Guid? StandardID { get; set; }
