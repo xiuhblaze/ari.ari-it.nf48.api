@@ -241,33 +241,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (query.Any())
                 throw new BusinessException("The standard is already assigned to this audit");
 
-            if (item.Status != foundItem.Status) // Cambio de estatus
-            {
-                switch (item.Status) // Si el nuevo status es...
-                {
-                    case StatusType.Active:
-
-                        // // #CHANGE_CYCLES: Evaluar esta validación una vez se implementen los cambios -xBlaze 20251205
-                        // - Que el standard no este asignado con otra auditoria del mismo audit
-                        //   cycle y el mismo step
-                        //if (foundItem.Audit != null 
-                        //    && foundItem.Audit.Status != AuditStatusType.Nothing
-                        //    && !(foundItem.Audit.IsMultisite.HasValue && foundItem.Audit.IsMultisite.Value))
-                        //{ 
-                        //    var auditsRepository = new AuditRepository();
-                        //    var hasStandard = await auditsRepository.IsAnyStandardStepAuditInAuditCycle(
-                        //        foundItem.Audit.AuditCycleID,
-                        //        foundItem.StandardID.Value,
-                        //        item.Step.Value,
-                        //        foundItem.Audit.ID
-                        //    );
-                        //    if (hasStandard)
-                        //        throw new BusinessException("The standard with this step is already assigned to another audit");
-                        //}
-                        break;
-                }
-            }
-
             if (item.Status == StatusType.Active || foundItem.Status == StatusType.Nothing) // Nuevo o activando
             { 
                 // - Validar que el step no sea null
@@ -275,19 +248,18 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The audit step must be assigned");
 
                 // - Validar que el step no esté en otra auditoria del mismo ciclo
-                if (await _repository.IsStepInAuditCycleAsync(
-                    foundAuditCycle.ID,
-                    item.Step.Value,
-                    foundItem.ID)
-                )
-                    throw new BusinessException("The audit step is already assigned to another audit in the same audit cycle");
-                //if (await _repository.IsAnyStandardStepAuditInAuditCycleAsync(
+                //   ACTUALIZACION 20260112: Deshabilitado pues puede ser un mismo evento de 
+                //                           auditoria pero para diferente sitio y es
+                //                           considerado válido. -xBlaze
+                //if (await _repository.IsStepInAuditCycleAsync(
                 //    foundAuditCycle.ID,
-                //    foundAuditCycle.StandardID.Value,
                 //    item.Step.Value,
                 //    foundItem.ID)
                 //)
-                //    throw new BusinessException("The standard with this step is already assigned to another audit in the same audit cycle");
+                //    throw new BusinessException("The audit step is already assigned to another audit in the same audit cycle");
+                // - xBlaze: Esta validación va a ser mejor hacerla cuando
+                //           se intenten guardar los cambios en la Auditoría,
+                //           pues ahí se tiene el contexto completo.
 
                 // - Validar que el step sea valido para el tipo de ciclo de auditoria
                 AuditStepType stepValue = item.Step.Value;

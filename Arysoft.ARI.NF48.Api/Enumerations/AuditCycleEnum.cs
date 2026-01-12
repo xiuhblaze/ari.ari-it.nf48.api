@@ -11,10 +11,14 @@
     public enum AuditCycleOrderType
     {
         Nothing,
+        Standard,
+        Name,
         Date,
         Status,
+        StandardDesc,
+        NameDesc,
         DateDesc,
-        StatusDesc
+        StatusDesc,
     } // AuditCycleOrderType
 
     public enum AuditCyclePeriodicityType

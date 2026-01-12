@@ -153,15 +153,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Contacts = item.Contacts != null
                     ? ContactMapping.ContactToListDto(item.Contacts
                         .Where(i => i.Status != StatusType.Nothing))
-                    : new List<ContactItemListDto>(),
+                    : null,
                 Notes = item.Notes != null
                     ? NoteMapping.NotesToListDto(item.Notes
                         .Where(i => i.Status != StatusType.Nothing))
-                    : new List<NoteItemDto>(),
+                    : null,
                 Sites = item.Sites != null
                     ? SiteMapping.SiteToListDto(item.Sites
-                        .Where(i => i.Status != StatusType.Nothing))
-                    : new List<SiteItemListDto>(),
+                        .Where(i => i.Status != StatusType.Nothing)
+                        .OrderByDescending(i => i.IsMainSite)
+                        .ThenBy(i => i.Description))
+                    : null,
                 Standards = item.OrganizationStandards != null
                     ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))
