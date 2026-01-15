@@ -17,5 +17,15 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                     && m.ID != OrganizationStandardExceptionID)
                 .AnyAsync();
         } // ExistStandardAsync
+
+        public async Task<OrganizationStandard> GetByOrganizationAndStandardAsync(
+            Guid OrganizationID,
+            Guid StandardID)
+        {
+            return await _model
+                .Where(m => m.OrganizationID == OrganizationID
+                    && m.StandardID == StandardID)
+                .FirstOrDefaultAsync();
+        } // GetByOrganizationAndStandardAsync
     }
 }

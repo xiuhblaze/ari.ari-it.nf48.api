@@ -29,10 +29,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<AuditStandardItemListDto>>))]
-        public IHttpActionResult GetAuditStandards([FromUri] AuditStandardQueryFilters filters)
+        public async Task<IHttpActionResult> GetAuditStandards([FromUri] AuditStandardQueryFilters filters)
         {
             var items = _service.Gets(filters);
-            var itemDto = AuditStandardMapping.AuditStandardToListDto(items);
+            var itemDto = await AuditStandardMapping.AuditStandardToListDto(items);
             var response = new ApiResponse<IEnumerable<AuditStandardItemListDto>>(itemDto)
             {
                 Meta = new Metadata
@@ -55,7 +55,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = AuditStandardMapping.AuditStandardToItemDetailDto(item);
+            var itemDto = await AuditStandardMapping.AuditStandardToItemDetailDto(item);
             var response = new ApiResponse<AuditStandardItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -70,7 +70,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = AuditStandardMapping.ItemAddDtoToAuditStandard(itemAddDto);
             item = await _service.AddAsync(item);
-            var itemDto = AuditStandardMapping.AuditStandardToItemDetailDto(item);
+            var itemDto = await AuditStandardMapping.AuditStandardToItemDetailDto(item);
             var response = new ApiResponse<AuditStandardItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -88,7 +88,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = AuditStandardMapping.ItemEditDtoToAuditStandard(itemEditDto);
             item = await _service.UpdateAsync(item);
-            var itemDto = AuditStandardMapping.AuditStandardToItemDetailDto(item);
+            var itemDto = await AuditStandardMapping.AuditStandardToItemDetailDto(item);
             var response = new ApiResponse<AuditStandardItemDetailDto>(itemDto);
 
             return Ok(response);

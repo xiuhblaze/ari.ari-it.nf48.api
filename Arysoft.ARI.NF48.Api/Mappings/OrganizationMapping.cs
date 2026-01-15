@@ -74,7 +74,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? SiteMapping.SiteToItemListDto(mainSite)
                     : null,
                 NextAudit = nextAudit != null
-                    ? AuditMapping.AuditToItemListDto(nextAudit)
+                    ? await AuditMapping.AuditToItemListDto(nextAudit)
                     : null,
                 AuditCyclesCount = item.AuditCycles != null
                     ? item.AuditCycles.Where(i => 

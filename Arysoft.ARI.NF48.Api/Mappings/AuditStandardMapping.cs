@@ -1,25 +1,41 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Arysoft.ARI.NF48.Api.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
     public class AuditStandardMapping
     {
-        public static IEnumerable<AuditStandardItemListDto> AuditStandardToListDto(IEnumerable<AuditStandard> items)
+        public static async Task<IEnumerable<AuditStandardItemListDto>> AuditStandardToListDto(IEnumerable<AuditStandard> items)
         {
             var itemsDto = new List<AuditStandardItemListDto>();
             foreach (var item in items)
             {
-                itemsDto.Add(AuditStandardToItemListDto(item));
+                itemsDto.Add(await AuditStandardToItemListDto(item));
             }
             return itemsDto;
         } // AuditStandarToListDto
 
-        public static AuditStandardItemListDto AuditStandardToItemListDto(AuditStandard item)
+        public static async Task<AuditStandardItemListDto> AuditStandardToItemListDto(AuditStandard item)
         {
+            var _organizationStandardRepository = new OrganizationStandardRepository();
+            var organizatinoStandardStatus = StatusType.Nothing;
+            var organizationStandard = await _organizationStandardRepository
+                .GetByOrganizationAndStandardAsync(
+                    item.AuditCycle != null && item.AuditCycle.OrganizationID != Guid.Empty 
+                        ? item.AuditCycle.OrganizationID 
+                        : Guid.Empty,
+                    item.AuditCycle?.StandardID ?? Guid.Empty
+                );
+
+            if (organizationStandard != null)
+                organizatinoStandardStatus = organizationStandard.Status;
+
             return new AuditStandardItemListDto
             {
                 ID = item.ID,
@@ -47,6 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardStatus = item.Standard != null
                     ? item.Standard.Status
                     : StatusType.Nothing,
+                OrganizationStandardStatus = organizatinoStandardStatus,
                 AuditorsCount = item.AuditAuditors != null
                     ? item.AuditAuditors.Count
                     : 0,
@@ -56,7 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // AuditStandardToItemListDto
 
-        public static AuditStandardItemDetailDto AuditStandardToItemDetailDto(AuditStandard item)
+        public static async Task<AuditStandardItemDetailDto> AuditStandardToItemDetailDto(AuditStandard item)
         {
             return new AuditStandardItemDetailDto
             {
@@ -74,7 +91,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
                     : null,
                 Audit = item.Audit != null
-                    ? AuditMapping.AuditToItemListDto(item.Audit)
+                    ? await AuditMapping.AuditToItemListDto(item.Audit)
                     : null,
                 Standard = item.Standard != null
                     ? StandardMapping.StandardToItemListDto(item.Standard)

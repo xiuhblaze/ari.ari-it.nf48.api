@@ -436,11 +436,17 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   validar que tenga la información completa requerida por el Status nuevo como:
             // - Standars activos
             // - Auditores activos y con el Standard correcto 
+            // - Al cambiar al STATUS Confirmed, validar que tenga:
+            //   - Auditores asignados y 'activos'
+            //   - Standards asociados 'activos'
+            //   - Sites asignados 'activos' y al menos el sitio principal (ver si hay excepcion
+            //     cuando es Auditoria Especial)
 
             // TODO: AQUI VOY
 
             if (newItem.StartDate > newItem.EndDate)
                 throw new BusinessException("The start date must be less than the end date");
+
 
             // NOTE: Esta validación queda en espera de mejora pues si se puede
             // programar una auditoria en el mismo ciclo y paso, pero no se puede

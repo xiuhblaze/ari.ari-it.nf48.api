@@ -164,7 +164,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             item.ID = Guid.NewGuid();
             item.AuditCycleID = appForm.AuditCycleID; // await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
-            item.StandardID = appForm.StandardID ?? Guid.Empty;
+            item.StandardID = appForm.StandardID.Value;
             item.CycleYear = appForm.CycleYear;
             item.Status = ADCStatusType.New;
             item.Created = DateTime.UtcNow;

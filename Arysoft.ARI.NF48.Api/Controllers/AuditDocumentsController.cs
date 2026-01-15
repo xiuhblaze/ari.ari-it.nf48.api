@@ -59,7 +59,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
-            var itemDto = AuditDocumentMapping.AuditDocumentToItemDetailDto(item);
+            var itemDto = await AuditDocumentMapping.AuditDocumentToItemDetailDto(item);
             var response = new ApiResponse<AuditDocumentItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -74,7 +74,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = AuditDocumentMapping.ItemAddDtoToAuditDocument(itemAddDto);
             item = await _service.AddAsync(item);
-            var itemDto = AuditDocumentMapping.AuditDocumentToItemDetailDto(item);
+            var itemDto = await AuditDocumentMapping.AuditDocumentToItemDetailDto(item);
             var response = new ApiResponse<AuditDocumentItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -124,7 +124,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 : item.UploadedBy;
 
             item = await _service.UpdateAsync(itemToEdit);
-            var itemDto = AuditDocumentMapping.AuditDocumentToItemDetailDto(item);
+            var itemDto = await AuditDocumentMapping.AuditDocumentToItemDetailDto(item);
             var response = new ApiResponse<AuditDocumentItemDetailDto>(itemDto);
 
             return Ok(response);

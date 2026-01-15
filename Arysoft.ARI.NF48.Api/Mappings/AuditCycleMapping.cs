@@ -23,6 +23,16 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static AuditCycleItemListDto AuditCycleToItemListDto(AuditCycle item)
         {
+            var organizationStandardStatus = StatusType.Nothing;
+            var organizationStandard = item.Organization != null
+                && item.Organization.OrganizationStandards != null
+                    ? item.Organization.OrganizationStandards
+                        .Where(os => os.StandardID == item.StandardID)
+                        .FirstOrDefault()
+                    : null;
+            if (organizationStandard != null) 
+                organizationStandardStatus = organizationStandard.Status;
+
             return new AuditCycleItemListDto
             {
                 ID = item.ID,
@@ -39,9 +49,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationName = item.Organization != null
                     ? item.Organization.Name
                     : string.Empty,
+                OrganizationStandardStatus = organizationStandardStatus,
                 StandardName = item.StandardID != null && item.Standard != null
                     ? item.Standard.Name
                     : string.Empty,
+                StandardStatus = item.StandardID != null && item.Standard != null
+                    ? item.Standard.Status
+                    : StatusType.Nothing,
                 AuditsCount = item.AuditStandards != null
                     ? item.AuditStandards.Where(asd => 
                         asd.Audit != null
@@ -90,7 +104,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? StandardMapping.StandardToItemListDto(item.Standard)
                     : null,
                 AuditStandards = item.AuditStandards != null
-                    ? AuditStandardMapping.AuditStandardToListDto(
+                    ? await AuditStandardMapping.AuditStandardToListDto(
                         item.AuditStandards.Where(asd => 
                             asd.Status != StatusType.Nothing
                             && asd.Status != StatusType.Deleted))
