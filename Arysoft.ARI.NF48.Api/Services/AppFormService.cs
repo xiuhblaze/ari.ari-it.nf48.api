@@ -708,6 +708,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The audit cycle does not have a standard assigned");
             }
 
+            // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
+            //   * ISO 9001
+
+            if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k) 
+                throw new BusinessException("The selected standard is not valid for generating an Application Form");
+
         } // ValidateCreateAppFormAsync
 
         private async Task ValidateAppFormAsync(AppForm newItem, AppForm currentItem)
@@ -771,7 +777,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (currentItem.AuditCycle != null 
                 && currentItem.AuditCycle.EndDate.HasValue
                 && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
-                throw new BusinessException("Audit cycle is old, Application Forms cannot be generated for a certificate that has expired");
+                throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
 
             // Considerar que solo la primera vez se registra el standard, despues si
             // ya se validó, sin importar el status del standard, se queda

@@ -160,6 +160,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                 && adc.CycleYear == appForm.CycleYear))
                 throw new BusinessException("The Application Form already has a ADC with the same Cycle Year");
 
+            // Validar que sea de un Standard valido, por lo pronto:
+            // * ISO 9001
+            if (appForm.Standard.StandardBase != StandardBaseType.ISO9k)
+                throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
+
+
             // Set default values
 
             item.ID = Guid.NewGuid();
