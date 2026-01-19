@@ -135,8 +135,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <returns></returns>
         /// <remarks>
         /// Autor: xBlaze
-        /// Creacion: 2024-06-12
-        /// Ultima Modificacion: 2024-06-12
+        /// Creacion: unkonwn
+        /// Ultima Modificacion: unknown
         /// </remarks>
         public async Task<AuditCycleType> GetAuditCycleTypeByADCSiteAuditIDAsync(Guid id)
         {
@@ -155,6 +155,28 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return adc.AuditCycle.CycleType ?? AuditCycleType.Nothing;
         } // GetAuditCycleTypeByADCIDAsync
+
+        /// <summary>
+        /// Obtiene el tipo de Ciclo de Auditoria asociado al ADCSite indicado por el ID
+        /// </summary>
+        /// <param name="adcSiteID"></param>
+        /// <returns></returns>
+        /// Autor: xBlaze
+        /// Creacion: 19-01-2026
+        /// Ultima Modificacion: 19-01-2026
+        public async Task<AuditCycleType> GetAuditCycleTypeByADCSiteIDAsync(Guid adcSiteID)
+        { 
+            var query = _model
+                .Include(m => m.ADCSites)
+                .Include(m => m.AuditCycle)
+                .Where(m => m.ADCSites
+                    .Any(s => s.ID == adcSiteID));
+            var adc = await query.FirstOrDefaultAsync();
+
+            if (adc == null) return AuditCycleType.Nothing;
+
+            return adc.AuditCycle.CycleType ?? AuditCycleType.Nothing;
+        } // GetAuditCycleTypeByADCSiteIDAsync
 
         public void UpdateValues(ADC item)
         {

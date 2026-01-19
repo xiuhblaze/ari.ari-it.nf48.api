@@ -758,10 +758,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm, bool isMultisite)
         {
-            //var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
-            //    .FirstOrDefault(s => s.StandardID == appForm.StandardID)
-            //    ?? throw new BusinessException("The current standard was not found in audit cycle");
-
             var cycleType = appForm.AuditCycle.CycleType ?? AuditCycleType.Nothing; // currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing;
             var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing; // currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing;
             var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
@@ -781,7 +777,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             switch (cycleType)
             {
                 case AuditCycleType.Initial:
-                    //stepList.Add(AuditStepType.Stage1);
+                    stepList.Add(AuditStepType.Stage1); // para registrar los días de ST1
                     stepList.Add(AuditStepType.Stage2);
                     stepList.Add(AuditStepType.Surveillance1);
                     stepList.Add(AuditStepType.Surveillance2);
@@ -852,6 +848,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     ADCSiteID = adcSite.ID,
                     Value = !isMultisite || currentSite.IsMainSite, // si es un solo sitio o es el principal, por default en true (el sitio recibe todas las auditorias)
                     AuditStep = step,
+                    Days = step == AuditStepType.Stage1 ? (decimal?)1 : null,
                     Status = StatusType.Active,
                     Created = DateTime.UtcNow,
                     Updated = DateTime.UtcNow,

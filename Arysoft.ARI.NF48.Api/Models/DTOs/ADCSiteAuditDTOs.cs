@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
@@ -17,9 +15,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public AuditStepType? AuditStep { get; set; }
 
-        public decimal? PreAuditDays { get; set; }
-
-        public decimal? Stage1Days { get; set; }
+        public decimal? Days { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -45,13 +41,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid ID { get; set; }
 
+        public Guid? ADCSiteID { get; set; } // Solo para crear registros cuando se recibe en listado
+
         public bool? Value { get; set; }
         
         public AuditStepType? AuditStep { get; set; }
 
-        public decimal? PreAuditDays { get; set; }
-
-        public decimal? Stage1Days { get; set; }
+        public decimal? Days { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

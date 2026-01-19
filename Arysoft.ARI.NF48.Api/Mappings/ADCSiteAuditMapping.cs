@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using System;
 using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
@@ -26,8 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCSiteID = item.ADCSiteID,
                 Value = item.Value,
                 AuditStep = item.AuditStep,
-                PreAuditDays = item.PreAuditDays,
-                Stage1Days = item.Stage1Days,
+                Days = item.Days,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -49,10 +49,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADCSiteAudit
             {
                 ID = itemDto.ID,
+                ADCSiteID = itemDto.ADCSiteID ?? Guid.Empty,
                 Value = itemDto.Value,
                 AuditStep = itemDto.AuditStep,
-                PreAuditDays = itemDto.PreAuditDays,
-                Stage1Days = itemDto.Stage1Days,
+                Days = itemDto.Days,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };
