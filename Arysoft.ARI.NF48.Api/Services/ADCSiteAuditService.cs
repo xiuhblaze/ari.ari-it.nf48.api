@@ -150,10 +150,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 foundItem = await _repository.GetAsync(item.ID);
 
-                // Solo si es PreAudit, permitir crearlo sino existe
-                if (foundItem == null) // TODO: Considerar que el objeto no trae el valor de ADCSiteID
+                // Solo si es PreAudit, permitir crearlo si es que no existe
+                if (foundItem == null) 
                 {
-                    if (item.ID != Guid.Empty 
+                    if (item.ID == Guid.Empty 
                         && item.AuditStep == AuditStepType.PreAudit 
                         && item.Status == StatusType.Nothing)
                     {

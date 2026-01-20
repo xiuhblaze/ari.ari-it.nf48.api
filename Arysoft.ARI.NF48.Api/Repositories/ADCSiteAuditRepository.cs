@@ -1,7 +1,9 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {
@@ -20,5 +22,19 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return query.Any();
         } // ExistsAuditStep
+
+        public async Task DeleteByADCIDAndAuditStepAsync(Guid ADCID, AuditStepType auditStepType)
+        {
+            var query = _model.Where(x =>
+                x.ADCSite.ADCID == ADCID
+                && x.AuditStep == auditStepType
+            );
+
+            foreach(var item in query)
+            {
+                _context.Entry(item).State = EntityState.Deleted;
+            }
+
+        } // DeleteByADCIDAndAuditStepAsync
     }
 }
