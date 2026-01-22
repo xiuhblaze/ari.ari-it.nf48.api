@@ -161,9 +161,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// </summary>
         /// <param name="adcSiteID"></param>
         /// <returns></returns>
+        /// <remarks>
         /// Autor: xBlaze
         /// Creacion: 19-01-2026
         /// Ultima Modificacion: 19-01-2026
+        /// </remarks>
         public async Task<AuditCycleType> GetAuditCycleTypeByADCSiteIDAsync(Guid adcSiteID)
         { 
             var query = _model
@@ -178,6 +180,20 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return adc.AuditCycle.CycleType ?? AuditCycleType.Nothing;
         } // GetAuditCycleTypeByADCSiteIDAsync
 
+        /// <summary>
+        /// Marca el entidad ADC especificada como modificada en el contexto 
+        /// de datos actual, preparándola para su actualización durante la 
+        /// próxima operación de guardado.
+        /// </summary>
+        /// <param name="item">
+        /// La entidad ADC a actualizar. Debe tener un identificador válido que 
+        /// corresponda a una entidad existente en el contexto.
+        /// </param>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: unknow
+        /// Ultima Modificacion: 21-01-2026
+        /// </remarks>
         public void UpdateValues(ADC item)
         {
             var existing = _context.Set<ADC>().Local

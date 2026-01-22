@@ -6,6 +6,7 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -144,41 +145,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             var appForm = await _appFormRepository.GetAsync(item.AppFormID)
                 ?? throw new BusinessException("The Application Form was not found.");
 
-            // Validar que el AppForm sea active
-
-            if (appForm.Status != AppFormStatusType.Active)
-                throw new BusinessException("The Application Form must be Active to create an ADC.");
-
-            // Validar que el AppForm no tenga un ADC
-            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing 
-                && adc.Status < ADCStatusType.Cancel))
-                throw new BusinessException("The Application Form already has a valid ADC");
-
-            // Validar que el AppForm no tenga un CycleYear igual al del appForm valido
-            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing
-                && adc.Status < ADCStatusType.Cancel
-                && adc.CycleYear == appForm.CycleYear))
-                throw new BusinessException("The Application Form already has a ADC with the same Cycle Year");
-
-            // Validar que sea de un Standard valido, por lo pronto:
-            // * ISO 9001
-            if (appForm.Standard.StandardBase != StandardBaseType.ISO9k)
-                throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
-
-
-            // Set default values
-
-            item.ID = Guid.NewGuid();
-            item.AuditCycleID = appForm.AuditCycleID; // await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
-            item.StandardID = appForm.StandardID.Value;
-            item.CycleYear = appForm.CycleYear;
-            item.Status = ADCStatusType.New;
-            item.Created = DateTime.UtcNow;
-            item.Updated = DateTime.UtcNow;
+            await ValidateCreateItemAsync(item, appForm);
+            item = SetValuesCreateItem(item, appForm);
 
             try
             { 
-            // Procesar ADC
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
@@ -188,9 +159,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.AddAsync: {ex.Message}");
             }
 
-            await AddSitesToNewADCAsync(item);
-
-            //await ProcesarADCAsync(item);
+            await AddSitesToNewADCAsync(item); // Agregar los Sites del AppForm al ADC
 
             try 
             { 
@@ -205,7 +174,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             item = await _repository.GetAsync(item.ID, asNoTracking: true)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            await RecalcularTotalesAsync(item);
+            await RecalcularTotalesAsync(item); // Calcula los MD5 y total de empleados
 
             try
             {
@@ -229,18 +198,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The record to update was not found");
 
             await ValidateUpdateItemAsync(item, foundItem);
-            SetValuesUpdateItem(item, foundItem);
+            var toUpdateItem = SetValuesUpdateItem(item, foundItem);
 
-            foundItem.Alerts = await GetAlertsAsync(foundItem);
-
-            //if (foundItem.Alerts.Contains(ADCAlertType.SitesMistmatch))
-            //{
-            //    await UpdateSitesToExistingADCAsync(foundItem);
-            //}
+            toUpdateItem.Alerts = await GetAlertsAsync(toUpdateItem);
 
             try
             {
-                _repository.Update(foundItem);
+                _repository.Update(toUpdateItem);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -248,7 +212,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.UpdateAsync: {ex.Message}");
             }
 
-            return foundItem;
+            return toUpdateItem;
         } // UpdateAsync
 
         public async Task<ADC> UpdateCompleteADCAsync(ADC item)
@@ -270,15 +234,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 listSites = await _adcSitesService
                     .UpdateListAsync(item.ADCSites.ToList());
             }
-
-            // Creo que no lo necesita pues en Get ya se actualizan los sites
-            // y debe de traer ya los nuevos datos
-            //if (item.Status < ADCStatusType.Inactive)
-            //{
-            //    //await ProcesarADCAsync(foundItem);
-            //    if (foundItem.Alerts.Contains(ADCAlertType.SitesMistmatch))
-            //        await UpdateSitesToExistingADCAsync(foundItem);
-            //}
 
             try
             {
@@ -384,6 +339,63 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
+        // - Create Item
+
+        /// <summary>
+        /// Validaciones para crear un nuevo ADC, solo genera excepciones,
+        /// no necesita devolver valor alguno
+        /// </summary>
+        /// <param name="item">item ADC que traer los valores minimos para crear el ADC</param>
+        /// <param name="appForm">item AppForm del que depende el ADC</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 21-01-2026
+        /// Ultima Modificacion: 21-01-2026
+        /// </remarks>
+        private async Task ValidateCreateItemAsync(ADC item, AppForm appForm)
+        {
+            // Validations
+
+            // Validar que el AppForm sea active
+
+            if (appForm.Status != AppFormStatusType.Active)
+                throw new BusinessException("The Application Form must be Active to create an ADC.");
+
+            // Validar que el AppForm no tenga un ADC
+            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing
+                && adc.Status < ADCStatusType.Cancel))
+                throw new BusinessException("The Application Form already has a valid ADC");
+
+            // Validar que el AppForm no tenga un CycleYear igual al del appForm valido
+            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing
+                && adc.Status < ADCStatusType.Cancel
+                && adc.CycleYear == appForm.CycleYear))
+                throw new BusinessException("The Application Form already has a ADC with the same Cycle Year");
+
+            // Validar que sea de un Standard valido, por lo pronto:
+            // * ISO 9001
+            if (appForm.Standard.StandardBase != StandardBaseType.ISO9k)
+                throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
+
+        } // ValidateCreateItemAsync
+
+        private ADC SetValuesCreateItem(ADC item, AppForm appForm)
+        {
+            item.ID = Guid.NewGuid();
+            item.AuditCycleID = appForm.AuditCycleID; 
+            item.StandardID = appForm.StandardID.Value;
+            item.CycleYear = appForm.CycleYear;
+            item.Status = ADCStatusType.New;
+            item.Created = DateTime.UtcNow;
+            item.Updated = DateTime.UtcNow;
+
+            return item;
+        } // SetValuesCreateItem
+
+        // - Update Item
+
         /// <summary>
         /// Procesa las validaciones necesarias para actualizar un ADC
         /// </summary>
@@ -451,9 +463,10 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <summary>
         /// Establece los valores para actualizar un ADC
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="foundItem"></param>
-        private void SetValuesUpdateItem(ADC item, ADC foundItem)
+        /// <param name="item">Item con los datos a actualizar</param>
+        /// <param name="foundItem">Item encontrado en la BDD con los datos actuales</param>
+        /// <returns>Retorna un objeto ADC con los valores actualizados</returns>
+        private ADC SetValuesUpdateItem(ADC item, ADC foundItem)
         {
             // - Si hay cambios en el status, realizar diferentes asignaciones
             if (foundItem.Status != item.Status)
@@ -503,6 +516,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
+
+            return foundItem;
         } // SetValuesUpdateItem
 
         /// <summary>
