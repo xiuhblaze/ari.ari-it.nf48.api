@@ -6,7 +6,6 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -942,11 +941,24 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private string GetHistoricalDataJSON(ADC item)
         {
+            var _organizationRepository = new OrganizationRepository();
             var firstSite = item.ADCSites?
                 .FirstOrDefault(s => s.Status == StatusType.Active);
+            var isMultiStandard = _organizationRepository.IsMultiStandard(item.AuditCycle.OrganizationID);
 
-            var historicalData = new 
-            { 
+            var historicalData = new
+            {
+                IsMultiStandard = isMultiStandard,
+                AuditCycle = new {
+                    item.AuditCycle?.CycleType,
+                    item.AuditCycle?.InitialStep,
+                    item.AuditCycle?.Periodicity
+                }, 
+                Standard = new {
+                    item.Standard.Name,
+                    item.Standard?.StandardBase,
+                    item.Standard?.Description
+                },
                 Sites = item.ADCSites?
                     .Where(s => s.Status == StatusType.Active)
                     .Select(s => new {
@@ -963,6 +975,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                         acv.ADCConcept.StandardID,
                         acv.ADCConcept.IndexSort,
                         acv.ADCConcept.Description,
+                        acv.ADCConcept.WhenTrue,
+                        acv.ADCConcept.Increase,
+                        acv.ADCConcept.Decrease,
+                        acv.ADCConcept.IncreaseUnit,
+                        acv.ADCConcept.DecreaseUnit,
                         acv.ADCConcept.ExtraInfo
                     })
             };

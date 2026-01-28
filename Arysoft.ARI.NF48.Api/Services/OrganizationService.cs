@@ -57,8 +57,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                         || (c.COID != null && c.COID.ToLower().Contains(filters.Text))
                     ))
                     || (e.Sites != null && e.Sites.Any(s => 
-                        (s.Address != null && s.Address.Contains(filters.Text))
-                        || (s.Country != null && s.Country.Contains(filters.Text))
+                        (s.Address != null && s.Address.ToLower().Contains(filters.Text))
+                        || (s.Country != null && s.Country.ToLower().Contains(filters.Text))
                     ))
                     || (e.Website != null && e.Website.ToLower().Contains(filters.Text))
                     || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))                    

@@ -32,13 +32,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Filters
 
             if (filters.AuditCycleID != null && filters.AuditCycleID != Guid.Empty)
-                items = items.Where(m => m.AuditCycleID == filters.AuditCycleID);
+                items = items.Where(i => 
+                    i.ADCs.Where(adc => adc.AuditCycleID == filters.AuditCycleID).Any()
+                );
 
             if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
-                items = items.Where(m => 
-                    m.AuditCycle != null 
-                    && m.AuditCycle.OrganizationID == filters.OrganizationID
-                );
+                items = items.Where(i => i.OrganizationID == filters.OrganizationID);
 
             if (!string.IsNullOrEmpty(filters.Text))
             {
@@ -47,8 +46,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     (m.Justification != null && m.Justification.ToLower().Contains(filters.Text))
                     || (m.SignerName != null && m.SignerName.ToLower().Contains(filters.Text))
                     || (m.SignerPosition != null && m.SignerPosition.ToLower().Contains(filters.Text))
-                    || (m.HistoricalDataJSON != null && m.HistoricalDataJSON.ToLower().Contains(filters.Text))
+                    //|| (m.HistoricalDataJSON != null && m.HistoricalDataJSON.ToLower().Contains(filters.Text))
                     || (m.UpdatedUser != null && m.UpdatedUser.ToLower().Contains(filters.Text))
+                    || (m.Organization != null & m.Organization.Name != null && m.Organization.Name.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -124,17 +124,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // Agregar los ProposalAudits si solo hay un (1) ADC disponible en el auditcycle
-            if (await adcRepository
-                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 1)
-            {
-                // Agregar los ProposalAudits y asociar en el ADC la propuesta (ProposalID)
-                var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
-                await AddADCAsync(item, adcID);
+            // TODO: Los ProposalAudits se van a crear cuando se asigne el ADC a la Propuesta
+            //if (await adcRepository
+            //    .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 1)
+            //{
+            //    // Agregar los ProposalAudits y asociar en el ADC la propuesta (ProposalID)
+            //    var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
+            //    await AddADCAsync(item, adcID);
 
-                // Reload item
-                item = await _repository.GetAsync(item.ID)
-                    ?? throw new BusinessException("The Proposal was not found after add audit steps totals");
-            }
+            //    // Reload item
+            //    item = await _repository.GetAsync(item.ID)
+            //        ?? throw new BusinessException("The Proposal was not found after add audit steps totals");
+            //}
 
             return item;
         } // CreateAsync
@@ -248,12 +249,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("ADC record not found");
 
             // Validar que no este el ADC ya asociado
-            if (adc.ProposalID != null && adc.ProposalID != Guid.Empty)
+            if (adc.ProposalID != null && adc.ProposalID != Guid.Empty
+                && adc.Proposal.Status != ProposalStatusType.Nothing)
                 throw new BusinessException("The ADC is already associated with a proposal.");
 
-            // Validar que sea del mismo AuditCycle
-            if (adc.AuditCycleID != foundItem.AuditCycleID)
-                throw new BusinessException("The ADC does not belong to the same Audit Cycle as the proposal.");
+            //// Validar que sea del mismo AuditCycle
+            //if (adc.AuditCycleID != foundItem.AuditCycleID)
+            //    throw new BusinessException("The ADC does not belong to the same Audit Cycle as the proposal.");
 
             await AddStepsFromADCAsync(foundItem, adc);
             await adcService.UpdateProposalIDAsync(adc.ID, item.ID, item.UpdatedUser);
@@ -292,23 +294,24 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var adcRepository = new ADCRepository();
 
-            // - Validar que exista al menos un ADC disponible en el auditcycle para asociar
+            // - Validar que exista al menos un ADC disponible en la Organización para asociar
             var countADCs = await adcRepository
-                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID);
+                .CountADCsAvailableByOrganizationAsync(item.OrganizationID);
 
             if (countADCs == 0)
                 throw new BusinessException("There are no ADCs available to be associated with the proposal.");
 
-            if (countADCs == 1)
-            { 
-                // - Validar que no exista otra propuesta activa para el mismo ciclo de auditoría, pues solo hay un ADC
-                if (await _repository.ExistsActiveProposalForAuditCycleAsync(item.AuditCycleID))
-                    throw new BusinessException("There is already an active proposal for the selected audit cycle.");
-            }
+            //if (countADCs == 1) //TODO: Esta validacion se va a transladar al momento de asignar un ADC a la Propuesta
+            //{ 
+            //    // - Validar que no exista otra propuesta activa para el mismo ciclo de auditoría, pues solo hay un ADC
+            //    if (await _repository.ExistsActiveProposalForAuditCycleAsync(item.AuditCycleID))
+            //        throw new BusinessException("There is already an active proposal for the selected audit cycle.");
+            //}
 
             // - Validar que el auditcycle y la organization esten activos
-            if (!await _repository.HasValidParentsForCreateAsync(item))
-                throw new BusinessException("The Organization or Audit cycle records are not valid.");
+            // TODO: Esta validación también se va a transladar al momento de asignar un ADC a la Propuesta
+            //if (!await _repository.HasValidParentsForCreateAsync(item))
+            //    throw new BusinessException("The Organization or Audit cycle records are not valid.");
 
         } // ValidateNewItem
 
@@ -631,8 +634,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var historicalData = new
             {
-                OrganizationName = item.AuditCycle?.Organization?.Name ?? string.Empty,
-                AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
+                OrganizationName = item.Organization?.Name ?? string.Empty,
+                //AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
                 AppForm = new {
                     MainSiteAddress = "",
                     LegalEntities = "", // array
@@ -641,13 +644,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                     ContactName = "",
                     EMail = ""
                 },
-                ADC = new { 
-                    Description = "",
-                    TotalEmployees = 0,
-                    TotalInitial = 0,
-                    TotalMD11 = 0,
-                    TotalSurveillance = 0,                    
-                },
+                ADCs = item.ADCs?
+                    .Where(adc => adc.Status == ADCStatusType.Active)
+                    .Select(adc => new
+                    {
+                        adc.Description,
+                        adc.TotalEmployees,
+                        TotalInitial = 0,
+                        TotalMD11 = 0,
+                        TotalSurveillance = 0
+                    })
                 //Sites = item.ProposalSites?
                 //    .Where(ps => ps.Status == StatusType.Active)
                 //    .Select(ps => new { 

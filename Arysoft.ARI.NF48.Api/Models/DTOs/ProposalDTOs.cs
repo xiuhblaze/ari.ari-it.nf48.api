@@ -9,7 +9,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid AuditCycleID { get; set; }
+        public Guid OrganizationID { get; set; }
 
         public string Justification { get; set; }
 
@@ -47,13 +47,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string OrganizationName { get; set; }
 
-        public string AuditCycleName { get; set; }
-
         public int ADCCount { get; set; }
 
         public int ProposalAuditsCount { get; set; }
 
         public int NotesCount { get; set; }
+
+        public List<string> AuditCycleNames { get; set; }
 
         public List<string> Standards { get; set; }
 
@@ -67,9 +67,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid AuditCycleID { get; set; }
-
-        public CycleYearType? CycleYear { get; set; }
+        public Guid OrganizationID { get; set; }
 
         public string Justification { get; set; }
 
@@ -113,8 +111,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public AuditCycleItemListDto AuditCycle { get; set; }
+        public OrganizationItemListDto Organization { get; set; }
 
+        // Tienen que incluir los AuditCycles y los Standards de los Audit Cycles
         public ICollection<ADCItemListDto> ADCs { get; set; }
 
         public ICollection<ProposalAuditItemDto> ProposalAudits { get; set; }
@@ -122,8 +121,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ICollection<NoteItemDto> Notes { get; set; }
 
         // RELATIONS EXTRA FIELDS
-
-        public OrganizationItemProposalDto Organization { get; set; }
 
         // Tienen que ser los seleccionados en los AppForm's
         public ICollection<SiteItemListDto> Sites { get; set; }
@@ -148,8 +145,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class ProposalCreateDto
     {
-        [Required(ErrorMessage = "The Audit Cycle ID is required")]
-        public Guid? AuditCycleID { get; set; }
+        [Required(ErrorMessage = "The Organization ID is required")]
+        public Guid? OrganizationID { get; set; }
 
         [Required(ErrorMessage = "The User that creates is required")]
         [StringLength(50, ErrorMessage = "The User name must be less than 50 characters")]

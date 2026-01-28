@@ -16,7 +16,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasColumnName("ProposalID");
 
             modelBuilder.Entity<Proposal>()
-                .Property(m => m.AuditCycleID)
+                .Property(m => m.OrganizationID)
                 .IsRequired();
 
             modelBuilder.Entity<Proposal>()

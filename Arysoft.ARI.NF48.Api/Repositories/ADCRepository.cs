@@ -51,6 +51,31 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         } // CountADCsByAuditCycle
 
         /// <summary>
+        /// Valida si hay un ADC disponible dada la organización indicada ya sea
+        /// si no tiene registrada una Propuesta o si la Propuesta asociada está 
+        /// en estado "0" (Nothing)
+        /// </summary>
+        /// <param name="organziationID">Identificador de la organización a revisar</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 2026-01-28
+        /// Ultima Modificacion: 2026-01-28
+        /// </remarks>
+        public async Task<int> CountADCsAvailableByOrganizationAsync(Guid organziationID)
+        {
+            var query = _model
+                .Include(m => m.Proposal)
+                .Include(m => m.AppForm)
+                .Where(m => m.AppForm.OrganizationID == organziationID
+                    && m.Status == ADCStatusType.Active
+                    && (m.ProposalID == null
+                        || (m.Proposal != null && m.Proposal.Status == 0)));
+
+            return await query.CountAsync();
+        } // CountADCsAvailableByOrganizationAsync
+
+        /// <summary>
         /// Obtiene el ID de un ADC disponible (sin propuesta asignada)
         /// </summary>
         /// <param name="auditCycleID"></param>
@@ -86,8 +111,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <returns></returns>
         /// <remarks>
         /// Autor: xBlaze
-        /// Creacion: 2024-06-12
-        /// Ultima Modificacion: 2024-06-12
+        /// Creacion: unknown
+        /// Ultima Modificacion: unknown
         /// </remarks>
         public async Task<bool> IncludePreAuditByADCSiteAuditIDAsync(Guid id)
         { 
