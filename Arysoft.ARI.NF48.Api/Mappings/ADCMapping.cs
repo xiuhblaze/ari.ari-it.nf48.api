@@ -42,7 +42,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // INTERNAL
                 HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
-                AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
+                AuditCycle = AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle),
+                //AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
                 AppFormOrganizationName = item.AppForm?.Organization?.Name ?? string.Empty,
                 //AppFormStandardID = item.AppForm?.StandardID ?? Guid.Empty,
                 //AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,

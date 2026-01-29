@@ -123,20 +123,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ProposalService.CreateAsync: {ex.Message}");
             }
 
-            // Agregar los ProposalAudits si solo hay un (1) ADC disponible en el auditcycle
-            // TODO: Los ProposalAudits se van a crear cuando se asigne el ADC a la Propuesta
-            //if (await adcRepository
-            //    .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 1)
-            //{
-            //    // Agregar los ProposalAudits y asociar en el ADC la propuesta (ProposalID)
-            //    var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
-            //    await AddADCAsync(item, adcID);
-
-            //    // Reload item
-            //    item = await _repository.GetAsync(item.ID)
-            //        ?? throw new BusinessException("The Proposal was not found after add audit steps totals");
-            //}
-
             return item;
         } // CreateAsync
 
@@ -253,10 +239,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 && adc.Proposal.Status != ProposalStatusType.Nothing)
                 throw new BusinessException("The ADC is already associated with a proposal.");
 
-            //// Validar que sea del mismo AuditCycle
-            //if (adc.AuditCycleID != foundItem.AuditCycleID)
-            //    throw new BusinessException("The ADC does not belong to the same Audit Cycle as the proposal.");
-
             await AddStepsFromADCAsync(foundItem, adc);
             await adcService.UpdateProposalIDAsync(adc.ID, item.ID, item.UpdatedUser);
             
@@ -300,13 +282,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (countADCs == 0)
                 throw new BusinessException("There are no ADCs available to be associated with the proposal.");
-
-            //if (countADCs == 1) //TODO: Esta validacion se va a transladar al momento de asignar un ADC a la Propuesta
-            //{ 
-            //    // - Validar que no exista otra propuesta activa para el mismo ciclo de auditoría, pues solo hay un ADC
-            //    if (await _repository.ExistsActiveProposalForAuditCycleAsync(item.AuditCycleID))
-            //        throw new BusinessException("There is already an active proposal for the selected audit cycle.");
-            //}
 
             // - Validar que el auditcycle y la organization esten activos
             // TODO: Esta validación también se va a transladar al momento de asignar un ADC a la Propuesta

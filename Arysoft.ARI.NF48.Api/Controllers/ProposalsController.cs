@@ -36,7 +36,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public IHttpActionResult GetProposals([FromUri] ProposalQueryFilters filters)
         {
             var items = _service.Gets(filters);
-            var itemsDto = Mappings.ProposalMapping.ProposalToListDto(items);
+            var itemsDto = ProposalMapping.ProposalToListDto(items);
             var  response = new ApiResponse<IEnumerable<ProposalItemListDto>>(itemsDto)
             {
                 Meta = new Metadata
@@ -101,12 +101,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             if (file != null)
             {
-                //filename = FileRepository.UploadFile(
-                //    file,
-                //    $"~/files/{item.AuditCycle.OrganizationID}/Cycles/{item.AuditCycle.ID}/Proposals",
-                //    item.ID.ToString(),
-                //    new string[] { ".docx", "xlsx", ".pdf", ".jpg", ".png" }
-                //);
                 filename = FileRepository.UploadFile(
                     file,
                     $"~/files/organizations/{item.OrganizationID}/proposals",

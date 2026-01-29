@@ -47,13 +47,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public string AuditCycleName { get; set; }
+        //public string AuditCycleName { get; set; }
+
+        public AuditCycleItemListDto AuditCycle { get; set; }
 
         public string AppFormOrganizationName { get; set; }
 
-        public Guid AppFormStandardID { get; set; }
+        //public Guid AppFormStandardID { get; set; }
 
-        public string AppFormStandardName { get; set; }
+        //public string AppFormStandardName { get; set; }
 
         public string StandardName { get; set; }
 
