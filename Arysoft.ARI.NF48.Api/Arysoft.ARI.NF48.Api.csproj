@@ -586,6 +586,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Tools\CorsMessageHandler.cs" />
     <Compile Include="Tools\Encrypt.cs" />
+    <Compile Include="Tools\EscapeLikeValue.cs" />
     <Compile Include="Tools\FullName.cs" />
     <Compile Include="Tools\GetModelStateErrors.cs" />
     <Compile Include="Tools\GlobalCorsPolicyAttribute.cs" />

@@ -337,9 +337,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             foundItem.Value = item.Value;
             foundItem.AuditStep = item.AuditStep;
-            foundItem.Days = item.AuditStep == AuditStepType.PreAudit || item.AuditStep == AuditStepType.Stage1
-                ? item.Days ?? 0
-                : 0;
+            foundItem.Days = item.Days ?? 0;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing

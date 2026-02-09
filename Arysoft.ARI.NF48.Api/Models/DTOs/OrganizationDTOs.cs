@@ -75,8 +75,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid? OrganizationFamilyID { get; set; }
-
         public int? Folio { get; set; }
 
         public string Name { get; set; }

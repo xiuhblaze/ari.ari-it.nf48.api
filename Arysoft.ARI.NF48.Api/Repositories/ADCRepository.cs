@@ -131,13 +131,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <summary>
         /// Indica si el tipo de ciclo de auditoría del ADC es el indicado
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cycleType"></param>
+        /// <param name="id">Identificador del ADC a consultar</param>
+        /// <param name="cycleType">Tipo de ciclo de auditoria a comprobar</param>
         /// <returns></returns>
         /// <remarks>
         /// Autor: xBlaze
-        /// Creacion: 2024-06-12
-        /// Ultima Modificacion: 2024-06-12
+        /// Creacion: unknown
+        /// Ultima Modificacion: 2026-02-04
         /// </remarks>
         public async Task<bool> IsAuditCycleTypeByADCID(Guid id, AuditCycleType cycleType)
         {

@@ -5,6 +5,7 @@ using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,6 +50,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
+                filters.Text = Strings.EscapeLikeValue(filters.Text);
                 items = items.Where(e =>
                     (e.Name != null && e.Name.ToLower().Contains(filters.Text))
                     || (e.Companies != null && e.Companies.Any(c => 
@@ -201,6 +203,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // Paging
+
+            Console.WriteLine(items.ToString());
 
             var pagedItems = PagedList<Organization>
                 .Create(items, filters.PageNumber, filters.PageSize);
