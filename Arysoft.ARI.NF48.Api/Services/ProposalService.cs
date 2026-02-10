@@ -98,9 +98,19 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Proposal> GetAsync(Guid id, bool asNoTracking = false)
         {
-            // TODO: Analizar alertas 
+            var item = await _repository.GetAsync(id, asNoTracking)
+                ?? throw new BusinessException("The record does not exist.");
 
-            return await _repository.GetAsync(id, asNoTracking);
+            if (item.Status <= ProposalStatusType.Rejected)
+            {
+                await AddOrUpdateStepsAsync(item);
+                await CalculateStepsTotalsAsync(item);
+
+                item = await _repository.GetAsync(id, asNoTracking)
+                    ?? throw new BusinessException("The record does not exist after updating steps.");
+            }
+
+            return item; //await _repository.GetAsync(id, asNoTracking);
         } // GetAsync
 
         public async Task<Proposal> CreateAsync(Proposal item)
