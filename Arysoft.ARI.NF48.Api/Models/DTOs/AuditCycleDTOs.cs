@@ -34,7 +34,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string OrganizationName { get; set; }
 
+        public StatusType? OrganizationStandardStatus { get; set; }
+
         public string StandardName { get; set; }
+
+        public StatusType? StandardStatus { get; set; }
 
         public int AuditsCount { get; set; }
 

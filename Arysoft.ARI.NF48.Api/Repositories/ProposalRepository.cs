@@ -17,9 +17,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 query = query.AsNoTracking();
 
             return await query
-                .Include(m => m.AuditCycle)
-                .Include("AuditCycle.Organization")
+                .Include(m => m.Organization)
                 .Include(m => m.ADCs)
+                .Include("ADCs.AuditCycle")
+                .Include("ADCs.AppForm")
+                .Include("ADCs.Standard")
                 .Include(m => m.ProposalAudits)
                 .Include(m => m.Notes)
                 .FirstOrDefaultAsync(m => m.ID == id);
@@ -28,23 +30,18 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         // Validar que las Propuestas coincidan con los ADC
         // del AuditCycle
 
-        // - Valida que el appform, auditcycle y la organization esten activos, o algo así
+        /// <summary>
+        /// Valida que la organization este activa y de ser necesario algun
+        /// otro dato previo a la creación de una Propuesta
+        /// </summary>
+        /// <param name="item">Objeto con los valores de la propuesta</param>
+        /// <returns></returns>
         public async Task<bool> HasValidParentsForCreateAsync(Proposal item)
-        {
-            var auditCycle = await _context.Set<AuditCycle>()
-                .Include(ac => ac.Organization)
-                .Where(ac => ac.ID == item.AuditCycleID)
-                .FirstOrDefaultAsync();
-
-            if (auditCycle == null) 
+        {   
+            if (item.Organization == null) 
                 return false;
-            if (auditCycle.Status != StatusType.Active 
-                && auditCycle.Status != StatusType.Inactive) 
-                return false;
-            if (auditCycle.Organization == null) 
-                return false;
-            if (auditCycle.Organization.Status != OrganizationStatusType.Applicant
-                && auditCycle.Organization.Status !=  OrganizationStatusType.Active)
+            if (item.Organization.Status != OrganizationStatusType.Applicant
+                && item.Organization.Status !=  OrganizationStatusType.Active)
                 return false;
 
             // xBlaze: Esto no porque al ser una nueva propuesta aun no cuenta con ADCs 
@@ -63,30 +60,30 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return true;
         } // HasValidParentsAsync
 
-        public async Task<bool> ExistsActiveProposalForAuditCycleAsync(Guid auditCycleId)
-        {
-            return await _model
-                .Where(p => p.AuditCycleID == auditCycleId
-                            && (p.Status >= ProposalStatusType.New
-                                && p.Status <= ProposalStatusType.Active))
-                .AnyAsync();
-        } // ExistsActiveProposalForAuditCycleAsync
+        //public async Task<bool> ExistsActiveProposalForAuditCycleAsync(Guid auditCycleId)
+        //{
+        //    return await _model
+        //        .Where(p => p.AuditCycleID == auditCycleId
+        //                    && (p.Status >= ProposalStatusType.New
+        //                        && p.Status <= ProposalStatusType.Active))
+        //        .AnyAsync();
+        //} // ExistsActiveProposalForAuditCycleAsync
 
         public async Task<bool> HasValidParentsForUpdateAsync(Proposal item)
         {
-            var auditCycle = await _context.Set<AuditCycle>()
-                .Include(ac => ac.Organization)
-                .Where(ac => ac.ID == item.AuditCycleID)
-                .FirstOrDefaultAsync();
+            //var auditCycle = await _context.Set<AuditCycle>()
+            //    .Include(ac => ac.Organization)
+            //    .Where(ac => ac.ID == item.AuditCycleID)
+            //    .FirstOrDefaultAsync();
 
-            if (auditCycle == null 
-                || (auditCycle.Status != StatusType.Active 
-                    && auditCycle.Status != StatusType.Inactive))
-                return false;
-            if (auditCycle.Organization == null
-                || (auditCycle.Organization.Status != OrganizationStatusType.Applicant
-                    && auditCycle.Organization.Status != OrganizationStatusType.Active))
-                return false;
+            //if (auditCycle == null 
+            //    || (auditCycle.Status != StatusType.Active 
+            //        && auditCycle.Status != StatusType.Inactive))
+            //    return false;
+            //if (auditCycle.Organization == null
+            //    || (auditCycle.Organization.Status != OrganizationStatusType.Applicant
+            //        && auditCycle.Organization.Status != OrganizationStatusType.Active))
+            //    return false;
 
             if (item.Status >= ProposalStatusType.Review 
                 && item.Status < ProposalStatusType.Inactive)

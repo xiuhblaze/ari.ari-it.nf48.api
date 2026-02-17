@@ -13,17 +13,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Name { get; set; }
 
-        //public string LegalEntity { get; set; }
-
         public string LogoFile { get; set; }
-
-        //public string QRFile { get; set; }
 
         public string Website { get; set; }
 
         public string Phone { get; set; }
-
-        //public string COID { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -81,23 +75,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public Guid? OrganizationFamilyID { get; set; }
-
         public int? Folio { get; set; }
 
         public string Name { get; set; }
 
-        // public string LegalEntity { get; set; }
-
         public string LogoFile { get; set; }
-
-        // public string QRFile { get; set; }
 
         public string Website { get; set; }
 
         public string Phone { get; set; }
-
-        // public string COID { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -113,13 +99,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        // public IEnumerable<ApplicationItemListDto> Applications { get; set; }
-
         public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
 
         public IEnumerable<CompanyItemListDto> Companies { get; set; }
-
-        // public IEnumerable<CertificateItemListDto> Certificates { get; set; }
 
         public IEnumerable<ContactItemListDto> Contacts { get; set; }
 

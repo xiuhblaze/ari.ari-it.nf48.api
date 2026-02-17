@@ -85,7 +85,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> PutADCSiteAudit(Guid id, [FromBody] ADCSiteAuditUpdateDto itemDto)
         {
             if (!ModelState.IsValid)
-                throw new Exceptions.BusinessException(Strings.GetModelStateErrors(ModelState));
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             if (id != itemDto.ID)
                 throw new BusinessException("ID mismatch");
@@ -106,7 +106,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> PutADCSiteAudits([FromBody] ADCSiteAuditListUpdateDto itemsDto)
         {
             if (!ModelState.IsValid)
-                throw new Exceptions.BusinessException(Strings.GetModelStateErrors(ModelState));
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             var items = ADCSiteAuditMapping
                 .UpdateListDtoToADCSiteAudit(itemsDto);
@@ -124,7 +124,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> DeleteADCSiteAudit(Guid id, [FromUri] ADCSiteAuditDeleteDto itemDeleteDto)
         {
             if (!ModelState.IsValid)
-                throw new Exceptions.BusinessException(Strings.GetModelStateErrors(ModelState));
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             if (id != itemDeleteDto.ID)
                 throw new BusinessException("ID mismatch");

@@ -51,6 +51,31 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         } // CountADCsByAuditCycle
 
         /// <summary>
+        /// Valida si hay un ADC disponible dada la organización indicada ya sea
+        /// si no tiene registrada una Propuesta o si la Propuesta asociada está 
+        /// en estado "0" (Nothing)
+        /// </summary>
+        /// <param name="organziationID">Identificador de la organización a revisar</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 2026-01-28
+        /// Ultima Modificacion: 2026-01-28
+        /// </remarks>
+        public async Task<int> CountADCsAvailableByOrganizationAsync(Guid organziationID)
+        {
+            var query = _model
+                .Include(m => m.Proposal)
+                .Include(m => m.AppForm)
+                .Where(m => m.AppForm.OrganizationID == organziationID
+                    && m.Status == ADCStatusType.Active
+                    && (m.ProposalID == null
+                        || (m.Proposal != null && m.Proposal.Status == 0)));
+
+            return await query.CountAsync();
+        } // CountADCsAvailableByOrganizationAsync
+
+        /// <summary>
         /// Obtiene el ID de un ADC disponible (sin propuesta asignada)
         /// </summary>
         /// <param name="auditCycleID"></param>
@@ -86,8 +111,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <returns></returns>
         /// <remarks>
         /// Autor: xBlaze
-        /// Creacion: 2024-06-12
-        /// Ultima Modificacion: 2024-06-12
+        /// Creacion: unknown
+        /// Ultima Modificacion: unknown
         /// </remarks>
         public async Task<bool> IncludePreAuditByADCSiteAuditIDAsync(Guid id)
         { 
@@ -106,13 +131,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <summary>
         /// Indica si el tipo de ciclo de auditoría del ADC es el indicado
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cycleType"></param>
+        /// <param name="id">Identificador del ADC a consultar</param>
+        /// <param name="cycleType">Tipo de ciclo de auditoria a comprobar</param>
         /// <returns></returns>
         /// <remarks>
         /// Autor: xBlaze
-        /// Creacion: 2024-06-12
-        /// Ultima Modificacion: 2024-06-12
+        /// Creacion: unknown
+        /// Ultima Modificacion: 2026-02-04
         /// </remarks>
         public async Task<bool> IsAuditCycleTypeByADCID(Guid id, AuditCycleType cycleType)
         {
@@ -135,8 +160,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <returns></returns>
         /// <remarks>
         /// Autor: xBlaze
-        /// Creacion: 2024-06-12
-        /// Ultima Modificacion: 2024-06-12
+        /// Creacion: unkonwn
+        /// Ultima Modificacion: unknown
         /// </remarks>
         public async Task<AuditCycleType> GetAuditCycleTypeByADCSiteAuditIDAsync(Guid id)
         {
@@ -156,6 +181,44 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return adc.AuditCycle.CycleType ?? AuditCycleType.Nothing;
         } // GetAuditCycleTypeByADCIDAsync
 
+        /// <summary>
+        /// Obtiene el tipo de Ciclo de Auditoria asociado al ADCSite indicado por el ID
+        /// </summary>
+        /// <param name="adcSiteID"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 19-01-2026
+        /// Ultima Modificacion: 19-01-2026
+        /// </remarks>
+        public async Task<AuditCycleType> GetAuditCycleTypeByADCSiteIDAsync(Guid adcSiteID)
+        { 
+            var query = _model
+                .Include(m => m.ADCSites)
+                .Include(m => m.AuditCycle)
+                .Where(m => m.ADCSites
+                    .Any(s => s.ID == adcSiteID));
+            var adc = await query.FirstOrDefaultAsync();
+
+            if (adc == null) return AuditCycleType.Nothing;
+
+            return adc.AuditCycle.CycleType ?? AuditCycleType.Nothing;
+        } // GetAuditCycleTypeByADCSiteIDAsync
+
+        /// <summary>
+        /// Marca el entidad ADC especificada como modificada en el contexto 
+        /// de datos actual, preparándola para su actualización durante la 
+        /// próxima operación de guardado.
+        /// </summary>
+        /// <param name="item">
+        /// La entidad ADC a actualizar. Debe tener un identificador válido que 
+        /// corresponda a una entidad existente en el contexto.
+        /// </param>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: unknow
+        /// Ultima Modificacion: 21-01-2026
+        /// </remarks>
         public void UpdateValues(ADC item)
         {
             var existing = _context.Set<ADC>().Local

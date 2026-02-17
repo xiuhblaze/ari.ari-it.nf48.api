@@ -6,9 +6,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 {
     public class Proposal : BaseModel
     {
-        public Guid AuditCycleID { get; set; }
-
-        public CycleYearType? CycleYear { get; set; }
+        public Guid OrganizationID { get; set; }
 
         public string Justification { get; set; }
 
@@ -44,7 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public virtual AuditCycle AuditCycle { get; set; }
+        public virtual Organization Organization { get; set; }
 
         public virtual ICollection<ADC> ADCs { get; set; }
 

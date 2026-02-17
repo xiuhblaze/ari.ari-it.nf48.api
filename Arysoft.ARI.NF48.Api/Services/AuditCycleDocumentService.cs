@@ -39,6 +39,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 );
             }
 
+            if (filters.OrganizationID != null)
+            { 
+                items = items.Where(e => e.OrganizationID == filters.OrganizationID);
+            }
+
             if (filters.AuditCycleID != null)
             {
                 items = items.Where(e => e.AuditCycles != null 

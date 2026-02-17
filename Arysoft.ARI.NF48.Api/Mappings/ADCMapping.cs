@@ -25,10 +25,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 AuditCycleID = item.AuditCycleID,
                 AppFormID = item.AppFormID,
+                StandardID = item.StandardID,
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
                 Description = item.Description,
-                IncludePreAudit = item.IncludePreAudit,
+                IncludePreAudit = item.IncludePreAudit ?? false,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
@@ -41,10 +42,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // INTERNAL
                 HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
-                AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
+                AuditCycle = AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle),
+                //AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
                 AppFormOrganizationName = item.AppForm?.Organization?.Name ?? string.Empty,
-                AppFormStandardID = item.AppForm?.StandardID ?? Guid.Empty,
-                AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
+                //AppFormStandardID = item.AppForm?.StandardID ?? Guid.Empty,
+                //AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
+                StandardName = item.Standard?.Name ?? string.Empty,
                 NotesCount = item.Notes?.Count() ?? 0,
                 ADCSitesCount = item.ADCSites?.Count() ?? 0,
                 HasProposal = item.Proposal != null,
@@ -60,10 +63,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 AuditCycleID = item.AuditCycleID,
                 AppFormID = item.AppFormID,
+                StandardID = item.StandardID,
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
                 Description = item.Description,
-                IncludePreAudit = item.IncludePreAudit,
+                IncludePreAudit = item.IncludePreAudit ?? false,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
@@ -90,6 +94,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         item.ADCSites.OrderByDescending(x => x.Site?.IsMainSite)
                             .ThenBy(x => x.Site?.Description)
                         ).ToList()
+                    : null,
+                Standard = item.Standard != null
+                    ? StandardMapping.StandardToItemListDto(item.Standard)
                     : null,
                 Proposal = item.Proposal != null
                     ? ProposalMapping.ProposalToItemListDto(item.Proposal)

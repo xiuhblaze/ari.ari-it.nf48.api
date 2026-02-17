@@ -201,7 +201,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
                         var newFilename = FileRepository.UploadFile(
                             file,
-                            $"~/files/organizations/{organizationID}/Cycles/{auditCycleID}/ADC",
+                            $"~/files/organizations/{organizationID}/cycles/{auditCycleID}/adc",
                             foundItem.ID.ToString()
                         );
 

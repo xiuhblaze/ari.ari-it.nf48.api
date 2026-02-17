@@ -5,6 +5,7 @@ using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,6 +50,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.ToLower().Trim();
+                filters.Text = Strings.EscapeLikeValue(filters.Text);
                 items = items.Where(e =>
                     (e.Name != null && e.Name.ToLower().Contains(filters.Text))
                     || (e.Companies != null && e.Companies.Any(c => 
@@ -57,8 +59,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                         || (c.COID != null && c.COID.ToLower().Contains(filters.Text))
                     ))
                     || (e.Sites != null && e.Sites.Any(s => 
-                        (s.Address != null && s.Address.Contains(filters.Text))
-                        || (s.Country != null && s.Country.Contains(filters.Text))
+                        (s.Address != null && s.Address.ToLower().Contains(filters.Text))
+                        || (s.Country != null && s.Country.ToLower().Contains(filters.Text))
                     ))
                     || (e.Website != null && e.Website.ToLower().Contains(filters.Text))
                     || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))                    
@@ -201,6 +203,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // Paging
+
+            Console.WriteLine(items.ToString());
 
             var pagedItems = PagedList<Organization>
                 .Create(items, filters.PageNumber, filters.PageSize);

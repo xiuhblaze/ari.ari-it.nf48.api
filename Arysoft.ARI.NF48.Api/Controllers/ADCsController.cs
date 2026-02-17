@@ -1,5 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
+using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
+using Arysoft.ARI.NF48.Api.IO;
 using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
@@ -107,30 +109,6 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // PutUpdateCompleteADC
 
-        //[HttpPut()]
-        //[Route("api/ADCs/{id}/proposal/{proposalID}")]
-        //[ResponseType(typeof(ApiResponse<ADCItemDetailDto>))]
-        //public async Task<IHttpActionResult> PutUpdateProposalToADC(Guid id, Guid proposalID, ADCUpdateProposalIDDto itemUpdateDto)
-        //{   
-        //    if (!ModelState.IsValid)
-        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
-
-        //    if (id != itemUpdateDto.ID)
-        //        throw new BusinessException("ID Mismatch");
-
-        //    if (proposalID != itemUpdateDto.ProposalID)
-        //        throw new BusinessException("Proposal ID Mismatch");
-
-        //    var item = await _service.UpdateProposalIDAsync(
-        //        itemUpdateDto.ID ?? Guid.Empty,
-        //        itemUpdateDto.ProposalID ?? Guid.Empty,
-        //        itemUpdateDto.UpdatedUser);
-        //    var itemDto = ADCMapping.ADCToItemDetailDto(item);
-        //    var response = new ApiResponse<ADCItemDetailDto>(itemDto);
-
-        //    return Ok(response);
-        //} // PutUpdateProposalToADC
-
         [HttpDelete]
         [ResponseType(typeof(ApiResponse<bool>))]
         public async Task<IHttpActionResult> DeleteADC(Guid id, ADCDeleteDto itemDeleteDto)
@@ -141,6 +119,14 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             if (id != itemDeleteDto.ID)
                 throw new BusinessException("ID Mismatch");
+
+            var foundItem = await _service.GetAsync(id, true)
+                ?? throw new BusinessException("Item not found");
+
+            if (foundItem.Status == ADCStatusType.Deleted)
+            {
+                FileRepository.DeleteDirectory($"~/files/organizations/{foundItem.AppForm.OrganizationID}/cycles/{foundItem.AuditCycleID}/adc");
+            }
 
             var item = ADCMapping
                 .ItemDeleteDtoToADC(itemDeleteDto);

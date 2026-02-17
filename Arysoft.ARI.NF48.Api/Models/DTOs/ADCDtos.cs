@@ -47,13 +47,17 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public string AuditCycleName { get; set; }
+        //public string AuditCycleName { get; set; }
+
+        public AuditCycleItemListDto AuditCycle { get; set; }
 
         public string AppFormOrganizationName { get; set; }
 
-        public Guid AppFormStandardID { get; set; }
+        //public Guid AppFormStandardID { get; set; }
 
-        public string AppFormStandardName { get; set; }
+        //public string AppFormStandardName { get; set; }
+
+        public string StandardName { get; set; }
 
         public int NotesCount { get; set; }
 
@@ -115,13 +119,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public AuditCycleItemListDto AuditCycle { get; set; }
-
         public AppFormItemListDto AppForm { get; set; }
 
-        public ICollection<ADCSiteItemListDto> ADCSites { get; set; }
+        public AuditCycleItemListDto AuditCycle { get; set; }
+
+        public StandardItemListDto Standard { get; set; }
 
         public ProposalItemListDto Proposal { get; set; }
+
+        public ICollection<ADCSiteItemListDto> ADCSites { get; set; }
 
         public ICollection<NoteItemDto> Notes { get; set; }
 
