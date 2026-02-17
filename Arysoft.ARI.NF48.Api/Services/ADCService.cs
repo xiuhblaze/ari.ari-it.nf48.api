@@ -91,9 +91,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             return pagedItems;
         } // Gets
 
-        public async Task<ADC> GetAsync(Guid id)
+        public async Task<ADC> GetAsync(Guid id, bool asNoTracking = false)
         {
-            var item = await _repository.GetAsync(id)
+            var item = await _repository.GetAsync(id, asNoTracking)
                 ?? throw new BusinessException("The ADC was not found.");
 
             if (item.Status < ADCStatusType.Inactive)
@@ -144,35 +144,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             var appForm = await _appFormRepository.GetAsync(item.AppFormID)
                 ?? throw new BusinessException("The Application Form was not found.");
 
-            // Validar que el AppForm sea active
-
-            if (appForm.Status != AppFormStatusType.Active)
-                throw new BusinessException("The Application Form must be Active to create an ADC.");
-
-            // Validar que el AppForm no tenga un ADC
-            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing 
-                && adc.Status < ADCStatusType.Cancel))
-                throw new BusinessException("The Application Form already has a valid ADC");
-
-            // Validar que el AppForm no tenga un CycleYear igual al del appForm valido
-            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing
-                && adc.Status < ADCStatusType.Cancel
-                && adc.CycleYear == appForm.CycleYear))
-                throw new BusinessException("The Application Form already has a ADC with the same Cycle Year");
-
-            // Set default values
-
-            item.ID = Guid.NewGuid();
-            item.AuditCycleID = appForm.AuditCycleID; // await _appFormRepository.GetAuditCycleIDAsync(item.AppFormID);
-            item.StandardID = appForm.StandardID ?? Guid.Empty;
-            item.CycleYear = appForm.CycleYear;
-            item.Status = ADCStatusType.New;
-            item.Created = DateTime.UtcNow;
-            item.Updated = DateTime.UtcNow;
+            await ValidateCreateItemAsync(item, appForm);
+            item = SetValuesCreateItem(item, appForm);
 
             try
             { 
-            // Procesar ADC
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
@@ -182,9 +158,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.AddAsync: {ex.Message}");
             }
 
-            await AddSitesToNewADCAsync(item);
-
-            //await ProcesarADCAsync(item);
+            await AddSitesToNewADCAsync(item); // Agregar los Sites del AppForm al ADC
 
             try 
             { 
@@ -199,7 +173,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             item = await _repository.GetAsync(item.ID, asNoTracking: true)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            await RecalcularTotalesAsync(item);
+            await RecalcularTotalesAsync(item); // Calcula los MD5 y total de empleados
 
             try
             {
@@ -223,18 +197,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The record to update was not found");
 
             await ValidateUpdateItemAsync(item, foundItem);
-            SetValuesUpdateItem(item, foundItem);
+            var toUpdateItem = SetValuesUpdateItem(item, foundItem);
 
-            foundItem.Alerts = await GetAlertsAsync(foundItem);
-
-            //if (foundItem.Alerts.Contains(ADCAlertType.SitesMistmatch))
-            //{
-            //    await UpdateSitesToExistingADCAsync(foundItem);
-            //}
+            toUpdateItem.Alerts = await GetAlertsAsync(toUpdateItem);
 
             try
             {
-                _repository.Update(foundItem);
+                _repository.Update(toUpdateItem);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -242,7 +211,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.UpdateAsync: {ex.Message}");
             }
 
-            return foundItem;
+            return toUpdateItem;
         } // UpdateAsync
 
         public async Task<ADC> UpdateCompleteADCAsync(ADC item)
@@ -264,15 +233,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 listSites = await _adcSitesService
                     .UpdateListAsync(item.ADCSites.ToList());
             }
-
-            // Creo que no lo necesita pues en Get ya se actualizan los sites
-            // y debe de traer ya los nuevos datos
-            //if (item.Status < ADCStatusType.Inactive)
-            //{
-            //    //await ProcesarADCAsync(foundItem);
-            //    if (foundItem.Alerts.Contains(ADCAlertType.SitesMistmatch))
-            //        await UpdateSitesToExistingADCAsync(foundItem);
-            //}
 
             try
             {
@@ -378,6 +338,63 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
+        // - Create Item
+
+        /// <summary>
+        /// Validaciones para crear un nuevo ADC, solo genera excepciones,
+        /// no necesita devolver valor alguno
+        /// </summary>
+        /// <param name="item">item ADC que traer los valores minimos para crear el ADC</param>
+        /// <param name="appForm">item AppForm del que depende el ADC</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 21-01-2026
+        /// Ultima Modificacion: 21-01-2026
+        /// </remarks>
+        private async Task ValidateCreateItemAsync(ADC item, AppForm appForm)
+        {
+            // Validations
+
+            // Validar que el AppForm sea active
+
+            if (appForm.Status != AppFormStatusType.Active)
+                throw new BusinessException("The Application Form must be Active to create an ADC.");
+
+            // Validar que el AppForm no tenga un ADC
+            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing
+                && adc.Status < ADCStatusType.Cancel))
+                throw new BusinessException("The Application Form already has a valid ADC");
+
+            // Validar que el AppForm no tenga un CycleYear igual al del appForm valido
+            if (appForm.ADCs.Any(adc => adc.Status > ADCStatusType.Nothing
+                && adc.Status < ADCStatusType.Cancel
+                && adc.CycleYear == appForm.CycleYear))
+                throw new BusinessException("The Application Form already has a ADC with the same Cycle Year");
+
+            // Validar que sea de un Standard valido, por lo pronto:
+            // * ISO 9001
+            if (appForm.Standard.StandardBase != StandardBaseType.ISO9k)
+                throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
+
+        } // ValidateCreateItemAsync
+
+        private ADC SetValuesCreateItem(ADC item, AppForm appForm)
+        {
+            item.ID = Guid.NewGuid();
+            item.AuditCycleID = appForm.AuditCycleID; 
+            item.StandardID = appForm.StandardID.Value;
+            item.CycleYear = appForm.CycleYear;
+            item.Status = ADCStatusType.New;
+            item.Created = DateTime.UtcNow;
+            item.Updated = DateTime.UtcNow;
+
+            return item;
+        } // SetValuesCreateItem
+
+        // - Update Item
+
         /// <summary>
         /// Procesa las validaciones necesarias para actualizar un ADC
         /// </summary>
@@ -424,24 +441,31 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The Audit Cycle Type must be Initial to include Pre-Audit.");
             }
 
-            //var myAuditCycleStandard = foundItem.AppForm.AuditCycle.AuditCycleStandards
-            //    .FirstOrDefault(acs => acs.StandardID == foundItem.StandardID)
-            //    ?? throw new BusinessException("The current standard was not found in audit cycle");
-            //if (!foundItem.AuditCycle.AuditCycleStandards
-            //    .Any(acs => acs.CycleType == AuditCycleType.Initial)
-            //    && (item.IncludePreAudit.HasValue && item.IncludePreAudit.Value))
-            //{
-            //    throw new BusinessException("There is no initial standard cycle for including pre audit");
-            //}
+            if (foundItem.IncludePreAudit.HasValue && foundItem.IncludePreAudit.Value
+                && (!item.IncludePreAudit.HasValue || !item.IncludePreAudit.Value))
+            {
+                // Se quito pre-audit, eliminar los ADCSiteAudits de pre-audit
+                var adcSiteAuditRepository = new ADCSiteAuditRepository();
 
+                try
+                {
+                    await adcSiteAuditRepository.DeleteByADCIDAndAuditStepAsync(foundItem.ID, AuditStepType.PreAudit);
+                    await adcSiteAuditRepository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ADCService.ValidateUpdateItemAsync.DeletePreAudit: {ex.Message}");
+                }
+            }
         } // ValidateUpdateItem
 
         /// <summary>
         /// Establece los valores para actualizar un ADC
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="foundItem"></param>
-        private void SetValuesUpdateItem(ADC item, ADC foundItem)
+        /// <param name="item">Item con los datos a actualizar</param>
+        /// <param name="foundItem">Item encontrado en la BDD con los datos actuales</param>
+        /// <returns>Retorna un objeto ADC con los valores actualizados</returns>
+        private ADC SetValuesUpdateItem(ADC item, ADC foundItem)
         {
             // - Si hay cambios en el status, realizar diferentes asignaciones
             if (foundItem.Status != item.Status)
@@ -478,6 +502,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             foundItem.Description = item.Description;
+            foundItem.IncludePreAudit = item.IncludePreAudit ?? false;
             foundItem.TotalInitial = item.TotalInitial;
             foundItem.TotalMD11 = item.TotalMD11;
             foundItem.TotalSurveillance = item.TotalSurveillance;
@@ -490,6 +515,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
+
+            return foundItem;
         } // SetValuesUpdateItem
 
         /// <summary>
@@ -752,10 +779,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm, bool isMultisite)
         {
-            //var currentAuditCycleStandard = appForm.AuditCycle.AuditCycleStandards
-            //    .FirstOrDefault(s => s.StandardID == appForm.StandardID)
-            //    ?? throw new BusinessException("The current standard was not found in audit cycle");
-
             var cycleType = appForm.AuditCycle.CycleType ?? AuditCycleType.Nothing; // currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing;
             var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing; // currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing;
             var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
@@ -775,7 +798,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             switch (cycleType)
             {
                 case AuditCycleType.Initial:
-                    //stepList.Add(AuditStepType.Stage1);
+                    stepList.Add(AuditStepType.Stage1); // para registrar los días de ST1
                     stepList.Add(AuditStepType.Stage2);
                     stepList.Add(AuditStepType.Surveillance1);
                     stepList.Add(AuditStepType.Surveillance2);
@@ -839,13 +862,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var currentSite = appForm.Sites
                     .Where(s => s.ID == adcSite.SiteID)
                     .FirstOrDefault() ?? new Site();
+                bool isOneOrMainSite = !isMultisite || currentSite.IsMainSite;
 
                 var adcStepAudit = new ADCSiteAudit()
                 {
                     ID = Guid.NewGuid(),
                     ADCSiteID = adcSite.ID,
-                    Value = !isMultisite || currentSite.IsMainSite, // si es un solo sitio o es el principal, por default en true (el sitio recibe todas las auditorias)
+                    Value = isOneOrMainSite, // si es un solo sitio o es el principal, por default en true (el sitio recibe todas las auditorias)
                     AuditStep = step,
+                    Days = isOneOrMainSite && step == AuditStepType.Stage1 
+                        ? (decimal?)1 
+                        : null,
                     Status = StatusType.Active,
                     Created = DateTime.UtcNow,
                     Updated = DateTime.UtcNow,
@@ -855,75 +882,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 listADCSiteAudits.Add(adcStepAudit);
                 hasChanges = true;
             }
-
-            //foreach (AuditStepType step in Enum.GetValues(typeof(AuditStepType)))
-            //{
-            //    bool addStep = false;
-
-            //    switch (cycleType)
-            //    {
-            //        case AuditCycleType.Initial:
-            //            if (step == AuditStepType.Stage1 
-            //                || step == AuditStepType.Stage2
-            //                || step == AuditStepType.Surveillance1
-            //                || step == AuditStepType.Surveillance2
-            //                || (step == AuditStepType.Surveillance3 
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
-            //                || (step == AuditStepType.Surveillance4
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
-            //                || (step == AuditStepType.Surveillance5
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual))
-            //                addStep = true;
-            //            break;
-            //        case AuditCycleType.Recertificacion:
-            //            if (step == AuditStepType.Recertification
-            //                || step == AuditStepType.Surveillance1
-            //                || step == AuditStepType.Surveillance2
-            //                || (step == AuditStepType.Surveillance3
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
-            //                || (step == AuditStepType.Surveillance4
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
-            //                || (step == AuditStepType.Surveillance5
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual))
-            //                addStep = true;
-            //            break;
-            //        case AuditCycleType.Transfer:
-            //            if ((step == AuditStepType.Transfer
-            //                || step == AuditStepType.Recertification
-            //                || step == AuditStepType.Surveillance1
-            //                || step == AuditStepType.Surveillance2
-            //                || (step == AuditStepType.Surveillance3
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
-            //                || (step == AuditStepType.Surveillance4
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual)
-            //                || (step == AuditStepType.Surveillance5
-            //                    && periodicity == AuditCyclePeriodicityType.Biannual))
-            //                && (step >= initialStep 
-            //                    || initialStep == AuditStepType.Surveillance1 
-            //                    || initialStep == AuditStepType.Surveillance2))
-            //                addStep = true;
-            //            break;
-            //    }
-
-            //    if (addStep)
-            //    {
-            //        var adcStepAudit = new ADCSiteAudit()
-            //        {
-            //            ID = Guid.NewGuid(),
-            //            ADCSiteID = adcSite.ID,
-            //            Value = false,
-            //            AuditStep = step,
-            //            Status = StatusType.Active,
-            //            Created = DateTime.UtcNow,
-            //            Updated = DateTime.UtcNow,
-            //            UpdatedUser = "system",
-            //        };
-
-            //        adcSiteAuditRepository.Add(adcStepAudit);
-            //        listADCSiteAudits.Add(adcStepAudit);
-            //        hasChanges = true;
-            //    }
-            //}
 
             if (hasChanges)
             {
@@ -983,11 +941,24 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private string GetHistoricalDataJSON(ADC item)
         {
+            var _organizationRepository = new OrganizationRepository();
             var firstSite = item.ADCSites?
                 .FirstOrDefault(s => s.Status == StatusType.Active);
+            var isMultiStandard = _organizationRepository.IsMultiStandard(item.AuditCycle.OrganizationID);
 
-            var historicalData = new 
-            { 
+            var historicalData = new
+            {
+                IsMultiStandard = isMultiStandard,
+                AuditCycle = new {
+                    item.AuditCycle?.CycleType,
+                    item.AuditCycle?.InitialStep,
+                    item.AuditCycle?.Periodicity
+                }, 
+                Standard = new {
+                    item.Standard.Name,
+                    item.Standard?.StandardBase,
+                    item.Standard?.Description
+                },
                 Sites = item.ADCSites?
                     .Where(s => s.Status == StatusType.Active)
                     .Select(s => new {
@@ -1004,6 +975,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                         acv.ADCConcept.StandardID,
                         acv.ADCConcept.IndexSort,
                         acv.ADCConcept.Description,
+                        acv.ADCConcept.WhenTrue,
+                        acv.ADCConcept.Increase,
+                        acv.ADCConcept.Decrease,
+                        acv.ADCConcept.IncreaseUnit,
+                        acv.ADCConcept.DecreaseUnit,
                         acv.ADCConcept.ExtraInfo
                     })
             };

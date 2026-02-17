@@ -11,7 +11,9 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public string Text { get; set; }
 
-        public CertificateValidityStatusType? CertificatesValidityStatus { get; set; }
+        // public CertificateValidityStatusType? CertificatesValidityStatus { get; set; }
+
+        public OrganizationCertificateCycleAlertType? CertificateCycleAlert { get; set; }
 
         public OrganizationStatusType? Status { get; set; }
 

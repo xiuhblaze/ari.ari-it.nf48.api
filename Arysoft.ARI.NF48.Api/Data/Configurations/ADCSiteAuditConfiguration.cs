@@ -19,11 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .IsRequired();
 
             modelBuilder.Entity<ADCSiteAudit>() // Ajustar precisión/escala para números decimales
-                .Property(m => m.PreAuditDays)
-                .HasPrecision(5, 2);
-
-            modelBuilder.Entity<ADCSiteAudit>() // Ajustar precisión/escala para números decimales
-                .Property(m => m.Stage1Days)
+                .Property(m => m.Days)
                 .HasPrecision(5, 2);
 
             modelBuilder.Entity<ADCSiteAudit>()

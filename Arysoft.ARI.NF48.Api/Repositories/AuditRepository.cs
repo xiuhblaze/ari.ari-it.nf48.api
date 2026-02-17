@@ -200,7 +200,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         /// <summary>
         /// Elimina de forma directa con sentencias SQL porque con
-        /// entityframwork no se puede borrar en cascada, se apendeja XD
+        /// entityframwork NO SE PUEDE BORRAR EN CASCADA, se apendeja XD
         /// </summary>
         /// <param name="item"></param>
         public new void Delete(Audit item)

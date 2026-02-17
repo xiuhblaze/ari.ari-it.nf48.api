@@ -9,9 +9,14 @@
         Deleted         // Registro eliminado logicamente
     }
 
-    // Estatus que deben de llevar las Organizaciones
-    // Applicant,
-    // Cliente, -> Active
+    public enum  OrganizationCertificateCycleAlertType
+    {
+        Nothing,
+        Active,             // Filtrar por todas las organizaciones que tienen al menos un ciclo activo
+        LastYear,           // Filtrar por todas las organizaciones que tienen al menos un ciclo que le queda un año o menos para expirar
+        LeftThreeMonths,    // Filtrar por todas las organizaciones que tienen al menos un ciclo que le quedan tres meses o menos para expirar
+        Expired,            // Filtrar por todas las organizaciones que tienen al menos un ciclo expirado
+    }
 
     public enum OrganizationOrderType
     { 

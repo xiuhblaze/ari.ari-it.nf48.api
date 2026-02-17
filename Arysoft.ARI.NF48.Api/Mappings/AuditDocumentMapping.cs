@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
@@ -48,8 +49,19 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // AuditDocumentToItemListDto
 
-        public static AuditDocumentItemDetailDto AuditDocumentToItemDetailDto(AuditDocument item)
+        public static async Task<AuditDocumentItemDetailDto> AuditDocumentToItemDetailDto(AuditDocument item)
         {
+            var auditStandards = item.AuditStandards?
+                .Where(ads => ads.Status != StatusType.Nothing)
+                .ToList();
+            var auditStandardsDto = new List<AuditStandardItemListDto>();
+
+            foreach (var auditStandard in auditStandards)
+            {
+                var auditStandardDto = await AuditStandardMapping.AuditStandardToItemListDto(auditStandard);
+                auditStandardsDto.Add(auditStandardDto);
+            }
+
             return new AuditDocumentItemDetailDto
             {
                 ID = item.ID,
@@ -66,11 +78,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Audit = item.Audit != null
-                    ? AuditMapping.AuditToItemListDto(item.Audit)
+                    ? await AuditMapping.AuditToItemListDto(item.Audit)
                     : null,
-                AuditStandards = item.AuditStandards?
-                    .Where(ads => ads.Status != StatusType.Nothing)
-                    .Select(ads => AuditStandardMapping.AuditStandardToItemListDto(ads))
+                AuditStandards = auditStandardsDto
                 //Standard = item.Standard != null
                 //    ? StandardMapping.StandardToItemListDto(item.Standard)
                 //    : null

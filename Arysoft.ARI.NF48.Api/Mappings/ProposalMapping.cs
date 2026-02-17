@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -21,10 +22,24 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static ProposalItemListDto ProposalToItemListDto(Proposal item)
         {
+            var auditCycleNames = new List<string>();
+            var standardNames = new List<string>();
+
+            if (item.ADCs != null)
+            {
+                foreach(var adc in item.ADCs)
+                {
+                    if (adc.AuditCycle != null && !string.IsNullOrEmpty(adc.AuditCycle.Name))
+                    {
+                        auditCycleNames.Add(adc.AuditCycle.Name);
+                        standardNames.Add(adc.Standard.Name);
+                    }
+                }
+            }
+
             return new ProposalItemListDto
             {
                 ID = item.ID,
-                AuditCycleID = item.AuditCycleID,
                 Justification = item.Justification,
                 SignerName = item.SignerName,
                 SignerPosition = item.SignerPosition,
@@ -42,30 +57,29 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 HistoricalDataJSON = item.HistoricalDataJSON,
                 Status = item.Status,
                 // RELATIONS
-                OrganizationName = item.AuditCycle?.Organization?.Name ?? string.Empty,
-                AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
+                OrganizationName = item.Organization?.Name ?? string.Empty,
                 ADCCount = item.ADCs?.Count ?? 0,
                 ProposalAuditsCount = item.ProposalAudits?.Count ?? 0,
                 NotesCount = item.Notes?.Count ?? 0,
-                Standards = item.ADCs != null
-                    ? item.ADCs
-                        .Select(asd => asd.AppForm.Standard.Name)
-                        .ToList()
-                    : new List<string>(),
+
+                AuditCycleNames = auditCycleNames,
+                Standards = standardNames,
                 // NOT MAPPED
                 Alerts = item.Alerts,
             };
         } // ProposalToItemListDto
 
-        public static ProposalItemDetailDto ProposalToItemDetailDto(Proposal item)
-        {
+        public static async Task<ProposalItemDetailDto> ProposalToItemDetailDto(Proposal item)
+        {  
+
             return new ProposalItemDetailDto
             {
                 ID = item.ID,
-                AuditCycleID = item.AuditCycleID,
+                OrganizationID = item.OrganizationID,
                 Justification = item.Justification,
                 SignerName = item.SignerName,
                 SignerPosition = item.SignerPosition,                
+                SendToSignDate = item.SignRequestDate,
                 SignedFilename = item.SignedFilename,
                 CurrencyCode = item.CurrencyCode,
                 ExchangeRate = item.ExchangeRate,
@@ -83,8 +97,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 // RELATIONS
-                AuditCycle = item.AuditCycle != null
-                    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
+                Organization = item.Organization != null
+                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization)
                     : null,
                 ADCs = item.ADCs != null
                     ? ADCMapping.ADCToListDto(
@@ -101,10 +115,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         item.Notes.OrderByDescending(n => n.Created)
                         ).ToList()
                     : null,
-                // RELATIONS EXTRA FIELDS
-                Organization = item.AuditCycle?.Organization != null
-                    ? OrganizationMapping.OrganizationToItemProposalDto(item.AuditCycle.Organization)
-                    : null,
+                // RELATIONS EXTRA FIELDS                
                 Sites = item.ADCs != null
                     ? SiteMapping.SiteToListDto(
                             item.ADCs
@@ -155,7 +166,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {
             return new Proposal
             {
-                AuditCycleID = itemDto.AuditCycleID ?? Guid.Empty,
+                OrganizationID = itemDto.OrganizationID ?? Guid.Empty,
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemCreateDtoToProposal

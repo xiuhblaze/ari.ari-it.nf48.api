@@ -30,10 +30,10 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<AuditItemListDto>>))]
-        public IHttpActionResult GetAudits([FromUri] AuditQueryFilters filters)
+        public async Task<IHttpActionResult> GetAudits([FromUri] AuditQueryFilters filters)
         {
             var items = _service.Gets(filters);
-            var itemDto = AuditMapping.AuditToListDto(items);
+            var itemDto = await AuditMapping.AuditToListDto(items);
             var response = new ApiResponse<IEnumerable<AuditItemListDto>>(itemDto)
             {
                 Meta = new Metadata

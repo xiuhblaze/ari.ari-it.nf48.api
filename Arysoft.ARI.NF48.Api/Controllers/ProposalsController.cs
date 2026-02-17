@@ -36,7 +36,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public IHttpActionResult GetProposals([FromUri] ProposalQueryFilters filters)
         {
             var items = _service.Gets(filters);
-            var itemsDto = Mappings.ProposalMapping.ProposalToListDto(items);
+            var itemsDto = ProposalMapping.ProposalToListDto(items);
             var  response = new ApiResponse<IEnumerable<ProposalItemListDto>>(itemsDto)
             {
                 Meta = new Metadata
@@ -57,8 +57,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> GetProposal(Guid id)
         {
             var item = await _service.GetAsync(id)
-                ?? throw new Exceptions.BusinessException("Item not found");
-            var itemDto = Mappings.ProposalMapping.ProposalToItemDetailDto(item);
+                ?? throw new BusinessException("Item not found");
+            var itemDto = await ProposalMapping.ProposalToItemDetailDto(item);
             var response = new ApiResponse<ProposalItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -73,7 +73,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = ProposalMapping.ItemCreateDtoToProposal(itemCreateDto);
             item = await _service.CreateAsync(item);
-            var itemDto = ProposalMapping.ProposalToItemDetailDto(item);
+            var itemDto = await ProposalMapping.ProposalToItemDetailDto(item);
             var response = new ApiResponse<ProposalItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -103,7 +103,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 filename = FileRepository.UploadFile(
                     file,
-                    $"~/files/{item.AuditCycle.OrganizationID}/Cycles/{item.AuditCycle.ID}/Proposals",
+                    $"~/files/organizations/{item.OrganizationID}/proposals",
                     item.ID.ToString(),
                     new string[] { ".docx", "xlsx", ".pdf", ".jpg", ".png" }
                 );
@@ -114,7 +114,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             itemToEdit.SignedFilename = filename ?? item.SignedFilename;
 
             item = await _service.UpdateAsync(itemToEdit);
-            var itemDto = ProposalMapping.ProposalToItemDetailDto(item);
+            var itemDto = await ProposalMapping.ProposalToItemDetailDto(item);
             var response = new ApiResponse<ProposalItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -145,7 +145,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             {
                 filename = FileRepository.UploadFile(
                     file,
-                    $"~/files/{foundItem.AuditCycle.OrganizationID}/Cycles/{foundItem.AuditCycle.ID}/Proposals",
+                    $"~/files/organizations/{foundItem.OrganizationID}/proposals",
                     foundItem.ID.ToString(),
                     new string[] { ".docx", "xlsx", ".pdf", ".jpg", ".png" }
                 );
@@ -154,7 +154,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var itemToEdit = ProposalMapping.ItemUpdateWithListDtoToProposal(itemUpdateDto);
             itemToEdit.SignedFilename = filename ?? foundItem.SignedFilename;
             var item = await _service.UpdateCompleteAsync(itemToEdit);
-            var itemDto = ProposalMapping.ProposalToItemDetailDto(item);
+            var itemDto = await ProposalMapping.ProposalToItemDetailDto(item);
             var response = new ApiResponse<ProposalItemDetailDto>(itemDto);
 
             return Ok(response);

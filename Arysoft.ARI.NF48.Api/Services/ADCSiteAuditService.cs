@@ -150,13 +150,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 foundItem = await _repository.GetAsync(item.ID);
 
-                // Solo si es PreAudit, permitir crearlo sino existe
-                if (foundItem == null)
+                // Solo si es PreAudit, permitir crearlo si es que no existe
+                if (foundItem == null) 
                 {
-                    if (item.AuditStep == AuditStepType.PreAudit)
+                    if (item.ID == Guid.Empty 
+                        && item.AuditStep == AuditStepType.PreAudit 
+                        && item.Status == StatusType.Nothing)
                     {
-                        await ValidateUpdateItemAsync(item, new ADCSiteAudit());
-
+                        await ValidateCreateItemAtList(item);
                         foundItem = CreatePreAuditItem(item);
                         _repository.Add(foundItem);
                         areUpdatedItems = true;
@@ -171,7 +172,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     areUpdatedItems = true;
                     updatedItems.Add(foundItem);
                 }
-
             }
 
             if (areUpdatedItems)
@@ -226,6 +226,35 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PRIVATE
 
+        private async Task ValidateCreateItemAtList(ADCSiteAudit item)
+        {
+            // Validations
+
+            if (item.ADCSiteID == Guid.Empty)
+                throw new BusinessException("The ADCSite is required.");
+
+            // - Validar que tenga el AuditStep
+            if (item.AuditStep == null || item.AuditStep == AuditStepType.Nothing)
+                throw new BusinessException("The Audit Step is required.");
+
+            // - Validar que no esté para ese ADCSite en mismo AuditStep
+            if (_repository.ExistsAuditStep(
+                item.ADCSiteID,
+                item.AuditStep ?? AuditStepType.Nothing,
+                Guid.Empty))
+                throw new BusinessException("The Audit Step already exists for that ADCSite");
+
+            if (!await IsValidAuditStepAsync(item.AuditStep ?? AuditStepType.Nothing, item.ADCSiteID))
+                throw new BusinessException("The Audit Step is not valid for the Audit Cycle Type of that ADCSite.");
+
+            // - Si es PreAudit, validar que tenga PreAuditDays
+            if (item.AuditStep == AuditStepType.PreAudit)
+            {
+                if (item.Days == null || item.Days < 0)
+                    throw new BusinessException("The PreAudit Days is required for this Audit Step.");
+            }
+        } // ValidateCreateItemAtList
+
         private ADCSiteAudit CreatePreAuditItem(ADCSiteAudit item)
         {
             item.ID = Guid.NewGuid();
@@ -238,7 +267,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private async Task ValidateUpdateItemAsync(ADCSiteAudit item, ADCSiteAudit foundItem)
         {
-            var _adcRepository = new ADCRepository();
+            //var _adcRepository = new ADCRepository();
 
             // Validations
 
@@ -253,54 +282,54 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.ID))
                 throw new BusinessException("The Audit Step already exists for that ADCSite");
 
-            // - De acuerdo al tipo de AuditCycle, ver si es valido el AuditStep
-            //   Initial: PreAudit, Stage1, Stage2, Surveillance1-5 (aquí se valida que PreAudit sea solo en Initial)
-            //   Recertificacion: Recertification, Surveillance1-5
-            //   Transfer: Transfer, Recertification, Surveillance1-5
+            // - Validar que el AuditStep sea válido para el tipo de AuditCycle del ADCSite
+            if (!await IsValidAuditStepAsync(item.AuditStep ?? AuditStepType.Nothing, foundItem.ADCSiteID))
+                throw new BusinessException("The Audit Step is not valid for the Audit Cycle Type of that ADCSite.");
 
-            var auditCycleType = await _adcRepository
-                .GetAuditCycleTypeByADCSiteAuditIDAsync(item.ID);
-            switch (auditCycleType)
-            {
-                case AuditCycleType.Initial:
-                    if (item.AuditStep != AuditStepType.PreAudit &&
-                        item.AuditStep != AuditStepType.Stage1 &&
-                        item.AuditStep != AuditStepType.Stage2 &&
-                        item.AuditStep != AuditStepType.Surveillance1 &&
-                        item.AuditStep != AuditStepType.Surveillance2 &&
-                        item.AuditStep != AuditStepType.Surveillance3 &&
-                        item.AuditStep != AuditStepType.Surveillance4 &&
-                        item.AuditStep != AuditStepType.Surveillance5)
-                    {
-                        throw new BusinessException("The Audit Step is not valid for the Initial Audit Cycle.");
-                    }
-                    break;
-                case AuditCycleType.Recertification:
-                    if (item.AuditStep != AuditStepType.Recertification &&
-                        item.AuditStep != AuditStepType.Surveillance1 &&
-                        item.AuditStep != AuditStepType.Surveillance2 &&
-                        item.AuditStep != AuditStepType.Surveillance3 &&
-                        item.AuditStep != AuditStepType.Surveillance4 &&
-                        item.AuditStep != AuditStepType.Surveillance5)
-                    {
-                        throw new BusinessException("The Audit Step is not valid for the Recertification Audit Cycle.");
-                    }
-                    break;
-                case AuditCycleType.Transfer:
-                    if (item.AuditStep != AuditStepType.Transfer &&
-                        item.AuditStep != AuditStepType.Recertification &&
-                        item.AuditStep != AuditStepType.Surveillance1 &&
-                        item.AuditStep != AuditStepType.Surveillance2 &&
-                        item.AuditStep != AuditStepType.Surveillance3 &&
-                        item.AuditStep != AuditStepType.Surveillance4 &&
-                        item.AuditStep != AuditStepType.Surveillance5)
-                    {
-                        throw new BusinessException("The Audit Step is not valid for the Transfer Audit Cycle.");
-                    }
-                    break;
-                default:
-                    throw new BusinessException("The Audit Cycle Type is not valid.");
-            }
+            // xBlaze: Por borrar, se mandó al metodo IsValidAuditStepAsync
+            //var auditCycleType = await _adcRepository
+            //    .GetAuditCycleTypeByADCSiteAuditIDAsync(item.ID);
+            //switch (auditCycleType)
+            //{
+            //    case AuditCycleType.Initial:
+            //        if (item.AuditStep != AuditStepType.PreAudit &&
+            //            item.AuditStep != AuditStepType.Stage1 &&
+            //            item.AuditStep != AuditStepType.Stage2 &&
+            //            item.AuditStep != AuditStepType.Surveillance1 &&
+            //            item.AuditStep != AuditStepType.Surveillance2 &&
+            //            item.AuditStep != AuditStepType.Surveillance3 &&
+            //            item.AuditStep != AuditStepType.Surveillance4 &&
+            //            item.AuditStep != AuditStepType.Surveillance5)
+            //        {
+            //            throw new BusinessException("The Audit Step is not valid for the Initial Audit Cycle.");
+            //        }
+            //        break;
+            //    case AuditCycleType.Recertification:
+            //        if (item.AuditStep != AuditStepType.Recertification &&
+            //            item.AuditStep != AuditStepType.Surveillance1 &&
+            //            item.AuditStep != AuditStepType.Surveillance2 &&
+            //            item.AuditStep != AuditStepType.Surveillance3 &&
+            //            item.AuditStep != AuditStepType.Surveillance4 &&
+            //            item.AuditStep != AuditStepType.Surveillance5)
+            //        {
+            //            throw new BusinessException("The Audit Step is not valid for the Recertification Audit Cycle.");
+            //        }
+            //        break;
+            //    case AuditCycleType.Transfer:
+            //        if (item.AuditStep != AuditStepType.Transfer &&
+            //            item.AuditStep != AuditStepType.Recertification &&
+            //            item.AuditStep != AuditStepType.Surveillance1 &&
+            //            item.AuditStep != AuditStepType.Surveillance2 &&
+            //            item.AuditStep != AuditStepType.Surveillance3 &&
+            //            item.AuditStep != AuditStepType.Surveillance4 &&
+            //            item.AuditStep != AuditStepType.Surveillance5)
+            //        {
+            //            throw new BusinessException("The Audit Step is not valid for the Transfer Audit Cycle.");
+            //        }
+            //        break;
+            //    default:
+            //        throw new BusinessException("The Audit Cycle Type is not valid.");
+            //}
 
         } // validateUpdateItem 
 
@@ -308,10 +337,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             foundItem.Value = item.Value;
             foundItem.AuditStep = item.AuditStep;
-            if (item.AuditStep == AuditStepType.PreAudit)
-                foundItem.PreAuditDays = item.PreAuditDays;
-            if (item.AuditStep == AuditStepType.Stage1)
-                foundItem.Stage1Days = item.Stage1Days;
+            foundItem.Days = item.Days ?? 0;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing
@@ -321,5 +347,76 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.UpdatedUser = item.UpdatedUser;
 
         } // SetValuesUpdateItem
+
+        /// <summary>
+        /// Determina si el auditStep es válido para el tipo de AuditCycle del ADCSite
+        ///  - De acuerdo al tipo de AuditCycle, ver si es valido el AuditStep
+        ///    Initial: PreAudit, Stage1, Stage2, Surveillance1-5 (aquí se valida que PreAudit sea solo en Initial)
+        ///    Recertificacion: Recertification, Surveillance1-5
+        ///    Transfer: Transfer, Recertification, Surveillance1-5
+        /// </summary>
+        /// <param name="auditStep">Audit step a validar</param>
+        /// <param name="adcSiteID">
+        /// Identificador del ADCSite para obtener el ADC   con ello el tipo 
+        /// de ciclo.
+        /// </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 19-01-2026
+        /// Ultima Modificacion: 19-01-2026
+        /// </remarks>
+        private async Task<bool> IsValidAuditStepAsync(AuditStepType auditStep, Guid adcSiteID)
+        {
+            var _adcRepository = new ADCRepository();
+
+            var auditCycleType = await _adcRepository
+                .GetAuditCycleTypeByADCSiteIDAsync(adcSiteID);
+
+            switch (auditCycleType)
+            { 
+                case AuditCycleType.Nothing:
+                    throw new BusinessException("The Audit Cycle Type is not valid or was not found.");
+
+                case AuditCycleType.Initial:
+                    if (auditStep != AuditStepType.PreAudit &&
+                        auditStep != AuditStepType.Stage1 &&
+                        auditStep != AuditStepType.Stage2 &&
+                        auditStep != AuditStepType.Surveillance1 &&
+                        auditStep != AuditStepType.Surveillance2 &&
+                        auditStep != AuditStepType.Surveillance3 &&
+                        auditStep != AuditStepType.Surveillance4 &&
+                        auditStep != AuditStepType.Surveillance5)
+                    {
+                        return false;
+                    }
+                    break;
+                case AuditCycleType.Recertification:
+                    if (auditStep != AuditStepType.Recertification &&
+                        auditStep != AuditStepType.Surveillance1 &&
+                        auditStep != AuditStepType.Surveillance2 &&
+                        auditStep != AuditStepType.Surveillance3 &&
+                        auditStep != AuditStepType.Surveillance4 &&
+                        auditStep != AuditStepType.Surveillance5)
+                    {
+                        return false;
+                    }
+                    break;
+                case AuditCycleType.Transfer:
+                    if (auditStep != AuditStepType.Transfer &&
+                        auditStep != AuditStepType.Recertification &&
+                        auditStep != AuditStepType.Surveillance1 &&
+                        auditStep != AuditStepType.Surveillance2 &&
+                        auditStep != AuditStepType.Surveillance3 &&
+                        auditStep != AuditStepType.Surveillance4 &&
+                        auditStep != AuditStepType.Surveillance5)
+                    {
+                        return false;
+                    }
+                    break;
+            }
+
+            return true;
+        } // IsValidAuditStepAsync
     }
 }

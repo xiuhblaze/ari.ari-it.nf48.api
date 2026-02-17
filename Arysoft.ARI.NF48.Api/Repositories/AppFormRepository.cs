@@ -20,15 +20,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         public async Task<CycleYearType> GetNextCycleYearAsync(
             Guid auditCycleID, 
-            Guid standardID,
             AuditCyclePeriodicityType periodicity
-            )
+        )
         {
             var auditCycleRepository = _context.Set<AuditCycle>();
 
             var appFormsInCycle = await _model
                 .Where(m => m.AuditCycleID == auditCycleID 
-                    && m.StandardID == standardID
                     && m.Status > AppFormStatusType.Nothing
                     && m.Status < AppFormStatusType.Cancel
                 ).OrderBy(m => m.CycleYear)
@@ -65,6 +63,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             return nextCycleYear;
         } // GetNextCycleYearAsync
 
+        /// <summary>
+        /// Indica si existe algún AppForm válido en un ciclo de auditoría, excluyendo un ID concreto
+        /// </summary>
+        /// <param name="auditCycleID"></param>
+        /// <param name="exeptionID"></param>
+        /// <returns></returns>
         public async Task<bool> ExistsValidAppFormAsync(
             Guid auditCycleID, 
             Guid? exeptionID = null
@@ -101,6 +105,26 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await query.AnyAsync();
         } // ExistsValidCycleYearAppForm
+
+        /// <summary>
+        /// Marca como inactivos todos los AppForms de un ciclo de auditoría
+        /// xBlaze: creo que no se va a necesitar, pues se valida que no exista un appForm activo
+        /// antes de activar uno nuevo.
+        /// </summary>
+        /// <param name="auditCycleID"></param>
+        /// <returns></returns>
+        public async Task InactiveAllAppFormsFromAuditCycle(Guid auditCycleID)
+        {
+            var appForms = await _model
+                .Where(m => m.AuditCycleID == auditCycleID
+                    && m.Status > AppFormStatusType.Nothing
+                    && m.Status < AppFormStatusType.Inactive)
+                .ToListAsync();
+            foreach (var appForm in appForms)
+            {
+                appForm.Status = AppFormStatusType.Inactive;
+            }
+        } // InactiveAllAppFormsFromAuditCycle
 
         public new void Delete(AppForm item)
         {

@@ -66,17 +66,35 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
+                case AuditCycleOrderType.Standard:
+                    items = items.OrderBy(e => e.Standard.Name)
+                        .ThenBy(e => e.Status);
+                    break;
+                case AuditCycleOrderType.Name:
+                    items = items.OrderBy(e => e.Name)
+                        .ThenBy(e => e.Status);
+                    break;
                 case AuditCycleOrderType.Date:
                     items = items.OrderBy(e => e.StartDate);
+                    break;
+                case AuditCycleOrderType.Status:
+                    items = items.OrderBy(e => e.Status)
+                        .ThenByDescending(e => e.StartDate);
+                    break;
+                case AuditCycleOrderType.StandardDesc:
+                    items = items.OrderByDescending(e => e.Standard.Name)
+                        .ThenBy(e => e.Status);
+                    break;
+                case AuditCycleOrderType.NameDesc:
+                    items = items.OrderByDescending(e => e.Name)
+                        .ThenBy(e => e.Status);
                     break;
                 case AuditCycleOrderType.DateDesc:
                     items = items.OrderByDescending(e => e.StartDate);
                     break;
-                case AuditCycleOrderType.Status:
-                    items = items.OrderBy(e => e.Status);
-                    break;
                 case AuditCycleOrderType.StatusDesc:
-                    items = items.OrderByDescending(e => e.Status);
+                    items = items.OrderByDescending(e => e.Status)
+                        .ThenByDescending(e => e.StartDate);
                     break;
                 default:
                     items = items.OrderByDescending(e => e.StartDate);

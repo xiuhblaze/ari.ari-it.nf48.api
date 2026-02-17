@@ -32,13 +32,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Filters
 
             if (filters.AuditCycleID != null && filters.AuditCycleID != Guid.Empty)
-                items = items.Where(m => m.AuditCycleID == filters.AuditCycleID);
+                items = items.Where(i => 
+                    i.ADCs.Where(adc => adc.AuditCycleID == filters.AuditCycleID).Any()
+                );
 
             if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
-                items = items.Where(m => 
-                    m.AuditCycle != null 
-                    && m.AuditCycle.OrganizationID == filters.OrganizationID
-                );
+                items = items.Where(i => i.OrganizationID == filters.OrganizationID);
 
             if (!string.IsNullOrEmpty(filters.Text))
             {
@@ -47,8 +46,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     (m.Justification != null && m.Justification.ToLower().Contains(filters.Text))
                     || (m.SignerName != null && m.SignerName.ToLower().Contains(filters.Text))
                     || (m.SignerPosition != null && m.SignerPosition.ToLower().Contains(filters.Text))
-                    || (m.HistoricalDataJSON != null && m.HistoricalDataJSON.ToLower().Contains(filters.Text))
+                    //|| (m.HistoricalDataJSON != null && m.HistoricalDataJSON.ToLower().Contains(filters.Text))
                     || (m.UpdatedUser != null && m.UpdatedUser.ToLower().Contains(filters.Text))
+                    || (m.Organization != null & m.Organization.Name != null && m.Organization.Name.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -98,9 +98,19 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Proposal> GetAsync(Guid id, bool asNoTracking = false)
         {
-            // TODO: Analizar alertas 
+            var item = await _repository.GetAsync(id, asNoTracking)
+                ?? throw new BusinessException("The record does not exist.");
 
-            return await _repository.GetAsync(id, asNoTracking);
+            if (item.Status <= ProposalStatusType.Rejected)
+            {
+                await AddOrUpdateStepsAsync(item);
+                await CalculateStepsTotalsAsync(item);
+
+                item = await _repository.GetAsync(id, asNoTracking)
+                    ?? throw new BusinessException("The record does not exist after updating steps.");
+            }
+
+            return item; //await _repository.GetAsync(id, asNoTracking);
         } // GetAsync
 
         public async Task<Proposal> CreateAsync(Proposal item)
@@ -121,19 +131,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             catch (Exception ex)
             {
                 throw new BusinessException($"ProposalService.CreateAsync: {ex.Message}");
-            }
-
-            // Agregar los ProposalAudits si solo hay un (1) ADC disponible en el auditcycle
-            if (await adcRepository
-                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID) == 1)
-            {
-                // Agregar los ProposalAudits y asociar en el ADC la propuesta (ProposalID)
-                var adcID = await adcRepository.GetADCIDAvailableByAuditCycleAsync(item.AuditCycleID);
-                await AddADCAsync(item, adcID);
-
-                // Reload item
-                item = await _repository.GetAsync(item.ID)
-                    ?? throw new BusinessException("The Proposal was not found after add audit steps totals");
             }
 
             return item;
@@ -193,7 +190,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.ProposalAudits = listProposalAudits;
 
-            // Recalcular los totales de los steps
+            // Calcular los totales de los steps
             await CalculateStepsTotalsAsync(foundItem);
 
             // Reload item
@@ -248,16 +245,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("ADC record not found");
 
             // Validar que no este el ADC ya asociado
-            if (adc.ProposalID != null && adc.ProposalID != Guid.Empty)
+            if (adc.ProposalID != null && adc.ProposalID != Guid.Empty
+                && adc.Proposal.Status != ProposalStatusType.Nothing)
                 throw new BusinessException("The ADC is already associated with a proposal.");
 
-            // Validar que sea del mismo AuditCycle
-            if (adc.AuditCycleID != foundItem.AuditCycleID)
-                throw new BusinessException("The ADC does not belong to the same Audit Cycle as the proposal.");
-
-            await AddStepsFromADCAsync(foundItem, adc);
             await adcService.UpdateProposalIDAsync(adc.ID, item.ID, item.UpdatedUser);
             
+            //await AddStepsFromADCAsync(foundItem, adc);
+            await AddOrUpdateStepsAsync(foundItem);
             await CalculateStepsTotalsAsync(foundItem);
 
         } // AddADCAsync
@@ -279,8 +274,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             await adcService.RemoveProposalIDAsync(adcID, item.UpdatedUser);            
             await RemoveAllStepsAsync(foundItem.ID);
-            await AddAllStepsAsync(foundItem);
 
+            //await AddAllStepsAsync(foundItem);
+            await AddOrUpdateStepsAsync(foundItem);
             await CalculateStepsTotalsAsync(foundItem);
         } // RemoveADCAsync
 
@@ -292,23 +288,17 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var adcRepository = new ADCRepository();
 
-            // - Validar que exista al menos un ADC disponible en el auditcycle para asociar
+            // - Validar que exista al menos un ADC disponible en la Organización para asociar
             var countADCs = await adcRepository
-                .CountADCsAvailableByAuditCycleAsync(item.AuditCycleID);
+                .CountADCsAvailableByOrganizationAsync(item.OrganizationID);
 
             if (countADCs == 0)
                 throw new BusinessException("There are no ADCs available to be associated with the proposal.");
 
-            if (countADCs == 1)
-            { 
-                // - Validar que no exista otra propuesta activa para el mismo ciclo de auditoría, pues solo hay un ADC
-                if (await _repository.ExistsActiveProposalForAuditCycleAsync(item.AuditCycleID))
-                    throw new BusinessException("There is already an active proposal for the selected audit cycle.");
-            }
-
             // - Validar que el auditcycle y la organization esten activos
-            if (!await _repository.HasValidParentsForCreateAsync(item))
-                throw new BusinessException("The Organization or Audit cycle records are not valid.");
+            // TODO: Esta validación también se va a transladar al momento de asignar un ADC a la Propuesta
+            //if (!await _repository.HasValidParentsForCreateAsync(item))
+            //    throw new BusinessException("The Organization or Audit cycle records are not valid.");
 
         } // ValidateNewItem
 
@@ -465,22 +455,124 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The ADC does not have the main site");
             bool hasChanges = false;
 
-            foreach (var adcSiteAudit in mainADCSite.ADCSiteAudits
-                .Where(asa => asa.Status == StatusType.Active))
+            // Lista temporal con par (AuditStep, Days)
+            var auditStepDays = new List<(AuditStepType AuditStep, decimal Days)>();
+
+            // Recolectar los días de todos los ADCSite del ADC
+            foreach (var adcSite in adc.ADCSites
+                .Where(adcs => adcs.Status == StatusType.Active))
             {
-                if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+                foreach (var adcSiteAudit in adcSite.ADCSiteAudits
+                    .Where(asa => asa.Status == StatusType.Active))
+                {
+                    if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+                    var step = adcSiteAudit.AuditStep ?? AuditStepType.Nothing;
+                    var days = (decimal)(adcSiteAudit.Days ?? 0);
+                    var idx = auditStepDays.FindIndex(x => x.AuditStep == step);
+                    if (idx >= 0)
+                    {
+                        var (AuditStep, Days) = auditStepDays[idx];
+                        auditStepDays[idx] = (AuditStep, Days + days);
+                    }
+                    else
+                    {
+                        auditStepDays.Add((step, days));
+                    }
+                }
+            }
 
-                // Validar si existe ya el ProposalAudit
+            //// Recolectar desde el main site del ADC actual
+            //foreach (var adcSiteAudit in mainADCSite.ADCSiteAudits
+            //    .Where(asa => asa.Status == StatusType.Active))
+            //{
+            //    if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+
+            //    var step = adcSiteAudit.AuditStep ?? AuditStepType.Nothing;
+            //    var days = (decimal)(adcSiteAudit.Days ?? 0);
+
+            //    var idx = auditStepDays.FindIndex(x => x.AuditStep == step);
+            //    if (idx >= 0)
+            //    {
+            //        var (AuditStep, Days) = auditStepDays[idx];
+            //        auditStepDays[idx] = (AuditStep, Days + days);
+            //    }
+            //    else
+            //    {
+            //        auditStepDays.Add((step, days));
+            //    }
+            //}
+
+            // Incluir ADCS ya asociados a la propuesta (si existen) y acumular días
+            var adcsByProposal = adcRepository.Gets()
+                .Where(a => a.ProposalID == proposal.ID
+                    && a.Status == ADCStatusType.Active);
+
+            foreach (var adcByProposal in adcsByProposal)
+            {
+                var mainSiteByProposal = adcByProposal.ADCSites
+                    .Where(adcs => adcs.Status == StatusType.Active
+                        && adcs.Site.IsMainSite)
+                    .FirstOrDefault()
+                    ?? throw new BusinessException("The ADC associated with the proposal does not have the main site");
+
+                foreach (var adcSite in adcByProposal.ADCSites
+                    .Where(adcs => adcs.Status == StatusType.Active))
+                    {
+                        foreach (var adcSiteAudit in adcSite.ADCSiteAudits
+                            .Where(asa => asa.Status == StatusType.Active))
+                        {
+                            if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+                            var step = adcSiteAudit.AuditStep ?? AuditStepType.Nothing;
+                            var days = (decimal)(adcSiteAudit.Days ?? 0);
+                            var idx = auditStepDays.FindIndex(x => x.AuditStep == step);
+                            if (idx >= 0)
+                            {
+                                var (AuditStep, Days) = auditStepDays[idx];
+                                auditStepDays[idx] = (AuditStep, Days + days);
+                            }
+                            else
+                            {
+                                auditStepDays.Add((step, days));
+                            }
+                        }
+                    }
+
+                //foreach (var adcSiteAudit in mainSiteByProposal.ADCSiteAudits
+                //    .Where(asa => asa.Status == StatusType.Active))
+                //{
+                //    if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+
+                //    var step = adcSiteAudit.AuditStep ?? AuditStepType.Nothing;
+                //    var days = (decimal)(adcSiteAudit.Days ?? 0);
+
+                //    var idx = auditStepDays.FindIndex(x => x.AuditStep == step);
+                //    if (idx >= 0)
+                //    {
+                //        var (AuditStep, Days) = auditStepDays[idx];
+                //        auditStepDays[idx] = (AuditStep, Days + days);
+                //    }
+                //    else
+                //    {
+                //        auditStepDays.Add((step, days));
+                //    }
+                //}
+            }
+
+            // Ahora usa auditStepDays para crear/actualizar ProposalAudits
+            foreach (var entry in auditStepDays)
+            {
+                // ejemplo: obtener el proposalAudit por step y asignar TotalAuditDays = entry.Days
                 var proposalAudit = await proposalAuditRepository
-                    .GetByProposalAndStepAsync(proposal.ID, adcSiteAudit.AuditStep ?? AuditStepType.Nothing);
+                    .GetByProposalAndStepAsync(proposal.ID, entry.AuditStep);
 
-                if (proposalAudit == null) // Si no existe, crearlo
+                if (proposalAudit == null)
                 {
                     proposalAudit = new ProposalAudit
                     {
                         ID = Guid.NewGuid(),
                         ProposalID = proposal.ID,
-                        AuditStep = adcSiteAudit.AuditStep,
+                        AuditStep = entry.AuditStep,
+                        TotalAuditDays = entry.Days,
                         Status = StatusType.Active,
                         Created = DateTime.UtcNow,
                         Updated = DateTime.UtcNow,
@@ -489,7 +581,70 @@ namespace Arysoft.ARI.NF48.Api.Services
                     proposalAuditRepository.Add(proposalAudit);
                     hasChanges = true;
                 }
+                else
+                {
+                    // si ya existe actualizar días si es necesario
+                    if (proposalAudit.TotalAuditDays != entry.Days)
+                    {
+                        proposalAudit.TotalAuditDays = entry.Days;
+                        proposalAudit.Updated = DateTime.UtcNow;
+                        proposalAudit.UpdatedUser = proposal.UpdatedUser;
+                        proposalAuditRepository.Update(proposalAudit);
+                        hasChanges = true;
+                    }
+                }
             }
+
+            //// Esta parte es cuando haya multiples ADCs asociados a la Propuesta
+            //var adcsByProposal = adcRepository.Gets()
+            //    .Where(a => a.ProposalID == proposal.ID
+            //        && a.Status == ADCStatusType.Active);
+
+            //foreach (var adcByProposal in adcsByProposal)
+            //{ 
+            //    var mainSiteByProposal = adcByProposal.ADCSites
+            //        .Where(adcs => adcs.Status == StatusType.Active
+            //            && adcs.Site.IsMainSite)
+            //        .FirstOrDefault()
+            //        ?? throw new BusinessException("The ADC associated with the proposal does not have the main site");
+            //    foreach (var adcSiteAudit in mainSiteByProposal.ADCSiteAudits
+            //        .Where(asa => asa.Status == StatusType.Active))
+            //    {
+            //        if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+            //        if (!auditSteps.Contains(adcSiteAudit.AuditStep ?? AuditStepType.Nothing))
+            //            auditSteps.Add(adcSiteAudit.AuditStep ?? AuditStepType.Nothing);
+            //    }
+            //}
+
+
+            //foreach (var adcSiteAudit in mainADCSite.ADCSiteAudits
+            //    .Where(asa => asa.Status == StatusType.Active))
+            //{
+            //    if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+
+            //    // Si es Preaudit
+
+            //    // Validar si existe ya el ProposalAudit
+            //    var proposalAudit = await proposalAuditRepository
+            //        .GetByProposalAndStepAsync(proposal.ID, adcSiteAudit.AuditStep ?? AuditStepType.Nothing);
+
+            //    if (proposalAudit == null) // Si no existe, crearlo
+            //    {
+            //        proposalAudit = new ProposalAudit // TODO: Verificar esto para que lleven los días de Auditoria indicados
+            //        {
+            //            ID = Guid.NewGuid(),
+            //            ProposalID = proposal.ID,
+            //            AuditStep = adcSiteAudit.AuditStep,
+            //            TotalAuditDays = adcSiteAudit.Days ?? 0, // Porque existe preaudit y stage 1 con posibles valores
+            //            Status = StatusType.Active,
+            //            Created = DateTime.UtcNow,
+            //            Updated = DateTime.UtcNow,
+            //            UpdatedUser = proposal.UpdatedUser
+            //        };
+            //        proposalAuditRepository.Add(proposalAudit);
+            //        hasChanges = true;
+            //    }
+            //}
 
             if (hasChanges)
             {
@@ -515,6 +670,92 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await AddStepsFromADCAsync(proposal, adc);
             }
         } // AddAllStepsAsync
+
+        private async Task AddOrUpdateStepsAsync(Proposal proposal)
+        {
+            var adcRepository = new ADCRepository();
+            var proposalAuditRepository = new ProposalAuditRepository();
+            bool hasChanges = false;
+
+            var auditStepDays = new List<(AuditStepType AuditStep, decimal Days)>();
+
+            var adcs = await adcRepository
+                .GetsByProposalAsync(proposal.ID);
+
+            foreach (var adc in adcs.Where(a => a.Status == ADCStatusType.Active))
+            { 
+                foreach (var adcSite in adc.ADCSites
+                    .Where(adcSite => adcSite.Status == StatusType.Active))
+                {
+                    foreach (var adcSiteAudit in adcSite.ADCSiteAudits
+                        .Where(asa => asa.Status == StatusType.Active))
+                    {
+                        if (adcSiteAudit.AuditStep == AuditStepType.Nothing) continue;
+                        var step = adcSiteAudit.AuditStep ?? AuditStepType.Nothing;
+                        var days = (decimal)(adcSiteAudit.Days ?? 0);
+                        var idx = auditStepDays.FindIndex(x => x.AuditStep == step);
+                        if (idx >= 0)
+                        {
+                            var (AuditStep, Days) = auditStepDays[idx];
+                            auditStepDays[idx] = (AuditStep, Days + days);
+                        }
+                        else
+                        {
+                            auditStepDays.Add((step, days));
+                        }
+                    }
+                }
+            }
+
+            // Ahora usa auditStepDays para crear/actualizar ProposalAudits
+            foreach (var entry in auditStepDays)
+            {
+                var proposalAudit = await proposalAuditRepository
+                    .GetByProposalAndStepAsync(proposal.ID, entry.AuditStep);
+                if (proposalAudit == null)
+                {
+                    proposalAudit = new ProposalAudit
+                    {
+                        ID = Guid.NewGuid(),
+                        ProposalID = proposal.ID,
+                        AuditStep = entry.AuditStep,
+                        TotalAuditDays = entry.Days,
+                        Status = StatusType.Active,
+                        Created = DateTime.UtcNow,
+                        Updated = DateTime.UtcNow,
+                        UpdatedUser = proposal.UpdatedUser
+                    };
+
+                    proposalAuditRepository.Add(proposalAudit);
+                    hasChanges = true;
+                }
+                else
+                {
+                    // si ya existe actualizar días si es necesario
+                    if (proposalAudit.TotalAuditDays != entry.Days)
+                    {
+                        proposalAudit.TotalAuditDays = entry.Days;
+                        proposalAudit.Updated = DateTime.UtcNow;
+                        proposalAudit.UpdatedUser = proposal.UpdatedUser;
+
+                        proposalAuditRepository.Update(proposalAudit);
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            if (hasChanges)
+            {
+                try
+                {
+                    await proposalAuditRepository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ProposalService.AddOrUpdateStepsAsync: {ex.Message}");
+                }
+            }
+        } // AddOrUpdateStepsAsync
 
         private async Task RemoveAllStepsAsync(Guid proposalID)
         {
@@ -544,14 +785,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var adcs = await adcRepository
                 .GetsByProposalAsync(proposal.ID);
-            //var hasStage1 = proposalAuditSteps
-            //    .Where(pas => pas.AuditStep == AuditStepType.Stage1)
-            //    .Any();
+            //var proposalAuditStage1 = proposalAuditSteps
+            //    .Where(pas => pas.AuditStep == AuditStepType.Stage1);
 
             foreach (var proposalAudit in proposalAuditSteps)
-            {
+            {                
                 var adcSiteList = new List<ADCSite>();
 
+                // Obteniendo los sites que tienen el step de todos los ADCs
+                // asociados a la propuesta
                 foreach (var adc in adcs.Where(a => a.Status == ADCStatusType.Active))
                 {
                     var adcSites = adc.ADCSites
@@ -568,23 +810,33 @@ namespace Arysoft.ARI.NF48.Api.Services
                             adcSiteList.Add(adcSite);
                         }
                     }
-                } // Obteniendo los sites que tienen el step
-                
+                }
+
                 decimal totalAuditDays = 0;
                 foreach (var adcSite in adcSiteList)
                 {
-                    //proposalAudit.TotalAuditDays = proposalAudit.TotalAuditDays ?? 0;
                     switch (proposalAudit.AuditStep)
-                    { 
-                        //case AuditStepType.Stage1:
-                        //    //proposalAudit.TotalAuditDays = 1;
-                        //    totalAuditDays += 1;
-                        //    break;
+                    {
+                        // case AuditStepType.PreAudit: // La suma ya viene desde AddOrUpdateStepsAsync
+                        // case AuditStepType.Stage1: // La suma ya viene desde AddOrUpdateStepsAsync
                         case AuditStepType.Stage2:
-                            //if (hasStage1)
-                            //    totalAuditDays += adcSite.Total - 1 ?? 0;
-                            //else
-                            totalAuditDays += adcSite.Total ?? 0;
+                            
+                            // Revisar si stage1 existe y se va auditar para ese sitio,
+                            // si es así, restar lo que contenga en adcSiteAudit.Days
+                            var stage1 = adcSite.ADCSiteAudits
+                                .Where(asa => asa.Status == StatusType.Active
+                                    && (asa.Value.HasValue && asa.Value.Value)
+                                    && asa.AuditStep == AuditStepType.Stage1)
+                                .FirstOrDefault();
+                            if (stage1 != null)
+                            {
+                                totalAuditDays += (adcSite.Total ?? 0) - (stage1.Days ?? 0);
+                            }
+                            else
+                            { 
+                                totalAuditDays += adcSite.Total ?? 0;
+                            }
+
                             break;
                         case AuditStepType.Recertification:
                             totalAuditDays += adcSite.Recertification ?? 0;
@@ -599,17 +851,21 @@ namespace Arysoft.ARI.NF48.Api.Services
                     }
                 } // Por cada step, sumar el total de días de ese step
 
-                if (proposalAudit.AuditStep == AuditStepType.Stage2 && totalAuditDays < 2)
-                    totalAuditDays = 2; // Mínimo 2 días para Stage 2
+                // TODO: Ahora la suma de stage 1 y stage 2 debe ser al menos 2 días, ver
+                // como validar eso o desde el frontend.
+                //if (proposalAudit.AuditStep == AuditStepType.Stage2 && totalAuditDays < 2)
+                //    totalAuditDays = 2; // Mínimo 2 días para Stage 2
 
-                proposalAudit.TotalAuditDays = totalAuditDays;
-
+                if (proposalAudit.AuditStep != AuditStepType.PreAudit &&
+                    proposalAudit.AuditStep != AuditStepType.Stage1) 
+                { 
+                    proposalAudit.TotalAuditDays = totalAuditDays;
+                }
                 proposalAudit.Updated = DateTime.UtcNow;
                 proposalAudit.UpdatedUser = proposal.UpdatedUser;
+
                 proposalAuditRepository.Update(proposalAudit);
                 hasChanges = true;
-
-                // TODO: Falta guardar los datos nuevos y ver si falta algun step para agregarlo
             }
 
             if (hasChanges)
@@ -631,8 +887,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var historicalData = new
             {
-                OrganizationName = item.AuditCycle?.Organization?.Name ?? string.Empty,
-                AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
+                OrganizationName = item.Organization?.Name ?? string.Empty,
+                //AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
                 AppForm = new {
                     MainSiteAddress = "",
                     LegalEntities = "", // array
@@ -641,13 +897,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                     ContactName = "",
                     EMail = ""
                 },
-                ADC = new { 
-                    Description = "",
-                    TotalEmployees = 0,
-                    TotalInitial = 0,
-                    TotalMD11 = 0,
-                    TotalSurveillance = 0,                    
-                },
+                ADCs = item.ADCs?
+                    .Where(adc => adc.Status == ADCStatusType.Active)
+                    .Select(adc => new
+                    {
+                        adc.Description,
+                        adc.TotalEmployees,
+                        TotalInitial = 0,
+                        TotalMD11 = 0,
+                        TotalSurveillance = 0
+                    })
                 //Sites = item.ProposalSites?
                 //    .Where(ps => ps.Status == StatusType.Active)
                 //    .Select(ps => new { 

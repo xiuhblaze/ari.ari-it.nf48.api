@@ -9,17 +9,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 {
     public class AuditMapping
     {
-        public static IEnumerable<AuditItemListDto> AuditToListDto(IEnumerable<Audit> items)
+        public static async Task<IEnumerable<AuditItemListDto>> AuditToListDto(IEnumerable<Audit> items)
         { 
             var itemsDto = new List<AuditItemListDto>();
             foreach (var item in items)
             {
-                itemsDto.Add(AuditToItemListDto(item));
+                itemsDto.Add(await AuditToItemListDto(item));
             }
             return itemsDto;
         } // AuditToListDto
 
-        public static AuditItemListDto AuditToItemListDto(Audit item)
+        public static async Task<AuditItemListDto> AuditToItemListDto(Audit item)
         {
             return new AuditItemListDto
             { 
@@ -65,7 +65,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         && aa.Status != StatusType.Deleted))
                     : null,
                 Standards = item.AuditStandards != null
-                    ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
+                    ? await AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
                         asd.Status != StatusType.Nothing
                         && asd.Status != StatusType.Deleted))
                     : null,
@@ -119,7 +119,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         && n.Status != StatusType.Deleted))
                     : null,
                 Standards = item.AuditStandards != null
-                    ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
+                    ? await AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
                         asd.Status != StatusType.Nothing
                         && asd.Status != StatusType.Deleted))
                     : null,

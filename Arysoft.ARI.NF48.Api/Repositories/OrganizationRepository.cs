@@ -1,6 +1,8 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +11,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class OrganizationRepository : BaseRepository<Organization>
     {
+        public new IEnumerable<Organization> Gets()
+        { 
+            return _model
+                .Include(o => o.AuditCycles)
+                .AsEnumerable();
+        } // Gets
+
         public async Task<Organization> GetAsync(int folio)
         {
             return await _model
@@ -38,6 +47,28 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await response.AnyAsync();
         } // ExistOrganizationNameAsync
+
+        /// <summary>
+        /// Indica si una organización tiene más de un estándar activo asociado.
+        /// </summary>
+        /// <param name="id">Identificador de la organización</param>
+        /// <returns>True si tiene más de un standard de lo contrario False</returns>
+        /// <remarks>
+        /// Autor: xBlaze
+        /// Creacion: 2026-01-28
+        /// Ultima Modificacion: 2026-01-28
+        /// </remarks>
+        public async Task<bool> IsMultiStandard(Guid id)
+        {
+            var organization = await _model
+                .Include(o => o.OrganizationStandards)
+                .FirstOrDefaultAsync(o => o.ID == id)
+                ?? throw new BusinessException("The organization not found");
+            var activeStandardsCount = organization.OrganizationStandards
+                .Count(s => s.Status == StatusType.Active);
+
+            return activeStandardsCount > 1;
+        } // IsMultiStandard
 
         public new async Task DeleteTmpByUserAsync(string username)
         {
