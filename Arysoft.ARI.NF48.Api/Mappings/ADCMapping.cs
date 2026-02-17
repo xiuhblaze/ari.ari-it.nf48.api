@@ -63,6 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 AuditCycleID = item.AuditCycleID,
                 AppFormID = item.AppFormID,
+                StandardID = item.StandardID,
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
                 Description = item.Description,
@@ -93,6 +94,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         item.ADCSites.OrderByDescending(x => x.Site?.IsMainSite)
                             .ThenBy(x => x.Site?.Description)
                         ).ToList()
+                    : null,
+                Standard = item.Standard != null
+                    ? StandardMapping.StandardToItemListDto(item.Standard)
                     : null,
                 Proposal = item.Proposal != null
                     ? ProposalMapping.ProposalToItemListDto(item.Proposal)

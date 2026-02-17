@@ -91,9 +91,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             return pagedItems;
         } // Gets
 
-        public async Task<ADC> GetAsync(Guid id)
+        public async Task<ADC> GetAsync(Guid id, bool asNoTracking = false)
         {
-            var item = await _repository.GetAsync(id)
+            var item = await _repository.GetAsync(id, asNoTracking)
                 ?? throw new BusinessException("The ADC was not found.");
 
             if (item.Status < ADCStatusType.Inactive)

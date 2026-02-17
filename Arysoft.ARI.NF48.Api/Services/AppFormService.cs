@@ -170,6 +170,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AppFormService.AddAsync: {ex.Message}");
             }
 
+            item = await _repository.GetAsync(item.ID, true); // Obtener el item con las relaciones cargadas
+
             return item;
         } // AddAsync
 
@@ -680,6 +682,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (auditCycle.Status != StatusType.Active 
                 && auditCycle.Status != StatusType.Inactive)
                 throw new BusinessException("The selected audit cycle is not valid");
+
+            // - Validar que el ciclo no sea del pasado
+            if (auditCycle.EndDate < DateTime.Today)
+                throw new BusinessException("Can't create Application Forms for an Audit Cycle that is outdated.");
 
             if (await _repository.ExistsValidAppFormAsync(auditCycle.ID))
                 throw new BusinessException("There is already an active Application Form for this standard cycle");

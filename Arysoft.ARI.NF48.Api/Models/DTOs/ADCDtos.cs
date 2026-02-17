@@ -123,6 +123,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public AuditCycleItemListDto AuditCycle { get; set; }
 
+        public StandardItemListDto Standard { get; set; }
+
         public ProposalItemListDto Proposal { get; set; }
 
         public ICollection<ADCSiteItemListDto> ADCSites { get; set; }

@@ -48,10 +48,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 .Where(ads => ads.Status != StatusType.Nothing).ToList();
             var auditStandardsDto = new List<AuditStandardItemListDto>();
 
-            foreach (var auditStandard in auditStandards)
-            {
-                var auditStandardDto = await AuditStandardMapping.AuditStandardToItemListDto(auditStandard);
-                auditStandardsDto.Add(auditStandardDto);
+            if (auditStandards != null)
+            { 
+                foreach (var auditStandard in auditStandards)
+                {
+                    var auditStandardDto = await AuditStandardMapping.AuditStandardToItemListDto(auditStandard);
+                    auditStandardsDto.Add(auditStandardDto);
+                }
             }
 
             return new AuditAuditorItemDetailDto
