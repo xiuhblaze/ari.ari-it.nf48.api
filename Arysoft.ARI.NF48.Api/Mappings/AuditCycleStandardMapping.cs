@@ -30,15 +30,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 InitialStep = item.InitialStep,
                 CycleType = item.CycleType,
                 Status = item.Status,
-                StandardName = item.Standard != null
-                    ? item.Standard.Name
-                    : string.Empty,
-                StandardBase = item.Standard != null
-                    ? item.Standard.StandardBase ?? StandardBaseType.Nothing
-                    : StandardBaseType.Nothing,
-                StandardStatus = item.Standard != null
-                    ? item.Standard.Status
-                    : StatusType.Nothing
+                //StandardName = item.Standard != null
+                //    ? item.Standard.Name
+                //    : string.Empty,
+                //StandardBase = item.Standard != null
+                //    ? item.Standard.StandardBase ?? StandardBaseType.Nothing
+                //    : StandardBaseType.Nothing,
+                //StandardStatus = item.Standard != null
+                //    ? item.Standard.Status
+                //    : StatusType.Nothing
             };
         } // AuditCycleStandardToItemListDto
 
@@ -55,12 +55,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-                Standard = item.Standard != null
-                    ? StandardMapping.StandardToItemListDto(item.Standard)
-                    : null,
-                AuditCycle = item.AuditCycle != null
-                    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
-                    : null
+                //Standard = item.Standard != null
+                //    ? StandardMapping.StandardToItemListDto(item.Standard)
+                //    : null,
+                //AuditCycle = item.AuditCycle != null
+                //    ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
+                //    : null
             };
         } // AuditCycleStandardToItemDetailDto
 

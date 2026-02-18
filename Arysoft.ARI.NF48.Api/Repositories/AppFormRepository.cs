@@ -295,11 +295,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var _siteRepository = _context.Set<Site>();
 
             var foundItem = await _model.FindAsync(id)
-                ?? throw new BusinessException("The application form to remove a Site was not found");
+                ?? throw new BusinessException("The application form to remove a Site was not found");            
             if (foundItem.Status >= AppFormStatusType.Inactive)
-                throw new BusinessException("The application form is not active");
+                throw new BusinessException("The application form is not active, can't be remove sites");
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The site related was not found");
+            if (siteItem.IsMainSite)
+                throw new BusinessException("The main site can't be removed from the application form");
 
             if (!foundItem.Sites.Contains(siteItem))
                 throw new BusinessException("The site is not related to the application form");

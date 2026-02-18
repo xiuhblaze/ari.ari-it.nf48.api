@@ -63,18 +63,18 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Order
 
-            switch (filters.Order)
-            {
-                case AuditCycleStandardOrderType.StandardName:
-                    items = items.OrderBy(e => e.Standard.Name);
-                    break;
-                case AuditCycleStandardOrderType.StandardNameDesc:
-                    items = items.OrderByDescending(e => e.Standard.Name);
-                    break;
-                default:
-                    items = items.OrderBy(e => e.Standard.Name);
-                    break;
-            }
+            //switch (filters.Order)
+            //{
+            //    case AuditCycleStandardOrderType.StandardName:
+            //        items = items.OrderBy(e => e.Standard.Name);
+            //        break;
+            //    case AuditCycleStandardOrderType.StandardNameDesc:
+            //        items = items.OrderByDescending(e => e.Standard.Name);
+            //        break;
+            //    default:
+            //        items = items.OrderBy(e => e.Standard.Name);
+            //        break;
+            //}
 
             var pagedItems = PagedList<AuditCycleStandard>
                 .Create(items, filters.PageNumber, filters.PageSize);
@@ -145,14 +145,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   permitir agregarlo
             //   HACK: Actualizarlo para que no se sobrepongan las fechas del ciclo
             //   y de ahi permitirlo o no (xBlaze: 20250926)
-            if (foundItem.Status != item.Status 
-                && item.Status == StatusType.Active
-                && foundItem.AuditCycle.Status == StatusType.Active
-            )
-            {
-                if (await _repository.IsStandardActiveInOrganizationAnyAuditCycleAsync(foundItem.AuditCycle.OrganizationID, (Guid)item.StandardID, item.ID))
-                    throw new BusinessException("There is already a current standard in another active cycle");
-            }
+            //if (foundItem.Status != item.Status 
+            //    && item.Status == StatusType.Active
+            //    && foundItem.AuditCycle.Status == StatusType.Active
+            //)
+            //{
+            //    if (await _repository.IsStandardActiveInOrganizationAnyAuditCycleAsync(foundItem.AuditCycle.OrganizationID, (Guid)item.StandardID, item.ID))
+            //        throw new BusinessException("There is already a current standard in another active cycle");
+            //}
 
             // Assigning values
 

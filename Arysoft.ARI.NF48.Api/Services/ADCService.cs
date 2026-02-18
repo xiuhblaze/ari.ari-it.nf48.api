@@ -60,8 +60,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             foreach (var item in items)
-            {   
-                item.Alerts = GetAlertsAsync(item).GetAwaiter().GetResult();
+            {
+                if (item.Status < ADCStatusType.Inactive)
+                { 
+                    item.Alerts = GetAlertsAsync(item)
+                        .GetAwaiter()
+                        .GetResult();
+                }
             }
 
             // Order
@@ -378,6 +383,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (appForm.Standard.StandardBase != StandardBaseType.ISO9k)
                 throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
 
+            // Validar que el AppForm tenga un Sitio principal activo
+            if (!appForm.Sites.Any(s => s.IsMainSite && s.Status == StatusType.Active))
+                throw new BusinessException("The Application Form must have an active main Site to create an ADC.");
+
         } // ValidateCreateItemAsync
 
         private ADC SetValuesCreateItem(ADC item, AppForm appForm)
@@ -407,7 +416,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - Si cambia el status, realizar diferentes validaciones
             if (foundItem.Status != item.Status)
-            { 
+            {
                 switch (item.Status) // Si el nuevo status es...
                 {
                     case ADCStatusType.Review:
@@ -431,6 +440,18 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                     case ADCStatusType.Deleted:
                         throw new BusinessException("To delete an ADC, use the Delete method.");
+                }
+            }
+            else // El status no ha cambiado
+            {
+                if (foundItem.Status < ADCStatusType.Inactive) // Si sigue en proceso...
+                {
+                    // Validar que tenga el sitio principal
+                    if (!foundItem.ADCSites.Any(adcs =>
+                        adcs.Site.IsMainSite
+                        && adcs.Status == StatusType.Active
+                        && adcs.Site.Status == StatusType.Active))
+                        throw new BusinessException("The ADC must have an active main Site.");
                 }
             }
 
@@ -1025,6 +1046,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                         alerts.Add(ADCAlertType.EmployeesMistmatch);
                     }
                 } // Validando si cambia el numero de empleados
+
+                // Si falta asignar el sitio principal (que hayan
+                // actualizado los sitios y no esté le principal) o lo que sea
+                if (!item.ADCSites.Any(adcs => adcs.Site.IsMainSite
+                    && adcs.Status == StatusType.Active
+                    && adcs.Site.Status == StatusType.Active))
+                {
+                    if (!alerts.Contains(ADCAlertType.MainSiteMissing))
+                        alerts.Add(ADCAlertType.MainSiteMissing);
+                }
 
                 // Si el número de ADCSites no coincide con el número de Sites del AppForm
                 if (item.AppForm != null
