@@ -14,9 +14,9 @@ namespace Arysoft.ARI.NF48.Api
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
             // CORS - Desarrollo
-            //var cors = new EnableCorsAttribute("http://localhost:5173,http://localhost:84", "*", "*");            
+            var cors = new EnableCorsAttribute("http://localhost:5173,http://localhost:84", "*", "*");            
             // CORS - Producción
-            var cors = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,https://ariit.aarrin.com,http://ariit.aarrin.com", "*", "*");
+            //var cors = new EnableCorsAttribute("https://aarrin.com,http://aarrin.com,https://ariit.aarrin.com,http://ariit.aarrin.com", "*", "*");
             
             config.EnableCors(cors);
 

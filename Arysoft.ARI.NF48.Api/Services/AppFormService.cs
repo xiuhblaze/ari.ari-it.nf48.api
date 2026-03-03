@@ -169,8 +169,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Set values
 
+            var nextCycleYear = await _repository.GetNextCycleYearAsync(
+                item.AuditCycleID, 
+                auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+            );
+
             item.ID = Guid.NewGuid();
             item.StandardID = auditCycle.StandardID;
+            item.CycleYear = nextCycleYear;
             item.Status = AppFormStatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -740,6 +746,18 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The audit cycle does not have a standard assigned");
             }
 
+            // Considerar que solo la primera vez se registra el standard, despues si
+            // ya se validó, sin importar el status del standard, se queda
+            if (newItem.Status == AppFormStatusType.Nothing) // Si es nuevo...
+            {
+                if (await _repository.GetNextCycleYearAsync(
+                    newItem.AuditCycleID,
+                    auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+                    ) == CycleYearType.Nothing
+                )
+                    throw new BusinessException($"The certificate cycle has already completed all its years");
+            }
+
             // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
             //   * ISO 9001
 
@@ -783,9 +801,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Validar que el ciclo esté activo - Omitir por ahora -UPDATE xBlaze(20250826): este no, es necesario subir auditorias o documentación estando inactivo
             //   por lo pronto, validar que el ciclo no sea del pasado
             // - Validar que el standard esté activo y que pertenesca al ciclo,
-            //   solo la primera vez - YA
+            //   solo la primera vez - Este se cambió a ValidateCreateAppFormAsync
             // - Validar que el appform no esté en un status que no se pueda editar
             // - AuditLanguage - Validar que sea un idioma aceptado 'es', 'en' - YA
+            // - Al cambiar a Activo, validar:
+            //   - Tener al menos un sitio asignado y que sea el principal
+            //   - Tener al menos un contacto asignado
+            //   - Tener al menos un NACE code asignado
 
             var standardRepository = new StandardRepository();
 
@@ -835,8 +857,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AppFormStatusType.Active:
                         // Validaciónes más a detalle como:
                         // - Tener al menos un sitio asignado y que sea el principal
+                        if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.IsMainSite)
+                            .Any())
+                            throw new BusinessException("The Application Form must have an active main site assigned");
+
                         // - Tener al menos un contacto asignado
+                        if (!currentItem.Contacts.Where(c => c.Status == StatusType.Active).Any())
+                            throw new BusinessException("The Application Form must have at least one active contact assigned");
+
                         // - Tener al menos un nace code asignado
+                        if (!currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
+                            throw new BusinessException("The Application Form must have at least one active NACE code assigned");
                         break;
                 }
             } // El status cambió
@@ -844,22 +875,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (await _repository.ExistsValidAppFormAsync(newItem.AuditCycleID, newItem.ID))
                 throw new BusinessException("There is already an active Application Form for this standard cycle");
 
-            if (currentItem.AuditCycle != null 
-                && currentItem.AuditCycle.EndDate.HasValue
-                && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
-                throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
-
-            // Considerar que solo la primera vez se registra el standard, despues si
-            // ya se validó, sin importar el status del standard, se queda
-            if (currentItem.Status == AppFormStatusType.Nothing) // Si es nuevo...
-            {
-                if (await _repository.GetNextCycleYearAsync(
-                    currentItem.AuditCycleID,
-                    currentItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
-                    ) == CycleYearType.Nothing
-                )
-                    throw new BusinessException($"The certificate cycle has already completed all its years");
-            }
+            // NOTE: Deshabilitado por el momento porque se necesita modificar información
+            // aunque el ciclo esté inactivo, pero se puede considerar que no se
+            // debe de subir más información - xBlaze: 20260220
+            //if (currentItem.AuditCycle != null 
+            //    && currentItem.AuditCycle.EndDate.HasValue
+            //    && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
+            //    throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
 
             if (!string.IsNullOrEmpty(newItem.AuditLanguage))
             {   
