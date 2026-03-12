@@ -53,6 +53,18 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetContacts
 
+        [HttpGet]
+        [Route("api/contacts/proposal/{id}")]
+        [ResponseType(typeof(ApiResponse<IEnumerable<ContactItemListDto>>))]
+        public async Task<IHttpActionResult> GetContactsByProposalID(Guid id)
+        {
+            var items = await _contactService.GetsByProposalID(id);
+            var itemsDto = ContactMapping.ContactToListDto(items);
+            var response = new ApiResponse<IEnumerable<ContactItemListDto>>(itemsDto);
+
+            return Ok(response);
+        } // GetContactsByProposalID
+
         [ResponseType(typeof(ApiResponse<ContactItemDetailDto>))]
         public async Task<IHttpActionResult> GetContact(Guid id)
         {

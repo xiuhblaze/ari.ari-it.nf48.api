@@ -1,7 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.CustomEntities;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Mappings;
-using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
@@ -48,6 +47,18 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetSites
 
+        [HttpGet]
+        [Route("api/sites/proposal/{id}")]
+        [ResponseType(typeof(ApiResponse<IEnumerable<SiteItemListDto>>))]
+        public async Task<IHttpActionResult> GetSitesByProposalID(Guid id)
+        {
+            var items = await _siteService.GetsByProposalID(id);
+            var itemsDto = SiteMapping.SiteToListDto(items);
+            var response = new ApiResponse<IEnumerable<SiteItemListDto>>(itemsDto);
+
+            return Ok(response);
+        } // GetSitesByProposalID
+
         [ResponseType(typeof(ApiResponse<SiteItemDetailDto>))]
         public async Task<IHttpActionResult> GetSite(Guid id)
         {
@@ -57,7 +68,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             var response = new ApiResponse<SiteItemDetailDto>(itemDto);
 
             return Ok(response);
-        } // GetShift
+        } // GetSite
 
         // POST: api/Site
         [ResponseType(typeof(ApiResponse<SiteItemDetailDto>))]
