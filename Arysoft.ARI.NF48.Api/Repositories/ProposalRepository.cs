@@ -93,7 +93,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                     .Where(a => a.ProposalID == item.ID)
                     .ToListAsync();
 
-                if (adcs.Any()) return false;
+                if (!adcs.Any()) return false;
 
                 foreach (var adc in adcs)
                 {
