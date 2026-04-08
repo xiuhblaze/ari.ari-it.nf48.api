@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         } // ProposalToListDto
 
         public static ProposalItemListDto ProposalToItemListDto(Proposal item)
-        {
-            var auditCycleNames = new List<string>();
-            var standardNames = new List<string>();
+        {   
+            var auditCycles = new List<object>();
+            var sitesCount = 0;
+            var employeesCount = 0;
 
             if (item.ADCs != null)
             {
@@ -31,8 +33,30 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 {
                     if (adc.AuditCycle != null && !string.IsNullOrEmpty(adc.AuditCycle.Name))
                     {
-                        auditCycleNames.Add(adc.AuditCycle.Name);
-                        standardNames.Add(adc.Standard.Name);
+                        auditCycles.Add(new { 
+                            adc.AuditCycle.Name,
+                            adc.AuditCycle.CycleType,
+                            StandardName = adc.Standard.Name
+                        });
+                    }
+                }
+
+                var sites = item.ADCs.Where(adc => adc.ADCSites != null)
+                    .SelectMany(adc => adc.ADCSites)
+                    .Select(adc => adc.Site)
+                    .Distinct();
+                
+                if (sites.Any())
+                {
+                    sitesCount = sites.Count();
+
+                    foreach (var site in sites)
+                    {
+                        employeesCount += site.Status == StatusType.Active && site.Shifts.Any()
+                            ? site.Shifts
+                                .Where(i => i.Status == StatusType.Active)
+                                .Sum(i => i.NoEmployees) ?? 0
+                            : 0;
                     }
                 }
             }
@@ -40,6 +64,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ProposalItemListDto
             {
                 ID = item.ID,
+                OrganizationID = item.OrganizationID,
                 Justification = item.Justification,
                 SignerName = item.SignerName,
                 SignerPosition = item.SignerPosition,
@@ -61,9 +86,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ADCCount = item.ADCs?.Count ?? 0,
                 ProposalAuditsCount = item.ProposalAudits?.Count ?? 0,
                 NotesCount = item.Notes?.Count ?? 0,
-
-                AuditCycleNames = auditCycleNames,
-                Standards = standardNames,
+                // CALCULATED
+                SitesCount = sitesCount,
+                EmployeesCount = employeesCount,
+                AuditCycles = auditCycles,
                 // NOT MAPPED
                 Alerts = item.Alerts,
             };
@@ -116,7 +142,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         ).ToList()
                     : null,
                 // RELATIONS EXTRA FIELDS                
-                Sites = item.ADCs != null
+                Sites = item.ADCs != null       // Ya no es necesario
                     ? SiteMapping.SiteToListDto(
                             item.ADCs
                                 .Where(adc => adc.ADCSites != null)
@@ -128,7 +154,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .ThenBy(s => s.Description)
                         .ToList()
                     : new List<SiteItemListDto>(),
-                Contacts = item.ADCs != null
+                Contacts = item.ADCs != null    // Ya no es necesario
                     ? ContactMapping.ContactToListDto(
                             item.ADCs
                                 .Where(adc => adc.AppForm != null && adc.AppForm.Contacts != null)

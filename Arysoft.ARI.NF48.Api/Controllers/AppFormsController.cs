@@ -49,6 +49,17 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetAppForms
 
         [HttpGet]
+        [Route("api/appforms/proposal/{id}/scopes")]
+        [ResponseType(typeof(ApiResponse<IEnumerable<string>>))]
+        public async Task<IHttpActionResult> GetScopesByProposalID(Guid id)
+        {
+            var items = await _service.GetsScopesByProposalID(id);
+            var response = new ApiResponse<IEnumerable<string>>(items); 
+
+            return Ok(response);
+        } // GetScopesByProposalID
+
+        [HttpGet]
         [ResponseType(typeof(ApiResponse<AppFormItemDetailDto>))]
         public async Task<IHttpActionResult> GetAppForm(Guid id)
         {

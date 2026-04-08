@@ -59,7 +59,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         && r.Status != StatusType.Deleted))
                     .ToList()
                 : null;
-
+            // TODO: Aqui falla al crear un usuario nuevo
             var userSetting = item.Settings.FirstOrDefault();
 
             return new UserDetailDto

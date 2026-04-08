@@ -14,7 +14,10 @@ using System.Web.Http.Description;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
-    public class AuditCycleStandardsController : ApiController
+    // DISABLED: controlador deshabilitado intencionalmente — no exponer endpoints.
+    [Obsolete("Controlador deshabilitado - no exponer endpoints", false)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    internal class AuditCycleStandardsController : ApiController
     {
         private readonly AuditCycleStandardService _service;
 

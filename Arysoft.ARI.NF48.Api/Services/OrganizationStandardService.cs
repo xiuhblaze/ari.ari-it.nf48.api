@@ -82,7 +82,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Updated);
                     break;
                 default:
-                    items = items.OrderBy(e => e.Standard.Name);
+                    items = items.OrderBy(e => e.Status)
+                        .ThenByDescending(e => e.Standard.Name);
                     break;
             }
 

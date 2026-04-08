@@ -5,6 +5,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -100,11 +101,50 @@ namespace Arysoft.ARI.NF48.Api.Services
             return pagedItems;
         } // Gets
 
+        /// <summary>
+        /// Obtiene un listado de todos los Sites asociados a los ADCs
+        /// de la propuesta, dado el ID de la propuesta.
+        /// </summary>
+        /// <param name="id">Identificador de la Propuesta</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task<List<Site>> GetsByProposalID(Guid id)
+        {
+            var proposalRepository = new ProposalRepository();
+            var proposalItem = await proposalRepository.GetAsync(id)
+                ?? throw new BusinessException("The Proposal item not found");
+
+            var sites = proposalItem.ADCs != null
+                ? proposalItem.ADCs.Where(adc => adc.ADCSites != null)
+                    .SelectMany(adc => adc.ADCSites)
+                    .Select(adcSite => adcSite.Site)
+                    .Distinct()
+                    .OrderByDescending(adc => adc.IsMainSite)
+                    .ThenBy(adc => adc.Description)
+                    .ToList()
+                : new List<Site>();
+
+            return sites;
+        } // GetsByProposalID
+
+        /// <summary>
+        /// Obtiene los datos de un Site registrado en la base de datos
+        /// de acuerdo con el identificador recibido
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Site> GetAsync(Guid id)
         { 
             return await _siteRepository.GetAsync(id);
         } // GetAsync
 
+        /// <summary>
+        /// Crea un registro temporal de un site con la información minima
+        /// requerida
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task<Site> AddAsync(Site item)
         {
             // Validations
@@ -121,11 +161,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
-            
+
             // Execute queries
 
-            // TODO: Ver si se generaron Shifts para este site, si es asi, borrarlos primero
-            await _siteRepository.DeleteTmpByUserAsync(item.UpdatedUser);
+            // Nota: Cuenta con eliminación en cascada para los Shifts
+            await _siteRepository.DeleteTmpByUserAsync(item.UpdatedUser); 
             _siteRepository.Add(item);
             await _siteRepository.SaveChangesAsync();
 

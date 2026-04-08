@@ -4,7 +4,9 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,6 +34,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.Trim().ToLower();
+                filters.Text = Strings.EscapeLikeValue(filters.Text);
                 items = items.Where(e =>
                     (e.FirstName != null && e.FirstName.ToLower().Contains(filters.Text))
                     || (e.MiddleName != null && e.MiddleName.ToLower().Contains(filters.Text))
@@ -105,6 +108,31 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return pagedItems;
         } // Gets
+
+        /// <summary>
+        /// Obtiene un listado de todos los contactos asociados a los ADCs de
+        /// la propuesta, dado el ID de la propuesta.
+        /// </summary>
+        /// <param name="id">Identificador de la Propuesta</param>
+        /// <returns></returns>
+        public async Task<List<Contact>> GetsByProposalID(Guid id)
+        {
+            var proposalRepository = new ProposalRepository();
+            var proposalItem = await proposalRepository.GetAsync(id)
+                ?? throw new BusinessException("The proposal record was not found");
+
+            var contacts = proposalItem.ADCs != null
+                ? proposalItem.ADCs.Where(adc => adc.AppForm != null && adc.AppForm.Contacts != null)
+                    .SelectMany(adc => adc.AppForm.Contacts)
+                    .Distinct()
+                    .Where(contact => contact.Status == StatusType.Active)
+                    .OrderByDescending(contact => contact.IsMainContact)
+                    .ThenBy(contact => contact.FirstName)
+                    .ToList()
+                : new List<Contact>();
+
+            return contacts;
+        } // GetsByProposalID
 
         public async Task<Contact> GetAsync(Guid id)
         { 

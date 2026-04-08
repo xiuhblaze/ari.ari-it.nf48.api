@@ -55,6 +55,18 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetADCSites
 
         [HttpGet]
+        [Route("api/ADCSites/proposal/{id}")]
+        [ResponseType(typeof(ApiResponse<IEnumerable<ADCSiteItemListDto>>))]
+        public async Task<IHttpActionResult> GetADCSitesByProposalID(Guid id)
+        {
+            var items = await _service.GetsByProposalID(id);
+            var itemsDto = ADCSiteMapping.ADCSiteToListDto(items);
+            var response = new ApiResponse<IEnumerable<ADCSiteItemListDto>>(itemsDto);
+            
+            return Ok(response);
+        } // GetADCSitesByProposalID
+
+        [HttpGet]
         [ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]
         public async Task<IHttpActionResult> GetADCSite(Guid id)
         {

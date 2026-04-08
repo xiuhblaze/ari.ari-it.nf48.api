@@ -27,9 +27,10 @@
         CycleYearDesc
     }
 
-    public enum AppFormValidityStatusType // TODO: Terminarlo, se va a ocupar luego
+    public enum AppFormAlertType
     { 
         Nothing,
-
+        NoActiveSites,      // Alerta de que no hay sitios activos
+        MainSiteMissing,    // Alerta de sitio principal faltante
     }
 }

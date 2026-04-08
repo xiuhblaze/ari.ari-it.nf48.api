@@ -93,5 +93,9 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual ICollection<Note> Notes { get; set; }
 
         public virtual ICollection<Site> Sites { get; set; }
+
+        // NOT MAPPED
+
+        public List<AppFormAlertType> Alerts { get; set; }
     }
 }

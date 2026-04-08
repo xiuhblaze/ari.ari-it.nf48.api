@@ -96,6 +96,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public int NotesCount { get; set; }
 
         public int ADCCount { get; set; }
+
+        // NOT MAPPED
+
+        public List<AppFormAlertType> Alerts { get; set; }
+
     } // AppFormItemListDto
 
     public class AppFormItemDetailDto
@@ -189,6 +194,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ICollection<SiteItemListDto> Sites { get; set; }
 
         public ICollection<NoteItemDto> Notes { get; set; }
+
+        // NOT MAPPED
+
+        public List<AppFormAlertType> Alerts { get; set; }
 
     } // AppFormItemDetailDto
 

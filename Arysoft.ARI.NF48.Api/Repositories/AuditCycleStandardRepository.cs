@@ -41,9 +41,9 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             var items = _model
                 .Where(m => 
-                    m.AuditCycle.OrganizationID == organizationID
-                    && m.AuditCycle.Status == StatusType.Active
-                    && m.StandardID == standardID
+                    //m.AuditCycle.OrganizationID == organizationID
+                    //&& m.AuditCycle.Status == StatusType.Active
+                    m.StandardID == standardID
                     && m.Status == StatusType.Active
                 );
 
