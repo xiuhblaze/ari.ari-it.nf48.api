@@ -85,6 +85,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                         && i.Status != AppFormStatusType.Deleted);
             }
 
+            foreach (var item in items)
+            {
+                if (item.Status < AppFormStatusType.Inactive)
+                {
+                    item.Alerts = GetAlertsAsync(item)
+                        .GetAwaiter()
+                        .GetResult();
+                }
+            }
+
             // Order
 
             if (filters.Order.HasValue)
@@ -128,10 +138,39 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// </summary>
         /// <param name="id">Unique id</param>
         /// <returns></returns>
-        public async Task<AppForm> GetAsync(Guid id)
+        public async Task<AppForm> GetAsync(Guid id, bool asNoTracking = false)
         {
-            return await _repository.GetAsync(id);
+            var item = await _repository.GetAsync(id, asNoTracking)
+                ?? throw new BusinessException("The record was not found");
+
+            if (item.Status < AppFormStatusType.Inactive)
+            {
+                item.Alerts = await GetAlertsAsync(item);
+            }
+
+            return item; //await _repository.GetAsync(id);
         } // GetAsync
+
+        /// <summary>
+        /// Obtiene un listado de todos los Scopes de los AppForm asociadas las ADCs 
+        /// asociadas a una propuesta, dada por el ID
+        /// </summary>
+        /// <param name="id">Identificador de la Propuesta</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task<List<string>> GetsScopesByProposalID(Guid id)
+        {
+            var proposalRepository = new ProposalRepository();
+            var proposalItem = await proposalRepository.GetAsync(id)
+                ?? throw new BusinessException("The proposal record was not found");
+
+            var scopes = proposalItem.ADCs
+                .Where(adc => adc.AppForm != null)
+                .Select(adc => adc.AppForm.ActivitiesScope)
+                .ToList();
+
+            return scopes;
+        } // GetsScopesByProposalID
 
         /// <summary>
         /// Genera un registro con la información minima necesaria y en base a ella
@@ -151,8 +190,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Set values
 
+            var nextCycleYear = await _repository.GetNextCycleYearAsync(
+                item.AuditCycleID, 
+                auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+            );
+
             item.ID = Guid.NewGuid();
             item.StandardID = auditCycle.StandardID;
+            item.CycleYear = nextCycleYear;
             item.Status = AppFormStatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -171,6 +216,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             item = await _repository.GetAsync(item.ID, true); // Obtener el item con las relaciones cargadas
+            item = await AddMainSiteAsync(item); // Agregar el sitio principal al appform
 
             return item;
         } // AddAsync
@@ -657,6 +703,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             return JsonConvert.SerializeObject(historicalData);
         } // GetHistoricalDataJSON
 
+        // CREATE
+
         /// <summary>
         /// Valida los datos recibidos para crear un AppForm, con los datos minimos necesarios
         /// requeridos y que las asociaciones iniciales a otros objetos sean validas
@@ -690,7 +738,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (await _repository.ExistsValidAppFormAsync(auditCycle.ID))
                 throw new BusinessException("There is already an active Application Form for this standard cycle");
 
-            // TODO: Aqui voy 20260113
+            // - Validar que exista al menos un Site en la Organización y sea el sitio principal
+            if (!organization.Sites.Any(s => s.Status == StatusType.Active))
+                throw new BusinessException("The organization must have at least one active site");
+
+            if (!organization.Sites.Any(s => s.Status == StatusType.Active && s.IsMainSite))
+                throw new BusinessException("The organization must have an active main site");
 
             // - Validar que el Standard asociado al AuditCycle esté activo tanto en la
             //   organización como en el sistema
@@ -714,6 +767,18 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The audit cycle does not have a standard assigned");
             }
 
+            // Considerar que solo la primera vez se registra el standard, despues si
+            // ya se validó, sin importar el status del standard, se queda
+            if (newItem.Status == AppFormStatusType.Nothing) // Si es nuevo...
+            {
+                if (await _repository.GetNextCycleYearAsync(
+                    newItem.AuditCycleID,
+                    auditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
+                    ) == CycleYearType.Nothing
+                )
+                    throw new BusinessException($"The certificate cycle has already completed all its years");
+            }
+
             // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
             //   * ISO 9001
 
@@ -722,6 +787,34 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         } // ValidateCreateAppFormAsync
 
+        /// <summary>
+        /// Busca y agrega el sitio principal de la organización al appform creado, 
+        /// esto para asegurar que siempre vaya el sitio principal.
+        /// </summary>
+        /// <param name="appForm"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        private async Task<AppForm> AddMainSiteAsync(AppForm appForm)
+        {
+            var organizationRepository = new OrganizationRepository();
+            var organization = await organizationRepository.GetAsync(appForm.OrganizationID)
+                ?? throw new BusinessException("AddMainSiteAsync: The organization was not found");
+            var mainSite = organization.Sites
+                .Where(s => s.Status == StatusType.Active && s.IsMainSite)
+                .FirstOrDefault();
+
+            if (mainSite != null)
+            {
+                await _repository.AddSiteAsync(appForm.ID, mainSite.ID);
+                await _repository.SaveChangesAsync();
+                appForm = await _repository.GetAsync(appForm.ID, true); // Obtener el item con las relaciones cargadas
+            }
+
+            return appForm;
+        } // AddMainSiteAsync
+
+        // UPDATE
+
         private async Task ValidateAppFormAsync(AppForm newItem, AppForm currentItem)
         {
             // - Validar que el CycleYear no exista
@@ -729,9 +822,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Validar que el ciclo esté activo - Omitir por ahora -UPDATE xBlaze(20250826): este no, es necesario subir auditorias o documentación estando inactivo
             //   por lo pronto, validar que el ciclo no sea del pasado
             // - Validar que el standard esté activo y que pertenesca al ciclo,
-            //   solo la primera vez - YA
+            //   solo la primera vez - Este se cambió a ValidateCreateAppFormAsync
             // - Validar que el appform no esté en un status que no se pueda editar
             // - AuditLanguage - Validar que sea un idioma aceptado 'es', 'en' - YA
+            // - Al cambiar a Activo, validar:
+            //   - Tener al menos un sitio asignado y que sea el principal
+            //   - Tener al menos un contacto asignado
+            //   - Tener al menos un NACE code asignado
 
             var standardRepository = new StandardRepository();
 
@@ -775,27 +872,37 @@ namespace Arysoft.ARI.NF48.Api.Services
                 if (currentItem.Status == AppFormStatusType.Cancel
                     && newItem.Status != AppFormStatusType.New)
                     throw new BusinessException("You can't change to this status from Cancel");
+
+                switch (newItem.Status) 
+                {
+                    case AppFormStatusType.Active:
+                        // Validaciónes más a detalle como:
+                        // - Tener al menos un sitio asignado y que sea el principal
+                        if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.IsMainSite)
+                            .Any())
+                            throw new BusinessException("The Application Form must have an active main site assigned");
+
+                        // - Tener al menos un contacto asignado
+                        if (!currentItem.Contacts.Where(c => c.Status == StatusType.Active).Any())
+                            throw new BusinessException("The Application Form must have at least one active contact assigned");
+
+                        // - Tener al menos un nace code asignado
+                        if (!currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
+                            throw new BusinessException("The Application Form must have at least one active NACE code assigned");
+                        break;
+                }
             } // El status cambió
 
             if (await _repository.ExistsValidAppFormAsync(newItem.AuditCycleID, newItem.ID))
                 throw new BusinessException("There is already an active Application Form for this standard cycle");
 
-            if (currentItem.AuditCycle != null 
-                && currentItem.AuditCycle.EndDate.HasValue
-                && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
-                throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
-
-            // Considerar que solo la primera vez se registra el standard, despues si
-            // ya se validó, sin importar el status del standard, se queda
-            if (currentItem.Status == AppFormStatusType.Nothing) // Si es nuevo...
-            {
-                if (await _repository.GetNextCycleYearAsync(
-                    currentItem.AuditCycleID,
-                    currentItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
-                    ) == CycleYearType.Nothing
-                )
-                    throw new BusinessException($"The certificate cycle has already completed all its years");
-            }
+            // NOTE: Deshabilitado por el momento porque se necesita modificar información
+            // aunque el ciclo esté inactivo, pero se puede considerar que no se
+            // debe de subir más información - xBlaze: 20260220
+            //if (currentItem.AuditCycle != null 
+            //    && currentItem.AuditCycle.EndDate.HasValue
+            //    && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
+            //    throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
 
             if (!string.IsNullOrEmpty(newItem.AuditLanguage))
             {   
@@ -807,5 +914,22 @@ namespace Arysoft.ARI.NF48.Api.Services
             } else throw new BusinessException("The audit language is required");
 
         } // ValidateAppFormAsync
+
+        // STATIC METHODS
+
+        public static async Task<List<AppFormAlertType>> GetAlertsAsync(AppForm item)
+        {
+            var alerts = new List<AppFormAlertType>();
+
+            // - Que al menos haya un sitio activo, puede que hayan actualizado sitios
+            if (item.Sites == null || !item.Sites.Any(site => site.Status == StatusType.Active))
+                alerts.Add(AppFormAlertType.NoActiveSites);
+
+            // - Que tenga al menos un sitio activo y que uno de ellos sea el sitio principal
+            if (item.Sites == null || !item.Sites.Any(s => s.Status == StatusType.Active && s.IsMainSite))
+                alerts.Add(AppFormAlertType.MainSiteMissing);
+
+            return alerts;
+        } // GetAlertsAsync
     }
 }

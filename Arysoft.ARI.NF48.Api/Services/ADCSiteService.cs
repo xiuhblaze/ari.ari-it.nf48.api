@@ -93,6 +93,27 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // Gets
 
         /// <summary>
+        /// Obtiene un listado unico de todos los ADCSites indistintamente
+        /// de los ADCs dado el ID de la propuesta.
+        /// </summary>
+        /// <param name="id">Identificador de la Propuesta</param>
+        /// <returns></returns>
+        public async Task<List<ADCSite>> GetsByProposalID(Guid id)
+        {
+            var proposalRepository = new ProposalRepository();
+            var proposalItem = await proposalRepository.GetAsync(id)
+                ?? throw new BusinessException("The Proposal item not found");
+
+            var adcSites = proposalItem.ADCs != null
+                ? proposalItem.ADCs.Where(adc => adc.ADCSites != null)
+                    .SelectMany(adc => adc.ADCSites)
+                    .ToList()
+                : new List<ADCSite>();
+
+            return adcSites;
+        } // GetsByProposalID
+
+        /// <summary>
         /// Obtiene un sitio ADC por su ID.
         /// </summary>
         /// <param name="id">Identificador del Sitio para el ADC</param>

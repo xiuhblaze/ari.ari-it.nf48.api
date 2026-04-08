@@ -6,6 +6,7 @@ using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,6 +43,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!string.IsNullOrEmpty(filters.Text))
             {
                 filters.Text = filters.Text.Trim().ToLower();
+                filters.Text = Strings.EscapeLikeValue(filters.Text);
                 items = items.Where(e => 
                     (e.FirstName != null && e.FirstName.ToLower().Contains(filters.Text))
                     || (e.MiddleName != null && e.MiddleName.ToLower().Contains(filters.Text))

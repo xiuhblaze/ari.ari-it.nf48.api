@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .FirstOrDefaultAsync();
         } // GetAuditCycleIDAsync
 
+        /// <summary>
+        /// Devuelve el siguiente año del cyclo
+        /// </summary>
+        /// <param name="auditCycleID"></param>
+        /// <param name="periodicity"></param>
+        /// <returns></returns>
         public async Task<CycleYearType> GetNextCycleYearAsync(
             Guid auditCycleID, 
             AuditCyclePeriodicityType periodicity
@@ -64,7 +71,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         } // GetNextCycleYearAsync
 
         /// <summary>
-        /// Indica si existe algún AppForm válido en un ciclo de auditoría, excluyendo un ID concreto
+        /// Indica si existe algún AppForm válido en un ciclo de auditoría, 
+        /// excluyendo un ID indicado
         /// </summary>
         /// <param name="auditCycleID"></param>
         /// <param name="exeptionID"></param>
@@ -85,7 +93,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             }
                 
             return await query.AnyAsync();
-        } // IsThereValidAppFormAsync
+        } // ExistsValidAppFormAsync
 
         public async Task<bool> ExistsValidCycleYearAppForm(
             Guid auditCycleID, 
@@ -257,15 +265,21 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             var foundItem = await _model.FindAsync(id)
                 ?? throw new BusinessException("The application form to add a Site was not found");
+
             if (foundItem.Status >= AppFormStatusType.Inactive)
                 throw new BusinessException("The application form is not active");
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The Site you're trying to relate was not found");
 
-            if (foundItem.Sites.Contains(siteItem))
+            //TODO: Ver si es necesario validar que el siteItem este activo
+
+            if (foundItem.Sites != null && foundItem.Sites.Contains(siteItem))
                 throw new BusinessException("The application form already has the Site related");
 
-            foundItem.Sites.Add(siteItem);
+            if (foundItem.Sites == null)
+                foundItem.Sites = new List<Site>();
+
+            foundItem.Sites.Add(siteItem); // Aqui también marca una excepción pues 'Sites' es null
         } // AddSiteAsync
 
         /// <summary>
@@ -295,11 +309,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             var _siteRepository = _context.Set<Site>();
 
             var foundItem = await _model.FindAsync(id)
-                ?? throw new BusinessException("The application form to remove a Site was not found");
+                ?? throw new BusinessException("The application form to remove a Site was not found");            
             if (foundItem.Status >= AppFormStatusType.Inactive)
-                throw new BusinessException("The application form is not active");
+                throw new BusinessException("The application form is not active, can't be remove sites");
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The site related was not found");
+            if (siteItem.IsMainSite)
+                throw new BusinessException("The main site can't be removed from the application form");
 
             if (!foundItem.Sites.Contains(siteItem))
                 throw new BusinessException("The site is not related to the application form");

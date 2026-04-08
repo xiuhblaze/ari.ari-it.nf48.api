@@ -15,8 +15,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // RELATIONS
 
-        public virtual AuditCycle AuditCycle { get; set; }
+        //public virtual AuditCycle AuditCycle { get; set; }
 
-        public virtual Standard Standard { get; set; }
+        //public virtual Standard Standard { get; set; }
     } // AuditCycleStandard
 }

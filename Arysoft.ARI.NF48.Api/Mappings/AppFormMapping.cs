@@ -98,7 +98,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : 0,
                 NotesCount = item.Notes != null
                     ? item.Notes.Count
-                    : 0
+                    : 0,
+                // NOT MAPPED
+                Alerts = item.Alerts
             };
         } // AppFormToItemListDto
 
@@ -176,7 +178,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? NoteMapping.NotesToListDto(
                         item.Notes.OrderByDescending(n => n.Created)
                         ).ToList()
-                    : null
+                    : null,
+                // NOT MAPPED
+                Alerts = item.Alerts
             };
         } // AppFormToItemDetailDto
 

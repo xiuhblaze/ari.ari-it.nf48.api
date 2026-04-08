@@ -25,5 +25,6 @@
         Nothing,            // No hay alerta
         EmployeesMistmatch, // Alerta de discrepancia en el número de empleados
         SitesMistmatch,     // Alerta de discrepancia en el número de sitios
+        MainSiteMissing,    // Alerta de sitio principal faltante
     }
 }

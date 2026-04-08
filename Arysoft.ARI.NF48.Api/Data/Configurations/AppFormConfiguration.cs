@@ -129,6 +129,11 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                     .MapRightKey("SiteID")
                     .ToTable("AppFormsSites"));
 
+            // NOT MAPPED
+
+            modelBuilder.Entity<AppForm>()
+                .Ignore(m => m.Alerts); // Not mapped property
+
         } // Configure
     }
 }

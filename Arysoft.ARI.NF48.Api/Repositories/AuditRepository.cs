@@ -283,6 +283,9 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             if (foundItem.Sites.Contains(itemSite))
                 throw new BusinessException("The audit already has the site related.");
 
+            if (itemSite.Status != StatusType.Active)
+                throw new BusinessException("The site you are trying to relate to the audit is not active.");
+
             foundItem.Sites.Add(itemSite);
         } // AddSiteAsync
 

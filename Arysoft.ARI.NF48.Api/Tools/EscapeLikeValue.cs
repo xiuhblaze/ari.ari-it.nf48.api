@@ -5,8 +5,8 @@
         /// <summary>
         /// Escapa caracteres especiales para ser usados en una consulta SQL con LIKE.
         /// </summary>
-        /// <param name="value">Termino de busqueda a escapar</param>
-        /// <returns>Término escapado seguro para usar en Contains/LIKE</returns>
+        /// <param name="value">Valor a escapar</param>
+        /// <returns>Valor escapado seguro para usar en Contains/LIKE</returns>
         /// <remarks>
         /// Autor: xBlaze
         /// Creacion: 2026-02-09

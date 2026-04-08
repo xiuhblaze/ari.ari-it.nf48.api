@@ -1,4 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -48,14 +49,16 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string OrganizationName { get; set; }
 
         public int ADCCount { get; set; }
-
+        
         public int ProposalAuditsCount { get; set; }
 
         public int NotesCount { get; set; }
 
-        public List<string> AuditCycleNames { get; set; }
+        public int SitesCount { get; set; }
 
-        public List<string> Standards { get; set; }
+        public int EmployeesCount { get; set; }
+
+        public List<object> AuditCycles { get; set; }
 
         // NOT MAPPED
 
