@@ -118,7 +118,8 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<List<Contact>> GetsByProposalID(Guid id)
         {
             var proposalRepository = new ProposalRepository();
-            var proposalItem = await proposalRepository.GetAsync(id);
+            var proposalItem = await proposalRepository.GetAsync(id)
+                ?? throw new BusinessException("The proposal record was not found");
 
             var contacts = proposalItem.ADCs != null
                 ? proposalItem.ADCs.Where(adc => adc.AppForm != null && adc.AppForm.Contacts != null)

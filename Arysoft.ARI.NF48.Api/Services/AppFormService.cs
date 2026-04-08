@@ -152,6 +152,27 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // GetAsync
 
         /// <summary>
+        /// Obtiene un listado de todos los Scopes de los AppForm asociadas las ADCs 
+        /// asociadas a una propuesta, dada por el ID
+        /// </summary>
+        /// <param name="id">Identificador de la Propuesta</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task<List<string>> GetsScopesByProposalID(Guid id)
+        {
+            var proposalRepository = new ProposalRepository();
+            var proposalItem = await proposalRepository.GetAsync(id)
+                ?? throw new BusinessException("The proposal record was not found");
+
+            var scopes = proposalItem.ADCs
+                .Where(adc => adc.AppForm != null)
+                .Select(adc => adc.AppForm.ActivitiesScope)
+                .ToList();
+
+            return scopes;
+        } // GetsScopesByProposalID
+
+        /// <summary>
         /// Genera un registro con la información minima necesaria y en base a ella
         /// Obtiene el siguiente ciclo disponible para el standard seleccionado
         /// </summary>
