@@ -57,14 +57,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.CriticalComplaintComments != null && m.CriticalComplaintComments.ToLower().Contains(filters.Text))
                     || (m.AutomationLevelJustification != null && m.AutomationLevelJustification.ToLower().Contains(filters.Text))
                     || (m.DesignResponsibilityJustify != null && m.DesignResponsibilityJustify.ToLower().Contains(filters.Text))
+                    || (m.OperationalControls != null && m.OperationalControls.ToLower().Contains(filters.Text))
                     || (m.CurrentCertificationsExpiration != null && m.CurrentCertificationsExpiration.ToLower().Contains(filters.Text))
                     || (m.CurrentStandards != null && m.CurrentStandards.ToLower().Contains(filters.Text))
                     || (m.CurrentCertificationsBy != null && m.CurrentCertificationsBy.ToLower().Contains(filters.Text) )
                     || (m.OutsourcedProcess != null && m.OutsourcedProcess.ToLower().Contains(filters.Text))
                     || (m.AnyConsultancyBy != null && m.AnyConsultancyBy.ToLower().Contains(filters.Text))
-                    || (m.SalesComments != null && m.SalesComments.ToLower().Contains(filters.Text))
-                    || (m.ReviewJustification != null && m.ReviewJustification.ToLower().Contains(filters.Text))
-                    || (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
+                    //|| (m.SalesComments != null && m.SalesComments.ToLower().Contains(filters.Text))
+                    //|| (m.ReviewJustification != null && m.ReviewJustification.ToLower().Contains(filters.Text))
+                    //|| (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
                     || (m.Organization != null && m.Organization.Name.ToLower().Contains(filters.Text))
                     || (m.Standard != null && m.Standard.Name.ToLower().Contains(filters.Text))
                     || (m.UserSales != null && m.UserSales.ToLower().Contains(filters.Text))
@@ -341,17 +342,22 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Si es inactivo, cancelado solo guardar ciertos valores y no todo lo demas
             if (item.Status < AppFormStatusType.Inactive)
             {
+                // ISO Varios
+                foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K
+                foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K
+                foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K
+                foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K
+                foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;             // 9K, 14K
+                foundItem.CriticalComplaintComments = item.CriticalComplaintComments;   // 9K, 14K
+
                 // ISO 9K
-                foundItem.ActivitiesScope = item.ActivitiesScope;
-                foundItem.ProcessServicesCount = item.ProcessServicesCount;
-                foundItem.ProcessServicesDescription = item.ProcessServicesDescription;
-                foundItem.LegalRequirements = item.LegalRequirements;
-                foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;
-                foundItem.CriticalComplaintComments = item.CriticalComplaintComments;
                 foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
                 foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
                 foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
                 foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+
+                // ISO 14K
+                foundItem.OperationalControls = item.OperationalControls;
 
                 // General
                 foundItem.Description = item.Description;
@@ -367,7 +373,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
                 //foundItem.SalesComments = item.SalesComments;
                 foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
-                foundItem.ReviewJustification = item.ReviewJustification;
+                //foundItem.ReviewJustification = item.ReviewJustification;
                 //foundItem.ReviewComments = item.ReviewComments;                
             }
 
@@ -433,20 +439,31 @@ namespace Arysoft.ARI.NF48.Api.Services
                 Sites = new List<Site>()
             };
 
-            switch (originalItem.Standard.StandardBase)
+            // ISO VARIOS
+            if (originalItem.Standard.StandardBase == StandardBaseType.ISO9k
+                || originalItem.Standard.StandardBase == StandardBaseType.ISO14K)
             { 
-                case StandardBaseType.ISO9k:
-                    // ISO 9000
                     newItem.ActivitiesScope = originalItem.ActivitiesScope;
                     newItem.ProcessServicesCount = originalItem.ProcessServicesCount;
                     newItem.ProcessServicesDescription = originalItem.ProcessServicesDescription;
                     newItem.LegalRequirements = originalItem.LegalRequirements;
                     newItem.AnyCriticalComplaint = originalItem.AnyCriticalComplaint;
                     newItem.CriticalComplaintComments = originalItem.CriticalComplaintComments;
+            }
+
+            switch (originalItem.Standard.StandardBase)
+            { 
+                case StandardBaseType.ISO9k:
+                    // ISO 9000
                     newItem.AutomationLevelPercent = originalItem.AutomationLevelPercent;
                     newItem.AutomationLevelJustification = originalItem.AutomationLevelJustification;
                     newItem.IsDesignResponsibility = originalItem.IsDesignResponsibility;
                     newItem.DesignResponsibilityJustify = originalItem.DesignResponsibilityJustify;
+                    break;
+
+                case StandardBaseType.ISO14K:
+                    // ISO 14000
+                    newItem.OperationalControls = originalItem.OperationalControls;
                     break;
             }
 
@@ -464,6 +481,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 .Where(c => c.Status == StatusType.Active))
             {
                 await _repository.AddContactAsync(newItem, contact.ID);
+            }
+
+            // - Risk Levels
+            foreach (var riskLevel in originalItem.RiskLevels
+                .Where(rl => rl.Status == StatusType.Active))
+            {
+                await _repository.AddRiskLevelAsync(newItem, riskLevel.ID);
             }
 
             // - Sites
@@ -595,6 +619,39 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DelContactAsync
 
+        // RiskLevels
+
+        public async Task AddRiskLevelAsync(Guid id, Guid riskLevelID)
+        {
+            // Validar
+            // - Que el nivel de riesgo esté activo
+            // - Que el nivel de riesgo sea del standard del app form
+            await _repository.AddRiskLevelAsync(id, riskLevelID);
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.AddRiskLevelAsync: {ex.Message}");
+            }
+        } // AddRiskLevelAsync
+
+        public async Task DelRiskLevelAsync(Guid id, Guid riskLevelID)
+        {
+            await _repository.DelRiskLevelAsync(id, riskLevelID);
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.DelRiskLevelAsync: {ex.Message}");
+            }
+        } // DelRiskLevelAsync
+
+        // Sites
+
         public async Task AddSiteAsync(Guid id, Guid siteID)
         {
             // Validar
@@ -641,63 +698,71 @@ namespace Arysoft.ARI.NF48.Api.Services
                 item.Organization?.Website,
                 item.Organization?.Phone,
                 Companies = item.Organization.Companies
-                                    .Where(c => c.Status == StatusType.Active)
-                                    .Select(c => new { c.ID, c.Name, c.LegalEntity, c.COID }),
+                    .Where(c => c.Status == StatusType.Active)
+                    .Select(c => new { c.ID, c.Name, c.LegalEntity, c.COID }),
                 Contacts = item.Contacts
-                                    .Where(c => c.Status == StatusType.Active)
-                                    .Select(c => new 
-                                    { 
-                                        c.ID, 
-                                        FullName = Strings.FullName(c.FirstName, c.MiddleName, c.LastName), 
-                                        c.Email, 
-                                        c.Phone, 
-                                        c.Position 
-                                    }),
+                    .Where(c => c.Status == StatusType.Active)
+                    .Select(c => new 
+                    { 
+                        c.ID, 
+                        FullName = Strings.FullName(c.FirstName, c.MiddleName, c.LastName), 
+                        c.Email, 
+                        c.Phone, 
+                        c.Position 
+                    }),
                 Sites = item.Sites
-                                    .Where(s => s.Status == StatusType.Active)
-                                    .Select(s => new {
-                                        s.ID,
-                                        s.Description,
-                                        s.IsMainSite,
-                                        s.Address,
-                                        s.Country,
-                                        Shifts = s.Shifts
-                                            .Where(sh => sh.Status == StatusType.Active)
-                                            .Select(sh => new
-                                            {
-                                                sh.ID,
-                                                sh.Type,
-                                                sh.NoEmployees,
-                                                sh.ActivitiesDescription,
-                                                sh.ShiftStart,
-                                                sh.ShiftEnd,
-                                                sh.ShiftStart2,
-                                                sh.ShiftEnd2,
-                                            }),
-                                        EmployeesCount = s.Shifts
-                                            .Where(sh => sh.Status == StatusType.Active)
-                                            .Sum(sh => sh.NoEmployees)
-                                    }),
+                    .Where(s => s.Status == StatusType.Active)
+                    .Select(s => new {
+                        s.ID,
+                        s.Description,
+                        s.IsMainSite,
+                        s.Address,
+                        s.Country,
+                        Shifts = s.Shifts
+                            .Where(sh => sh.Status == StatusType.Active)
+                            .Select(sh => new
+                            {
+                                sh.ID,
+                                sh.Type,
+                                sh.NoEmployees,
+                                sh.ActivitiesDescription,
+                                sh.ShiftStart,
+                                sh.ShiftEnd,
+                                sh.ShiftStart2,
+                                sh.ShiftEnd2,
+                            }),
+                        EmployeesCount = s.Shifts
+                            .Where(sh => sh.Status == StatusType.Active)
+                            .Sum(sh => sh.NoEmployees)
+                    }),
                 SitesEmployeesCount = item.Sites != null
-                                    ? item.Sites
-                                        .Where(s => s.Status == StatusType.Active)
-                                        .Sum(s => s.Shifts
-                                            .Where(sh => sh.Status == StatusType.Active)
-                                            .Sum(sh => sh.NoEmployees)) ?? 0
-                                    : 0,
+                    ? item.Sites
+                        .Where(s => s.Status == StatusType.Active)
+                        .Sum(s => s.Shifts
+                            .Where(sh => sh.Status == StatusType.Active)
+                            .Sum(sh => sh.NoEmployees)) ?? 0
+                    : 0,
                 NaceCodes = item.NaceCodes
-                                    .Where(nc => nc.Status == StatusType.Active)
-                                    .Select(nc => new 
-                                        { 
-                                            nc.ID, 
-                                            nc.Sector,
-                                            nc.Division,
-                                            nc.Group,
-                                            nc.Class,
-                                            nc.Description,
-                                            nc.AccreditedStatus
-                                        }
-                                    )
+                    .Where(nc => nc.Status == StatusType.Active)
+                    .Select(nc => new 
+                        { 
+                            nc.ID, 
+                            nc.Sector,
+                            nc.Division,
+                            nc.Group,
+                            nc.Class,
+                            nc.Description,
+                            nc.AccreditedStatus
+                        }
+                    ),
+                RiskLevels = item.RiskLevels
+                    .Where(rl => rl.Status == StatusType.Active)
+                    .Select(rl => new
+                    {
+                        rl.ID,
+                        rl.Category,
+                        rl.BusinessSector
+                    })
             };
 
             return JsonConvert.SerializeObject(historicalData);
@@ -782,7 +847,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
             //   * ISO 9001
 
-            if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k) 
+            if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K) 
                 throw new BusinessException("The selected standard is not valid for generating an Application Form");
 
         } // ValidateCreateAppFormAsync
@@ -829,6 +895,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   - Tener al menos un sitio asignado y que sea el principal
             //   - Tener al menos un contacto asignado
             //   - Tener al menos un NACE code asignado
+
+            // TODO: Si es un ISO que requiere RiskLevel, validar que tenga un RiskLevel asignado
+            //       y que coincida con el nivel de riesgo del ISO
 
             var standardRepository = new StandardRepository();
 

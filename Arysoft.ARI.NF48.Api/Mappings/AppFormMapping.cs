@@ -22,23 +22,35 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static AppFormItemListDto AppFormToItemListDto(AppForm item)
         {
+            var category = RiskLevelCategory.Nothing;
+
+            if (item.RiskLevels != null && item.RiskLevels.Any())
+            {
+                // Obtener el valor del RiskLevel más alto (high = 1)
+                category = item.RiskLevels.Min(r => r.Category) 
+                    ?? RiskLevelCategory.Nothing;
+            }
+
             return new AppFormItemListDto
             {
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 AuditCycleID = item.AuditCycleID,
                 StandardID = item.StandardID,
-                // 9K
+                // ISO Varios
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
                 ProcessServicesDescription = item.ProcessServicesDescription,
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
+                // 9K
                 AutomationLevelPercent = item.AutomationLevelPercent,
                 AutomationLevelJustification = item.AutomationLevelJustification,
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
+                // 14K
+                OperationalControls = item.OperationalControls,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -51,10 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AnyConsultancyBy = item.AnyConsultancyBy,
                 // INTERNAL
                 SalesDate = item.SalesDate,
-                //SalesComments = item.SalesComments,
                 ReviewDate = item.ReviewDate,
-                ReviewJustification = item.ReviewJustification,
-                //ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
                 HistoricalDataJSON = item.HistoricalDataJSON,
@@ -69,6 +78,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardName = item.Standard != null
                     ? item.Standard.Name
                     : string.Empty,
+                RiskLevelCategory = category,
                 ADCCount = item.ADCs != null
                     ? item.ADCs.Count
                     : 0,
@@ -112,17 +122,20 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 AuditCycleID = item.AuditCycleID,
                 StandardID = item.StandardID,
-                // 9K
+                // ISO Varios
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
                 ProcessServicesDescription = item.ProcessServicesDescription,
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
+                // 9K
                 AutomationLevelPercent = item.AutomationLevelPercent,
                 AutomationLevelJustification = item.AutomationLevelJustification,
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
+                // ISO 14K
+                OperationalControls = item.OperationalControls,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -135,10 +148,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AnyConsultancyBy = item.AnyConsultancyBy,
                 // INTERNAL
                 SalesDate = item.SalesDate,
-                // SalesComments = item.SalesComments,
                 ReviewDate = item.ReviewDate,
-                // ReviewJustification = item.ReviewJustification,
-                // ReviewComments = item.ReviewComments,
                 UserSales = item.UserSales,
                 UserReviewer = item.UserReviewer,
                 HistoricalDataJSON = item.HistoricalDataJSON,
@@ -167,6 +177,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         item.Contacts.OrderByDescending(c => c.IsMainContact)
                             .ThenBy(c => c.FirstName)
                         ).ToList()
+                    : null,
+                RiskLevels = item.RiskLevels != null
+                    ? RiskLevelMapping.RiskLevelToListDto(item.RiskLevels).ToList()
                     : null,
                 Sites = item.Sites != null
                     ? SiteMapping.SiteToListDto(
@@ -198,19 +211,21 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {
             return new AppForm
             {
-                ID = item.ID,                
-                // StandardID = item.StandardID,
-                // 9K
+                ID = item.ID,
+                // ISO Varios
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
                 ProcessServicesDescription = item.ProcessServicesDescription,
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
+                // 9K
                 AutomationLevelPercent = item.AutomationLevelPercent,
                 AutomationLevelJustification = item.AutomationLevelJustification,
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
+                // 14K
+                OperationalControls = item.OperationalControls,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -221,11 +236,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OutsourcedProcess = item.OutsourcedProcess,
                 AnyConsultancy = item.AnyConsultancy,
                 AnyConsultancyBy = item.AnyConsultancyBy,
-                //SalesDate = item.SalesDate,
-                // SalesComments = item.SalesComments,
-                //ReviewDate = item.ReviewDate,
-                //ReviewJustification = item.ReviewJustification,
-                //ReviewComments = item.ReviewComments,
                 Status = item.Status,
                 UpdatedUser = item.UpdatedUser
             };
@@ -239,6 +249,5 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser
             };
         } // ItemDeleteDtoToAppForm
-
     }
 }

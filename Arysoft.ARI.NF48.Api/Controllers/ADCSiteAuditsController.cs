@@ -9,8 +9,6 @@ using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -55,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> GetADCSiteAudit(Guid id)
         {
             var item = await _service.GetAsync(id)
-                ?? throw new Exceptions.BusinessException("Item not found");
+                ?? throw new BusinessException("Item not found");
             var itemDto = ADCSiteAuditMapping
                 .ADCSiteAuditToItemDto(item);
             var response = new ApiResponse<ADCSiteAuditItemDto>(itemDto);
@@ -68,7 +66,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> PostADCSiteAudit([FromBody] ADCSiteAuditCreateDto itemDto)
         {
             if (!ModelState.IsValid)
-                throw new Exceptions.BusinessException(Strings.GetModelStateErrors(ModelState));
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             var item = ADCSiteAuditMapping
                 .ItemCreateDtoToADCSiteAudit(itemDto);

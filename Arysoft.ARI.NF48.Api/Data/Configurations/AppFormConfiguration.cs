@@ -44,6 +44,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
+                .Property(m => m.OperationalControls)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AppForm>()
                 .Property(m => m.CurrentCertificationsExpiration)
                 .HasMaxLength(100);
 
@@ -63,17 +67,17 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.AnyConsultancyBy)
                 .HasMaxLength(250);
 
-            modelBuilder.Entity<AppForm>()
-                .Property(m => m.SalesComments)
-                .HasMaxLength(1000);
+            //modelBuilder.Entity<AppForm>()
+            //    .Property(m => m.SalesComments)
+            //    .HasMaxLength(1000);
 
             //modelBuilder.Entity<AppForm>()
             //    .Property(m => m.ReviewJustification)
             //    .HasMaxLength(1000); // Va a ser MAX
 
-            modelBuilder.Entity<AppForm>()
-                .Property(m => m.ReviewComments)
-                .HasMaxLength(1000);
+            //modelBuilder.Entity<AppForm>()
+            //    .Property(m => m.ReviewComments)
+            //    .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.UserSales)
@@ -108,7 +112,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasForeignKey(m => m.OwnerID)
                 .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<AppForm>() // Probar estas relaciones también XD
+            modelBuilder.Entity<AppForm>()
                 .HasMany(m => m.Contacts)
                 .WithMany()
                 .Map(e => e.MapLeftKey("AppFormID")
@@ -121,6 +125,13 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Map(e => e.MapLeftKey("AppFormID")
                     .MapRightKey("NaceCodeID")
                     .ToTable("AppFormsNaceCodes"));
+
+            modelBuilder.Entity<AppForm>()
+                .HasMany(m => m.RiskLevels)
+                .WithMany()
+                .Map(e => e.MapLeftKey("AppFormID")
+                    .MapRightKey("RiskLevelID")
+                    .ToTable("AppFormsRiskLevels"));
 
             modelBuilder.Entity<AppForm>()
                 .HasMany(m => m.Sites)

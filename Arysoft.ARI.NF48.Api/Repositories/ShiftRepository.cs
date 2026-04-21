@@ -1,8 +1,4 @@
-﻿using Arysoft.ARI.NF48.Api.Exceptions;
-using Arysoft.ARI.NF48.Api.Models;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Arysoft.ARI.NF48.Api.Models;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {

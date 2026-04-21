@@ -145,6 +145,9 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             _context.Database.ExecuteSqlCommand(
                 "DELETE FROM AppFormsSites WHERE AppFormID = {0}", item.ID);
 
+            _context.Database.ExecuteSqlCommand(
+                "DELETE FROM AppFormsRiskLevels WHERE AppFormID = {0}", item.ID);
+
             base.Delete(item);
         } // Delete
 
@@ -323,6 +326,52 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             foundItem.Sites.Remove(siteItem);
         } // DelSiteAsync
 
+        // RISKLEVELS
+
+        public async Task AddRiskLevelAsync(Guid id, Guid riskLevelID)
+        {
+            var _riskLevelRepository = _context.Set<RiskLevel>();
+
+            var foundItem = await _model.FindAsync(id)
+                ?? throw new BusinessException("The application form to add a Risk Level was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
+            var riskLevelItem = await _riskLevelRepository.FindAsync(riskLevelID)
+                ?? throw new BusinessException("The Risk Level you're trying to relate was not found");
+
+            if (foundItem.StandardID != riskLevelItem.StandardID)
+                throw new BusinessException("The Risk Level you're trying to relate has a different Standard than the application form");
+            if (foundItem.RiskLevels.Contains(riskLevelItem))
+                throw new BusinessException("The application form already has the Risk Level related");
+            
+            foundItem.RiskLevels.Add(riskLevelItem);
+        } // AddRiskLevelAsync
+
+        public async Task AddRiskLevelAsync(AppForm item, Guid riskLevelID)
+        {
+            var _riskLevelRepository = _context.Set<RiskLevel>();            
+            var riskLevelItem = await _riskLevelRepository.FindAsync(riskLevelID)
+                ?? throw new BusinessException("The Risk Level you're trying to relate was not found");
+
+            item.RiskLevels.Add(riskLevelItem);
+        } // AddRiskLevelAsync
+
+        public async Task DelRiskLevelAsync(Guid id, Guid riskLevelID)
+        {
+            var _riskLevelRepository = _context.Set<RiskLevel>();
+
+            var foundItem = await _model.FindAsync(id)
+                ?? throw new BusinessException("The application form to remove a Risk Level was not found");
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
+            var riskLevelItem = await _riskLevelRepository.FindAsync(riskLevelID)
+                ?? throw new BusinessException("The risk level related was not found");
+            if (!foundItem.RiskLevels.Contains(riskLevelItem))
+                throw new BusinessException("The risk level is not related to the application form");
+            
+            foundItem.RiskLevels.Remove(riskLevelItem);
+        } // DelRiskLevelAsync
+
         // GENERAL
 
         public new async Task DeleteTmpByUserAsync(string username)
@@ -340,6 +389,9 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
                 _context.Database.ExecuteSqlCommand(
                     "DELETE FROM AppFormsSites WHERE AppFormID = {0}", item.ID);
+
+                _context.Database.ExecuteSqlCommand(
+                    "DELETE FROM AppFormsRiskLevels WHERE AppFormID = {0}", item.ID);
 
                 _model.Remove(item);
             }

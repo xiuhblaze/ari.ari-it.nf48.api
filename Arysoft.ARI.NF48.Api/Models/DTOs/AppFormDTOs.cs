@@ -15,7 +15,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
-        // ISO 9K
+        // ISO VARIOS
 
         public string ActivitiesScope { get; set; }
 
@@ -29,6 +29,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CriticalComplaintComments { get; set; }
 
+        // ISO 9K
+
         public int? AutomationLevelPercent { get; set; }
 
         public string AutomationLevelJustification { get; set; }
@@ -36,6 +38,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public bool? IsDesignResponsibility { get; set; }
 
         public string DesignResponsibilityJustify { get; set; }
+
+        // ISO 14K
+
+        public string OperationalControls { get; set; }
 
         // GENERAL
 
@@ -63,7 +69,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? ReviewDate { get; set; }
 
-        public string ReviewJustification { get; set; }
+        // public string ReviewJustification { get; set; }
 
         public string UserSales { get; set; }
 
@@ -81,9 +87,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string StandardName { get; set; }
 
-        public string UserSalesName { get; set; }
-
-        public string UserReviewerName { get; set; }
+        // Obtener el valor del RiskLevel más alto
+        public RiskLevelCategory? RiskLevelCategory { get; set; }
 
         public ICollection<string> Nacecodes { get; set; }
 
@@ -113,7 +118,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
-        // ISO 9K
+        // ISO VARIOS
 
         public string ActivitiesScope { get; set; }
 
@@ -127,6 +132,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CriticalComplaintComments { get; set; }
 
+        // ISO 9K
+
         public int? AutomationLevelPercent { get; set; }
 
         public string AutomationLevelJustification { get; set; }
@@ -134,6 +141,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public bool? IsDesignResponsibility { get; set; }
 
         public string DesignResponsibilityJustify { get; set; }
+
+        // ISO 14K
+
+        public string OperationalControls { get; set; }
 
         // GENERAL
 
@@ -160,8 +171,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime? SalesDate { get; set; }
 
         public DateTime? ReviewDate { get; set; }
- // 
-        // public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
 
         public string UserSales { get; set; }
 
@@ -185,11 +194,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StandardItemListDto Standard { get; set; }
 
+        public RiskLevelItemListDto RiskLevel { get; set; }
+
         public ICollection<ADCItemListDto> ADCs { get; set; }
+
+        public ICollection<ContactItemListDto> Contacts { get; set; }
 
         public ICollection<NaceCodeItemListDto> Nacecodes { get; set; }
 
-        public ICollection<ContactItemListDto> Contacts { get; set; }
+        public ICollection<RiskLevelItemListDto> RiskLevels { get; set; }
 
         public ICollection<SiteItemListDto> Sites { get; set; }
 
@@ -218,9 +231,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        // public Guid StandardID { get; set; } 
-
-        // ISO 9K
+        // ISO VARIOS
 
         [StringLength(1000)]
         public string ActivitiesScope { get; set; }
@@ -238,6 +249,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(1000)]
         public string CriticalComplaintComments { get; set; }
 
+        // ISO 9K
+
         public int? AutomationLevelPercent { get; set; }
 
         [StringLength(1000)]
@@ -247,6 +260,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(1000)]
         public string DesignResponsibilityJustify { get; set; }
+
+        // ISO 14K
+
+        [StringLength(1000)]
+        public string OperationalControls { get; set; }
 
         // GENERAL
 
@@ -330,4 +348,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid SiteID { get; set; }
     } // AppFormSiteDto
+
+    public class AppFormRiskLevelDto
+    {
+        [Required]
+        public Guid AppFormID { get; set; }
+
+        [Required]
+        public Guid RiskLevelID { get; set; }
+    } // AppFormRiskLevelDto
 }

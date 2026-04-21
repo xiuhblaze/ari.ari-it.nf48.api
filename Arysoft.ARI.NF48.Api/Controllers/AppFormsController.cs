@@ -206,6 +206,41 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // DelContact
 
+        // RISK LEVELS
+
+        [HttpPost]
+        [Route("api/AppForms/{id}/risk-level")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> AddRiskLevel(Guid id, [FromBody] AppFormRiskLevelDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.AppFormID)
+                throw new BusinessException("The ID of the item does not match the ID of the request");
+
+            await _service.AddRiskLevelAsync(itemDto.AppFormID, itemDto.RiskLevelID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // AddRiskLevel
+
+        [HttpDelete]
+        [Route("api/AppForms/{id}/risk-level")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> DelRiskLevel(Guid id, [FromBody] AppFormRiskLevelDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+            if (id != itemDto.AppFormID)
+                throw new BusinessException("The ID of the item does not match the ID of the request");
+
+            await _service.DelRiskLevelAsync(itemDto.AppFormID, itemDto.RiskLevelID);
+            var response = new ApiResponse<bool>(true);
+            
+            return Ok(response);
+        } // DelRiskLevel
+
         // SITES
 
         [HttpPost]
