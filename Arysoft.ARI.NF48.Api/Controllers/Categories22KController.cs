@@ -62,7 +62,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         // POST: api/Category22K
         [ResponseType(typeof(ApiResponse<Category22KItemDetailDto>))]
-        public async Task<IHttpActionResult> PostCategory22K([FromBody] Category22KPostDto itemAddDto)
+        public async Task<IHttpActionResult> PostCategory22K([FromBody] Category22KCreateDto itemAddDto)
         {
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
@@ -77,7 +77,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
         // PUT: api/Category22K/5
         [ResponseType(typeof(ApiResponse<Category22KItemDetailDto>))]
-        public async Task<IHttpActionResult> PutCategory22K(Guid id, [FromBody] Category22KPutDto itemEditDto)
+        public async Task<IHttpActionResult> PutCategory22K(Guid id, [FromBody] Category22KUpdateDto itemEditDto)
         {
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));

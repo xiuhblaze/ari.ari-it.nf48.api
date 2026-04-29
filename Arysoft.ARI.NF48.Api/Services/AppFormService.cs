@@ -64,8 +64,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.OutsourcedProcess != null && m.OutsourcedProcess.ToLower().Contains(filters.Text))
                     || (m.AnyConsultancyBy != null && m.AnyConsultancyBy.ToLower().Contains(filters.Text))
                     //|| (m.SalesComments != null && m.SalesComments.ToLower().Contains(filters.Text))
-                    //|| (m.ReviewJustification != null && m.ReviewJustification.ToLower().Contains(filters.Text))
-                    //|| (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
+                    || (m.ReviewJustification != null && m.ReviewJustification.ToLower().Contains(filters.Text))
+                    || (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
                     || (m.Organization != null && m.Organization.Name.ToLower().Contains(filters.Text))
                     || (m.Standard != null && m.Standard.Name.ToLower().Contains(filters.Text))
                     || (m.UserSales != null && m.UserSales.ToLower().Contains(filters.Text))
@@ -246,10 +246,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validar si el CycleYear es valido y no está duplicado
             if (await _repository.ExistsValidCycleYearAppForm(
-                foundItem.AuditCycleID, 
-                item.CycleYear ?? CycleYearType.Nothing,
-                item.ID
-                ))
+                    foundItem.AuditCycleID, 
+                    item.CycleYear ?? CycleYearType.Nothing,
+                    item.ID))
                 throw new BusinessException("The selected Cycle Year is already assigned to another Application Form for the same standard in the current audit cycle");
 
             // TODO: Considerar el validar por fechas de aplicación, que no este el año 2 un año fisico antes que año 1, etc.
@@ -305,15 +304,25 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AppFormStatusType.ApplicantRejected:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-                        //if (string.IsNullOrEmpty(item.ReviewComments))
-                        //    throw new BusinessException("Review comments is required");
+
+                        // HACK: Considerar que esta validacion se haga no solo al cambio, sino mientras se 
+                        // encuentre en los estados de: AplicantRejected y Active, para evitar que se
+                        // quite la justificación
+                        if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K 
+                            && string.IsNullOrEmpty(item.ReviewJustification))
+                            throw new BusinessException("Review justification are required");
                         break;
 
                     case AppFormStatusType.Active:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-                        //if (string.IsNullOrEmpty(item.ReviewComments))
-                        //    throw new BusinessException("Review comments is required");
+
+                        // HACK: Considerar que esta validacion se haga no solo al cambio, sino mientras se 
+                        // encuentre en los estados de: AplicantRejected y Active, para evitar que se
+                        // quite la justificación
+                        if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K 
+                            && string.IsNullOrEmpty(item.ReviewJustification))
+                            throw new BusinessException("Review justification are required");
                         break;
 
                     case AppFormStatusType.Inactive:
@@ -359,6 +368,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 // ISO 14K
                 foundItem.OperationalControls = item.OperationalControls;
 
+                // ISO 22K
+                foundItem.Category22KID = item.Category22KID;
+                foundItem.HACCPNum = item.HACCPNum;
+                // - internal
+                foundItem.ReviewJustification = item.ReviewJustification;
+                foundItem.ReviewComments = item.ReviewComments;
+
                 // General
                 foundItem.Description = item.Description;
                 foundItem.AuditLanguage = item.AuditLanguage;
@@ -373,8 +389,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
                 //foundItem.SalesComments = item.SalesComments;
                 foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
-                //foundItem.ReviewJustification = item.ReviewJustification;
-                //foundItem.ReviewComments = item.ReviewComments;                
             }
 
             foundItem.Status = item.Status;
@@ -436,12 +450,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 UpdatedUser = updatedUser,
                 NaceCodes = new List<NaceCode>(),
                 Contacts = new List<Contact>(),
-                Sites = new List<Site>()
+                Sites = new List<Site>(),
+                RiskLevels = new List<RiskLevel>()
             };
 
             // ISO VARIOS
             if (originalItem.Standard.StandardBase == StandardBaseType.ISO9k
-                || originalItem.Standard.StandardBase == StandardBaseType.ISO14K)
+                || originalItem.Standard.StandardBase == StandardBaseType.ISO14K
+                || originalItem.Standard.StandardBase == StandardBaseType.ISO22K)
             { 
                     newItem.ActivitiesScope = originalItem.ActivitiesScope;
                     newItem.ProcessServicesCount = originalItem.ProcessServicesCount;
@@ -464,6 +480,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case StandardBaseType.ISO14K:
                     // ISO 14000
                     newItem.OperationalControls = originalItem.OperationalControls;
+                    break;
+                case StandardBaseType.ISO22K:
+                    // ISO 22000
+                    newItem.Category22KID = originalItem.Category22KID;
+                    newItem.HACCPNum = originalItem.HACCPNum;
                     break;
             }
 
@@ -845,10 +866,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
-            //   * ISO 9001
+            //   * ISO 9001, ISO 14001 y ISO22000, pero se pueden agregar más en el futuro
 
             if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k
-                && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K) 
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K)
                 throw new BusinessException("The selected standard is not valid for generating an Application Form");
 
         } // ValidateCreateAppFormAsync
@@ -883,21 +905,20 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private async Task ValidateAppFormAsync(AppForm newItem, AppForm currentItem)
         {
-            // - Validar que el CycleYear no exista
+            // - Validar que el CycleYear exista
             // - Solo puede haber un appform activo por ciclo
             // - Validar que el ciclo esté activo - Omitir por ahora -UPDATE xBlaze(20250826): este no, es necesario subir auditorias o documentación estando inactivo
             //   por lo pronto, validar que el ciclo no sea del pasado
-            // - Validar que el standard esté activo y que pertenesca al ciclo,
+            // - Validar que el standard esté activo y que pertenezca al ciclo,
             //   solo la primera vez - Este se cambió a ValidateCreateAppFormAsync
             // - Validar que el appform no esté en un status que no se pueda editar
             // - AuditLanguage - Validar que sea un idioma aceptado 'es', 'en' - YA
-            // - Al cambiar a Activo, validar:
+            // - Al cambiar a Activo, validar de acuerdo con su Standard Base:
             //   - Tener al menos un sitio asignado y que sea el principal
             //   - Tener al menos un contacto asignado
-            //   - Tener al menos un NACE code asignado
-
-            // TODO: Si es un ISO que requiere RiskLevel, validar que tenga un RiskLevel asignado
-            //       y que coincida con el nivel de riesgo del ISO
+            //   - 9K y 14K: Tener al menos un NACE code asignado
+            //   - 14K: Tener al menos un Risk Level asignado
+            //   - 22K: Validar que tenga una categoría asignada y que si tiene HACCP
 
             var standardRepository = new StandardRepository();
 
@@ -942,36 +963,75 @@ namespace Arysoft.ARI.NF48.Api.Services
                     && newItem.Status != AppFormStatusType.New)
                     throw new BusinessException("You can't change to this status from Cancel");
 
-                switch (newItem.Status) 
-                {
-                    case AppFormStatusType.Active:
-                        // Validaciónes más a detalle como:
-                        // - Tener al menos un sitio asignado y que sea el principal
-                        if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.IsMainSite)
-                            .Any())
-                            throw new BusinessException("The Application Form must have an active main site assigned");
+                //if (newItem.Status >= AppFormStatusType.ApplicantReview
+                //    && newItem.Status <= AppFormStatusType.Active)
+                //{
+                //    // - Tener al menos un sitio asignado y que sea el principal
+                //    if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.IsMainSite)
+                //        .Any())
+                //        throw new BusinessException("The Application Form must have an active main site assigned");
 
-                        // - Tener al menos un contacto asignado
-                        if (!currentItem.Contacts.Where(c => c.Status == StatusType.Active).Any())
-                            throw new BusinessException("The Application Form must have at least one active contact assigned");
+                //    // - Tener al menos un contacto asignado
+                //    if (!currentItem.Contacts.Where(c => c.Status == StatusType.Active).Any())
+                //        throw new BusinessException("The Application Form must have at least one active contact assigned");
+                //}
 
-                        // - Tener al menos un nace code asignado
-                        if (!currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
-                            throw new BusinessException("The Application Form must have at least one active NACE code assigned");
-                        break;
-                }
+                if (await _repository.ExistsValidAppFormAsync(newItem.AuditCycleID, newItem.ID))
+                    throw new BusinessException("There is already an active Application Form for this standard cycle");
+
+                // NOTE: Deshabilitado por el momento porque se necesita modificar información
+                // aunque el ciclo esté inactivo, pero se puede considerar que no se
+                // debe de subir más información - xBlaze: 20260220
+                //if (currentItem.AuditCycle != null 
+                //    && currentItem.AuditCycle.EndDate.HasValue
+                //    && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
+                //    throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
+
+                //! switch (newItem.Status)  //CHECK: Lo mande a un metodo
+                //{
+                //    case AppFormStatusType.Active:
+                //        // Validaciónes más a detalle como:
+
+
+                //        // - Tener al menos un nace code asignado
+                //        if ((currentItem.Standard.StandardBase == StandardBaseType.ISO9k
+                //                || currentItem.Standard.StandardBase == StandardBaseType.ISO14K
+                //            )
+                //            && !currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
+                //            throw new BusinessException("The Application Form must have at least one active NACE code assigned");
+
+                //        if (currentItem.Standard.StandardBase == StandardBaseType.ISO14K
+                //            && !currentItem.RiskLevels.Where(rl => rl.Status == StatusType.Active).Any())
+                //        { 
+
+                //        }
+
+                //            throw new BusinessException("The Application Form must have at least one active Risk Level assigned");
+
+                //        break;
+                //}
             } // El status cambió
 
-            if (await _repository.ExistsValidAppFormAsync(newItem.AuditCycleID, newItem.ID))
-                throw new BusinessException("There is already an active Application Form for this standard cycle");
+            // ISO Varios
+            await ValidateAppFormForGeneralAsync(newItem, currentItem);
 
-            // NOTE: Deshabilitado por el momento porque se necesita modificar información
-            // aunque el ciclo esté inactivo, pero se puede considerar que no se
-            // debe de subir más información - xBlaze: 20260220
-            //if (currentItem.AuditCycle != null 
-            //    && currentItem.AuditCycle.EndDate.HasValue
-            //    && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
-            //    throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
+            // Validar por ISO Base...
+            switch (currentItem.Standard.StandardBase)
+            {
+                case StandardBaseType.ISO9k:
+                    await ValidateAppFormFor9KAsync(newItem, currentItem);
+                    break;
+
+                case StandardBaseType.ISO14K:
+                    await ValidateAppFormFor14KAsync(newItem, currentItem);
+                    break;
+
+                case StandardBaseType.ISO22K:
+                    await ValidateAppFormFor22KAsync(newItem, currentItem);
+                    break;
+            }
+
+            // General...
 
             if (!string.IsNullOrEmpty(newItem.AuditLanguage))
             {   
@@ -983,6 +1043,83 @@ namespace Arysoft.ARI.NF48.Api.Services
             } else throw new BusinessException("The audit language is required");
 
         } // ValidateAppFormAsync
+
+        // ISO General
+
+        private async Task ValidateAppFormForGeneralAsync(AppForm newItem, AppForm currentItem)
+        {
+            var item = newItem.Status == currentItem.Status // El status no ha cambiado
+                ? currentItem
+                : newItem;
+
+            if (item.Status >= AppFormStatusType.New
+                && item.Status <= AppFormStatusType.Active)
+            {
+                // - Validar que tenga al menos un sitio activo y que sea el principal
+                if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.IsMainSite).Any())
+                    throw new BusinessException("The Application Form must have an active main site assigned");
+
+                // - Validar que tenga al menos un contacto asignado
+                if (!currentItem.Contacts.Where(c => c.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active contact assigned");
+            }
+        } // ValidateAppFormForGeneralAsync
+
+        // ISO 9K
+        private async Task ValidateAppFormFor9KAsync(AppForm newItem, AppForm currentItem)
+        {
+            var item = newItem.Status == currentItem.Status // El status no ha cambiado
+                ? currentItem
+                : newItem;
+
+            if (item.Status >= AppFormStatusType.ApplicantReview
+                && item.Status <= AppFormStatusType.Active)
+            {
+                // - Validar que tenga al menos un nace code activo
+                if (!currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active NACE code assigned");
+            }
+        } // ValidateAppFormFor9KAsync
+
+        // ISO 14K
+        private async Task ValidateAppFormFor14KAsync(AppForm newItem, AppForm currentItem)
+        {
+            var item = newItem.Status == currentItem.Status // El status no ha cambiado
+                ? currentItem
+                : newItem;
+
+            // Si está dentro de estos status, validar...
+            if (item.Status >= AppFormStatusType.ApplicantReview
+                && item.Status <= AppFormStatusType.Active)
+            {
+                // - Validar que tenga al menos un nace code activo
+                if (!currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active NACE code assigned");
+
+                // - Validar que tenga un nivel de riesgo activo
+                if (!currentItem.RiskLevels.Where(rl => rl.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active Risk Level assigned");
+            }
+
+        } // ValidateAppFormFor14KAsync
+
+        // ISO 22K
+        private async Task ValidateAppFormFor22KAsync(AppForm newItem, AppForm currentItem)
+        {
+            var item = newItem.Status == currentItem.Status // El status no ha cambiado
+                ? currentItem
+                : newItem;
+
+            if (item.Status >= AppFormStatusType.ApplicantReview
+                && item.Status <= AppFormStatusType.Active)
+            {
+                if (item.Category22KID == null || item.Category22KID == Guid.Empty)
+                    throw new BusinessException("The Application Form must have a category assigned");
+
+                if (item.HACCPNum == null || item.HACCPNum <= 0)
+                    throw new BusinessException("The Application Form must have a valid HACCP number assigned");
+            }
+        } // ValidateAppFormFor22KAsync
 
         // STATIC METHODS
 

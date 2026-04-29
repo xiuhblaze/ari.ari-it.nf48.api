@@ -12,15 +12,17 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? StandardID { get; set; }
 
+        public Guid? Category22KID { get; set; }                // Solo para ISO 22K
+
         // ISO Varios
 
-        public string ActivitiesScope { get; set; }             // 9K, 14K
+        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K
 
-        public int? ProcessServicesCount { get; set; }          // 9K, 14K
+        public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K (lines of product)
 
-        public string ProcessServicesDescription { get; set; }  // 9K, 14K
+        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K (seasonality)
 
-        public string LegalRequirements { get; set; }           // 9K, 14K
+        public string LegalRequirements { get; set; }           // 9K, 14K, 22K
 
         public bool? AnyCriticalComplaint { get; set; }         // 9K, 14K
 
@@ -39,6 +41,14 @@ namespace Arysoft.ARI.NF48.Api.Models
         // ISO 14K
 
         public string OperationalControls { get; set; }
+
+        // ISO 22K
+
+        public int? HACCPNum { get; set; }  
+
+        public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
+
+        public string ReviewComments { get; set; }      // 22K: Additonal comments by application reviewer
 
         // GENERAL
 
@@ -64,13 +74,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public DateTime? SalesDate { get; set; }        // Última fecha en que Ventas (sales) aprueba o rechaza el appform
 
-        //public string SalesComments { get; set; }       // Comentarios de Ventas (sales) de la última aprobación o cambio de status
-
         public DateTime? ReviewDate { get; set; }       // Última fecha en que el revisor del appform aprueba o rechaza
-
-        //public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
-
-        //public string ReviewComments { get; set; }      // 22K: Additonal comments by application reviewer
 
         public string UserSales { get; set; }
 

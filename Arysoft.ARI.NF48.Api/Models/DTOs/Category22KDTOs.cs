@@ -23,10 +23,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public bool IsAccredited { get; set; }
 
         public StatusType Status { get; set; }
-
-        public DateTime Updated { get; set; }
-
-        public string UpdatedUser { get; set; }
     } // Category22KItemListDto
 
     public class Category22KItemDetailDto
@@ -56,14 +52,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string UpdatedUser { get; set; }
     } // Category22KItemDetailDto
 
-    public class Category22KPostDto
+    public class Category22KCreateDto
     {
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    }
+    } // Category22KCreateDto
 
-    public class Category22KPutDto
+    public class Category22KUpdateDto
     {
         [Required]
         public Guid ID { get; set; }
@@ -95,7 +91,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    }
+    } // Category22KUpdateDto
 
     public class Category22KDeleteDto
     {
@@ -105,5 +101,5 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         [StringLength(50)]
         public string UpdatedUser { get; set; }
-    }
+    } // Category22KDeleteDto
 }

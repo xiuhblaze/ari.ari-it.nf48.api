@@ -1,6 +1,4 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-
-namespace Arysoft.ARI.NF48.Api.Models
+﻿namespace Arysoft.ARI.NF48.Api.Models
 {
     public class Category22K : BaseModel
     {
@@ -17,7 +15,5 @@ namespace Arysoft.ARI.NF48.Api.Models
         public string Examples { get; set; }
 
         public bool IsAccredited { get; set; }
-
-        //public StatusType Status { get; set; }
     }
 }

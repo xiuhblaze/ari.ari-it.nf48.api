@@ -30,9 +30,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategoryDescription = item.SubCategoryDescription,
                 Examples = item.Examples,
                 IsAccredited = item.IsAccredited,
-                Status = item.Status,
-                Updated = item.Updated,
-                UpdatedUser = item.UpdatedUser
+                Status = item.Status
             };
         } // Category22KToItemListDto
 
@@ -55,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // Category22KToItemDetailDto
 
-        public static Category22K ItemAddDtoToCategory22K(Category22KPostDto itemDto)
+        public static Category22K ItemAddDtoToCategory22K(Category22KCreateDto itemDto)
         {
             return new Category22K
             {
@@ -63,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemAddDtoToCategory22K
 
-        public static Category22K ItemEditDtoToCategory22K(Category22KPutDto itemDto)
+        public static Category22K ItemEditDtoToCategory22K(Category22KUpdateDto itemDto)
         {
             return new Category22K
             {

@@ -108,9 +108,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
-            await _category22KRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-            _category22KRepository.Add(item);
-            await _category22KRepository.SaveChangesAsync();
+            try
+            { 
+                await _category22KRepository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _category22KRepository.Add(item);
+                await _category22KRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Category22KService.AddAsync: {ex.Message}");
+            }
 
             return item;
         } // AddAsync
@@ -152,7 +159,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException(ex.Message);
+                throw new BusinessException($"Category22KService.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
@@ -163,14 +170,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _category22KRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
 
-            // Validations
-
-            // - Que no tenga certificados activos, who knows
-
             if (foundItem.Status == StatusType.Deleted)
             {
-                //! Considerar eliminar todas las asociaciones al registro antes de su eliminación tales como
-                //  applications, ...
+                if (await _category22KRepository.ExistAssociatedAppFormsAsync(foundItem.ID))
+                    throw new BusinessException("The record cannot be deleted because it has associated app forms");
+
                 _category22KRepository.Delete(foundItem);
             }
             else
@@ -184,7 +188,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _category22KRepository.Update(foundItem);
             }
 
-            _category22KRepository.SaveChanges();
+            try
+            {
+                _category22KRepository.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Category22KService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }
