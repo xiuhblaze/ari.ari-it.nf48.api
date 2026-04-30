@@ -63,7 +63,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.CurrentCertificationsBy != null && m.CurrentCertificationsBy.ToLower().Contains(filters.Text) )
                     || (m.OutsourcedProcess != null && m.OutsourcedProcess.ToLower().Contains(filters.Text))
                     || (m.AnyConsultancyBy != null && m.AnyConsultancyBy.ToLower().Contains(filters.Text))
-                    //|| (m.SalesComments != null && m.SalesComments.ToLower().Contains(filters.Text))
                     || (m.ReviewJustification != null && m.ReviewJustification.ToLower().Contains(filters.Text))
                     || (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
                     || (m.Organization != null && m.Organization.Name.ToLower().Contains(filters.Text))
@@ -233,25 +232,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // - Asignaciones por status
 
-            //if (foundItem.Status == AppFormStatusType.Nothing) // Si es la primera vez...
-            //{
-            //    //foundItem.StandardID = foundItem.AuditCycle.StandardID; // item.StandardID; // Se asigna el standard
-            //    // Omitido porque la asignación del CycleYear se hace en el front al crear el appform - xBlaze 20251203
-            //    //foundItem.CycleYear = await _repository.GetNextCycleYearAwait( 
-            //    //    foundItem.AuditCycleID, 
-            //    //    item.StandardID ?? Guid.Empty,
-            //    //    foundItem.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing
-            //    //);
-            //}
-
-            // Validar si el CycleYear es valido y no está duplicado
-            if (await _repository.ExistsValidCycleYearAppForm(
-                    foundItem.AuditCycleID, 
-                    item.CycleYear ?? CycleYearType.Nothing,
-                    item.ID))
-                throw new BusinessException("The selected Cycle Year is already assigned to another Application Form for the same standard in the current audit cycle");
-
-            // TODO: Considerar el validar por fechas de aplicación, que no este el año 2 un año fisico antes que año 1, etc.
+            // Validar si el CycleYear es valido y no está duplicado - Movido a ValidateAppFormAsync 
+            //if (await _repository.ExistsValidCycleYearAppForm(
+            //        foundItem.AuditCycleID, 
+            //        item.CycleYear ?? CycleYearType.Nothing,
+            //        item.ID))
+            //    throw new BusinessException("The selected Cycle Year is already assigned to another Application Form in the current certificate cycle");
 
             if (item.Status == AppFormStatusType.Nothing 
                 || item.Status == AppFormStatusType.SalesReview // xBlaze 20250424: Estos dos últimos para evitar que se utilicen - en el futuro se podrian necesitar
@@ -285,17 +271,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                         //    foundItem.UserSales = item.UpdatedUser;
                         //}
                         if (foundItem.Status == AppFormStatusType.New)
-                        {
-                            //if (string.IsNullOrEmpty(item.SalesComments))
-                            //    throw new BusinessException("Comments is required");
+                        {   
                             item.SalesDate = DateTime.UtcNow;
                             foundItem.UserSales = item.UpdatedUser;
                         }
 
                         if (foundItem.Status == AppFormStatusType.ApplicantRejected)
                         {
-                            //if (string.IsNullOrEmpty(item.ReviewComments))
-                            //    throw new BusinessException("Review comments is required");
                             item.ReviewDate = DateTime.UtcNow;
                             foundItem.UserReviewer = item.UpdatedUser;
                         }
@@ -304,25 +286,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case AppFormStatusType.ApplicantRejected:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-
-                        // HACK: Considerar que esta validacion se haga no solo al cambio, sino mientras se 
-                        // encuentre en los estados de: AplicantRejected y Active, para evitar que se
-                        // quite la justificación
-                        if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K 
-                            && string.IsNullOrEmpty(item.ReviewJustification))
-                            throw new BusinessException("Review justification are required");
                         break;
 
                     case AppFormStatusType.Active:
                         item.ReviewDate = DateTime.UtcNow;
                         foundItem.UserReviewer = item.UpdatedUser;
-
-                        // HACK: Considerar que esta validacion se haga no solo al cambio, sino mientras se 
-                        // encuentre en los estados de: AplicantRejected y Active, para evitar que se
-                        // quite la justificación
-                        if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K 
-                            && string.IsNullOrEmpty(item.ReviewJustification))
-                            throw new BusinessException("Review justification are required");
                         break;
 
                     case AppFormStatusType.Inactive:
@@ -920,11 +888,20 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   - 14K: Tener al menos un Risk Level asignado
             //   - 22K: Validar que tenga una categoría asignada y que si tiene HACCP
 
+            // TODO: Considerar el validar por fechas de aplicación, que no este el año 2 un año fisico antes que año 1, etc.
+
             var standardRepository = new StandardRepository();
 
             if (currentItem.Status == AppFormStatusType.Inactive
                 || currentItem.Status == AppFormStatusType.Deleted)
                 throw new BusinessException("The record is not editable");
+
+            // Validar si el CycleYear es valido y no está duplicado
+            if (await _repository.ExistsValidCycleYearAppForm(
+                    currentItem.AuditCycleID,
+                    newItem.CycleYear ?? CycleYearType.Nothing,
+                    newItem.ID))
+                throw new BusinessException("The selected Cycle Year is already assigned to another Application Form in the current certificate cycle");
 
             if (newItem.Status != currentItem.Status) // El status cambió
             {
@@ -963,19 +940,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     && newItem.Status != AppFormStatusType.New)
                     throw new BusinessException("You can't change to this status from Cancel");
 
-                //if (newItem.Status >= AppFormStatusType.ApplicantReview
-                //    && newItem.Status <= AppFormStatusType.Active)
-                //{
-                //    // - Tener al menos un sitio asignado y que sea el principal
-                //    if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.IsMainSite)
-                //        .Any())
-                //        throw new BusinessException("The Application Form must have an active main site assigned");
-
-                //    // - Tener al menos un contacto asignado
-                //    if (!currentItem.Contacts.Where(c => c.Status == StatusType.Active).Any())
-                //        throw new BusinessException("The Application Form must have at least one active contact assigned");
-                //}
-
                 if (await _repository.ExistsValidAppFormAsync(newItem.AuditCycleID, newItem.ID))
                     throw new BusinessException("There is already an active Application Form for this standard cycle");
 
@@ -987,29 +951,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 //    && currentItem.AuditCycle.EndDate.Value < DateTime.Now)
                 //    throw new BusinessException("Audit cycle is old, Application Forms cannot be generated or updated for a certificate that has expired");
 
-                //! switch (newItem.Status)  //CHECK: Lo mande a un metodo
-                //{
-                //    case AppFormStatusType.Active:
-                //        // Validaciónes más a detalle como:
-
-
-                //        // - Tener al menos un nace code asignado
-                //        if ((currentItem.Standard.StandardBase == StandardBaseType.ISO9k
-                //                || currentItem.Standard.StandardBase == StandardBaseType.ISO14K
-                //            )
-                //            && !currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
-                //            throw new BusinessException("The Application Form must have at least one active NACE code assigned");
-
-                //        if (currentItem.Standard.StandardBase == StandardBaseType.ISO14K
-                //            && !currentItem.RiskLevels.Where(rl => rl.Status == StatusType.Active).Any())
-                //        { 
-
-                //        }
-
-                //            throw new BusinessException("The Application Form must have at least one active Risk Level assigned");
-
-                //        break;
-                //}
             } // El status cambió
 
             // ISO Varios
@@ -1118,6 +1059,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 if (item.HACCPNum == null || item.HACCPNum <= 0)
                     throw new BusinessException("The Application Form must have a valid HACCP number assigned");
+
+                if ((item.Status == AppFormStatusType.ApplicantRejected || item.Status == AppFormStatusType.Active)
+                    && string.IsNullOrEmpty(item.ReviewJustification))
+                    throw new BusinessException("Review justification are required");
             }
         } // ValidateAppFormFor22KAsync
 
