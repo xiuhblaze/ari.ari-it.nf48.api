@@ -29,7 +29,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = item.SubCategory,
                 SubCategoryDescription = item.SubCategoryDescription,
                 Examples = item.Examples,
-                IsAccredited = item.IsAccredited,
+                AccreditedStatus = item.AccreditedStatus,
                 Status = item.Status
             };
         } // Category22KToItemListDto
@@ -45,7 +45,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = item.SubCategory,
                 SubCategoryDescription = item.SubCategoryDescription,
                 Examples = item.Examples,
-                IsAccredited = item.IsAccredited,
+                AccreditedStatus = item.AccreditedStatus,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -72,7 +72,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = itemDto.SubCategory,
                 SubCategoryDescription = itemDto.SubCategoryDescription,
                 Examples = itemDto.Examples,
-                IsAccredited = itemDto.IsAccredited,
+                AccreditedStatus = itemDto.AccreditedStatus,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

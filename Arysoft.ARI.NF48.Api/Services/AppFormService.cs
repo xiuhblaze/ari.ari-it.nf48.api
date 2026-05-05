@@ -338,7 +338,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 // ISO 22K
                 foundItem.Category22KID = item.Category22KID;
-                foundItem.HACCPNum = item.HACCPNum;
+                foundItem.HACCPCount = item.HACCPCount;
                 // - internal
                 foundItem.ReviewJustification = item.ReviewJustification;
                 foundItem.ReviewComments = item.ReviewComments;
@@ -355,7 +355,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
                 // Internal
                 foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
-                //foundItem.SalesComments = item.SalesComments;
                 foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
             }
 
@@ -452,7 +451,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case StandardBaseType.ISO22K:
                     // ISO 22000
                     newItem.Category22KID = originalItem.Category22KID;
-                    newItem.HACCPNum = originalItem.HACCPNum;
+                    newItem.HACCPCount= originalItem.HACCPCount;
                     break;
             }
 
@@ -1057,7 +1056,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 if (item.Category22KID == null || item.Category22KID == Guid.Empty)
                     throw new BusinessException("The Application Form must have a category assigned");
 
-                if (item.HACCPNum == null || item.HACCPNum <= 0)
+                if (item.HACCPCount == null || item.HACCPCount <= 0)
                     throw new BusinessException("The Application Form must have a valid HACCP number assigned");
 
                 if ((item.Status == AppFormStatusType.ApplicantRejected || item.Status == AppFormStatusType.Active)

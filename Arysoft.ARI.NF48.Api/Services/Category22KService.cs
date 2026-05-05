@@ -44,10 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (filters.Accredited != null && filters.Accredited != Category22KAccreditedType.Nothing)
             {
-                items = items.Where(e =>
-                    (filters.Accredited == Category22KAccreditedType.Accredited && e.IsAccredited)
-                    || (filters.Accredited == Category22KAccreditedType.NotAccredited && !e.IsAccredited)
-                );
+                items = items.Where(e => e.AccreditedStatus == filters.Accredited);
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
@@ -130,7 +127,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - Que no haya duplicados
-            if (await _category22KRepository.ExistByCategorySubCategoryAsync(item.Category, item.SubCategory))
+            if (await _category22KRepository.ExistByCategorySubCategoryAsync(item.Category, item.SubCategory, item.ID))
                 throw new BusinessException("The Category and sub category already exist");
 
             // Assigning values
@@ -141,7 +138,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.SubCategory = item.SubCategory;
             foundItem.SubCategoryDescription = item.SubCategoryDescription;
             foundItem.Examples = item.Examples;
-            foundItem.IsAccredited = item.IsAccredited;
+            foundItem.AccreditedStatus = item.AccreditedStatus 
+                ?? Category22KAccreditedType.Nothing;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing

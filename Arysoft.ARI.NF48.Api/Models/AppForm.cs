@@ -44,7 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // ISO 22K
 
-        public int? HACCPNum { get; set; }  
+        public int? HACCPCount { get; set; }            // 22K: Indica el numero de procesos HACCP que se tienen, puede entrar más de una linea de producción en un proceso HACCP
 
         public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
 

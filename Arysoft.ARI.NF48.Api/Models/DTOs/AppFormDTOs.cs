@@ -15,6 +15,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
+        public Guid? Category22KID { get; set; }    // 22K
+
         // ISO VARIOS
 
         public string ActivitiesScope { get; set; }
@@ -43,6 +45,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string OperationalControls { get; set; }
 
+        // ISO 22K
+
+        public int? HACCPCount { get; set; }
+
+        //public string ReviewJustification { get; set; }   // Tal ves no se necesiten par este DTO
+
+        //public string ReviewComments { get; set; }
+
         // GENERAL
 
         public string Description { get; set; }
@@ -68,8 +78,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime? SalesDate { get; set; }
 
         public DateTime? ReviewDate { get; set; }
-
-        // public string ReviewJustification { get; set; }
 
         public string UserSales { get; set; }
 
@@ -118,6 +126,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
+        public Guid? Category22KID { get; set; }    // 22K
+
         // ISO VARIOS
 
         public string ActivitiesScope { get; set; }
@@ -145,6 +155,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // ISO 14K
 
         public string OperationalControls { get; set; }
+
+        // ISO 22K
+
+        public int? HACCPCount { get; set; }
+
+        public string ReviewJustification { get; set; }
+
+        public string ReviewComments { get; set; }
 
         // GENERAL
 
@@ -231,6 +249,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public Guid? Category22KID { get; set; }    // 22K
+
         // ISO VARIOS
 
         [StringLength(1000)]
@@ -265,6 +285,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(1000)]
         public string OperationalControls { get; set; }
+
+        // ISO 22K
+
+        public int? HACCPCount { get; set; }
+
+        public string ReviewJustification { get; set; }
+
+        [StringLength(1000)]
+        public string ReviewComments { get; set; }
 
         // GENERAL
 

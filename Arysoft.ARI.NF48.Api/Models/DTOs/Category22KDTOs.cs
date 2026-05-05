@@ -20,7 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Examples { get; set; }
 
-        public bool IsAccredited { get; set; }
+        public Category22KAccreditedType? AccreditedStatus { get; set; }
 
         public StatusType Status { get; set; }
     } // Category22KItemListDto
@@ -41,7 +41,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Examples { get; set; }
 
-        public bool IsAccredited { get; set; }
+        public Category22KAccreditedType? AccreditedStatus { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -84,7 +84,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Examples { get; set; }
 
-        public bool IsAccredited { get; set; }
+        public Category22KAccreditedType? AccreditedStatus { get; set; }
 
         public StatusType Status { get; set; }
 

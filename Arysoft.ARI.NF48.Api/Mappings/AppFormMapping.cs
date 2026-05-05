@@ -37,6 +37,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 AuditCycleID = item.AuditCycleID,
                 StandardID = item.StandardID,
+                Category22KID = item.Category22KID,
                 // ISO Varios
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
@@ -51,6 +52,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // 14K
                 OperationalControls = item.OperationalControls,
+                // 22K
+                HACCPCount = item.HACCPCount,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -122,6 +125,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 AuditCycleID = item.AuditCycleID,
                 StandardID = item.StandardID,
+                Category22KID = item.Category22KID,
                 // ISO Varios
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
@@ -136,6 +140,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // ISO 14K
                 OperationalControls = item.OperationalControls,
+                // ISO 22K
+                HACCPCount = item.HACCPCount,
+                ReviewJustification = item.ReviewJustification,
+                ReviewComments = item.ReviewComments,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -212,6 +220,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new AppForm
             {
                 ID = item.ID,
+                Category22KID = item.Category22KID,
                 // ISO Varios
                 ActivitiesScope = item.ActivitiesScope,
                 ProcessServicesCount = item.ProcessServicesCount,
@@ -226,6 +235,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // 14K
                 OperationalControls = item.OperationalControls,
+                // 22K
+                HACCPCount = item.HACCPCount,
+                ReviewJustification = item.ReviewJustification,
+                ReviewComments = item.ReviewComments,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,

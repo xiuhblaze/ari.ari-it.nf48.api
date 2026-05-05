@@ -8,13 +8,19 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class Category22KRepository : BaseRepository<Category22K>
     {
-        public async Task<bool> ExistByCategorySubCategoryAsync(string category, string subCategory)
+        public async Task<bool> ExistByCategorySubCategoryAsync(string category, string subCategory, Guid? exceptionID = null)
         {
-            return await _model
+            var query = _model
                 .Where(m => 
                     m.Category.ToUpper() == category.ToUpper()
-                    && m.SubCategory.ToUpper() == subCategory.ToUpper())
-                .AnyAsync();
+                    && m.SubCategory.ToUpper() == subCategory.ToUpper());
+
+            if (exceptionID != null && exceptionID != Guid.Empty)
+            {
+                query = query.Where(m => m.ID != exceptionID);
+            }
+
+            return await query.AnyAsync();
         } // ExistByCategorySubCategory
 
         public async Task<bool> ExistAssociatedAppFormsAsync(Guid category22KId)
