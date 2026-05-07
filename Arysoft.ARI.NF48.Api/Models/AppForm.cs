@@ -16,17 +16,17 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // ISO Varios
 
-        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K
+        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K, 37K (scope of certification)
 
-        public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K (lines of product)
+        public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K (lines of product), 37K (process/activities)
 
-        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K (seasonality)
+        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K (seasonality), 37K (process/activities description)
 
-        public string LegalRequirements { get; set; }           // 9K, 14K, 22K
+        public string LegalRequirements { get; set; }           // 9K, 14K, 22K, 37K (Anti-bribery controls)
 
-        public bool? AnyCriticalComplaint { get; set; }         // 9K, 14K
+        public bool? AnyCriticalComplaint { get; set; }         // 9K, 14K, 37K (Organization Involved in a bribery)
 
-        public string CriticalComplaintComments { get; set; }   // 9K, 14K
+        public string CriticalComplaintComments { get; set; }   // 9K, 14K, 37K (Organization Involved in a bribery - comments)
 
         // ISO 9K
 
@@ -91,6 +91,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public virtual AuditCycle AuditCycle { get; set; }
 
         public virtual Standard Standard { get; set; }
+
+        public virtual Category22K Category22K { get; set; }
 
         public virtual ICollection<ADC> ADCs { get; set; } // Solo va a ser un ADC
 

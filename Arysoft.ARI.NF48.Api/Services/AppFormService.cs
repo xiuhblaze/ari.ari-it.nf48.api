@@ -685,6 +685,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 StandardName = item.Standard?.Name,
                 item.Organization?.Website,
                 item.Organization?.Phone,
+                Category22K = item.Category22KID.HasValue ? new { 
+                    item.Category22K.Cluster,
+                    item.Category22K.Category,
+                    item.Category22K.CategoryDescription,
+                    item.Category22K.SubCategory,
+                    item.Category22K.SubCategoryDescription,
+                    item.Category22K.Examples,
+                    item.Category22K.AccreditedStatus
+                } : null,
                 Companies = item.Organization.Companies
                     .Where(c => c.Status == StatusType.Active)
                     .Select(c => new { c.ID, c.Name, c.LegalEntity, c.COID }),
@@ -833,11 +842,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
-            //   * ISO 9001, ISO 14001 y ISO22000, pero se pueden agregar más en el futuro
+            //   * ISO 9001
+            //   * ISO 14001
+            //   * ISO 22000
+            //   * ISO 37001
+            //   pero se pueden agregar más en el futuro
 
             if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K
-                && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K)
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO37K)
                 throw new BusinessException("The selected standard is not valid for generating an Application Form");
 
         } // ValidateCreateAppFormAsync
@@ -886,6 +900,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   - 9K y 14K: Tener al menos un NACE code asignado
             //   - 14K: Tener al menos un Risk Level asignado
             //   - 22K: Validar que tenga una categoría asignada y que si tiene HACCP
+            //   - 37K: Sin campos extra, validacion como 14K
 
             // TODO: Considerar el validar por fechas de aplicación, que no este el año 2 un año fisico antes que año 1, etc.
 
@@ -968,6 +983,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 case StandardBaseType.ISO22K:
                     await ValidateAppFormFor22KAsync(newItem, currentItem);
+                    break;
+
+                case StandardBaseType.ISO37K:
+                    await ValidateAppFormFor37KAsync(newItem, currentItem);
                     break;
             }
 
@@ -1064,6 +1083,26 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("Review justification are required");
             }
         } // ValidateAppFormFor22KAsync
+
+        private async Task ValidateAppFormFor37KAsync(AppForm newItem, AppForm currentItem)
+        {
+            var item = newItem.Status == currentItem.Status // El status no ha cambiado
+                ? currentItem
+                : newItem;
+
+            // Si está dentro de estos status, validar...
+            if (item.Status >= AppFormStatusType.ApplicantReview
+                && item.Status <= AppFormStatusType.Active)
+            {
+                // - Validar que tenga al menos un nace code activo
+                if (!currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active NACE code assigned");
+
+                // - Validar que tenga un nivel de riesgo activo
+                if (!currentItem.RiskLevels.Where(rl => rl.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active Risk Level assigned");
+            }
+        } // ValidateAppFormFor37KAsync
 
         // STATIC METHODS
 
