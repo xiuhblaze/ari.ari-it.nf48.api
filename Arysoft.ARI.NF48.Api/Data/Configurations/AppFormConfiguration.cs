@@ -48,6 +48,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
+                .Property(m => m.AssetsISO27KJSON)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<AppForm>()
                 .Property(m => m.CurrentCertificationsExpiration)
                 .HasMaxLength(100);
 

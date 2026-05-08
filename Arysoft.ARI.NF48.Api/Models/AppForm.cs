@@ -50,6 +50,10 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string ReviewComments { get; set; }      // 22K: Additonal comments by application reviewer
 
+        // ISO 27K
+
+        public string AssetsISO27KJSON { get; set; }    // 27K: Cadena JSON con la información de los activos
+
         // GENERAL
 
         public string Description { get; set; }         // Descripción corta del appform

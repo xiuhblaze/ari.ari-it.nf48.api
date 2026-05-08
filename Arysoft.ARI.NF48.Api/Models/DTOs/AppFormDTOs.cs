@@ -5,6 +5,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
+    //TODO: Analizar cuales de estos campos se necesitan en el DTO de lista,
+    //      y cuales solo en el DTO de detalle. Por ejemplo, los campos
+    //      relacionados con ISO 9K, 14K, 22K y 27K tal vez solo sean necesarios
+    //      en el DTO de detalle, mientras que el DTO de lista podría tener solo
+    //      los campos generales y algunos indicadores clave.
     public class AppFormItemListDto
     {
         public Guid ID { get; set; }
@@ -52,6 +57,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         //public string ReviewJustification { get; set; }   // Tal ves no se necesiten par este DTO
 
         //public string ReviewComments { get; set; }
+
+        // Los de ISO 27K seguramente no se necesiten en el DTO de lista
 
         // GENERAL
 
@@ -163,6 +170,20 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string ReviewJustification { get; set; }
 
         public string ReviewComments { get; set; }
+
+        // ISO 27K
+
+        public int? OwnServersCount { get; set; }
+
+        public int? CloudServersCount { get; set; }
+
+        public int? DesktopComputersCount { get; set; }
+
+        public int? LaptopComputersCount { get; set; }
+
+        public int? MobileWithAccessCount { get; set; }
+
+        public int? RemoteAccessCount { get; set; }
 
         // GENERAL
 
@@ -294,6 +315,20 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(1000)]
         public string ReviewComments { get; set; }
+
+        // ISO 27K
+
+        public int? OwnServersCount { get; set; }
+
+        public int? CloudServersCount { get; set; }
+
+        public int? DesktopComputersCount { get; set; }
+
+        public int? LaptopComputersCount { get; set; }
+
+        public int? MobileWithAccessCount { get; set; }
+
+        public int? RemoteAccessCount { get; set; }
 
         // GENERAL
 

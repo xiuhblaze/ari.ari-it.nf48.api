@@ -272,24 +272,24 @@ namespace Arysoft.ARI.NF48.Api.Services
                         //}
                         if (foundItem.Status == AppFormStatusType.New)
                         {   
-                            item.SalesDate = DateTime.UtcNow;
+                            item.SalesDate = DateTime.UtcNow;   // Guarda cuando se envió a revisión siendo nuevo
                             foundItem.UserSales = item.UpdatedUser;
                         }
 
                         if (foundItem.Status == AppFormStatusType.ApplicantRejected)
                         {
-                            item.ReviewDate = DateTime.UtcNow;
+                            item.ReviewDate = DateTime.UtcNow;  // Guarda cuando se envió a revision despues de rechazado
                             foundItem.UserReviewer = item.UpdatedUser;
                         }
                         break;
                     
                     case AppFormStatusType.ApplicantRejected:
-                        item.ReviewDate = DateTime.UtcNow;
+                        item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se rechazó
                         foundItem.UserReviewer = item.UpdatedUser;
                         break;
 
                     case AppFormStatusType.Active:
-                        item.ReviewDate = DateTime.UtcNow;
+                        item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se aprobó
                         foundItem.UserReviewer = item.UpdatedUser;
                         break;
 
@@ -342,6 +342,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 // - internal
                 foundItem.ReviewJustification = item.ReviewJustification;
                 foundItem.ReviewComments = item.ReviewComments;
+                // ISO 27K
+                foundItem.AssetsISO27KJSON = item.AssetsISO27KJSON;
 
                 // General
                 foundItem.Description = item.Description;

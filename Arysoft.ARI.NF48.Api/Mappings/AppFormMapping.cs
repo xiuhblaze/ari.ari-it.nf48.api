@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,7 +119,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         } // AppFormToItemListDto
 
         public static async Task<AppFormItemDetailDto> AppFormToItemDetailDto(AppForm item)
-        {
+        {   
+            // 27K: Convertir de string a json
+            var assets27KData = JsonConvert.DeserializeObject<dynamic>(item.AssetsISO27KJSON);
+
             return new AppFormItemDetailDto
             {
                 ID = item.ID,
@@ -144,6 +148,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 HACCPCount = item.HACCPCount,
                 ReviewJustification = item.ReviewJustification,
                 ReviewComments = item.ReviewComments,
+                // ISO 27K
+                OwnServersCount = assets27KData?.OwnServersCount,
+                CloudServersCount = assets27KData?.CloudServersCount,
+                DesktopComputersCount = assets27KData?.DesktopComputersCount,
+                LaptopComputersCount = assets27KData?.LaptopComputersCount,
+                MobileWithAccessCount = assets27KData?.MobileWithAccessCount,
+                RemoteAccessCount = assets27KData?.RemoteAccessCount,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -239,6 +250,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 HACCPCount = item.HACCPCount,
                 ReviewJustification = item.ReviewJustification,
                 ReviewComments = item.ReviewComments,
+                // 27K
+                AssetsISO27KJSON = getAssets27KDataJSON(item),
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -262,5 +275,20 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser
             };
         } // ItemDeleteDtoToAppForm
+
+        private static string getAssets27KDataJSON(AppFormUpdateDto item)
+        {
+            var assets27KData = new
+            {
+                item.OwnServersCount,
+                item.CloudServersCount,
+                item.DesktopComputersCount,
+                item.LaptopComputersCount,
+                item.MobileWithAccessCount,
+                item.RemoteAccessCount
+            };
+
+            return JsonConvert.SerializeObject(assets27KData);
+        } // getAssets27KDataJSON
     }
 }
