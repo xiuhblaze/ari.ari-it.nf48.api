@@ -120,8 +120,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static async Task<AppFormItemDetailDto> AppFormToItemDetailDto(AppForm item)
         {   
-            // 27K: Convertir de string a json
-            var assets27KData = JsonConvert.DeserializeObject<dynamic>(item.AssetsISO27KJSON);
+            // 27K: Convertir de string a json, 
+            var assets27KData = JsonConvert
+                .DeserializeObject<dynamic>(item.AssetsISO27KJSON ?? "{}");
 
             return new AppFormItemDetailDto
             {
@@ -151,9 +152,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // ISO 27K
                 OwnServersCount = assets27KData?.OwnServersCount,
                 CloudServersCount = assets27KData?.CloudServersCount,
-                DesktopComputersCount = assets27KData?.DesktopComputersCount,
-                LaptopComputersCount = assets27KData?.LaptopComputersCount,
-                MobileWithAccessCount = assets27KData?.MobileWithAccessCount,
+                DesktopsCount = assets27KData?.DesktopsCount,
+                LaptopsCount = assets27KData?.LaptopsCount,
+                MobilesCount = assets27KData?.MobilesCount,
                 RemoteAccessCount = assets27KData?.RemoteAccessCount,
                 // GENERAL
                 Description = item.Description,
@@ -251,7 +252,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ReviewJustification = item.ReviewJustification,
                 ReviewComments = item.ReviewComments,
                 // 27K
-                AssetsISO27KJSON = getAssets27KDataJSON(item),
+                AssetsISO27KJSON = GetAssets27KDataJSON(item),
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -276,19 +277,19 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemDeleteDtoToAppForm
 
-        private static string getAssets27KDataJSON(AppFormUpdateDto item)
+        private static string GetAssets27KDataJSON(AppFormUpdateDto item)
         {
             var assets27KData = new
             {
                 item.OwnServersCount,
                 item.CloudServersCount,
-                item.DesktopComputersCount,
-                item.LaptopComputersCount,
-                item.MobileWithAccessCount,
+                item.DesktopsCount,
+                item.LaptopsCount,
+                item.MobilesCount,
                 item.RemoteAccessCount
             };
 
             return JsonConvert.SerializeObject(assets27KData);
-        } // getAssets27KDataJSON
+        } // GetAssets27KDataJSON
     }
 }

@@ -847,12 +847,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   * ISO 9001
             //   * ISO 14001
             //   * ISO 22000
+            //   * ISO 27001
             //   * ISO 37001
             //   pero se pueden agregar más en el futuro
 
             if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO27K
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO37K)
                 throw new BusinessException("The selected standard is not valid for generating an Application Form");
 

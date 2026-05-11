@@ -177,11 +177,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? CloudServersCount { get; set; }
 
-        public int? DesktopComputersCount { get; set; }
+        public int? DesktopsCount { get; set; }
 
-        public int? LaptopComputersCount { get; set; }
+        public int? LaptopsCount { get; set; }
 
-        public int? MobileWithAccessCount { get; set; }
+        public int? MobilesCount { get; set; }
 
         public int? RemoteAccessCount { get; set; }
 
@@ -322,11 +322,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? CloudServersCount { get; set; }
 
-        public int? DesktopComputersCount { get; set; }
+        public int? DesktopsCount { get; set; }
 
-        public int? LaptopComputersCount { get; set; }
+        public int? LaptopsCount { get; set; }
 
-        public int? MobileWithAccessCount { get; set; }
+        public int? MobilesCount { get; set; }
 
         public int? RemoteAccessCount { get; set; }
 
