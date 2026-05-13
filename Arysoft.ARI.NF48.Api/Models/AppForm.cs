@@ -20,7 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K (lines of product), 37K (process/activities)
 
-        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K (seasonality), 37K (process/activities description)
+        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K (lines of product description), 37K (process/activities description)
 
         public string LegalRequirements { get; set; }           // 9K, 14K, 22K, 37K (Anti-bribery controls)
 
@@ -28,11 +28,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string CriticalComplaintComments { get; set; }   // 9K, 14K, 37K (Organization Involved in a bribery - comments)
 
+        public int? AutomationLevelPercent { get; set; }            // 9K, 27K Porcentaje de automatización del proceso
+
+        public string AutomationLevelJustification { get; set; }    // 9K, 27K
+
         // ISO 9K
-
-        public int? AutomationLevelPercent { get; set; } // Porcentaje de automatización del proceso
-
-        public string AutomationLevelJustification { get; set; }
 
         public bool? IsDesignResponsibility { get; set; }
 
@@ -46,9 +46,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public int? HACCPCount { get; set; }            // 22K: Indica el numero de procesos HACCP que se tienen, puede entrar más de una linea de producción en un proceso HACCP
 
-        public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
+        public string SeasonalityJSON { get; set; }     // 22K: Indica si la organización tiene estacionalidad en su producción o ventas
 
-        public string ReviewComments { get; set; }      // 22K: Additonal comments by application reviewer
+        public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
 
         // ISO 27K
 

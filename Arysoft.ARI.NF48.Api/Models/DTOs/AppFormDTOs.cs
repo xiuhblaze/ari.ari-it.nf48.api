@@ -149,11 +149,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CriticalComplaintComments { get; set; }
 
-        // ISO 9K
+        public string ReviewJustification { get; set; }
 
         public int? AutomationLevelPercent { get; set; }
 
         public string AutomationLevelJustification { get; set; }
+
+        // ISO 9K
 
         public bool? IsDesignResponsibility { get; set; }
 
@@ -167,9 +169,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? HACCPCount { get; set; }
 
-        public string ReviewJustification { get; set; }
-
-        public string ReviewComments { get; set; }
+        public string SeasonalityJSON { get; set; }
 
         // ISO 27K
 
@@ -290,6 +290,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(1000)]
         public string CriticalComplaintComments { get; set; }
 
+        public string ReviewJustification { get; set; }
+
         // ISO 9K
 
         public int? AutomationLevelPercent { get; set; }
@@ -311,10 +313,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int? HACCPCount { get; set; }
 
-        public string ReviewJustification { get; set; }
-
-        [StringLength(1000)]
-        public string ReviewComments { get; set; }
+        [StringLength(500)]
+        public string SeasonalityJSON { get; set; }
 
         // ISO 27K
 

@@ -48,6 +48,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
+                .Property(m => m.SeasonalityJSON)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<AppForm>()
                 .Property(m => m.AssetsISO27KJSON)
                 .HasMaxLength(250);
 
@@ -70,14 +74,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.AnyConsultancyBy)
                 .HasMaxLength(250);
-
-            //modelBuilder.Entity<AppForm>()
-            //    .Property(m => m.ReviewJustification)
-            //    .HasMaxLength(1000); // Va a ser MAX
-
-            modelBuilder.Entity<AppForm>()
-                .Property(m => m.ReviewComments)
-                .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.UserSales)

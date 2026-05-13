@@ -64,7 +64,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.OutsourcedProcess != null && m.OutsourcedProcess.ToLower().Contains(filters.Text))
                     || (m.AnyConsultancyBy != null && m.AnyConsultancyBy.ToLower().Contains(filters.Text))
                     || (m.ReviewJustification != null && m.ReviewJustification.ToLower().Contains(filters.Text))
-                    || (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
+                    // || (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
                     || (m.Organization != null && m.Organization.Name.ToLower().Contains(filters.Text))
                     || (m.Standard != null && m.Standard.Name.ToLower().Contains(filters.Text))
                     || (m.UserSales != null && m.UserSales.ToLower().Contains(filters.Text))
@@ -320,31 +320,29 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status < AppFormStatusType.Inactive)
             {
                 // ISO Varios
-                foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K
-                foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K
-                foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K
-                foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K
-                foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;             // 9K, 14K
-                foundItem.CriticalComplaintComments = item.CriticalComplaintComments;   // 9K, 14K
-
-                // ISO 9K
+                foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K, 22K
+                foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K, 22K
+                foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K, 22K
+                foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K, 22K
+                foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;             // 9K, 14K, 37K
+                foundItem.CriticalComplaintComments = item.CriticalComplaintComments;   // 9K, 14K, 37K
                 foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
                 foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
+                foundItem.ReviewJustification = item.ReviewJustification;
+                // ISO 9K
                 foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
                 foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
-
                 // ISO 14K
                 foundItem.OperationalControls = item.OperationalControls;
-
                 // ISO 22K
                 foundItem.Category22KID = item.Category22KID;
                 foundItem.HACCPCount = item.HACCPCount;
-                // - internal
-                foundItem.ReviewJustification = item.ReviewJustification;
-                foundItem.ReviewComments = item.ReviewComments;
+                foundItem.SeasonalityJSON = item.SeasonalityJSON;
+                // - internal 22K
                 // ISO 27K
-                foundItem.AssetsISO27KJSON = item.AssetsISO27KJSON;
-
+                foundItem.AssetsISO27KJSON = foundItem.Standard.StandardBase == StandardBaseType.ISO27K
+                    ? item.AssetsISO27KJSON
+                    : null;
                 // General
                 foundItem.Description = item.Description;
                 foundItem.AuditLanguage = item.AuditLanguage;
@@ -454,6 +452,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     // ISO 22000
                     newItem.Category22KID = originalItem.Category22KID;
                     newItem.HACCPCount= originalItem.HACCPCount;
+                    newItem.SeasonalityJSON = originalItem.SeasonalityJSON;
                     break;
             }
 
@@ -495,7 +494,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"AppFormService.DuplicateAsync.AddNaceCode: {ex.Message}");
+                throw new BusinessException($"AppFormService.DuplicateAsync: {ex.Message}");
             }
 
             return newItem;

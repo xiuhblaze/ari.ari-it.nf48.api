@@ -46,9 +46,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
-                // 9K
                 AutomationLevelPercent = item.AutomationLevelPercent,
                 AutomationLevelJustification = item.AutomationLevelJustification,
+                // 9K
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // 14K
@@ -138,17 +138,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
-                // 9K
                 AutomationLevelPercent = item.AutomationLevelPercent,
                 AutomationLevelJustification = item.AutomationLevelJustification,
+                ReviewJustification = item.ReviewJustification,
+                // 9K
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // ISO 14K
                 OperationalControls = item.OperationalControls,
                 // ISO 22K
                 HACCPCount = item.HACCPCount,
-                ReviewJustification = item.ReviewJustification,
-                ReviewComments = item.ReviewComments,
+                SeasonalityJSON = item.SeasonalityJSON,
                 // ISO 27K
                 OwnServersCount = assets27KData?.OwnServersCount,
                 CloudServersCount = assets27KData?.CloudServersCount,
@@ -240,17 +240,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 LegalRequirements = item.LegalRequirements,
                 AnyCriticalComplaint = item.AnyCriticalComplaint,
                 CriticalComplaintComments = item.CriticalComplaintComments,
-                // 9K
                 AutomationLevelPercent = item.AutomationLevelPercent,
                 AutomationLevelJustification = item.AutomationLevelJustification,
+                ReviewJustification = item.ReviewJustification,
+                // 9K
                 IsDesignResponsibility = item.IsDesignResponsibility,
                 DesignResponsibilityJustify = item.DesignResponsibilityJustify,
                 // 14K
                 OperationalControls = item.OperationalControls,
                 // 22K
                 HACCPCount = item.HACCPCount,
-                ReviewJustification = item.ReviewJustification,
-                ReviewComments = item.ReviewComments,
+                SeasonalityJSON = item.SeasonalityJSON,
                 // 27K
                 AssetsISO27KJSON = GetAssets27KDataJSON(item),
                 // GENERAL
