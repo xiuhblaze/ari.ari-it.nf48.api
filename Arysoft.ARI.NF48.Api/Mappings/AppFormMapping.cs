@@ -150,12 +150,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 HACCPCount = item.HACCPCount,
                 SeasonalityJSON = item.SeasonalityJSON,
                 // ISO 27K
-                OwnServersCount = assets27KData?.OwnServersCount,
-                CloudServersCount = assets27KData?.CloudServersCount,
-                DesktopsCount = assets27KData?.DesktopsCount,
-                LaptopsCount = assets27KData?.LaptopsCount,
-                MobilesCount = assets27KData?.MobilesCount,
-                RemoteAccessCount = assets27KData?.RemoteAccessCount,
+                AssetsISO27KJSON = item.AssetsISO27KJSON,
+                // ISO 45K
+                OHSHazardRisk45KJSON = item.OHSHazardRisk45KJSON,
+                HazardousMaterials45KJSON = item.HazardousMaterials45KJSON,
+                AccidentRate45KJSON = item.AccidentRate45KJSON,
+                IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON,
+                HighLevelRisks45K = item.HighLevelRisks45K,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -252,7 +253,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 HACCPCount = item.HACCPCount,
                 SeasonalityJSON = item.SeasonalityJSON,
                 // 27K
-                AssetsISO27KJSON = GetAssets27KDataJSON(item),
+                AssetsISO27KJSON = item.AssetsISO27KJSON,
+                // 45K
+                OHSHazardRisk45KJSON = item.OHSHazardRisk45KJSON,
+                HazardousMaterials45KJSON = item.HazardousMaterials45KJSON,
+                AccidentRate45KJSON = item.AccidentRate45KJSON,
+                IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON,
+                HighLevelRisks45K = item.HighLevelRisks45K,
                 // GENERAL
                 Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
@@ -276,20 +283,5 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser
             };
         } // ItemDeleteDtoToAppForm
-
-        private static string GetAssets27KDataJSON(AppFormUpdateDto item)
-        {
-            var assets27KData = new
-            {
-                item.OwnServersCount,
-                item.CloudServersCount,
-                item.DesktopsCount,
-                item.LaptopsCount,
-                item.MobilesCount,
-                item.RemoteAccessCount
-            };
-
-            return JsonConvert.SerializeObject(assets27KData);
-        } // GetAssets27KDataJSON
     }
 }

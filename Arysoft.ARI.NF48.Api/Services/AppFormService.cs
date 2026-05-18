@@ -330,19 +330,37 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
                 foundItem.ReviewJustification = item.ReviewJustification;
                 // ISO 9K
-                foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
-                foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO9k)
+                {
+                    foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
+                    foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+                }
                 // ISO 14K
-                foundItem.OperationalControls = item.OperationalControls;
+                foundItem.OperationalControls = foundItem.Standard.StandardBase == StandardBaseType.ISO14K
+                    ? item.OperationalControls
+                    : null;
                 // ISO 22K
-                foundItem.Category22KID = item.Category22KID;
-                foundItem.HACCPCount = item.HACCPCount;
-                foundItem.SeasonalityJSON = item.SeasonalityJSON;
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K)
+                {
+                    foundItem.Category22KID = item.Category22KID;
+                    foundItem.HACCPCount = item.HACCPCount;
+                    foundItem.SeasonalityJSON = item.SeasonalityJSON;
+                }
                 // - internal 22K
                 // ISO 27K
                 foundItem.AssetsISO27KJSON = foundItem.Standard.StandardBase == StandardBaseType.ISO27K
                     ? item.AssetsISO27KJSON
                     : null;
+                // ISO 45K
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO45K)
+                {
+                    foundItem.OHSHazardRisk45KJSON = item.OHSHazardRisk45KJSON;
+                    foundItem.HazardousMaterials45KJSON = item.HazardousMaterials45KJSON;
+                    foundItem.AccidentRate45KJSON = item.AccidentRate45KJSON;
+                    foundItem.IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON;
+                    foundItem.HighLevelRisks45K = item.HighLevelRisks45K;
+                }
+
                 // General
                 foundItem.Description = item.Description;
                 foundItem.AuditLanguage = item.AuditLanguage;
@@ -781,6 +799,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             var organizationRepository = new OrganizationRepository();
             //var auditCycleRepository = new AuditCycleRepository();
 
+            // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
+            //   [ ISO 9001, ISO 14001, ISO 22000, ISO 27001, ISO 37001, ISO 45001 ]
+            //   se pueden agregar más en el futuro
+
+            if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO27K
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO37K
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO45K)
+                throw new BusinessException("The selected standard is not valid for generating an Application Form");
+
             // - Validar que la organizacion exista y esté activo
             var organization = await organizationRepository.GetAsync(newItem.OrganizationID)
                 ?? throw new BusinessException("The selected organization was not found");
@@ -841,21 +871,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 )
                     throw new BusinessException($"The certificate cycle has already completed all its years");
             }
-
-            // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
-            //   * ISO 9001
-            //   * ISO 14001
-            //   * ISO 22000
-            //   * ISO 27001
-            //   * ISO 37001
-            //   pero se pueden agregar más en el futuro
-
-            if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k
-                && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K
-                && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K
-                && auditCycle.Standard.StandardBase != StandardBaseType.ISO27K
-                && auditCycle.Standard.StandardBase != StandardBaseType.ISO37K)
-                throw new BusinessException("The selected standard is not valid for generating an Application Form");
 
         } // ValidateCreateAppFormAsync
 

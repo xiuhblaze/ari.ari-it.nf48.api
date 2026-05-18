@@ -173,17 +173,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // ISO 27K
 
-        public int? OwnServersCount { get; set; }
+        public string AssetsISO27KJSON { get; set; }
 
-        public int? CloudServersCount { get; set; }
+        // ISO 45K
 
-        public int? DesktopsCount { get; set; }
+        public string OHSHazardRisk45KJSON { get; set; }
 
-        public int? LaptopsCount { get; set; }
+        public string HazardousMaterials45KJSON { get; set; }
 
-        public int? MobilesCount { get; set; }
+        public string AccidentRate45KJSON { get; set; }
 
-        public int? RemoteAccessCount { get; set; }
+        public string IndirectHSRisk45KJSON { get; set; }
+
+        public string HighLevelRisks45K { get; set; }
 
         // GENERAL
 
@@ -318,17 +320,24 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // ISO 27K
 
-        public int? OwnServersCount { get; set; }
+        [StringLength(500)]
+        public string AssetsISO27KJSON { get; set; }
 
-        public int? CloudServersCount { get; set; }
+        // ISO 45K
 
-        public int? DesktopsCount { get; set; }
+        [StringLength(1000)]
+        public string OHSHazardRisk45KJSON { get; set; }
 
-        public int? LaptopsCount { get; set; }
+        public string HazardousMaterials45KJSON { get; set; }
 
-        public int? MobilesCount { get; set; }
+        [StringLength(250)]
+        public string AccidentRate45KJSON { get; set; }
 
-        public int? RemoteAccessCount { get; set; }
+        [StringLength(250)]
+        public string IndirectHSRisk45KJSON { get; set; }
+
+        [StringLength(500)]
+        public string HighLevelRisks45K { get; set; }
 
         // GENERAL
 

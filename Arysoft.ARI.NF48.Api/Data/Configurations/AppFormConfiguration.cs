@@ -39,21 +39,53 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.AutomationLevelJustification)
                 .HasMaxLength(1000);
 
+            // ISO 9K
+
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.DesignResponsibilityJustify)
                 .HasMaxLength(1000);
+
+            // ISO 14K
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.OperationalControls)
                 .HasMaxLength(1000);
 
+            // ISO 22K
+
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.SeasonalityJSON)
                 .HasMaxLength(500);
 
+            // ISO 27K
+
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.AssetsISO27KJSON)
                 .HasMaxLength(250);
+
+            // ISO 45K
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.OHSHazardRisk45KJSON)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.AccidentRate45KJSON)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.IndirectHSRisk45KJSON)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.HighLevelRisks45K)
+                .HasMaxLength(500);
+
+            // GENERAL
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.AuditLanguage)
+                .HasMaxLength(2);
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.CurrentCertificationsExpiration)

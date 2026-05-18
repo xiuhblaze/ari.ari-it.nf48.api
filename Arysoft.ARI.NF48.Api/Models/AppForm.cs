@@ -54,6 +54,18 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string AssetsISO27KJSON { get; set; }    // 27K: Cadena JSON con la información de los activos
 
+        // ISO 45K
+
+        public string OHSHazardRisk45KJSON { get; set; }        // 45K: Cadena JSON con la información de los riesgos o peligros OHS
+
+        public string HazardousMaterials45KJSON { get; set; }   // 45K: Cadena JSON con la información de los materiales peligrosos
+
+        public string AccidentRate45KJSON { get; set; }         // 45K: Cadena JSON con la información de las tasas de accidentes
+
+        public string IndirectHSRisk45KJSON { get; set; }       // 45K: Cadena JSON con la información de los riesgos OHS indirectos
+
+        public string HighLevelRisks45K { get; set; }           // 45K: Cadena con una lista de los riesgos OHS de alto nivel separados por coma
+
         // GENERAL
 
         public string Description { get; set; }         // Descripción corta del appform
