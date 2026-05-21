@@ -71,7 +71,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.AccidentRate45KJSON)
-                .HasMaxLength(250);
+                .HasMaxLength(500);
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.IndirectHSRisk45KJSON)

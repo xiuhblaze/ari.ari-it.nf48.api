@@ -330,7 +330,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string HazardousMaterials45KJSON { get; set; }
 
-        [StringLength(250)]
+        [StringLength(500)]
         public string AccidentRate45KJSON { get; set; }
 
         [StringLength(250)]

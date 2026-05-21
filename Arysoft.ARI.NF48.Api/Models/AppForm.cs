@@ -16,17 +16,17 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // ISO Varios
 
-        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K, 37K (scope of certification)
+        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K, 37K (scope of certification), 45K
 
         public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K (lines of product), 37K (process/activities)
 
         public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K (lines of product description), 37K (process/activities description)
 
-        public string LegalRequirements { get; set; }           // 9K, 14K, 22K, 37K (Anti-bribery controls)
+        public string LegalRequirements { get; set; }           // 9K, 14K, 22K, 37K (Anti-bribery controls), 45K
 
-        public bool? AnyCriticalComplaint { get; set; }         // 9K, 14K, 37K (Organization Involved in a bribery)
+        public bool? AnyCriticalComplaint { get; set; }         // 9K, 14K, 37K (Organization Involved in a bribery), 45K
 
-        public string CriticalComplaintComments { get; set; }   // 9K, 14K, 37K (Organization Involved in a bribery - comments)
+        public string CriticalComplaintComments { get; set; }   // 9K, 14K, 37K (Organization Involved in a bribery - comments), 45K
 
         public int? AutomationLevelPercent { get; set; }            // 9K, 27K Porcentaje de automatización del proceso
 
