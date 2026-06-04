@@ -342,7 +342,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                             throw new BusinessException("The record status can only be changed to Approved from Review.");
                         break;
 
-                    case ProposalStatusType.Sended:
+                    case ProposalStatusType.Sent:
                         if (foundItem.Status != ProposalStatusType.Approved)
                             throw new BusinessException("The proposal can only be sent if it has been approved.");
 
@@ -354,7 +354,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                     case ProposalStatusType.Active:
                         // Validar que otra propuesa del mismo ciclo no esté activa
-                        if (foundItem.Status != ProposalStatusType.Sended)
+                        if (foundItem.Status != ProposalStatusType.Sent)
                             throw new BusinessException("The proposal can only be active if the client signed it.");
                         break;
 
@@ -399,7 +399,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         foundItem.ReviewDate = DateTime.UtcNow;
                         break;
 
-                    case ProposalStatusType.Sended:                        
+                    case ProposalStatusType.Sent:
                         foundItem.SignRequestDate = DateTime.UtcNow;
                         break;
 

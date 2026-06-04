@@ -44,7 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status == StatusType.Active)
                         .Sum(i => i.NoEmployees) ?? 0 
                     : 0,
-                Shifts = item.Shifts != null
+                Shifts = item.Shifts != null // Para el preview del AppForm
                     ? ShiftMapping.ShiftsToListDto(item.Shifts
                         .Where(i => i.Status != StatusType.Nothing))
                     : new List<ShiftItemListDto>(),

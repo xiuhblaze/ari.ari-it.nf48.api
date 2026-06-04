@@ -330,7 +330,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
                 foundItem.ReviewJustification = item.ReviewJustification;
                 // ISO 9K
-                if (foundItem.Standard.StandardBase == StandardBaseType.ISO9k)
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO9K)
                 {
                     foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
                     foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
@@ -440,7 +440,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             };
 
             // ISO VARIOS
-            if (originalItem.Standard.StandardBase == StandardBaseType.ISO9k
+            if (originalItem.Standard.StandardBase == StandardBaseType.ISO9K
                 || originalItem.Standard.StandardBase == StandardBaseType.ISO14K
                 || originalItem.Standard.StandardBase == StandardBaseType.ISO22K)
             { 
@@ -454,7 +454,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (originalItem.Standard.StandardBase)
             { 
-                case StandardBaseType.ISO9k:
+                case StandardBaseType.ISO9K:
                     // ISO 9000
                     newItem.AutomationLevelPercent = originalItem.AutomationLevelPercent;
                     newItem.AutomationLevelJustification = originalItem.AutomationLevelJustification;
@@ -803,7 +803,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   [ ISO 9001, ISO 14001, ISO 22000, ISO 27001, ISO 37001, ISO 45001 ]
             //   se pueden agregar más en el futuro
 
-            if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9k
+            if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9K
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO14K
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO27K
@@ -991,7 +991,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validar por ISO Base...
             switch (currentItem.Standard.StandardBase)
             {
-                case StandardBaseType.ISO9k:
+                case StandardBaseType.ISO9K:
                     await ValidateAppFormFor9KAsync(newItem, currentItem);
                     break;
 

@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
@@ -27,6 +28,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
+
+        public int NotesCount { get; set; }
     }
 
     public class ShiftItemDetailDto
@@ -59,7 +62,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
+        // RELATIONS
+
         public SiteItemListDto Site { get; set; }
+
+        public ICollection<NoteItemDto> Notes { get; set; }
     } // ShiftItemDetailDto
 
     public class ShiftPostDto

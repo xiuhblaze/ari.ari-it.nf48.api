@@ -14,7 +14,7 @@
     public enum StandardBaseType
     { 
         Nothing,
-        ISO9k,
+        ISO9K,
         ISO14K,
         ISO22K,
         ISO27K,
