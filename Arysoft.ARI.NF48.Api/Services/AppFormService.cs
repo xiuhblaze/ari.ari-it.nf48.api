@@ -64,7 +64,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (m.OutsourcedProcess != null && m.OutsourcedProcess.ToLower().Contains(filters.Text))
                     || (m.AnyConsultancyBy != null && m.AnyConsultancyBy.ToLower().Contains(filters.Text))
                     || (m.ReviewJustification != null && m.ReviewJustification.ToLower().Contains(filters.Text))
-                    // || (m.ReviewComments != null && m.ReviewComments.ToLower().Contains(filters.Text))
                     || (m.Organization != null && m.Organization.Name.ToLower().Contains(filters.Text))
                     || (m.Standard != null && m.Standard.Name.ToLower().Contains(filters.Text))
                     || (m.UserSales != null && m.UserSales.ToLower().Contains(filters.Text))

@@ -393,6 +393,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Solo puede haber un ciclo activo por standard y organización
             // - Que el tipo de ciclo sea en el orden correcto (Initial -> Recertification, o Transfer -> Recertification)
             // - Si ya cuenta con una Auditoria Inicial o de Recertificacion, validar que tenga las fechas del certificado
+            // - Si ya tiene algun documento asociado, no permitir cambiar el standard ni el tipo de ciclo
 
             // - Validar que el standard exista
             var standard = await _standardRepository.GetAsync(item.StandardID ?? Guid.Empty)

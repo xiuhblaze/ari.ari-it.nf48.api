@@ -30,11 +30,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual Standard Standard { get; set; }
 
-        //public virtual ICollection<Audit> Audits { get; set; }
-
-        //public virtual ICollection<AuditCycleStandard> AuditCycleStandards { get; set; }
-
-        public virtual ICollection<AuditStandard> AuditStandards { get; set; } // De aqui se van a obtener las auditorias asociadas
+        // - De aquí se van a obtener las auditorias asociadas
+        public virtual ICollection<AuditStandard> AuditStandards { get; set; }
 
         public virtual ICollection<AuditCycleDocument> AuditCycleDocuments { get; set; }
     }
