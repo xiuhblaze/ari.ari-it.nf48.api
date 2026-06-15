@@ -13,12 +13,16 @@ namespace Arysoft.ARI.NF48.Api.Services
     public class AuditAuditorService
     {
         public readonly AuditAuditorRepository _repository;
+        public readonly AuditRepository _auditRepository;
+        public readonly AuditorRepository _auditorRepository;
 
         // CONSTRUCTOR
 
         public AuditAuditorService()
         {
             _repository = new AuditAuditorRepository();
+            _auditRepository = new AuditRepository();
+            _auditorRepository = new AuditorRepository();
         }
 
         // METHODS
@@ -114,6 +118,15 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.AuditID == null || item.AuditID == Guid.Empty)
                 throw new BusinessException("Must first assign an audit");
 
+            var audit = await _auditRepository.GetAsync(item.AuditID)
+                ?? throw new BusinessException("The audit to which the auditor is being assigned was not found");
+
+            // Validations
+
+            // - Que el status de la auditoria este en Schedule o Confirmed solamente
+            if (audit.Status > AuditStatusType.Scheduled)
+                throw new BusinessException("Only auditors can be assigned to an audit pending confirmation.");
+
             // Assigning values
 
             item.ID = Guid.NewGuid();
@@ -142,13 +155,19 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The record to update was not found");
 
             // Validations
-            // - ISO9001: Que tenga los NACE codes relacionados a la auditoria (ver appForm)
+            // - Que tenga los NACE codes relacionados a la auditoria (ver appForm) (solo en algunas normas)
 
             // - La primera vez debe de traer el ID del auditor
             if (foundItem.Status == StatusType.Nothing)
             { 
                 if (item.AuditorID == null || item.AuditorID == Guid.Empty)
                     throw new BusinessException("Must first assign an auditor");
+
+                var auditor = await _auditorRepository.GetAsync(item.AuditorID.Value)
+                    ?? throw new BusinessException("The auditor being assigned was not found");
+
+                if (auditor.Status != StatusType.Active)
+                    throw new BusinessException("The auditor being assigned is not active");
 
                 foundItem.AuditorID = item.AuditorID;
             }
@@ -227,22 +246,22 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (foundItem.Audit.Status <= AuditStatusType.Scheduled)
                 throw new BusinessException("Only one auditor can be removed from an audit pending confirmation.");
 
-            _repository.Delete(foundItem);
+            //_repository.Delete(foundItem);
 
-            //if (foundItem.Status == StatusType.Deleted)
-            //{
-            //    _repository.Delete(foundItem);
-            //}
-            //else
-            //{
-            //    foundItem.Status = foundItem.Status == StatusType.Active
-            //        ? StatusType.Inactive
-            //        : StatusType.Deleted;
-            //    foundItem.Updated = DateTime.UtcNow;
-            //    foundItem.UpdatedUser = item.UpdatedUser;
+            if (foundItem.Status == StatusType.Deleted)
+            {
+                _repository.Delete(foundItem);
+            }
+            else
+            {
+                foundItem.Status = foundItem.Status == StatusType.Active
+                    ? StatusType.Inactive
+                    : StatusType.Deleted;
+                foundItem.Updated = DateTime.UtcNow;
+                foundItem.UpdatedUser = item.UpdatedUser;
 
-            //    _repository.Update(foundItem);
-            //}
+                _repository.Update(foundItem);
+            }
 
             try
             {

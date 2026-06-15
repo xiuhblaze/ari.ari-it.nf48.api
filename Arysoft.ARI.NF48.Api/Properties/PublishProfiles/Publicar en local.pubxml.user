@@ -3,7 +3,7 @@
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\comun\compiled\ari\backend v0.2</_PublishTargetUrl>
-    <History>True|2026-04-07T19:48:13.9062811Z||;True|2026-04-07T13:41:27.0872231-06:00||;True|2026-03-31T10:32:42.3969048-06:00||;True|2026-03-12T16:54:47.0500618-06:00||;True|2026-03-12T09:47:24.2842631-06:00||;True|2026-03-11T16:27:27.5480106-06:00||;True|2026-03-11T16:22:50.4447672-06:00||;True|2026-03-11T11:29:58.4179649-06:00||;True|2026-03-11T11:28:58.2459880-06:00||;True|2026-03-03T16:45:39.6483684-06:00||;True|2026-02-20T13:38:57.4621199-06:00||;True|2026-02-20T13:38:34.4276437-06:00||;True|2026-02-17T16:17:29.9421575-06:00||;True|2026-02-12T16:29:24.1960345-06:00||;True|2026-02-12T13:06:06.5728865-06:00||;True|2026-02-10T16:40:59.5133961-06:00||;True|2026-02-10T16:25:39.4399758-06:00||;True|2026-02-10T14:01:08.4722732-06:00||;True|2026-02-05T11:46:38.7907607-06:00||;True|2026-02-04T13:29:46.4811392-06:00||;True|2026-02-04T13:21:00.8468189-06:00||;True|2026-01-29T11:11:53.8925546-06:00||;True|2026-01-29T09:55:32.7008519-06:00||;True|2026-01-29T09:54:15.6870775-06:00||;True|2026-01-21T12:21:51.6475748-06:00||;True|2026-01-20T16:20:26.6013769-06:00||;True|2026-01-20T13:11:20.5556028-06:00||;True|2026-01-20T11:30:55.2602273-06:00||;True|2026-01-19T12:31:33.3406433-06:00||;True|2026-01-19T11:39:02.4039847-06:00||;True|2026-01-15T14:04:16.3866304-06:00||;True|2026-01-15T13:38:50.4490159-06:00||;True|2026-01-15T12:29:37.1359076-06:00||;True|2026-01-15T12:11:05.9524882-06:00||;True|2026-01-14T10:43:59.8405526-06:00||;True|2026-01-12T12:30:15.7545318-06:00||;True|2026-01-12T12:09:09.1026051-06:00||;True|2026-01-12T11:06:21.4419342-06:00||;True|2026-01-12T10:38:42.9077116-06:00||;True|2026-01-12T10:35:56.4066640-06:00||;True|2026-01-09T15:21:18.4954154-06:00||;True|2026-01-09T12:57:06.3096913-06:00||;True|2026-01-09T12:00:52.7448718-06:00||;True|2026-01-06T12:55:42.6127180-06:00||;True|2026-01-05T15:32:10.1409397-06:00||;True|2026-01-05T11:04:51.5647670-06:00||;True|2025-12-31T11:29:17.5363015-06:00||;True|2025-12-30T13:14:37.3294043-06:00||;True|2025-12-26T08:51:26.7251009-06:00||;True|2025-12-26T08:50:47.6838382-06:00||;True|2025-12-17T10:55:04.9078412-06:00||;True|2025-12-17T10:27:56.7674566-06:00||;True|2025-12-17T10:05:49.8920383-06:00||;True|2025-12-16T13:38:45.9129073-06:00||;True|2025-12-11T13:57:46.7148292-06:00||;True|2025-12-11T12:45:36.2818754-06:00||;True|2025-12-11T11:21:51.8434161-06:00||;True|2025-12-10T11:33:02.4863144-06:00||;True|2025-12-09T15:37:34.4324035-06:00||;True|2025-12-09T11:26:58.0403418-06:00||;True|2025-12-09T10:01:15.3099668-06:00||;True|2025-12-08T09:18:07.6823532-06:00||;</History>
+    <History>True|2026-06-15T22:23:46.6638231Z||;True|2026-04-07T13:48:13.9062811-06:00||;True|2026-04-07T13:41:27.0872231-06:00||;True|2026-03-31T10:32:42.3969048-06:00||;True|2026-03-12T16:54:47.0500618-06:00||;True|2026-03-12T09:47:24.2842631-06:00||;True|2026-03-11T16:27:27.5480106-06:00||;True|2026-03-11T16:22:50.4447672-06:00||;True|2026-03-11T11:29:58.4179649-06:00||;True|2026-03-11T11:28:58.2459880-06:00||;True|2026-03-03T16:45:39.6483684-06:00||;True|2026-02-20T13:38:57.4621199-06:00||;True|2026-02-20T13:38:34.4276437-06:00||;True|2026-02-17T16:17:29.9421575-06:00||;True|2026-02-12T16:29:24.1960345-06:00||;True|2026-02-12T13:06:06.5728865-06:00||;True|2026-02-10T16:40:59.5133961-06:00||;True|2026-02-10T16:25:39.4399758-06:00||;True|2026-02-10T14:01:08.4722732-06:00||;True|2026-02-05T11:46:38.7907607-06:00||;True|2026-02-04T13:29:46.4811392-06:00||;True|2026-02-04T13:21:00.8468189-06:00||;True|2026-01-29T11:11:53.8925546-06:00||;True|2026-01-29T09:55:32.7008519-06:00||;True|2026-01-29T09:54:15.6870775-06:00||;True|2026-01-21T12:21:51.6475748-06:00||;True|2026-01-20T16:20:26.6013769-06:00||;True|2026-01-20T13:11:20.5556028-06:00||;True|2026-01-20T11:30:55.2602273-06:00||;True|2026-01-19T12:31:33.3406433-06:00||;True|2026-01-19T11:39:02.4039847-06:00||;True|2026-01-15T14:04:16.3866304-06:00||;True|2026-01-15T13:38:50.4490159-06:00||;True|2026-01-15T12:29:37.1359076-06:00||;True|2026-01-15T12:11:05.9524882-06:00||;True|2026-01-14T10:43:59.8405526-06:00||;True|2026-01-12T12:30:15.7545318-06:00||;True|2026-01-12T12:09:09.1026051-06:00||;True|2026-01-12T11:06:21.4419342-06:00||;True|2026-01-12T10:38:42.9077116-06:00||;True|2026-01-12T10:35:56.4066640-06:00||;True|2026-01-09T15:21:18.4954154-06:00||;True|2026-01-09T12:57:06.3096913-06:00||;True|2026-01-09T12:00:52.7448718-06:00||;True|2026-01-06T12:55:42.6127180-06:00||;True|2026-01-05T15:32:10.1409397-06:00||;True|2026-01-05T11:04:51.5647670-06:00||;True|2025-12-31T11:29:17.5363015-06:00||;True|2025-12-30T13:14:37.3294043-06:00||;True|2025-12-26T08:51:26.7251009-06:00||;True|2025-12-26T08:50:47.6838382-06:00||;True|2025-12-17T10:55:04.9078412-06:00||;True|2025-12-17T10:27:56.7674566-06:00||;True|2025-12-17T10:05:49.8920383-06:00||;True|2025-12-16T13:38:45.9129073-06:00||;True|2025-12-11T13:57:46.7148292-06:00||;True|2025-12-11T12:45:36.2818754-06:00||;True|2025-12-11T11:21:51.8434161-06:00||;True|2025-12-10T11:33:02.4863144-06:00||;True|2025-12-09T15:37:34.4324035-06:00||;True|2025-12-09T11:26:58.0403418-06:00||;True|2025-12-09T10:01:15.3099668-06:00||;True|2025-12-08T09:18:07.6823532-06:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -56,13 +56,13 @@
       <publishTime>01/09/2024 18:25:12</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Help/Index.cshtml">
-      <publishTime>03/10/2025 10:19:42</publishTime>
+      <publishTime>10/03/2025 10:19:42</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Help/ResourceModel.cshtml">
       <publishTime>01/09/2024 18:25:11</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Shared/_Layout.cshtml">
-      <publishTime>03/10/2025 10:19:42</publishTime>
+      <publishTime>10/03/2025 10:19:42</publishTime>
     </File>
     <File Include="Areas/HelpPage/Views/Web.config">
       <publishTime>05/16/2025 08:24:57</publishTime>
@@ -71,16 +71,16 @@
       <publishTime>05/16/2025 08:24:57</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.dll">
-      <publishTime>10/09/2013 10:29:20</publishTime>
+      <publishTime>09/10/2013 10:29:20</publishTime>
     </File>
     <File Include="bin/Antlr3.Runtime.pdb">
-      <publishTime>10/09/2013 10:29:20</publishTime>
+      <publishTime>09/10/2013 10:29:20</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.dll">
-      <publishTime>04/07/2026 13:46:14</publishTime>
+      <publishTime>06/15/2026 16:23:44</publishTime>
     </File>
     <File Include="bin/Arysoft.ARI.NF48.Api.pdb">
-      <publishTime>04/07/2026 13:46:14</publishTime>
+      <publishTime>06/15/2026 16:23:44</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -104,7 +104,7 @@
       <publishTime>05/16/2025 08:25:03</publishTime>
     </File>
     <File Include="bin/es/System.Web.Optimization.resources.dll">
-      <publishTime>11/02/2014 09:28:40</publishTime>
+      <publishTime>02/11/2014 09:28:40</publishTime>
     </File>
     <File Include="bin/es/System.Web.Razor.resources.dll">
       <publishTime>05/16/2025 08:25:04</publishTime>
@@ -122,7 +122,7 @@
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="bin/Microsoft.Bcl.Memory.dll">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>06/15/2026 14:04:17</publishTime>
     </File>
     <File Include="bin/Microsoft.Bcl.TimeProvider.dll">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -329,7 +329,7 @@
       <publishTime>05/16/2025 08:25:03</publishTime>
     </File>
     <File Include="bin/System.Web.Optimization.dll">
-      <publishTime>11/02/2014 09:26:04</publishTime>
+      <publishTime>02/11/2014 09:26:04</publishTime>
     </File>
     <File Include="bin/System.Web.Razor.dll">
       <publishTime>05/16/2025 08:25:04</publishTime>
@@ -443,7 +443,7 @@
       <publishTime>05/16/2025 08:25:56</publishTime>
     </File>
     <File Include="Content/Site.css">
-      <publishTime>03/10/2025 10:19:42</publishTime>
+      <publishTime>10/03/2025 10:19:42</publishTime>
     </File>
     <File Include="favicon.ico">
       <publishTime>01/17/2023 23:16:07</publishTime>
@@ -512,13 +512,13 @@
       <publishTime>05/16/2025 08:24:58</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>03/10/2025 10:19:43</publishTime>
+      <publishTime>10/03/2025 10:19:43</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>01/17/2023 23:16:07</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>03/10/2025 10:19:43</publishTime>
+      <publishTime>10/03/2025 10:19:43</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>01/17/2023 23:16:07</publishTime>
@@ -527,7 +527,7 @@
       <publishTime>01/17/2023 23:16:07</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>04/07/2026 13:41:26</publishTime>
+      <publishTime>06/15/2026 16:23:45</publishTime>
     </File>
   </ItemGroup>
 </Project>
