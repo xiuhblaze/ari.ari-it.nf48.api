@@ -60,7 +60,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     .ToList()
                 : null;
             // TODO: Aqui falla al crear un usuario nuevo
-            var userSetting = item.Settings.FirstOrDefault();
+            var userSetting = item.Settings?.FirstOrDefault() ?? null;
 
             return new UserDetailDto
             {

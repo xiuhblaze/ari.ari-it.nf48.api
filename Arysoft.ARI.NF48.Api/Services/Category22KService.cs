@@ -44,10 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (filters.Accredited != null && filters.Accredited != Category22KAccreditedType.Nothing)
             {
-                items = items.Where(e =>
-                    (filters.Accredited == Category22KAccreditedType.Accredited && e.IsAccredited)
-                    || (filters.Accredited == Category22KAccreditedType.NotAccredited && !e.IsAccredited)
-                );
+                items = items.Where(e => e.AccreditedStatus == filters.Accredited);
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
@@ -108,9 +105,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
-            await _category22KRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-            _category22KRepository.Add(item);
-            await _category22KRepository.SaveChangesAsync();
+            try
+            { 
+                await _category22KRepository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _category22KRepository.Add(item);
+                await _category22KRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Category22KService.AddAsync: {ex.Message}");
+            }
 
             return item;
         } // AddAsync
@@ -123,7 +127,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - Que no haya duplicados
-            if (await _category22KRepository.ExistByCategorySubCategoryAsync(item.Category, item.SubCategory))
+            if (await _category22KRepository.ExistByCategorySubCategoryAsync(item.Category, item.SubCategory, item.ID))
                 throw new BusinessException("The Category and sub category already exist");
 
             // Assigning values
@@ -134,7 +138,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.SubCategory = item.SubCategory;
             foundItem.SubCategoryDescription = item.SubCategoryDescription;
             foundItem.Examples = item.Examples;
-            foundItem.IsAccredited = item.IsAccredited;
+            foundItem.AccreditedStatus = item.AccreditedStatus 
+                ?? Category22KAccreditedType.Nothing;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing
@@ -152,7 +157,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException(ex.Message);
+                throw new BusinessException($"Category22KService.UpdateAsync: {ex.Message}");
             }
 
             return foundItem;
@@ -163,14 +168,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _category22KRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
 
-            // Validations
-
-            // - Que no tenga certificados activos, who knows
-
             if (foundItem.Status == StatusType.Deleted)
             {
-                //! Considerar eliminar todas las asociaciones al registro antes de su eliminación tales como
-                //  applications, ...
+                if (await _category22KRepository.ExistAssociatedAppFormsAsync(foundItem.ID))
+                    throw new BusinessException("The record cannot be deleted because it has associated app forms");
+
                 _category22KRepository.Delete(foundItem);
             }
             else
@@ -184,7 +186,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 _category22KRepository.Update(foundItem);
             }
 
-            _category22KRepository.SaveChanges();
+            try
+            {
+                _category22KRepository.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Category22KService.DeleteAsync: {ex.Message}");
+            }
         } // DeleteAsync
     }
 }

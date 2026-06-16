@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
@@ -34,7 +35,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ShiftStart2 = item.ShiftStart2,
                 ShiftEnd2 = item.ShiftEnd2,
                 ExtraInfo = item.ExtraInfo,
-                Status = item.Status
+                Status = item.Status,
+                NotesCount = item.Notes != null
+                    ? item.Notes.Count
+                    : 0
             };
         } // ShiftToItemListDto
 
@@ -56,9 +60,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
-
+                // RELATIONS
                 Site = item.Site != null
                     ? SiteMapping.SiteToItemListDto(item.Site)
+                    : null,
+                Notes = item.Notes != null
+                    ? NoteMapping.NotesToListDto(
+                        item.Notes.OrderByDescending(n => n.Created)
+                        ).ToList()
                     : null
             };
 

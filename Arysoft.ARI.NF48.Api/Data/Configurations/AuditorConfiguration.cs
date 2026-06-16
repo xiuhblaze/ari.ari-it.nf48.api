@@ -60,6 +60,20 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
+            // RELATIONS
+
+            modelBuilder.Entity<Auditor>()
+                .HasMany(m => m.AuditorStandards)
+                .WithRequired(m => m.Auditor)
+                .HasForeignKey(m => m.AuditorID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Auditor>()
+                .HasMany(m => m.Documents)
+                .WithRequired(m => m.Auditor)
+                .HasForeignKey(m => m.AuditorID)
+                .WillCascadeOnDelete(true);
+
             // Not Mapped
 
             modelBuilder.Entity<Auditor>()

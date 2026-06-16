@@ -16,8 +16,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Examples { get; set; }
 
-        public bool IsAccredited { get; set; }
-
-        //public StatusType Status { get; set; }
+        public Category22KAccreditedType? AccreditedStatus { get; set; }
     }
 }

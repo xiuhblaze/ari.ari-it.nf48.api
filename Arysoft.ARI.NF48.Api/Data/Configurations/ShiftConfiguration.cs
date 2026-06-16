@@ -39,6 +39,12 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.UpdatedUser)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            modelBuilder.Entity<Shift>()
+                .HasMany(m => m.Notes)
+                .WithOptional()
+                .HasForeignKey(m => m.OwnerID)
+                .WillCascadeOnDelete(true);
         } // Configure
     }
 }
