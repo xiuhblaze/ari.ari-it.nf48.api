@@ -533,6 +533,13 @@
             <param name="message">The log message.</param>
             <param name="args">An object array that contains zero or more objects to format.</param>
         </member>
+        <member name="M:Microsoft.IdentityModel.Logging.LogHelper.Sanitize(System.String)">
+            <summary>
+            Sanitizes a string by encoding potentially harmful characters.
+            </summary>
+            <param name="input">The input string to sanitize</param>
+            <returns>A sanitized string safe for logging</returns>
+        </member>
         <member name="T:Microsoft.IdentityModel.Logging.LogMessages">
             <summary>
             Log messages and codes for Microsoft.IdentityModel.Logging
