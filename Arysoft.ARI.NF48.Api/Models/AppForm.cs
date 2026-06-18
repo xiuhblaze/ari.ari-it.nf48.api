@@ -16,13 +16,13 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // ISO Varios
 
-        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K, 37K (scope of certification), 45K
+        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K & HACCP, 37K (scope of certification), 45K
 
-        public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K (lines of product), 37K (process/activities)
+        public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K & HACCP (lines of product), 37K (process/activities)
 
-        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K (lines of product description), 37K (process/activities description)
+        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K & HACCP (lines of product description), 37K (process/activities description)
 
-        public string LegalRequirements { get; set; }           // 9K, 14K, 22K, 37K (Anti-bribery controls), 45K
+        public string LegalRequirements { get; set; }           // 9K, 14K, 22K & HACCP, 37K (Anti-bribery controls), 45K
 
         public bool? AnyCriticalComplaint { get; set; }         // 9K, 14K, 37K (Organization Involved in a bribery), 45K
 
@@ -42,11 +42,11 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string OperationalControls { get; set; }
 
-        // ISO 22K
+        // ISO 22K & HACCP
 
         public int? HACCPCount { get; set; }            // 22K: Indica el numero de procesos HACCP que se tienen, puede entrar más de una linea de producción en un proceso HACCP
 
-        public string SeasonalityJSON { get; set; }     // 22K: Indica si la organización tiene estacionalidad en su producción o ventas
+        public string SeasonalityJSON { get; set; }     // 22K: Indica si la organización tiene estacionalidad en su producción o ventas, lista de meses separados por coma o cadena JSON con la información de estacionalidad
 
         public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
 

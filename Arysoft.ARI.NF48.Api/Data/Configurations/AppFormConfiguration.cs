@@ -51,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.OperationalControls)
                 .HasMaxLength(1000);
 
-            // ISO 22K
+            // ISO 22K & HACCP
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.SeasonalityJSON)
