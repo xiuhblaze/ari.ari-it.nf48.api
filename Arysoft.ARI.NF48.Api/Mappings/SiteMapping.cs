@@ -27,7 +27,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new SiteItemListDto
             {
                 ID = item.ID,
-                OrganizationName = item.Organization.Name,
+                OrganizationID = item.OrganizationID,
+                OrganizationName = item.Organization?.Name ?? string.Empty,
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
