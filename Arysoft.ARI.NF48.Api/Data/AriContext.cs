@@ -29,7 +29,9 @@ namespace Arysoft.ARI.NF48.Api.Data
             ShiftConfiguration.Configure(modelBuilder);
             SiteConfiguration.Configure(modelBuilder);
 
+            // Módulo de AppForms
             AppFormConfiguration.Configure(modelBuilder);
+            RiskLevelConfiguration.Configure(modelBuilder);
 
             // Módulo de ADC - Audit Day Calculation
             ADCConfiguration.Configure(modelBuilder);

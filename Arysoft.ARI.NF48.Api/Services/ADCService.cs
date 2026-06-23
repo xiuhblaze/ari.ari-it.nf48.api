@@ -380,7 +380,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validar que sea de un Standard valido, por lo pronto:
             // * ISO 9001
-            if (appForm.Standard.StandardBase != StandardBaseType.ISO9k)
+            if (appForm.Standard.StandardBase != StandardBaseType.ISO9K)
                 throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
 
             // Validar que el AppForm tenga un Sitio principal activo

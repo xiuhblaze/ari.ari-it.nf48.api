@@ -27,7 +27,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new SiteItemListDto
             {
                 ID = item.ID,
-                OrganizationName = item.Organization.Name,
+                OrganizationID = item.OrganizationID,
+                OrganizationName = item.Organization?.Name ?? string.Empty,
                 Description = item.Description,
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
@@ -44,7 +45,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status == StatusType.Active)
                         .Sum(i => i.NoEmployees) ?? 0 
                     : 0,
-                Shifts = item.Shifts != null
+                Shifts = item.Shifts != null // Para el preview del AppForm
                     ? ShiftMapping.ShiftsToListDto(item.Shifts
                         .Where(i => i.Status != StatusType.Nothing))
                     : new List<ShiftItemListDto>(),

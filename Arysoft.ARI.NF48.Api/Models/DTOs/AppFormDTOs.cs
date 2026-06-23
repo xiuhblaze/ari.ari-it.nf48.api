@@ -5,6 +5,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
+    //TODO: Analizar cuales de estos campos se necesitan en el DTO de lista,
+    //      y cuales solo en el DTO de detalle. Por ejemplo, los campos
+    //      relacionados con ISO 9K, 14K, 22K y 27K tal vez solo sean necesarios
+    //      en el DTO de detalle, mientras que el DTO de lista podría tener solo
+    //      los campos generales y algunos indicadores clave.
     public class AppFormItemListDto
     {
         public Guid ID { get; set; }
@@ -15,7 +20,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
-        // ISO 9K
+        public Guid? Category22KID { get; set; }    // 22K
+
+        // ISO VARIOS
 
         public string ActivitiesScope { get; set; }
 
@@ -29,6 +36,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CriticalComplaintComments { get; set; }
 
+        // ISO 9K
+
         public int? AutomationLevelPercent { get; set; }
 
         public string AutomationLevelJustification { get; set; }
@@ -36,6 +45,20 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public bool? IsDesignResponsibility { get; set; }
 
         public string DesignResponsibilityJustify { get; set; }
+
+        // ISO 14K
+
+        public string OperationalControls { get; set; }
+
+        // ISO 22K
+
+        public int? HACCPCount { get; set; }
+
+        //public string ReviewJustification { get; set; }   // Tal ves no se necesiten par este DTO
+
+        //public string ReviewComments { get; set; }
+
+        // Los de ISO 27K seguramente no se necesiten en el DTO de lista
 
         // GENERAL
 
@@ -63,8 +86,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public DateTime? ReviewDate { get; set; }
 
-        public string ReviewJustification { get; set; }
-
         public string UserSales { get; set; }
 
         public string UserReviewer { get; set; }
@@ -81,9 +102,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string StandardName { get; set; }
 
-        public string UserSalesName { get; set; }
-
-        public string UserReviewerName { get; set; }
+        // Obtener el valor del RiskLevel más alto
+        public RiskLevelCategory? RiskLevelCategory { get; set; }
 
         public ICollection<string> Nacecodes { get; set; }
 
@@ -113,7 +133,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public Guid? StandardID { get; set; }
 
-        // ISO 9K
+        public Guid? Category22KID { get; set; }    // 22K
+
+        // ISO VARIOS
 
         public string ActivitiesScope { get; set; }
 
@@ -127,13 +149,43 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string CriticalComplaintComments { get; set; }
 
+        public string ReviewJustification { get; set; }
+
         public int? AutomationLevelPercent { get; set; }
 
         public string AutomationLevelJustification { get; set; }
 
+        // ISO 9K
+
         public bool? IsDesignResponsibility { get; set; }
 
         public string DesignResponsibilityJustify { get; set; }
+
+        // ISO 14K
+
+        public string OperationalControls { get; set; }
+
+        // ISO 22K
+
+        public int? HACCPCount { get; set; }
+
+        public string SeasonalityJSON { get; set; }
+
+        // ISO 27K
+
+        public string AssetsISO27KJSON { get; set; }
+
+        // ISO 45K
+
+        public string OHSHazardRisk45KJSON { get; set; }
+
+        public string HazardousMaterials45KJSON { get; set; }
+
+        public string AccidentRate45KJSON { get; set; }
+
+        public string IndirectHSRisk45KJSON { get; set; }
+
+        public string HighLevelRisks45K { get; set; }
 
         // GENERAL
 
@@ -160,8 +212,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime? SalesDate { get; set; }
 
         public DateTime? ReviewDate { get; set; }
- // 
-        // public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
 
         public string UserSales { get; set; }
 
@@ -185,11 +235,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public StandardItemListDto Standard { get; set; }
 
+        public RiskLevelItemListDto RiskLevel { get; set; }
+
         public ICollection<ADCItemListDto> ADCs { get; set; }
+
+        public ICollection<ContactItemListDto> Contacts { get; set; }
 
         public ICollection<NaceCodeItemListDto> Nacecodes { get; set; }
 
-        public ICollection<ContactItemListDto> Contacts { get; set; }
+        public ICollection<RiskLevelItemListDto> RiskLevels { get; set; }
 
         public ICollection<SiteItemListDto> Sites { get; set; }
 
@@ -218,9 +272,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        // public Guid StandardID { get; set; } 
+        public Guid? Category22KID { get; set; }    // 22K
 
-        // ISO 9K
+        // ISO VARIOS
 
         [StringLength(1000)]
         public string ActivitiesScope { get; set; }
@@ -238,6 +292,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(1000)]
         public string CriticalComplaintComments { get; set; }
 
+        public string ReviewJustification { get; set; }
+
+        // ISO 9K
+
         public int? AutomationLevelPercent { get; set; }
 
         [StringLength(1000)]
@@ -247,6 +305,39 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(1000)]
         public string DesignResponsibilityJustify { get; set; }
+
+        // ISO 14K
+
+        [StringLength(1000)]
+        public string OperationalControls { get; set; }
+
+        // ISO 22K
+
+        public int? HACCPCount { get; set; }
+
+        [StringLength(500)]
+        public string SeasonalityJSON { get; set; }
+
+        // ISO 27K
+
+        [StringLength(500)]
+        public string AssetsISO27KJSON { get; set; }
+
+        // ISO 45K
+
+        [StringLength(1000)]
+        public string OHSHazardRisk45KJSON { get; set; }
+
+        public string HazardousMaterials45KJSON { get; set; }
+
+        [StringLength(500)]
+        public string AccidentRate45KJSON { get; set; }
+
+        [StringLength(250)]
+        public string IndirectHSRisk45KJSON { get; set; }
+
+        [StringLength(500)]
+        public string HighLevelRisks45K { get; set; }
 
         // GENERAL
 
@@ -330,4 +421,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid SiteID { get; set; }
     } // AppFormSiteDto
+
+    public class AppFormRiskLevelDto
+    {
+        [Required]
+        public Guid AppFormID { get; set; }
+
+        [Required]
+        public Guid RiskLevelID { get; set; }
+    } // AppFormRiskLevelDto
 }

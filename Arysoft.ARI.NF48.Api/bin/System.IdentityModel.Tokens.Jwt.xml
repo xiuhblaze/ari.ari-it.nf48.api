@@ -1520,7 +1520,7 @@
             <exception cref="T:Microsoft.IdentityModel.Tokens.SecurityTokenEncryptionFailedException">if <see cref="P:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.InnerToken"/> is set and <see cref="P:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.EncryptingCredentials"/> is not set.</exception>
             <returns>A JWE or JWS in 'Compact Serialization Format'.</returns>
         </member>
-        <member name="M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateSignature(System.Byte[],System.Byte[],Microsoft.IdentityModel.Tokens.SecurityKey,System.String,Microsoft.IdentityModel.Tokens.SecurityToken,Microsoft.IdentityModel.Tokens.TokenValidationParameters)">
+        <member name="M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateSignature(System.Byte[],System.Byte[],Microsoft.IdentityModel.Tokens.SecurityKey,System.String,Microsoft.IdentityModel.Tokens.SecurityToken,Microsoft.IdentityModel.Tokens.TokenValidationParameters,Microsoft.IdentityModel.Telemetry.ITelemetryClient)">
             <summary>
             Obtains a <see cref="T:Microsoft.IdentityModel.Tokens.SignatureProvider"/> and validates the signature.
             </summary>
@@ -1530,6 +1530,7 @@
             <param name="algorithm">Crypto algorithm to use.</param>
             <param name="securityToken">The <see cref="T:Microsoft.IdentityModel.Tokens.SecurityToken"/> being validated.</param>
             <param name="validationParameters">Priority will be given to <see cref="P:Microsoft.IdentityModel.Tokens.TokenValidationParameters.CryptoProviderFactory"/> over <see cref="P:Microsoft.IdentityModel.Tokens.SecurityKey.CryptoProviderFactory"/>.</param>
+            <param name="telemetryClient">The telemetry client for recording metrics.</param>
             <returns>'true' if signature is valid.</returns>
         </member>
         <member name="M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateSignature(System.String,Microsoft.IdentityModel.Tokens.TokenValidationParameters)">

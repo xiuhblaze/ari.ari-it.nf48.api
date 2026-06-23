@@ -12,27 +12,59 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? StandardID { get; set; }
 
+        public Guid? Category22KID { get; set; }                // Solo para ISO 22K
+
+        // ISO Varios
+
+        public string ActivitiesScope { get; set; }             // 9K, 14K, 22K & HACCP, 37K (scope of certification), 45K
+
+        public int? ProcessServicesCount { get; set; }          // 9K, 14K, 22K & HACCP (lines of product), 37K (process/activities)
+
+        public string ProcessServicesDescription { get; set; }  // 9K, 14K, 22K & HACCP (lines of product description), 37K (process/activities description)
+
+        public string LegalRequirements { get; set; }           // 9K, 14K, 22K & HACCP, 37K (Anti-bribery controls), 45K
+
+        public bool? AnyCriticalComplaint { get; set; }         // 9K, 14K, 37K (Organization Involved in a bribery), 45K
+
+        public string CriticalComplaintComments { get; set; }   // 9K, 14K, 37K (Organization Involved in a bribery - comments), 45K
+
+        public int? AutomationLevelPercent { get; set; }            // 9K, 27K Porcentaje de automatización del proceso
+
+        public string AutomationLevelJustification { get; set; }    // 9K, 27K
+
         // ISO 9K
-
-        public string ActivitiesScope { get; set; }
-
-        public int? ProcessServicesCount { get; set; }
-
-        public string ProcessServicesDescription { get; set; }
-
-        public string LegalRequirements { get; set; }
-
-        public bool? AnyCriticalComplaint { get; set; }
-
-        public string CriticalComplaintComments { get; set; }
-
-        public int? AutomationLevelPercent { get; set; } // Porcentaje de automatización del proceso
-
-        public string AutomationLevelJustification { get; set; }
 
         public bool? IsDesignResponsibility { get; set; }
 
         public string DesignResponsibilityJustify { get; set; }
+
+        // ISO 14K
+
+        public string OperationalControls { get; set; }
+
+        // ISO 22K & HACCP
+
+        public int? HACCPCount { get; set; }            // 22K: Indica el numero de procesos HACCP que se tienen, puede entrar más de una linea de producción en un proceso HACCP
+
+        public string SeasonalityJSON { get; set; }     // 22K: Indica si la organización tiene estacionalidad en su producción o ventas, lista de meses separados por coma o cadena JSON con la información de estacionalidad
+
+        public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
+
+        // ISO 27K
+
+        public string AssetsISO27KJSON { get; set; }    // 27K: Cadena JSON con la información de los activos
+
+        // ISO 45K
+
+        public string OHSHazardRisk45KJSON { get; set; }        // 45K: Cadena JSON con la información de los riesgos o peligros OHS
+
+        public string HazardousMaterials45KJSON { get; set; }   // 45K: Cadena JSON con la información de los materiales peligrosos
+
+        public string AccidentRate45KJSON { get; set; }         // 45K: Cadena JSON con la información de las tasas de accidentes
+
+        public string IndirectHSRisk45KJSON { get; set; }       // 45K: Cadena JSON con la información de los riesgos OHS indirectos
+
+        public string HighLevelRisks45K { get; set; }           // 45K: Cadena con una lista de los riesgos OHS de alto nivel separados por coma
 
         // GENERAL
 
@@ -58,13 +90,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public DateTime? SalesDate { get; set; }        // Última fecha en que Ventas (sales) aprueba o rechaza el appform
 
-        public string SalesComments { get; set; }       // Comentarios de Ventas (sales) de la última aprobación o cambio de status
-
         public DateTime? ReviewDate { get; set; }       // Última fecha en que el revisor del appform aprueba o rechaza
-
-        public string ReviewJustification { get; set; } // 22K: Justification of the reasons why the application is declining
-
-        public string ReviewComments { get; set; }      // 22K: Additonal comments by application reviewer
 
         public string UserSales { get; set; }
 
@@ -82,13 +108,15 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public virtual Standard Standard { get; set; }
 
+        public virtual Category22K Category22K { get; set; }
+
         public virtual ICollection<ADC> ADCs { get; set; } // Solo va a ser un ADC
 
         public virtual ICollection<Contact> Contacts { get; set; }
 
-        // public virtual ICollection<AppFormCurrentCertification> CurrentCertifications { get; set; }
-
         public virtual ICollection<NaceCode> NaceCodes { get; set; }
+
+        public virtual ICollection<RiskLevel> RiskLevels { get; set; }
 
         public virtual ICollection<Note> Notes { get; set; }
 

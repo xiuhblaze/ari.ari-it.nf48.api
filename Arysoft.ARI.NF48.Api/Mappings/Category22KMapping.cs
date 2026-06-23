@@ -29,10 +29,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = item.SubCategory,
                 SubCategoryDescription = item.SubCategoryDescription,
                 Examples = item.Examples,
-                IsAccredited = item.IsAccredited,
-                Status = item.Status,
-                Updated = item.Updated,
-                UpdatedUser = item.UpdatedUser
+                AccreditedStatus = item.AccreditedStatus,
+                Status = item.Status
             };
         } // Category22KToItemListDto
 
@@ -47,7 +45,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = item.SubCategory,
                 SubCategoryDescription = item.SubCategoryDescription,
                 Examples = item.Examples,
-                IsAccredited = item.IsAccredited,
+                AccreditedStatus = item.AccreditedStatus,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -55,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // Category22KToItemDetailDto
 
-        public static Category22K ItemAddDtoToCategory22K(Category22KPostDto itemDto)
+        public static Category22K ItemAddDtoToCategory22K(Category22KCreateDto itemDto)
         {
             return new Category22K
             {
@@ -63,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemAddDtoToCategory22K
 
-        public static Category22K ItemEditDtoToCategory22K(Category22KPutDto itemDto)
+        public static Category22K ItemEditDtoToCategory22K(Category22KUpdateDto itemDto)
         {
             return new Category22K
             {
@@ -74,7 +72,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = itemDto.SubCategory,
                 SubCategoryDescription = itemDto.SubCategoryDescription,
                 Examples = itemDto.Examples,
-                IsAccredited = itemDto.IsAccredited,
+                AccreditedStatus = itemDto.AccreditedStatus,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

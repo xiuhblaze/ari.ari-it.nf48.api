@@ -39,9 +39,53 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.AutomationLevelJustification)
                 .HasMaxLength(1000);
 
+            // ISO 9K
+
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.DesignResponsibilityJustify)
                 .HasMaxLength(1000);
+
+            // ISO 14K
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.OperationalControls)
+                .HasMaxLength(1000);
+
+            // ISO 22K & HACCP
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.SeasonalityJSON)
+                .HasMaxLength(500);
+
+            // ISO 27K
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.AssetsISO27KJSON)
+                .HasMaxLength(250);
+
+            // ISO 45K
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.OHSHazardRisk45KJSON)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.AccidentRate45KJSON)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.IndirectHSRisk45KJSON)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.HighLevelRisks45K)
+                .HasMaxLength(500);
+
+            // GENERAL
+
+            modelBuilder.Entity<AppForm>()
+                .Property(m => m.AuditLanguage)
+                .HasMaxLength(2);
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.CurrentCertificationsExpiration)
@@ -62,18 +106,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.AnyConsultancyBy)
                 .HasMaxLength(250);
-
-            modelBuilder.Entity<AppForm>()
-                .Property(m => m.SalesComments)
-                .HasMaxLength(1000);
-
-            //modelBuilder.Entity<AppForm>()
-            //    .Property(m => m.ReviewJustification)
-            //    .HasMaxLength(1000); // Va a ser MAX
-
-            modelBuilder.Entity<AppForm>()
-                .Property(m => m.ReviewComments)
-                .HasMaxLength(1000);
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.UserSales)
@@ -108,7 +140,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasForeignKey(m => m.OwnerID)
                 .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<AppForm>() // Probar estas relaciones también XD
+            modelBuilder.Entity<AppForm>()
                 .HasMany(m => m.Contacts)
                 .WithMany()
                 .Map(e => e.MapLeftKey("AppFormID")
@@ -121,6 +153,13 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Map(e => e.MapLeftKey("AppFormID")
                     .MapRightKey("NaceCodeID")
                     .ToTable("AppFormsNaceCodes"));
+
+            modelBuilder.Entity<AppForm>()
+                .HasMany(m => m.RiskLevels)
+                .WithMany()
+                .Map(e => e.MapLeftKey("AppFormID")
+                    .MapRightKey("RiskLevelID")
+                    .ToTable("AppFormsRiskLevels"));
 
             modelBuilder.Entity<AppForm>()
                 .HasMany(m => m.Sites)

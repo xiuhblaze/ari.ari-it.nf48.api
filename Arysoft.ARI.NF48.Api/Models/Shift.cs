@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using System;
+using System.Collections.Generic;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -26,5 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Models
         // RELATIONS
 
         public virtual Site Site { get; set; }
+
+        public virtual ICollection<Note> Notes { get; set; }
     }
 }
