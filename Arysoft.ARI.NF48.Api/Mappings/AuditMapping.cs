@@ -167,5 +167,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser,
             };
         } // ItemDeleteDtoToAudit
+
+        public static AuditDashboardAuditsInMonth ItemArrayToAuditsInMonth(int[] items)
+        {
+            return new AuditDashboardAuditsInMonth
+            {
+                ToDo = items[0],
+                InProgress = items[1],
+                Completed = items[2]
+            };
+        } // ItemArrayToAuditsInMonth
     }
 }

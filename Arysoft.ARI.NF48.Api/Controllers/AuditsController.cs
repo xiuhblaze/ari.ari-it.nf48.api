@@ -107,6 +107,18 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetNextAuditorAudit
 
+        [HttpGet]
+        [Route("api/Audits/in-month")]
+        [ResponseType(typeof(ApiResponse<AuditDashboardAuditsInMonth>))]
+        public async Task<IHttpActionResult> GetAuditsInMonth([FromUri] DateTime? value)
+        {
+            var auditSummary = await _service.GetAuditsInMonthAsync(value);
+            var auditsInMonth = AuditMapping.ItemArrayToAuditsInMonth(auditSummary);
+            var response = new ApiResponse<AuditDashboardAuditsInMonth>(auditsInMonth);
+
+            return Ok(response);
+        } // GetAuditsInMonth
+
         [HttpPost]
         [ResponseType(typeof(ApiResponse<AuditItemDetailDto>))]
         public async Task<IHttpActionResult> PostAudit([FromBody] AuditPostDto itemAddDto)
