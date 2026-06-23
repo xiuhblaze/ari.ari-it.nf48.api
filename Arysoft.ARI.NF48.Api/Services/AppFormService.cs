@@ -319,10 +319,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status < AppFormStatusType.Inactive)
             {
                 // ISO Varios
-                foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K, 22K
-                foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K, 22K
-                foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K, 22K
-                foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K, 22K
+                foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K, 22K, HACCP
+                foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K, 22K, HACCP
+                foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K, 22K, HACCP
+                foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K, 22K, HACCP
                 foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;             // 9K, 14K, 37K
                 foundItem.CriticalComplaintComments = item.CriticalComplaintComments;   // 9K, 14K, 37K
                 foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
@@ -338,8 +338,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.OperationalControls = foundItem.Standard.StandardBase == StandardBaseType.ISO14K
                     ? item.OperationalControls
                     : null;
-                // ISO 22K
-                if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K)
+                // ISO 22K & HACCP
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K 
+                    || foundItem.Standard.StandardBase == StandardBaseType.HACCP)
                 {
                     foundItem.Category22KID = item.Category22KID;
                     foundItem.HACCPCount = item.HACCPCount;
@@ -419,6 +420,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                 OrganizationID = originalItem.OrganizationID,
                 AuditCycleID = originalItem.AuditCycleID,
                 StandardID = originalItem.StandardID,
+                // ISO Varios
+                ActivitiesScope = originalItem.ActivitiesScope,
+                ProcessServicesCount = originalItem.ProcessServicesCount,
+                ProcessServicesDescription = originalItem.ProcessServicesDescription,
+                LegalRequirements = originalItem.LegalRequirements,
+                AnyCriticalComplaint = originalItem.AnyCriticalComplaint,
+                CriticalComplaintComments = originalItem.CriticalComplaintComments,
                 // General
                 AuditLanguage = originalItem.AuditLanguage,
                 CycleYear = cycleYear,
@@ -438,19 +446,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 RiskLevels = new List<RiskLevel>()
             };
 
-            // ISO VARIOS
-            if (originalItem.Standard.StandardBase == StandardBaseType.ISO9K
-                || originalItem.Standard.StandardBase == StandardBaseType.ISO14K
-                || originalItem.Standard.StandardBase == StandardBaseType.ISO22K)
-            { 
-                    newItem.ActivitiesScope = originalItem.ActivitiesScope;
-                    newItem.ProcessServicesCount = originalItem.ProcessServicesCount;
-                    newItem.ProcessServicesDescription = originalItem.ProcessServicesDescription;
-                    newItem.LegalRequirements = originalItem.LegalRequirements;
-                    newItem.AnyCriticalComplaint = originalItem.AnyCriticalComplaint;
-                    newItem.CriticalComplaintComments = originalItem.CriticalComplaintComments;
-            }
-
             switch (originalItem.Standard.StandardBase)
             { 
                 case StandardBaseType.ISO9K:
@@ -460,16 +455,26 @@ namespace Arysoft.ARI.NF48.Api.Services
                     newItem.IsDesignResponsibility = originalItem.IsDesignResponsibility;
                     newItem.DesignResponsibilityJustify = originalItem.DesignResponsibilityJustify;
                     break;
-
                 case StandardBaseType.ISO14K:
                     // ISO 14000
                     newItem.OperationalControls = originalItem.OperationalControls;
                     break;
                 case StandardBaseType.ISO22K:
-                    // ISO 22000
+                case StandardBaseType.HACCP:
+                    // ISO 22000 & HACCP
                     newItem.Category22KID = originalItem.Category22KID;
                     newItem.HACCPCount= originalItem.HACCPCount;
                     newItem.SeasonalityJSON = originalItem.SeasonalityJSON;
+                    break;
+                case StandardBaseType.ISO27K:
+                    newItem.AssetsISO27KJSON = originalItem.AssetsISO27KJSON;
+                    break;
+                case StandardBaseType.ISO45K:
+                    newItem.OHSHazardRisk45KJSON = originalItem.OHSHazardRisk45KJSON;
+                    newItem.HazardousMaterials45KJSON = originalItem.HazardousMaterials45KJSON;
+                    newItem.AccidentRate45KJSON = originalItem.AccidentRate45KJSON;
+                    newItem.IndirectHSRisk45KJSON = originalItem.IndirectHSRisk45KJSON;
+                    newItem.HighLevelRisks45K = originalItem.HighLevelRisks45K;
                     break;
             }
 
@@ -799,7 +804,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             //var auditCycleRepository = new AuditCycleRepository();
 
             // - Validar que sea un Standard valido para generar un AppForm, por el momento solo:
-            //   [ ISO 9001, ISO 14001, ISO 22000, ISO 27001, ISO 37001, ISO 45001 ]
+            //   [ ISO 9001, ISO 14001, ISO 22000, ISO 27001, ISO 37001, ISO 45001, HACCP ]
             //   se pueden agregar más en el futuro
 
             if (auditCycle.Standard.StandardBase != StandardBaseType.ISO9K
@@ -807,7 +812,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO22K
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO27K
                 && auditCycle.Standard.StandardBase != StandardBaseType.ISO37K
-                && auditCycle.Standard.StandardBase != StandardBaseType.ISO45K)
+                && auditCycle.Standard.StandardBase != StandardBaseType.ISO45K
+                && auditCycle.Standard.StandardBase != StandardBaseType.HACCP)
                 throw new BusinessException("The selected standard is not valid for generating an Application Form");
 
             // - Validar que la organizacion exista y esté activo
@@ -916,7 +922,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             //   - Tener al menos un contacto asignado
             //   - 9K y 14K: Tener al menos un NACE code asignado
             //   - 14K: Tener al menos un Risk Level asignado
-            //   - 22K: Validar que tenga una categoría asignada y que si tiene HACCP
+            //   - 22K y HACCP: Validar que tenga una categoría asignada y que si tiene HACCP
             //   - 37K: Sin campos extra, validacion como 14K
 
             // TODO: Considerar el validar por fechas de aplicación, que no este el año 2 un año fisico antes que año 1, etc.
@@ -999,6 +1005,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
 
                 case StandardBaseType.ISO22K:
+                case StandardBaseType.HACCP:
                     await ValidateAppFormFor22KAsync(newItem, currentItem);
                     break;
 
@@ -1079,7 +1086,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         } // ValidateAppFormFor14KAsync
 
-        // ISO 22K
+        // ISO 22K & HACCP
         private async Task ValidateAppFormFor22KAsync(AppForm newItem, AppForm currentItem)
         {
             var item = newItem.Status == currentItem.Status // El status no ha cambiado

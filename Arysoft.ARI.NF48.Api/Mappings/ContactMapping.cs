@@ -25,6 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ContactItemListDto
             {
                 ID = item.ID,
+                OrganizationID = item.OrganizationID,
                 OrganizationName = item.Organization != null ? item.Organization.Name : string.Empty,
                 FullName = Strings.FullName(item.FirstName, item.MiddleName, item.LastName),
                 Email = item.Email,

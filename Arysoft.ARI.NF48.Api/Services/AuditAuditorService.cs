@@ -173,10 +173,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // - El auditor ya está asignado en la auditoria
-            if (foundItem.Audit.AuditAuditors.Any(a => 
+            if (foundItem.Audit.AuditAuditors.Any(a =>
                 a.AuditorID == foundItem.AuditorID && a.ID != item.ID))
                 throw new BusinessException("The auditor is already assigned to this audit");
-
+            
             // - El auditor no puede estar en dos auditorias al mismo tiempo,
             //   si la asiganción del auditor esta activa o se va a activar
             if (item.Status == StatusType.Active && foundItem.Audit != null
@@ -243,25 +243,25 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - Validar que la auditoria esté en Status de Shedule solamente
-            if (foundItem.Audit.Status <= AuditStatusType.Scheduled)
+            if (foundItem.Audit.Status > AuditStatusType.Scheduled)
                 throw new BusinessException("Only one auditor can be removed from an audit pending confirmation.");
 
-            //_repository.Delete(foundItem);
+            _repository.Delete(foundItem); // Eliminación directa, sin cambiar el status a Deleted, ya que el registro no se ha confirmado todavía y no se requiere mantener un historial de auditor asignado a la auditoria
 
-            if (foundItem.Status == StatusType.Deleted)
-            {
-                _repository.Delete(foundItem);
-            }
-            else
-            {
-                foundItem.Status = foundItem.Status == StatusType.Active
-                    ? StatusType.Inactive
-                    : StatusType.Deleted;
-                foundItem.Updated = DateTime.UtcNow;
-                foundItem.UpdatedUser = item.UpdatedUser;
+            //if (foundItem.Status == StatusType.Deleted)
+            //{
+            //    _repository.Delete(foundItem);
+            //}
+            //else
+            //{
+            //    foundItem.Status = foundItem.Status == StatusType.Active
+            //        ? StatusType.Inactive
+            //        : StatusType.Deleted;
+            //    foundItem.Updated = DateTime.UtcNow;
+            //    foundItem.UpdatedUser = item.UpdatedUser;
 
-                _repository.Update(foundItem);
-            }
+            //    _repository.Update(foundItem);
+            //}
 
             try
             {
