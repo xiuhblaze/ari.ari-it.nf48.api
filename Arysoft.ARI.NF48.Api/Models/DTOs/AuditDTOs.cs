@@ -214,4 +214,15 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid SiteID { get; set; }        
     } // AuditEditSiteDto
+
+    // DASHBOARD
+
+    public class AuditDashboardAuditsInMonth
+    {
+        public int? ToDo { get; set; }
+
+        public int? InProgress { get; set; }
+
+        public int? Completed { get; set; }
+    } // AuditDashboardAuditsInMonth
 }
