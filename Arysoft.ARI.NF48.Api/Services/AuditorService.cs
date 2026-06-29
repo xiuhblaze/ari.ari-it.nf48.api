@@ -2,8 +2,8 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.IO;
-using Arysoft.ARI.NF48.Api.Mappings;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using Arysoft.ARI.NF48.Api.Tools;
@@ -152,6 +152,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return item;
         } // GetAsync
+
+        public async Task<int[]> GetMiniStatisticDataAsync()
+        {
+            var items = _auditorRepository.Gets();            
+
+            var active = items.Count(e => e.Status == StatusType.Active);
+            
+            return new int[] { active };
+        } // GetMiniStatisticDataAsync
 
         public async Task<Auditor> AddAsync(Auditor item)
         {
