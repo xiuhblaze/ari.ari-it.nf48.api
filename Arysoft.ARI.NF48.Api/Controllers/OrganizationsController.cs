@@ -67,6 +67,18 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetOrganization
 
+        [HttpGet]
+        [Route("api/Organizations/mini-statistic")]
+        [ResponseType(typeof(ApiResponse<OrganizationMiniStatisticDto>))]
+        public async Task<IHttpActionResult> GetMiniStatisticData()
+        {
+            var item = await _organizationService.GetMiniStatisticDataAsync();
+            var itemDto = OrganizationMapping.OrganizationDataToMiniStatisticDataDto(item);
+            var response = new ApiResponse<OrganizationMiniStatisticDto>(itemDto);
+
+            return Ok(response);
+        } // GetMiniStatisticData
+
         // POST: api/Organization
         [ResponseType(typeof(ApiResponse<OrganizationItemDetailDto>))]
         public async Task<IHttpActionResult> PostOrganization([FromBody] OrganizationPostDto itemAddDto)

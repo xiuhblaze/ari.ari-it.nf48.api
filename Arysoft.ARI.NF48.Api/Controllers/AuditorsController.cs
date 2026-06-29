@@ -63,6 +63,19 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetAuditor
 
+        [HttpGet]
+        [Route("api/Auditors/mini-statistic")]
+        [ResponseType(typeof(ApiResponse<AuditorMiniStatisticsDto>))]
+        public async Task<IHttpActionResult> GetMiniStatisticData()
+        {
+            var item = await _auditorService.GetMiniStatisticDataAsync();
+            var itemDto = AuditorMapping.AuditorDataToMiniStatisticDataDto(item);
+            var response = new ApiResponse<AuditorMiniStatisticsDto>(itemDto);
+
+            return Ok(response);
+        } // GetMiniStatisticData
+
+        // POST: api/Auditors
         [ResponseType(typeof(ApiResponse<AuditorItemDetailDto>))]
         public async Task<IHttpActionResult> PostAuditor([FromBody] AuditorPostDto itemPostDto)
         {

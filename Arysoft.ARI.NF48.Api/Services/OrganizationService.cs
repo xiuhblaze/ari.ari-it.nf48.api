@@ -232,6 +232,45 @@ namespace Arysoft.ARI.NF48.Api.Services
             return item;
         } // GetAsync
 
+        /// <summary>
+        /// Obtiene un arreglo de enteros para MiniStatisticsCards con los siguientes 
+        /// datos estadísticos:
+        /// [0] - Cantidad de organizaciones activas
+        /// [1] - Cantidad de organizaciones solicitantes
+        /// [2] - Cantidad de organizaciones activas con al menos un certificado en 
+        ///       su último año
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int[]> GetMiniStatisticDataAsync()
+        {
+            var items = _organizationRepository.Gets();
+
+            var activesCount = items.Count(i =>
+                i.Status == OrganizationStatusType.Active
+            );
+
+            var applicantsCount = items.Count(i =>
+                i.Status == OrganizationStatusType.Applicant
+            );
+
+            // Revisar si en el AuditCycle activo esta su fecha de termino en
+            // este año
+            var activesWarningCount = items.Count(
+                i => i.Status == OrganizationStatusType.Active
+                    && i.AuditCycles != null
+                    && i.AuditCycles
+                        .Where(ac => ac.Status == StatusType.Active)
+                        .Any(ac => ac.EndDate != null
+                            && ac.EndDate.Value.AddYears(-1) < DateTime.UtcNow
+                            && DateTime.UtcNow <= ac.EndDate.Value
+                        )
+            );
+
+            return new int[] { activesCount, applicantsCount, activesWarningCount };
+        } // GetMiniStatisticDataAsync
+
+        // EDIT METHODS
+
         public async Task<Organization> AddAsync(Organization item)
         {   
             // Assigning values

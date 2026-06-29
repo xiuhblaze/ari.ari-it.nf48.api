@@ -173,4 +173,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     }
+
+    public class OrganizationMiniStatisticDto
+    {
+        public int ActivesCount { get; set; }
+
+        public int ApplicantsCount { get; set; }
+
+        public int ActivesWarningCount { get; set; }
+    } // OrganizationMiniStatisticDto
 }

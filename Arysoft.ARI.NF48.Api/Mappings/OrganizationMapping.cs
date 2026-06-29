@@ -173,6 +173,16 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // OrganizationToItemDetailDto
 
+        public static OrganizationMiniStatisticDto OrganizationDataToMiniStatisticDataDto(int[] items)
+        { 
+            return new OrganizationMiniStatisticDto
+            {
+                ActivesCount = items[0],
+                ApplicantsCount = items[1],
+                ActivesWarningCount = items[2]
+            };
+        } // OrganizationDataToMiniStatisticDataDto
+
         public static OrganizationItemProposalDto OrganizationToItemProposalDto(Organization item)
         {
             return new OrganizationItemProposalDto
