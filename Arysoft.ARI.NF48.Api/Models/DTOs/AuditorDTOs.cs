@@ -134,4 +134,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // AuditorDeleteDto
+
+    public class AuditorMiniStatisticsDto
+    {   
+        public int ActiveAuditors { get; set; }
+
+        // public string AuditorOfTheMonth { get; set; }
+    } // AuditorMiniStatisticsDto
 }

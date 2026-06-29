@@ -80,6 +80,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // AuditorToItemDetailDto
 
+        public static AuditorMiniStatisticsDto AuditorDataToMiniStatisticDataDto(int[] items)
+        {
+            return new AuditorMiniStatisticsDto
+            {
+                ActiveAuditors = items[0]
+            };
+        } // AuditorDataToMiniStatisticDataDto
+
         public static Auditor ItemAddDtoToAuditor(AuditorPostDto itemDto)
         {
             return new Auditor
