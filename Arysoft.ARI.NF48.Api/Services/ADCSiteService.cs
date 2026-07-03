@@ -120,6 +120,8 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <returns></returns>
         public async Task<ADCSite> GetAsync(Guid id)
         {
+            var _md5Repository = new MD5Repository();
+            var _appFormRepository = new AppFormRepository();
             var item = await _repository.GetAsync(id)
                 ?? throw new BusinessException("The record was not found");
 
@@ -129,10 +131,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
             {
                 // Volver a obtener el MD5 y guardar antes de enviar
-                var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
                 
-                item.InitialMD5 = employeesMD5.InitialMD5;
-                item.NoEmployees = employeesMD5.NoEmployees;
+                var maximumRiskLevel = await _appFormRepository.GetMaximumRiskLevelCategoryAsync(item.ADC?.AppFormID ?? Guid.Empty);
+                var tableType = MD5Service.GetTableType(item.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
+
+                //var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
+                var _noEmployees = GetEmployees(item.Site ?? new Site());
+                var _initialMD5 = await _md5Repository.GetDaysAsync(_noEmployees, tableType, maximumRiskLevel);
+
+                item.InitialMD5 = _initialMD5; // employeesMD5.InitialMD5;
+                item.NoEmployees = _noEmployees; //employeesMD5.NoEmployees;
 
                 _repository.Update(item);
                 try
@@ -217,13 +225,13 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var foundItem = await _repository.GetAsync(adcSiteID)
                 ?? throw new BusinessException("The record to update was not found");
-
+            var tableType = MD5Service.GetTableType(foundItem.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
             //var employeesMD5 = await GetEmployeesMD5Async(foundItem.SiteID ?? Guid.Empty);
 
             //foundItem.InitialMD5 = employeesMD5.InitialMD5;
             //foundItem.NoEmployees = employeesMD5.NoEmployees;
             var employees = GetEmployees(foundItem.Site ?? new Site());
-            var md5 = await GetMD5ByEmployeesAsync(employees);
+            var md5 = await GetMD5ByEmployeesAsync(employees, tableType);
 
             foundItem.MD5ID = md5.ID;
             foundItem.InitialMD5 = md5.Days; // employeesMD5.InitialMD5;
@@ -357,7 +365,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // NOTA: La mayoria de calculos se va a realizar en el frontend
                 var employees = GetEmployees(foundItem.Site ?? new Site());
-                var md5 = await GetMD5ByEmployeesAsync(employees);
+                var tableType = MD5Service.GetTableType(foundItem.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
+                var md5 = await GetMD5ByEmployeesAsync(employees, tableType);
 
                 foundItem.MD5ID = md5.ID;
                 foundItem.InitialMD5 = md5.Days;
@@ -387,7 +396,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // STATICs
 
-        public static async Task<EmployeesMD5> GetEmployeesMD5Async(Guid siteID)
+        // poner obsoleto esta funcion
+        [Obsolete("This method is obsolete. Use GetEmployeesAsync(Guid siteID) instead and MD5Repository.GetDaysAsync(...) by separated.")]
+        public static async Task<EmployeesMD5> GetEmployeesMD5Async(Guid siteID, MD5TableType tableType)
         {
             var siteRepository = new SiteRepository();
             var md5Repository = new MD5Repository();
@@ -397,7 +408,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ? site.Shifts.Where(s => s.Status == StatusType.Active)
                     .Sum(s => s.NoEmployees) ?? 0
                 : 0;
-            var initialMD5 = await md5Repository.GetDaysAsync(employeesCount);
+            var initialMD5 = await md5Repository.GetDaysAsync(employeesCount, tableType);
 
             return new EmployeesMD5
             {
@@ -406,9 +417,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             };
         } // GetEmployeesMD5Async
 
-        public static int GetEmployees(Site site)
+        public static async Task<int> GetEmployeesAsync(Guid siteID)
         {
             var siteRepository = new SiteRepository();
+            var site = await siteRepository.GetAsync(siteID)
+                    ?? throw new BusinessException("The Site ID does not exist");
+            //var employeesCount = site.Shifts != null
+            //    ? site.Shifts.Where(s => s.Status == StatusType.Active)
+            //        .Sum(s => s.NoEmployees) ?? 0
+            //    : 0;
+            return GetEmployees(site); // employeesCount;
+        } // GetEmployeesAsync
+
+        public static int GetEmployees(Site site)
+        {
+            //var siteRepository = new SiteRepository();
             //var site = await siteRepository.GetAsync(siteID)
             //        ?? throw new BusinessException("The Site ID does not exist");
             var employeesCount = site.Shifts != null
@@ -419,7 +442,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             return employeesCount;
         } // GetEmployees
 
-        public static async Task<MD5> GetMD5ByEmployeesAsync(int employees)
+        public static async Task<MD5> GetMD5ByEmployeesAsync(int employees, MD5TableType tableType)
         {
             if (employees < 0)
                 throw new ArgumentException("The number of employees cannot be negative.");
@@ -432,7 +455,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             //    ? site.Shifts.Where(s => s.Status == StatusType.Active)
             //        .Sum(s => s.NoEmployees) ?? 0
             //    : 0;
-            var md5Item = await md5Repository.GetByEmployeesAsync(employees);
+            var md5Item = await md5Repository.GetByEmployeesAsync(employees, tableType);
 
             return md5Item;
         } // GetMD5ByEmployeesAsync

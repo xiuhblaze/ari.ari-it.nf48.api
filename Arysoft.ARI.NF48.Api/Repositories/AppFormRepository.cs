@@ -11,6 +11,24 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class AppFormRepository : BaseRepository<AppForm>
     {
+        //public new async Task<AppForm> GetAsync(Guid id, bool asNoTracking = false)
+        //{
+        //    var query = _model
+        //        .Include(m => m.Organization)
+        //        .Include(m => m.AuditCycle)
+        //        .Include(m => m.Standard)
+        //        .Include(m => m.Category22K)
+        //        .Include(m => m.Contacts)
+        //        .Include(m => m.NaceCodes)
+        //        .Include(m => m.RiskLevels)
+        //        .Include(m => m.Sites);
+
+        //    if (asNoTracking)
+        //        query = query.AsNoTracking();
+
+        //    return await query.FirstOrDefaultAsync(m => m.ID == id);
+        //} // GetAsync
+
         public async Task<Guid> GetAuditCycleIDAsync(Guid appFormID)
         {
             return await _model
@@ -69,6 +87,30 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return nextCycleYear;
         } // GetNextCycleYearAsync
+
+        /// <summary>
+        /// Devuelve el máximo nivel de riesgo de un AppForm, considerando solo los niveles 
+        /// activos y distintos a 'Nothing' y considerando 1 el maximo y 5 el minimo
+        /// </summary>
+        /// <param name="appFormID">Identificador del AppForm a evaluar su nivel maximo de riesgo</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task<RiskLevelCategory> GetMaximumRiskLevelCategoryAsync(Guid appFormID)
+        {
+            var _appForm = await _model
+                .Include(m => m.RiskLevels)
+                .FirstOrDefaultAsync(m => m.ID == appFormID)
+                ?? throw new BusinessException("The AppForm item not found");
+
+            if (_appForm.RiskLevels == null || _appForm.RiskLevels.Count == 0)
+                return RiskLevelCategory.Nothing;
+
+            // Retorna el valor mínimo de la enumeración, que es el máximo riesgo
+            return _appForm.RiskLevels
+                .Where(rl => rl.Status == StatusType.Active 
+                    && rl.Category != RiskLevelCategory.Nothing)
+                .Min(m => m.Category) ?? RiskLevelCategory.Medium; 
+        } // GetMaximumRiskLevelCategoryAsync
 
         /// <summary>
         /// Indica si existe algún AppForm válido en un ciclo de auditoría, 

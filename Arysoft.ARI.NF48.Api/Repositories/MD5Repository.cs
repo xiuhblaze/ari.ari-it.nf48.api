@@ -16,11 +16,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// <param name="endValue"></param>
         /// <param name="exceptionID"></param>
         /// <returns></returns>
-        public async Task<bool> IsInRangeAsync(int startValue, int endValue, Guid? exceptionID)
+        public async Task<bool> IsInRangeAsync(int startValue, int endValue, MD5TableType tableType, Guid? exceptionID)
         { 
             var items = _model
                 .Where(m => m.StartValue <= endValue && m.EndValue >= startValue
-                    && m.Status == StatusType.Active);
+                    && m.Status == StatusType.Active
+                    && m.TableType == tableType);
 
             if (exceptionID.HasValue && exceptionID != Guid.Empty)
             { 
@@ -31,38 +32,60 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         }
 
         /// <summary>
-        /// Obtiene el número de dias aplicable dado el número de empleados
+        /// Obtiene el número de dias aplicable dado el número de empleados y
+        /// el tipo de tabla MD5, por default era QMS , pero se agrego el 
+        /// tipo EMS y OHSMS para poder obtener los dias de acuerdo al tipo de 
+        /// standard que se este evaluando.
         /// </summary>
-        /// <param name="employees"></param>
+        /// <param name="employees">Numero de empleados a buscar el rango</param>
+        /// <param name="tableType">Tipo de tabla MD5, ya sea QMS, EMS o OHSMS</param>
+        /// <param name="riskLevel">Nivel de riesgo, solo necesario en algunos standards, por defautl es Medium</param>
         /// <returns></returns>
-        public async Task<decimal> GetDaysAsync(int employees)
+        public async Task<decimal> GetDaysAsync(
+            int employees, 
+            MD5TableType tableType, 
+            RiskLevelCategory riskLevel = RiskLevelCategory.Medium
+        )
         {
             var item = await _model
                 .Where(m => m.StartValue <= employees && m.EndValue >= employees
-                    && m.Status == StatusType.Active)
+                    && m.Status == StatusType.Active
+                    && m.TableType == tableType)
                 .FirstOrDefaultAsync();
 
-            return item?.Days ?? 0;
+            if (item == null) return 0;
+
+            return riskLevel == RiskLevelCategory.Nothing ? item.Days ?? 0 :
+                   riskLevel == RiskLevelCategory.High ? item.HighDays ?? 0 :
+                   riskLevel == RiskLevelCategory.Medium ? item.Days ?? 0 :
+                   riskLevel == RiskLevelCategory.Low ? item.LowDays ?? 0 :
+                   riskLevel == RiskLevelCategory.Limited ? item.LimDays ?? 0
+                   : 0;
         } // GetDaysAsync
 
         /// <summary>
         ///  Obtiene el registro MD5 dado el numero de empleados
+        ///  en el tipo de tabla indicada (QMS, EMS o OHSMS)
         /// </summary>
         /// <param name="employees"></param>
+        /// <param name="tableType"></param>
         /// <returns></returns>
-        public async Task<MD5> GetByEmployeesAsync(int employees)
+        public async Task<MD5> GetByEmployeesAsync(int employees, MD5TableType tableType)
         {
             var mD5Maximum = await _model
                 .OrderByDescending(m => m.EndValue)
                 .FirstOrDefaultAsync();
 
-            if (mD5Maximum.EndValue < employees)
+            // Si el número de empleados es mayor que el rango máximo, se devuelve el registro
+            // con el rango máximo
+            if (mD5Maximum.EndValue < employees) 
             {
                 return mD5Maximum;
             }
 
             return await _model
                 .Where(m => m.StartValue <= employees && m.EndValue >= employees
+                    && m.TableType == tableType
                     && m.Status == StatusType.Active)
                 .FirstOrDefaultAsync();
         } // GetByEmployees
