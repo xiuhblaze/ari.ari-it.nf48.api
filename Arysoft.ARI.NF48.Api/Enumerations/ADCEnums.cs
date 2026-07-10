@@ -15,9 +15,9 @@
     public enum ADCOrderType
     {
         Nothing,        // No ordenar
-        Description,    // Ordenar por descripción
+        // Description,    // Ordenar por descripción
         Created,        // Ordenar por fecha de creación
-        DescriptionDesc,
+        // DescriptionDesc,
         CreatedDesc,
     }
 

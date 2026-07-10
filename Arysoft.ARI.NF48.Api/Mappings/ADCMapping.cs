@@ -1,6 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,7 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardID = item.StandardID,
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
-                Description = item.Description,
+                //Description = item.Description,
                 IncludePreAudit = item.IncludePreAudit ?? false,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
@@ -66,7 +65,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardID = item.StandardID,
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
-                Description = item.Description,
+                //Description = item.Description,
                 IncludePreAudit = item.IncludePreAudit ?? false,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
@@ -124,7 +123,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADC
             {
                 ID = itemDto.ID,
-                Description = itemDto.Description,
+                //Description = itemDto.Description,
                 IncludePreAudit = itemDto.IncludePreAudit,
                 TotalInitial = itemDto.TotalInitial,
                 TotalMD11 = itemDto.TotalMD11,

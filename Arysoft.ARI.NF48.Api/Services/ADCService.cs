@@ -73,15 +73,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
-                case ADCOrderType.Description:
-                    items = items.OrderBy(e => e.Description);
-                    break;
+                //case ADCOrderType.Description:
+                //    items = items.OrderBy(e => e.Description);
+                //    break;
                 case ADCOrderType.Created:
                     items = items.OrderBy(e => e.Created);
                     break;
-                case ADCOrderType.DescriptionDesc:
-                    items = items.OrderBy(e => e.Description);
-                    break;
+                //case ADCOrderType.DescriptionDesc:
+                //    items = items.OrderBy(e => e.Description);
+                //    break;
                 case ADCOrderType.CreatedDesc:
                     items = items.OrderByDescending(e => e.Created);
                     break;
@@ -524,7 +524,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            foundItem.Description = item.Description;
+            //foundItem.Description = item.Description;
             foundItem.IncludePreAudit = item.IncludePreAudit ?? false;
             foundItem.TotalInitial = item.TotalInitial;
             foundItem.TotalMD11 = item.TotalMD11;

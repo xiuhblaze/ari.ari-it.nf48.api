@@ -445,7 +445,10 @@ namespace Arysoft.ARI.NF48.Api.Services
         public static async Task<MD5> GetMD5ByEmployeesAsync(int employees, MD5TableType tableType)
         {
             if (employees < 0)
-                throw new ArgumentException("The number of employees cannot be negative.");
+                throw new BusinessException("The number of employees cannot be negative.");
+
+            if (tableType == MD5TableType.Nothing)
+                throw new BusinessException("The MD5 table type is required.");
 
             //var siteRepository = new SiteRepository();
             var md5Repository = new MD5Repository();

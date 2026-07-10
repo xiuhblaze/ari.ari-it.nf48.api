@@ -901,7 +901,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Where(adc => adc.Status == ADCStatusType.Active)
                     .Select(adc => new
                     {
-                        adc.Description,
+                        //adc.Description,
                         adc.TotalEmployees,
                         TotalInitial = 0,
                         TotalMD11 = 0,

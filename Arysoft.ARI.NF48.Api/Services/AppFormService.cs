@@ -362,7 +362,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
 
                 // General
-                foundItem.Description = item.Description;
+                // foundItem.Description = item.Description;
                 foundItem.AuditLanguage = item.AuditLanguage;
                 foundItem.CycleYear = item.CycleYear;
                 foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
@@ -705,6 +705,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 OrganizationName = item.Organization?.Name,
                 AuditCycleName = item.AuditCycle?.Name,
+                AuditCycleType = item.AuditCycle?.CycleType,
                 StandardName = item.Standard?.Name,
                 item.Organization?.Website,
                 item.Organization?.Phone,

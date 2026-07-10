@@ -219,10 +219,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class AuditDashboardAuditsInMonth
     {
-        public int? ToDo { get; set; }
-
-        public int? InProgress { get; set; }
-
-        public int? Completed { get; set; }
-    } // AuditDashboardAuditsInMonth
+        public int ScheduledCount { get; set; }
+        public int ConfirmedCount { get; set; }
+        public int InProcessCount { get; set; }
+        public int FinishedCount { get; set; }
+        public int CompletedCount { get; set; }
+        public int ClosedCount { get; set; }
+    }
 }

@@ -19,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public CycleYearType? CycleYear { get; set; }
 
-        public string Description { get; set; }
+        //public string Description { get; set; }
 
         public bool? IncludePreAudit { get; set; }
 
@@ -47,15 +47,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        //public string AuditCycleName { get; set; }
-
         public AuditCycleItemListDto AuditCycle { get; set; }
 
         public string AppFormOrganizationName { get; set; }
-
-        //public Guid AppFormStandardID { get; set; }
-
-        //public string AppFormStandardName { get; set; }
 
         public string StandardName { get; set; }
 
@@ -85,7 +79,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public CycleYearType? CycleYear { get; set; }
 
-        public string Description { get; set; }
+        // public string Description { get; set; }
 
         public bool? IncludePreAudit { get; set; }
 
@@ -152,8 +146,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public Guid ID { get; set; }
 
-        [StringLength(500)]
-        public string Description { get; set; }
+        //[StringLength(500)]
+        //public string Description { get; set; }
 
         [Required(ErrorMessage = "Indicate whether pre audit are included")]
         public bool? IncludePreAudit { get; set; }
