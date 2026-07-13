@@ -632,6 +632,38 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // RiskLevels
 
+        public async Task AddListRiskLevelsAsync(Guid id, List<Guid> riskLevelsIDs)
+        {
+            await _repository.DeleteAllRiskLevelsFromAppFormAsync(id);
+
+            try 
+            { 
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.AddListRiskLevelsAsync.DeleteAllRiskLevels: {ex.Message}");
+            }
+
+            var foundItem = await _repository.GetAsync(id)
+                ?? throw new BusinessException("The AppForm record to update was not found");
+
+            foreach (var riskLevelID in riskLevelsIDs)
+            { 
+                await _repository.AddRiskLevelAsync(foundItem, riskLevelID);
+            }
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"AppFormService.AddListRiskLevelsAsync.AddRiskLevels: {ex.Message}");
+            }
+
+        } // AddListRiskLevelsAsync
+
         public async Task AddRiskLevelAsync(Guid id, Guid riskLevelID)
         {
             // Validar

@@ -398,6 +398,20 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             item.RiskLevels.Add(riskLevelItem);
         } // AddRiskLevelAsync
 
+        public async Task DeleteAllRiskLevelsFromAppFormAsync(Guid id)
+        {
+            var foundItem = await _model.FindAsync(id)
+                ?? throw new BusinessException("The application form to remove all Risk Levels was not found");
+
+            if (foundItem.Status >= AppFormStatusType.Inactive)
+                throw new BusinessException("The application form is not active");
+
+            _context.Database.ExecuteSqlCommand(
+                "DELETE FROM AppFormsRiskLevels WHERE AppFormID = {0}", foundItem.ID);
+
+            foundItem.RiskLevels.Clear();
+        } // DeleteAllRiskLevelsFromAppFormAsync
+
         public async Task DelRiskLevelAsync(Guid id, Guid riskLevelID)
         {
             var _riskLevelRepository = _context.Set<RiskLevel>();
