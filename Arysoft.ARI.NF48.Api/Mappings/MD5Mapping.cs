@@ -27,9 +27,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new MD5ItemListDto
             {
                 ID = item.ID,
+                TableType = item.TableType,
                 StartValue = item.StartValue,
                 EndValue = item.EndValue,
+                HighDays = item.HighDays,
                 Days = item.Days,
+                LowDays = item.LowDays,
+                LimDays = item.LimDays,
                 Status = item.Status
             };
         } // MD5ToItemListDto
@@ -39,9 +43,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new MD5ItemDetailDto
             {
                 ID = item.ID,
+                TableType = item.TableType,
                 StartValue = item.StartValue,
                 EndValue = item.EndValue,
+                HighDays = item.HighDays,
                 Days = item.Days,
+                LowDays = item.LowDays,
+                LimDays = item.LimDays,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -53,9 +61,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {
             return new MD5
             {
+                TableType = item.TableType,
                 StartValue = item.StartValue,
                 EndValue = item.EndValue,
+                HighDays = item.HighDays,
                 Days = item.Days,
+                LowDays = item.LowDays,
+                LimDays = item.LimDays,
                 Status = item.Status ?? StatusType.Nothing,
                 UpdatedUser = item.UpdatedUser
             };
@@ -68,7 +80,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 StartValue = item.StartValue,
                 EndValue = item.EndValue,
+                HighDays = item.HighDays,
                 Days = item.Days,
+                LowDays = item.LowDays,
+                LimDays = item.LimDays,
                 UpdatedUser = item.UpdatedUser
             };
         } // ItemUpdateDtoToMD5

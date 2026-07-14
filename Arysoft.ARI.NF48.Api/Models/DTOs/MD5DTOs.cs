@@ -8,11 +8,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public MD5TableType? TableType { get; set; }
+
         public int? StartValue { get; set; }
 
         public int? EndValue { get; set; }
 
+        public decimal? HighDays { get; set; }
+
         public decimal? Days { get; set; }
+
+        public decimal? LowDays { get; set; }
+
+        public decimal? LimDays { get; set; }
 
         public StatusType Status { get; set; }
     }
@@ -21,11 +29,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
+        public MD5TableType? TableType { get; set; }
+
         public int? StartValue { get; set; }
 
         public int? EndValue { get; set; }
 
+        public decimal? HighDays { get; set; }
+
         public decimal? Days { get; set; }
+
+        public decimal? LowDays { get; set; }
+
+        public decimal? LimDays { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -38,11 +54,19 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
     public class MD5ItemCreateDto
     {
+        public MD5TableType? TableType { get; set; }
+
         public int? StartValue { get; set; }
 
         public int? EndValue { get; set; }
 
+        public decimal? HighDays { get; set; }
+
         public decimal? Days { get; set; }
+
+        public decimal? LowDays { get; set; }
+
+        public decimal? LimDays { get; set; }
 
         public StatusType? Status { get; set; }
 
@@ -62,8 +86,14 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public int EndValue { get; set; }
 
+        public decimal? HighDays { get; set; }
+
         [Required]
-        public decimal Days { get; set; }
+        public decimal? Days { get; set; }
+
+        public decimal? LowDays { get; set; }
+
+        public decimal? LimDays { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

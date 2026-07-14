@@ -39,9 +39,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Recertification = item.Recertification,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
-                ADCDescription = item.ADC != null 
-                    ? item.ADC.Description 
-                    : string.Empty,
+                //ADCDescription = item.ADC != null 
+                //    ? item.ADC.Description 
+                //    : string.Empty,
                 SiteDescription = item.Site != null 
                     ? item.Site.Description 
                     : string.Empty,

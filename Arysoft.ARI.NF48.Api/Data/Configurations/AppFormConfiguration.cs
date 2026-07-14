@@ -15,9 +15,9 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.ID)
                 .HasColumnName("AppFormID");
 
-            modelBuilder.Entity<AppForm>()
-                .Property(m => m.Description)
-                .HasMaxLength(500);
+            //modelBuilder.Entity<AppForm>()
+            //    .Property(m => m.Description)
+            //    .HasMaxLength(500);
 
             modelBuilder.Entity<AppForm>()
                 .Property(m => m.ActivitiesScope)

@@ -62,7 +62,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
-        public string Description { get; set; }
+        // public string Description { get; set; }
 
         public string AuditLanguage { get; set; }
 
@@ -189,7 +189,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
-        public string Description { get; set; }
+        // public string Description { get; set; }
 
         public string AuditLanguage { get; set; }
 
@@ -341,8 +341,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // GENERAL
 
-        [StringLength(500)]
-        public string Description { get; set; }
+        //[StringLength(500)]
+        //public string Description { get; set; }
 
         [StringLength(2)]
         public string AuditLanguage { get; set; }

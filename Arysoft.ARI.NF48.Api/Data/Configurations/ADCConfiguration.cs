@@ -23,9 +23,9 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.AppFormID)
                 .IsRequired();
 
-            modelBuilder.Entity<ADC>()
-                .Property(m => m.Description)
-                .HasMaxLength(500);
+            //modelBuilder.Entity<ADC>()
+            //    .Property(m => m.Description)
+            //    .HasMaxLength(500);
 
             modelBuilder.Entity<ADC>()
                 .Property(m => m.TotalInitial)

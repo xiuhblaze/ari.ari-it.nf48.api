@@ -56,7 +56,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 // 22K
                 HACCPCount = item.HACCPCount,
                 // GENERAL
-                Description = item.Description,
+                // Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CycleYear = item.CycleYear,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
@@ -158,7 +158,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON,
                 HighLevelRisks45K = item.HighLevelRisks45K,
                 // GENERAL
-                Description = item.Description,
+                //Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CycleYear = item.CycleYear,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
@@ -261,7 +261,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON,
                 HighLevelRisks45K = item.HighLevelRisks45K,
                 // GENERAL
-                Description = item.Description,
+                //Description = item.Description,
                 AuditLanguage = item.AuditLanguage,
                 CycleYear = item.CycleYear,
                 CurrentCertificationsExpiration = item.CurrentCertificationsExpiration,
