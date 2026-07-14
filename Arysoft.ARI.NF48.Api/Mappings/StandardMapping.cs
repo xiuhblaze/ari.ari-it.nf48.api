@@ -28,8 +28,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 Name = item.Name,
                 Description = item.Description,
-                MaxReductionDays = item.MaxReductionDays,
-                SalesMaxReductionDays = item.SalesMaxReductionDays,
+                //MaxReductionDays = item.MaxReductionDays,
+                //SalesMaxReductionDays = item.SalesMaxReductionDays,
                 StandardBase = item.StandardBase,
                 Status = item.Status,
                 Updated = item.Updated,
@@ -38,10 +38,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? item.AuditorStandards
                         .Where(aus => aus.Status == StatusType.Active).Count()
                     : 0,
-                CatAuditorDocumentsCount = item.CatAuditorDocuments != null
-                    ? item.CatAuditorDocuments
-                        .Where(cad => cad.Status != StatusType.Nothing).Count()
-                    : 0,
+                //CatAuditorDocumentsCount = item.CatAuditorDocuments != null
+                //    ? item.CatAuditorDocuments
+                //        .Where(cad => cad.Status != StatusType.Nothing).Count()
+                //    : 0,
                 //CertificatesCount = item.Certificates != null
                 //    ? item.Certificates
                 //        .Where(c => c.Status != CertificateStatusType.Nothing).Count()
@@ -60,8 +60,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 Name = item.Name,
                 Description = item.Description,
-                MaxReductionDays = item.MaxReductionDays,
-                SalesMaxReductionDays = item.SalesMaxReductionDays,
+                //MaxReductionDays = item.MaxReductionDays,
+                //SalesMaxReductionDays = item.SalesMaxReductionDays,
                 StandardBase = item.StandardBase,
                 Status = item.Status,
                 Created = item.Created,
@@ -71,10 +71,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? AuditorStandardMapping.AuditorStandardToListDto(item.AuditorStandards
                         .Where(aus => aus.Status >= StatusType.Nothing))
                     : null,
-                CatAuditorDocuments = item.CatAuditorDocuments != null
-                    ? CatAuditorDocumentMapping.CatAuditorDocumentToListDto(item.CatAuditorDocuments
-                        .Where(i => i.Status != StatusType.Nothing))
-                    : null,
+                //CatAuditorDocuments = item.CatAuditorDocuments != null
+                //    ? CatAuditorDocumentMapping.CatAuditorDocumentToListDto(item.CatAuditorDocuments
+                //        .Where(i => i.Status != StatusType.Nothing))
+                //    : null,
                 //Certificates = item.Certificates != null
                 //    ? CertificateMapping.CertificatesToListDto(item.Certificates
                 //        .Where(c => c.Status != CertificateStatusType.Nothing))
@@ -101,8 +101,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Name = itemDto.Name,
                 Description = itemDto.Description,
-                MaxReductionDays = itemDto.MaxReductionDays,
-                SalesMaxReductionDays = itemDto.SalesMaxReductionDays,
+                //MaxReductionDays = itemDto.MaxReductionDays,
+                //SalesMaxReductionDays = itemDto.SalesMaxReductionDays,
                 StandardBase = itemDto.StandardBase,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

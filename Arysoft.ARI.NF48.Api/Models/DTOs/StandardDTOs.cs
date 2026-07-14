@@ -13,10 +13,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Description { get; set; }
 
-        public int? MaxReductionDays { get; set; }
-
-        public int? SalesMaxReductionDays { get; set; }
-
         public StandardBaseType? StandardBase { get; set; }
 
         public StatusType Status { get; set; }
@@ -25,11 +21,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string UpdatedUser { get; set; }
 
-        // public int ApplicationsCount { get; set; }
+        // RELATIONS
 
         public int AuditorsCount { get; set; }
 
-        public int CatAuditorDocumentsCount { get; set; }
+        // public int CatAuditorDocumentsCount { get; set; }
 
         // public int CertificatesCount { get; set; }
 
@@ -44,10 +40,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string Name { get; set; }
 
         public string Description { get; set; }
-
-        public int? MaxReductionDays { get; set; }
-
-        public int? SalesMaxReductionDays { get; set; }
 
         public StandardBaseType? StandardBase { get; set; }
 
@@ -65,7 +57,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public IEnumerable<AuditorStandardItemListDto> Auditors { get; set; }
 
-        public IEnumerable<CatAuditorDocumentItemListDto> CatAuditorDocuments { get; set; }
+        // public IEnumerable<CatAuditorDocumentItemListDto> CatAuditorDocuments { get; set; }
 
         // public IEnumerable<CertificateItemListDto> Certificates { get; set; }
 
@@ -91,11 +83,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(250)]
         public string Description { get; set; }
 
-        [Range(0, 20, ErrorMessage = "Value for Max Reduction Days must be between {1} and {2}.")]
-        public int? MaxReductionDays { get; set; }
+        //[Range(0, 20, ErrorMessage = "Value for Max Reduction Days must be between {1} and {2}.")]
+        //public int? MaxReductionDays { get; set; }
 
-        [Range(0, 20, ErrorMessage = "Value for Max Reduction Days must be between {1} and {2}.")]
-        public int? SalesMaxReductionDays { get; set; }
+        //[Range(0, 20, ErrorMessage = "Value for Max Reduction Days must be between {1} and {2}.")]
+        //public int? SalesMaxReductionDays { get; set; }
 
         [Required]
         public StandardBaseType? StandardBase { get; set; }
