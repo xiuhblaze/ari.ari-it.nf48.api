@@ -172,9 +172,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {
             return new AuditDashboardAuditsInMonth
             {
-                ToDo = items[0],
-                InProgress = items[1],
-                Completed = items[2]
+                ScheduledCount = items[0],
+                ConfirmedCount = items[1],
+                InProcessCount = items[2],
+                FinishedCount = items[3],
+                CompletedCount = items[4],
+                ClosedCount = items[5]
             };
         } // ItemArrayToAuditsInMonth
     }

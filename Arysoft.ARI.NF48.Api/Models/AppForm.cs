@@ -68,7 +68,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // GENERAL
 
-        public string Description { get; set; }         // Descripción corta del appform
+        // public string Description { get; set; }         // Descripción corta del appform
 
         public string AuditLanguage { get; set; }       // Siglas del idioma en base al ISO 639-1
 

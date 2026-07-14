@@ -238,23 +238,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             var startDate = new DateTime(thisValue.Year, thisValue.Month, 1);
             var endDate = startDate.AddMonths(1).AddSeconds(-1);
 
-            var toDo = items.Count(i => 
-                (i.Status == AuditStatusType.Scheduled
-                || i.Status == AuditStatusType.Confirmed)
-                && i.StartDate >= startDate && i.EndDate <= endDate
-            );
+            items = items.Where(i => i.StartDate >= startDate && i.EndDate <= endDate);
 
-            var inProgress = items.Count(i => i.Status == AuditStatusType.InProcess
-                && i.StartDate >= startDate && i.EndDate <= endDate);
+            var audits = new int[] {
+                items.Count(i => i.Status == AuditStatusType.Scheduled),
+                items.Count(i => i.Status == AuditStatusType.Confirmed),
+                items.Count(i => i.Status == AuditStatusType.InProcess),
+                items.Count(i => i.Status == AuditStatusType.Finished),
+                items.Count(i => i.Status == AuditStatusType.Completed),
+                items.Count(i => i.Status == AuditStatusType.Closed)
+            };
 
-            var completed = items.Count(i => 
-                (i.Status == AuditStatusType.Finished
-                || i.Status == AuditStatusType.Completed
-                || i.Status == AuditStatusType.Closed)
-                && i.StartDate >= startDate && i.EndDate <= endDate
-            );
-
-            return new int[] { toDo, inProgress, completed };
+            return audits;
         } // GetAuditSummaryAsync
 
         public async Task<Audit> AddAsync(Audit item)

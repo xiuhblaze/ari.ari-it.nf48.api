@@ -225,6 +225,20 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // AddRiskLevel
 
+        [HttpPut]
+        [Route("api/AppForms/{id}/risk-level-all")]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> UpdateAllRiskLevel(Guid id, [FromBody] List<Guid> riskLevelsID)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+        
+            await _service.AddListRiskLevelsAsync(id, riskLevelsID);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // UpdateRiskLevel
+
         [HttpDelete]
         [Route("api/AppForms/{id}/risk-level")]
         [ResponseType(typeof(ApiResponse<bool>))]

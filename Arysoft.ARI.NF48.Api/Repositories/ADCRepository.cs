@@ -19,6 +19,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await query
                 .Include(m => m.AppForm)
+                .Include("AppForm.Standard")
+                .Include("AppForm.RiskLevels")
                 .Include(m => m.ADCSites)
                 .Include("ADCSites.Site")
                 .Include("ADCSites.Site.Shifts")

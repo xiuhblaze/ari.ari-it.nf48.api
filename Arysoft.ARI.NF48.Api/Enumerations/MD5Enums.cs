@@ -13,7 +13,9 @@
         Nothing,
         StartValue,
         Days,
+        TableType,
         StartValueDesc,
         DaysDesc,
+        TableTypeDesc,
     }
 }

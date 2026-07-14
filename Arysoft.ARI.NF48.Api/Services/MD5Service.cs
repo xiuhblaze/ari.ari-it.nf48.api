@@ -29,6 +29,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Filters
 
+            if (filters.MD5TableType.HasValue && filters.MD5TableType != MD5TableType.Nothing)
+            {
+                items = items.Where(e => e.TableType == filters.MD5TableType);
+            }
+
             if (filters.NumEmployees != null && filters.NumEmployees > 0)
             {
                 items = items.Where(e =>
@@ -39,6 +44,26 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (filters.Days != null && filters.Days > 0)
             {
                 items = items.Where(e => e.Days == filters.Days);
+            }
+
+            if (filters.StartDays != null && filters.StartDays > 0)
+            {
+                items = items.Where(e => e.Days >= filters.StartDays);
+            }
+
+            if (filters.EndDays != null && filters.EndDays > 0)
+            {
+                items = items.Where(e => e.Days <= filters.EndDays);
+            }
+
+            if (filters.StartEmployees != null && filters.StartEmployees > 0)
+            {
+                items = items.Where(e => e.EndValue >= filters.StartEmployees);
+            }
+
+            if (filters.EndEmployees != null && filters.EndEmployees > 0)
+            {
+                items = items.Where(e => e.StartValue <= filters.EndEmployees);
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
@@ -63,14 +88,23 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case MD5OrderType.Days:
                     items = items.OrderBy(i => i.Days);
                     break;
+                case MD5OrderType.TableType:
+                    items = items.OrderBy(i => i.TableType)
+                        .ThenBy(i => i.StartValue);
+                    break;
                 case MD5OrderType.StartValueDesc:
                     items = items.OrderByDescending(i => i.StartValue);
                     break;
                 case MD5OrderType.DaysDesc:
                     items = items.OrderByDescending(i => i.Days);
                     break;
+                case MD5OrderType.TableTypeDesc:
+                    items = items.OrderByDescending(i => i.TableType)
+                        .ThenByDescending(i => i.StartValue);
+                    break;
                 default:
-                    items = items.OrderBy(i => i.StartValue);
+                    items = items.OrderBy(i => i.TableType)
+                        .ThenBy(i => i.StartValue);
                     break;
             }
 
@@ -91,12 +125,14 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validate
 
-            await ValidateDataAsync(item);
+            if (!item.TableType.HasValue || item.TableType == MD5TableType.Nothing)
+                throw new BusinessException("The table type is required");
+
+            await ValidateDataAsync(item); // Todas las validaciones comunes de creación y actualización
 
             // Assign values
 
             item.ID = Guid.NewGuid();
-            //item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
@@ -123,13 +159,17 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Validate
 
+            item.TableType = foundItem.TableType; // No se puede cambiar el tipo de tabla
             await ValidateDataAsync(item);
 
             // Assign values
 
             foundItem.StartValue = item.StartValue;
             foundItem.EndValue = item.EndValue;
+            foundItem.HighDays = item.HighDays;
             foundItem.Days = item.Days;
+            foundItem.LowDays = item.LowDays;
+            foundItem.LimDays = item.LimDays;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing
@@ -196,8 +236,34 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.EndValue.HasValue && item.EndValue <= 0)
                 throw new BusinessException("The end value must be greater than zero");
 
-            if (item.Days.HasValue && item.Days <= 0)
-                throw new BusinessException("The days must be greater than zero");
+            switch(item.TableType)
+            {
+                case MD5TableType.QMS:
+                    if (!item.Days.HasValue || item.Days <= 0)
+                        throw new BusinessException("The days are required for QMS table type");
+                    break;
+                case MD5TableType.EMS:
+                    if (!item.HighDays.HasValue || item.HighDays <= 0)
+                        throw new BusinessException("The high days are required for EMS table type");
+                    if (!item.Days.HasValue || item.Days <= 0)
+                        throw new BusinessException("The medium days are required for EMS table type");
+                    if (!item.LowDays.HasValue || item.LowDays <= 0)
+                        throw new BusinessException("The low days are required for EMS table type");
+                    if (!item.LimDays.HasValue || item.LimDays <= 0)
+                        throw new BusinessException("The limited days are required for EMS table type");
+                    break;
+                case MD5TableType.OHSMS:
+                    if (!item.HighDays.HasValue || item.HighDays <= 0)
+                        throw new BusinessException("The high days are required for OHSMS table type");
+                    if (!item.Days.HasValue || item.Days <= 0)
+                        throw new BusinessException("The medium days are required for OHSMS table type");
+                    if (!item.LowDays.HasValue || item.LowDays <= 0)
+                        throw new BusinessException("The low days are required for OHSMS table type");
+                    break;
+            }
+
+            //if (item.Days.HasValue && item.Days <= 0)
+            //    throw new BusinessException("The days must be greater than zero");
 
             if (item.StartValue.HasValue && item.EndValue.HasValue)
             {
@@ -205,9 +271,24 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The start value must be less than or equal to the end value");
 
                 // - Que el rango de empleados no se solape con otro rango existente
-                if (await _repository.IsInRangeAsync(item.StartValue ?? 0, item.EndValue ?? 0, item.ID))
+                if (await _repository.IsInRangeAsync(item.StartValue ?? 0, item.EndValue ?? 0, item.TableType ?? MD5TableType.Nothing, item.ID))
                     throw new BusinessException("The range of employees already exists in the database");
             }
-        }
-    }
+        } // ValidateDataAsync
+
+        // STATIC
+
+        public static MD5TableType GetTableType(StandardBaseType standardBase)
+        {
+            return standardBase == StandardBaseType.ISO9K ? MD5TableType.QMS
+                : standardBase == StandardBaseType.ISO14K ? MD5TableType.EMS
+                : standardBase == StandardBaseType.ISO22K ? MD5TableType.OHSMS // De aquí para abajo estan en duda
+                : standardBase == StandardBaseType.ISO27K ? MD5TableType.QMS
+                : standardBase == StandardBaseType.ISO37K ? MD5TableType.EMS
+                : standardBase == StandardBaseType.ISO45K ? MD5TableType.OHSMS
+                : standardBase == StandardBaseType.HACCP ? MD5TableType.QMS
+                : throw new BusinessException("The standard base type is not valid");
+        } // GetDaysAsync
+
+    } // MD5Service
 }
