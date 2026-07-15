@@ -67,6 +67,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
+            if (filters.StandardBase != null && filters.StandardBase != StandardBaseType.Nothing)
+            {
+                items = items.Where(e => e.AuditorStandards
+                    .Any(aus => aus.Standard.StandardBase == filters.StandardBase
+                        && aus.Status != StatusType.Nothing
+                    ));
+            }
+
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
                 items = items.Where(e => e.Status == filters.Status);
