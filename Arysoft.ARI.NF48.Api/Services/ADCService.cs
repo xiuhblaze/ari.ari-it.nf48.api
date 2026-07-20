@@ -25,6 +25,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // METHODS
 
+        // CRUD
+
         public PagedList<ADC> Gets(ADCQueryFilters filters)
         {
             var items = _repository.Gets();
@@ -115,7 +117,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                             ?? throw new BusinessException("The ADC was not found after update sites.");
                     }
 
-                    await RecalcularTotalesAsync(item);
+                    item = await RecalcularTotalesAsync(item);
 
                     try
                     {
@@ -140,6 +142,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<ADC> AddAsync(ADC item)
         {
             var _appFormRepository = new AppFormRepository();
+            var _tmpADCRepository = new ADCRepository();
 
             // Validations
 
@@ -165,35 +168,24 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             await AddSitesToNewADCAsync(item); // Agregar los Sites del AppForm al ADC
 
-            try 
-            { 
-                _repository.UpdateValues(item);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"ADCService.AddAsync.Update.ProcesarADCAsync: {ex.Message}");
-            }
-
-            item = await _repository.GetAsync(item.ID, asNoTracking: true)
+            // Recargar todo el item para recalcular los totales y MD5,
+            // pues los ADCSites se agregaron en la bdd
+            var tmpItem = await _tmpADCRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            await RecalcularTotalesAsync(item); // Calcula los MD5 y total de empleados
+            tmpItem = await RecalcularTotalesAsync(tmpItem); // Calcula los MD5 y total de empleados
 
             try
             {
-                _repository.UpdateValues(item);
-                await _repository.SaveChangesAsync();
+                // _tmpADCRepository.UpdateValues(tmpItem); // No se necesita
+                await _tmpADCRepository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 throw new BusinessException($"ADCService.AddAsync.Update.RecalcularTotales: {ex.Message}");
             }
 
-            item = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The ADC was not found after and recalculation.");
-
-            return item;
+            return tmpItem;
         } // AddAsync
 
         public async Task<ADC> UpdateAsync(ADC item)
@@ -288,6 +280,36 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // CASOS DE USO
+
+        /// <summary>
+        /// Establece el status de un ADC a Inactive
+        /// </summary>
+        /// <param name="appFormID">Identificador del AppForm</param>
+        /// <param name="updaterUser">Usuario que realiza la actualización</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task SetToInactiveFromAppFormAsync(Guid appFormID, string updaterUser)
+        {
+            var foundItem = _repository.Gets()
+                .Where(a => a.AppFormID == appFormID)
+                .FirstOrDefault() ?? throw new BusinessException("The ADC to set to inactive was not found.");
+            foundItem.Status = ADCStatusType.Inactive;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = updaterUser;
+
+            _repository.Update(foundItem);
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCService.SetToInactiveFromAppFormAsync: {ex.Message}");
+            }
+        } // SetToInactiveFromAppFormAsync
 
         // PROPOSAL
 
@@ -941,7 +963,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        private async Task RecalcularTotalesAsync(ADC item) 
+        private async Task<ADC> RecalcularTotalesAsync(ADC item) 
         {
             var appFormRepository = new AppFormRepository();
             var md5Repository = new MD5Repository();
@@ -966,8 +988,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                         await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID);
 
-                        adcSite.NoEmployees = _noEmployees;
-                        adcSite.InitialMD5 = _initialMD5;
+                        //adcSite.NoEmployees = _noEmployees; // Creo que esta asignación no se guarda nunca, se guarda en .UpdateEmployeesMD5Async una linea arriba
+                        //adcSite.InitialMD5 = _initialMD5;
                     }
 
                     totalEmployees += _noEmployees;
@@ -979,6 +1001,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 item.TotalEmployees = 0;
             }
+
+            return item;
         } // RecalcularTotales
 
         private string GetHistoricalDataJSON(ADC item)
@@ -1028,6 +1052,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return JsonSerializer.Serialize(historicalData);
         } // GetHistoricalDataJSON
+
+
 
         // STATIC METHODS
 

@@ -228,162 +228,165 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validate
 
             await ValidateAppFormAsync(item, foundItem);
+            var toUpdateItem = await SetValuesToUpdateItemAsync(item, foundItem);
 
-            // - Asignaciones por status
+            //// - Asignaciones por status
 
-            // Validar si el CycleYear es valido y no está duplicado - Movido a ValidateAppFormAsync 
-            //if (await _repository.ExistsValidCycleYearAppForm(
-            //        foundItem.AuditCycleID, 
-            //        item.CycleYear ?? CycleYearType.Nothing,
-            //        item.ID))
-            //    throw new BusinessException("The selected Cycle Year is already assigned to another Application Form in the current certificate cycle");
+            //// Validar si el CycleYear es valido y no está duplicado - Movido a ValidateAppFormAsync 
+            ////if (await _repository.ExistsValidCycleYearAppForm(
+            ////        foundItem.AuditCycleID, 
+            ////        item.CycleYear ?? CycleYearType.Nothing,
+            ////        item.ID))
+            ////    throw new BusinessException("The selected Cycle Year is already assigned to another Application Form in the current certificate cycle");
 
-            if (item.Status == AppFormStatusType.Nothing 
-                || item.Status == AppFormStatusType.SalesReview // xBlaze 20250424: Estos dos últimos para evitar que se utilicen - en el futuro se podrian necesitar
-                || item.Status == AppFormStatusType.SalesRejected)
-                item.Status = AppFormStatusType.New;
+            //if (item.Status == AppFormStatusType.Nothing 
+            //    || item.Status == AppFormStatusType.SalesReview // xBlaze 20250424: Estos dos últimos para evitar que se utilicen - en el futuro se podrian necesitar
+            //    || item.Status == AppFormStatusType.SalesRejected)
+            //    item.Status = AppFormStatusType.New;
 
-            if (item.Status != foundItem.Status) // El status cambió
-            {
-                switch (item.Status)
-                {
-                    //case AppFormStatusType.SalesReview:
-                    //    item.SalesDate = DateTime.UtcNow;
-                    //    foundItem.UserSales = item.UpdatedUser;
-                    //    if (string.IsNullOrEmpty(item.SalesComments))
-                    //        throw new BusinessException("Sales comments is required");
-                    //    break;
+            //if (item.Status != foundItem.Status) // El status cambió
+            //{
+            //    switch (item.Status)
+            //    {
+            //        //case AppFormStatusType.SalesReview:
+            //        //    item.SalesDate = DateTime.UtcNow;
+            //        //    foundItem.UserSales = item.UpdatedUser;
+            //        //    if (string.IsNullOrEmpty(item.SalesComments))
+            //        //        throw new BusinessException("Sales comments is required");
+            //        //    break;
 
-                    //case AppFormStatusType.SalesRejected:
-                    //    item.SalesDate = DateTime.UtcNow;
-                    //    foundItem.UserSales = item.UpdatedUser;
-                    //    if (string.IsNullOrEmpty(item.SalesComments))
-                    //        throw new BusinessException("Sales comments is required");
-                    //    break;
+            //        //case AppFormStatusType.SalesRejected:
+            //        //    item.SalesDate = DateTime.UtcNow;
+            //        //    foundItem.UserSales = item.UpdatedUser;
+            //        //    if (string.IsNullOrEmpty(item.SalesComments))
+            //        //        throw new BusinessException("Sales comments is required");
+            //        //    break;
 
-                    case AppFormStatusType.ApplicantReview:
-                        //if (foundItem.Status == AppFormStatusType.SalesReview)
-                        //{
-                        //    if (string.IsNullOrEmpty(item.SalesComments))
-                        //        throw new BusinessException("Sales comments is required");
-                        //    item.SalesDate = DateTime.UtcNow;
-                        //    foundItem.UserSales = item.UpdatedUser;
-                        //}
-                        if (foundItem.Status == AppFormStatusType.New)
-                        {   
-                            item.SalesDate = DateTime.UtcNow;   // Guarda cuando se envió a revisión siendo nuevo
-                            foundItem.UserSales = item.UpdatedUser;
-                        }
+            //        case AppFormStatusType.ApplicantReview:
+            //            //if (foundItem.Status == AppFormStatusType.SalesReview)
+            //            //{
+            //            //    if (string.IsNullOrEmpty(item.SalesComments))
+            //            //        throw new BusinessException("Sales comments is required");
+            //            //    item.SalesDate = DateTime.UtcNow;
+            //            //    foundItem.UserSales = item.UpdatedUser;
+            //            //}
+            //            if (foundItem.Status == AppFormStatusType.New)
+            //            {   
+            //                item.SalesDate = DateTime.UtcNow;   // Guarda cuando se envió a revisión siendo nuevo
+            //                foundItem.UserSales = item.UpdatedUser;
+            //            }
 
-                        if (foundItem.Status == AppFormStatusType.ApplicantRejected)
-                        {
-                            item.ReviewDate = DateTime.UtcNow;  // Guarda cuando se envió a revision despues de rechazado
-                            foundItem.UserReviewer = item.UpdatedUser;
-                        }
-                        break;
+            //            if (foundItem.Status == AppFormStatusType.ApplicantRejected)
+            //            {
+            //                item.ReviewDate = DateTime.UtcNow;  // Guarda cuando se envió a revision despues de rechazado
+            //                foundItem.UserReviewer = item.UpdatedUser;
+            //            }
+            //            break;
                     
-                    case AppFormStatusType.ApplicantRejected:
-                        item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se rechazó
-                        foundItem.UserReviewer = item.UpdatedUser;
-                        break;
+            //        case AppFormStatusType.ApplicantRejected:
+            //            item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se rechazó
+            //            foundItem.UserReviewer = item.UpdatedUser;
+            //            break;
 
-                    case AppFormStatusType.Active:
-                        item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se aprobó
-                        foundItem.UserReviewer = item.UpdatedUser;
-                        break;
+            //        case AppFormStatusType.Active:
+            //            item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se aprobó
+            //            foundItem.UserReviewer = item.UpdatedUser;
+            //            break;
 
-                    case AppFormStatusType.Inactive:
-                        // Guardar todos los datos de contacts y sites en formato
-                        // JSON solo si viene de estar activo
-                        if (foundItem.Status == AppFormStatusType.Active)
-                        {
-                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
-                        }
-                        break;
+            //        case AppFormStatusType.Inactive:
+            //            // Guardar todos los datos de contacts y sites en formato
+            //            // JSON solo si viene de estar activo
+            //            if (foundItem.Status == AppFormStatusType.Active)
+            //            {
+            //                foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+            //                //TODO: Inactivar en cascada el ADC, la Proposal y los siguientes
+            //                //      registros relacionados (Confirmation letter...)
+            //            }
+            //            break;
 
-                    case AppFormStatusType.Cancel:
-                        // Guardar todos los datos de contacts y sites en formato
-                        // JSON solo si viene de cualquier status que sea menor a inactivo
-                        if (foundItem.Status <= AppFormStatusType.Active)
-                        {
-                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
-                        }
-                        break;
+            //        case AppFormStatusType.Cancel:
+            //            // Guardar todos los datos de contacts y sites en formato
+            //            // JSON solo si viene de cualquier status que sea menor a inactivo
+            //            if (foundItem.Status <= AppFormStatusType.Active)
+            //            {
+            //                foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+            //            }
+            //            break;
 
-                } // switch
-            } // Cambio de status
+            //    } // switch
+            //} // Cambio de status
 
-            // Asignar valores
+            //// Asignar valores
 
-            // Si es inactivo, cancelado solo guardar ciertos valores y no todo lo demas
-            if (item.Status < AppFormStatusType.Inactive)
-            {
-                // ISO Varios
-                foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K, 22K, HACCP
-                foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K, 22K, HACCP
-                foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K, 22K, HACCP
-                foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K, 22K, HACCP
-                foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;             // 9K, 14K, 37K
-                foundItem.CriticalComplaintComments = item.CriticalComplaintComments;   // 9K, 14K, 37K
-                foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
-                foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
-                foundItem.ReviewJustification = item.ReviewJustification;
-                // ISO 9K
-                if (foundItem.Standard.StandardBase == StandardBaseType.ISO9K)
-                {
-                    foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
-                    foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
-                }
-                // ISO 14K
-                foundItem.OperationalControls = foundItem.Standard.StandardBase == StandardBaseType.ISO14K
-                    ? item.OperationalControls
-                    : null;
-                // ISO 22K & HACCP
-                if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K 
-                    || foundItem.Standard.StandardBase == StandardBaseType.HACCP)
-                {
-                    foundItem.Category22KID = item.Category22KID;
-                    foundItem.HACCPCount = item.HACCPCount;
-                    foundItem.SeasonalityJSON = item.SeasonalityJSON;
-                }
-                // - internal 22K
-                // ISO 27K
-                foundItem.AssetsISO27KJSON = foundItem.Standard.StandardBase == StandardBaseType.ISO27K
-                    ? item.AssetsISO27KJSON
-                    : null;
-                // ISO 45K
-                if (foundItem.Standard.StandardBase == StandardBaseType.ISO45K)
-                {
-                    foundItem.OHSHazardRisk45KJSON = item.OHSHazardRisk45KJSON;
-                    foundItem.HazardousMaterials45KJSON = item.HazardousMaterials45KJSON;
-                    foundItem.AccidentRate45KJSON = item.AccidentRate45KJSON;
-                    foundItem.IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON;
-                    foundItem.HighLevelRisks45K = item.HighLevelRisks45K;
-                }
+            //// Si es inactivo, cancelado solo guardar ciertos valores y no todo lo demas
+            //if (item.Status < AppFormStatusType.Inactive)
+            //{
+            //    // ISO Varios
+            //    foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K, 22K, HACCP
+            //    foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K, 22K, HACCP
+            //    foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K, 22K, HACCP
+            //    foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K, 22K, HACCP
+            //    foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;             // 9K, 14K, 37K
+            //    foundItem.CriticalComplaintComments = item.CriticalComplaintComments;   // 9K, 14K, 37K
+            //    foundItem.AutomationLevelPercent = item.AutomationLevelPercent;
+            //    foundItem.AutomationLevelJustification = item.AutomationLevelJustification;
+            //    foundItem.ReviewJustification = item.ReviewJustification;
+            //    // ISO 9K
+            //    if (foundItem.Standard.StandardBase == StandardBaseType.ISO9K)
+            //    {
+            //        foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
+            //        foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+            //    }
+            //    // ISO 14K
+            //    foundItem.OperationalControls = foundItem.Standard.StandardBase == StandardBaseType.ISO14K
+            //        ? item.OperationalControls
+            //        : null;
+            //    // ISO 22K & HACCP
+            //    if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K 
+            //        || foundItem.Standard.StandardBase == StandardBaseType.HACCP)
+            //    {
+            //        foundItem.Category22KID = item.Category22KID;
+            //        foundItem.HACCPCount = item.HACCPCount;
+            //        foundItem.SeasonalityJSON = item.SeasonalityJSON;
+            //    }
+            //    // - internal 22K
+            //    // ISO 27K
+            //    foundItem.AssetsISO27KJSON = foundItem.Standard.StandardBase == StandardBaseType.ISO27K
+            //        ? item.AssetsISO27KJSON
+            //        : null;
+            //    // ISO 45K
+            //    if (foundItem.Standard.StandardBase == StandardBaseType.ISO45K)
+            //    {
+            //        foundItem.OHSHazardRisk45KJSON = item.OHSHazardRisk45KJSON;
+            //        foundItem.HazardousMaterials45KJSON = item.HazardousMaterials45KJSON;
+            //        foundItem.AccidentRate45KJSON = item.AccidentRate45KJSON;
+            //        foundItem.IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON;
+            //        foundItem.HighLevelRisks45K = item.HighLevelRisks45K;
+            //    }
 
-                // General
-                // foundItem.Description = item.Description;
-                foundItem.AuditLanguage = item.AuditLanguage;
-                foundItem.CycleYear = item.CycleYear;
-                foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
-                foundItem.CurrentStandards = item.CurrentStandards;
-                foundItem.CurrentCertificationsBy = item.CurrentCertificationsBy;
-                foundItem.OutsourcedProcess = item.OutsourcedProcess;
-                foundItem.AnyConsultancy = item.AnyConsultancy;
-                foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
-                // Internal
-                foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
-                foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
-            }
+            //    // General
+            //    // foundItem.Description = item.Description;
+            //    foundItem.AuditLanguage = item.AuditLanguage;
+            //    foundItem.CycleYear = item.CycleYear;
+            //    foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
+            //    foundItem.CurrentStandards = item.CurrentStandards;
+            //    foundItem.CurrentCertificationsBy = item.CurrentCertificationsBy;
+            //    foundItem.OutsourcedProcess = item.OutsourcedProcess;
+            //    foundItem.AnyConsultancy = item.AnyConsultancy;
+            //    foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
+            //    // Internal
+            //    foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
+            //    foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
+            //}
 
-            foundItem.Status = item.Status;
-            foundItem.Updated = DateTime.UtcNow;
-            foundItem.UpdatedUser = item.UpdatedUser;
+            //foundItem.Status = item.Status;
+            //foundItem.Updated = DateTime.UtcNow;
+            //foundItem.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
             try
             {   
-                _repository.Update(foundItem);
+                _repository.Update(toUpdateItem);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -391,7 +394,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"AppFormService.UpdateAsync: {ex.Message}");
             }
 
-            return foundItem;
+            return toUpdateItem;
         } // UpdateAsync
 
         public async Task<AppForm> DuplicateAsync(Guid id, string updatedUser)
@@ -939,6 +942,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // AddMainSiteAsync
 
         // UPDATE
+        // - Validate
 
         private async Task ValidateAppFormAsync(AppForm newItem, AppForm currentItem)
         {
@@ -1001,10 +1005,25 @@ namespace Arysoft.ARI.NF48.Api.Services
                     && newItem.Status != AppFormStatusType.Cancel)
                     throw new BusinessException("You can't change to this status from Active");
 
-                //if (currentItem.Status == AppFormStatusType.Inactive
-                //    && newItem.Status != AppFormStatusType.Active
-                //    && newItem.Status != AppFormStatusType.Cancel)
-                //    throw new BusinessException("You can't change to this status from Inactive");
+                if (currentItem.Status == AppFormStatusType.Inactive)
+                {
+                    if (newItem.Status != AppFormStatusType.Active
+                        && newItem.Status != AppFormStatusType.Cancel)
+                        throw new BusinessException("You can't change to this status from Inactive");
+
+                    // TODO: Validar el ADC y la Proposal para ver si se pueden inactivar también
+                    // NOTE: Creo que ahorita vale madres, al inactivar el AppForm, se inactiva todo, ingesu! -xB: 20260717
+                    //if (currentItem.ADCs.Count > 0) 
+                    //{
+                    //    // Lógica para inactivar ADCs y Proposal
+                    //    var myADC = currentItem.ADCs.FirstOrDefault();
+
+                    //    if (myADC != null && myADC.Status == ADCStatusType.Active)
+                    //    {
+                    //        throw new BusinessException("You can't change to Inactive status because there is an active ADC associated with this Application Form.");
+                    //    }
+                    //}
+                }
 
                 if (currentItem.Status == AppFormStatusType.Cancel
                     && newItem.Status != AppFormStatusType.New)
@@ -1044,6 +1063,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 case StandardBaseType.ISO37K:
                     await ValidateAppFormFor37KAsync(newItem, currentItem);
+                    break;
+                case StandardBaseType.ISO45K:
+                    await ValidateAppFormFor45KAsync(newItem, currentItem);
                     break;
             }
 
@@ -1141,6 +1163,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // ValidateAppFormFor22KAsync
 
+        // ISO 37K
+
         private async Task ValidateAppFormFor37KAsync(AppForm newItem, AppForm currentItem)
         {
             var item = newItem.Status == currentItem.Status // El status no ha cambiado
@@ -1160,6 +1184,192 @@ namespace Arysoft.ARI.NF48.Api.Services
                     throw new BusinessException("The Application Form must have at least one active Risk Level assigned");
             }
         } // ValidateAppFormFor37KAsync
+
+        // ISO 45K
+
+        private async Task ValidateAppFormFor45KAsync(AppForm newItem, AppForm currentItem)
+        {
+            var item = newItem.Status == currentItem.Status // El status no ha cambiado
+                ? currentItem
+                : newItem;
+
+            // Si está dentro de estos status, validar...
+            if (item.Status >= AppFormStatusType.ApplicantReview
+                && item.Status <= AppFormStatusType.Active)
+            {
+                // - Validar que tenga al menos un nace code activo (sector)
+                if (!currentItem.NaceCodes.Where(nc => nc.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active NACE code assigned");
+                
+                // - Validar que tenga un nivel de riesgo activo
+                if (!currentItem.RiskLevels.Where(rl => rl.Status == StatusType.Active).Any())
+                    throw new BusinessException("The Application Form must have at least one active Risk Level assigned");
+            }
+        } // ValidateAppFormFor45KAsync
+
+        // - Set
+
+        private async Task<AppForm> SetValuesToUpdateItemAsync(AppForm item, AppForm foundItem)
+        {
+            var _adcService = new ADCService();
+
+            // - Asignaciones por status
+
+            // Validar si el CycleYear es valido y no está duplicado - Movido a ValidateAppFormAsync 
+            //if (await _repository.ExistsValidCycleYearAppForm(
+            //        foundItem.AuditCycleID, 
+            //        item.CycleYear ?? CycleYearType.Nothing,
+            //        item.ID))
+            //    throw new BusinessException("The selected Cycle Year is already assigned to another Application Form in the current certificate cycle");
+
+            if (item.Status == AppFormStatusType.Nothing
+                || item.Status == AppFormStatusType.SalesReview // xBlaze 20250424: Estos dos últimos para evitar que se utilicen - en el futuro se podrian necesitar
+                || item.Status == AppFormStatusType.SalesRejected)
+                item.Status = AppFormStatusType.New;
+
+            if (item.Status != foundItem.Status) // El status cambió
+            {
+                switch (item.Status)             // Si el status cambió a...
+                {
+                    //case AppFormStatusType.SalesReview:
+                    //    item.SalesDate = DateTime.UtcNow;
+                    //    foundItem.UserSales = item.UpdatedUser;
+                    //    if (string.IsNullOrEmpty(item.SalesComments))
+                    //        throw new BusinessException("Sales comments is required");
+                    //    break;
+
+                    //case AppFormStatusType.SalesRejected:
+                    //    item.SalesDate = DateTime.UtcNow;
+                    //    foundItem.UserSales = item.UpdatedUser;
+                    //    if (string.IsNullOrEmpty(item.SalesComments))
+                    //        throw new BusinessException("Sales comments is required");
+                    //    break;
+
+                    case AppFormStatusType.ApplicantReview:
+                        //if (foundItem.Status == AppFormStatusType.SalesReview)
+                        //{
+                        //    if (string.IsNullOrEmpty(item.SalesComments))
+                        //        throw new BusinessException("Sales comments is required");
+                        //    item.SalesDate = DateTime.UtcNow;
+                        //    foundItem.UserSales = item.UpdatedUser;
+                        //}
+                        if (foundItem.Status == AppFormStatusType.New)
+                        {
+                            item.SalesDate = DateTime.UtcNow;   // Guarda cuando se envió a revisión siendo nuevo
+                            foundItem.UserSales = item.UpdatedUser;
+                        }
+
+                        if (foundItem.Status == AppFormStatusType.ApplicantRejected)
+                        {
+                            item.ReviewDate = DateTime.UtcNow;  // Guarda cuando se envió a revision despues de rechazado
+                            foundItem.UserReviewer = item.UpdatedUser;
+                        }
+                        break;
+
+                    case AppFormStatusType.ApplicantRejected:
+                        item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se rechazó
+                        foundItem.UserReviewer = item.UpdatedUser;
+                        break;
+
+                    case AppFormStatusType.Active:
+                        item.ReviewDate = DateTime.UtcNow;      // Guarda cuando se aprobó
+                        foundItem.UserReviewer = item.UpdatedUser;
+                        break;
+
+                    case AppFormStatusType.Inactive:
+                        // Guardar todos los datos de contacts y sites en formato
+                        // JSON solo si viene de estar activo
+                        if (foundItem.Status == AppFormStatusType.Active)
+                        {
+                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                            // TODO: Inactivar en cascada el ADC, la Proposal y los siguientes registros relacionados (Confirmation letter...)
+                            if (foundItem.ADCs.Count > 0)
+                            {
+                                await _adcService.SetToInactiveFromAppFormAsync(foundItem.ID, item.UpdatedUser);                                
+                            }
+                        }
+                        break;
+
+                    case AppFormStatusType.Cancel:
+                        // Guardar todos los datos de contacts y sites en formato
+                        // JSON solo si viene de cualquier status que sea menor a inactivo
+                        if (foundItem.Status <= AppFormStatusType.Active)
+                        {
+                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                        }
+                        break;
+                } // switch
+            } // Cambio de status
+
+            // Asignar valores
+
+            // Si es inactivo, cancelado solo guardar ciertos valores y no todo lo demas
+            if (item.Status < AppFormStatusType.Inactive)
+            {
+                // ISO Varios
+                foundItem.ActivitiesScope = item.ActivitiesScope;                       // 9K, 14K, 22K, HACCP
+                foundItem.ProcessServicesCount = item.ProcessServicesCount;             // 9K, 14K, 22K, HACCP
+                foundItem.ProcessServicesDescription = item.ProcessServicesDescription; // 9K, 14K, 22K, HACCP
+                foundItem.LegalRequirements = item.LegalRequirements;                   // 9K, 14K, 22K, HACCP
+                foundItem.AnyCriticalComplaint = item.AnyCriticalComplaint;             // 9K, 14K, 37K
+                foundItem.CriticalComplaintComments = item.CriticalComplaintComments;   // 9K, 14K, 37K
+                foundItem.AutomationLevelPercent = item.AutomationLevelPercent;         // 9K, 27K
+                foundItem.AutomationLevelJustification = item.AutomationLevelJustification; // 9K, 27K
+                foundItem.ReviewJustification = item.ReviewJustification;               // All
+                // ISO 9K
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO9K)
+                {
+                    foundItem.IsDesignResponsibility = item.IsDesignResponsibility;
+                    foundItem.DesignResponsibilityJustify = item.DesignResponsibilityJustify;
+                }
+                // ISO 14K
+                foundItem.OperationalControls = foundItem.Standard.StandardBase == StandardBaseType.ISO14K
+                    ? item.OperationalControls
+                    : null;
+                // ISO 22K & HACCP
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO22K
+                    || foundItem.Standard.StandardBase == StandardBaseType.HACCP)
+                {
+                    foundItem.Category22KID = item.Category22KID;
+                    foundItem.HACCPCount = item.HACCPCount;
+                    foundItem.SeasonalityJSON = item.SeasonalityJSON;
+                }
+                // - internal 22K
+                // ISO 27K
+                foundItem.AssetsISO27KJSON = foundItem.Standard.StandardBase == StandardBaseType.ISO27K
+                    ? item.AssetsISO27KJSON
+                    : null;
+                // ISO 45K
+                if (foundItem.Standard.StandardBase == StandardBaseType.ISO45K)
+                {
+                    foundItem.OHSHazardRisk45KJSON = item.OHSHazardRisk45KJSON;
+                    foundItem.HazardousMaterials45KJSON = item.HazardousMaterials45KJSON;
+                    foundItem.AccidentRate45KJSON = item.AccidentRate45KJSON;
+                    foundItem.IndirectHSRisk45KJSON = item.IndirectHSRisk45KJSON;
+                    foundItem.HighLevelRisks45K = item.HighLevelRisks45K;
+                }
+
+                // General
+                // foundItem.Description = item.Description;
+                foundItem.AuditLanguage = item.AuditLanguage;
+                foundItem.CycleYear = item.CycleYear;
+                foundItem.CurrentCertificationsExpiration = item.CurrentCertificationsExpiration;
+                foundItem.CurrentStandards = item.CurrentStandards;
+                foundItem.CurrentCertificationsBy = item.CurrentCertificationsBy;
+                foundItem.OutsourcedProcess = item.OutsourcedProcess;
+                foundItem.AnyConsultancy = item.AnyConsultancy;
+                foundItem.AnyConsultancyBy = item.AnyConsultancyBy;
+                // Internal
+                foundItem.SalesDate = item.SalesDate ?? foundItem.SalesDate;
+                foundItem.ReviewDate = item.ReviewDate ?? foundItem.ReviewDate;
+            }
+
+            foundItem.Status = item.Status;
+            foundItem.Updated = DateTime.UtcNow;
+            foundItem.UpdatedUser = item.UpdatedUser;
+
+            return foundItem;
+        } // SetValuesToUpdateItem
 
         // STATIC METHODS
 

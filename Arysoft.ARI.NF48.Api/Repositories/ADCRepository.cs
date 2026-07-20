@@ -231,6 +231,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 _context.Entry(existing).State = EntityState.Detached;
             }
 
+            _context.Set<ADC>().Attach(item);
             _context.Entry(item).State = EntityState.Modified;
         } // UpdateValues
 
