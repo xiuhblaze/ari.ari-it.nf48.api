@@ -194,7 +194,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The record to update was not found");
 
             await ValidateUpdateItemAsync(item, foundItem);
-            var toUpdateItem = SetValuesUpdateItem(item, foundItem);
+            var toUpdateItem = await SetValuesUpdateItemAsync(item, foundItem);
 
             toUpdateItem.Alerts = await GetAlertsAsync(toUpdateItem);
 
@@ -219,7 +219,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var _adcSitesService = new ADCSiteService();
 
             await ValidateUpdateItemAsync(item, foundItem);
-            SetValuesUpdateItem(item, foundItem);
+            await SetValuesUpdateItemAsync(item, foundItem);
 
             foundItem.Alerts = await GetAlertsAsync(foundItem);
 
@@ -260,7 +260,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             else // Eliminación lógica
             {
                 if (string.IsNullOrEmpty(foundItem.HistoricalDataJSON))
-                    foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                    foundItem.HistoricalDataJSON = await GetHistoricalDataJSONAsync(foundItem);
 
                 foundItem.Status = foundItem.Status < ADCStatusType.Cancel
                     ? ADCStatusType.Cancel
@@ -294,20 +294,25 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var foundItem = _repository.Gets()
                 .Where(a => a.AppFormID == appFormID)
-                .FirstOrDefault() ?? throw new BusinessException("The ADC to set to inactive was not found.");
-            foundItem.Status = ADCStatusType.Inactive;
-            foundItem.Updated = DateTime.UtcNow;
-            foundItem.UpdatedUser = updaterUser;
+                .FirstOrDefault();
 
-            _repository.Update(foundItem);
+            if (foundItem != null) 
+            {
+                foundItem.HistoricalDataJSON = await GetHistoricalDataJSONAsync(foundItem);
+                foundItem.Status = ADCStatusType.Inactive;
+                foundItem.Updated = DateTime.UtcNow;
+                foundItem.UpdatedUser = updaterUser;
 
-            try
-            {
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"ADCService.SetToInactiveFromAppFormAsync: {ex.Message}");
+                _repository.Update(foundItem);
+
+                try
+                {
+                    await _repository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ADCService.SetToInactiveFromAppFormAsync: {ex.Message}");
+                }
             }
         } // SetToInactiveFromAppFormAsync
 
@@ -510,7 +515,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <param name="item">Item con los datos a actualizar</param>
         /// <param name="foundItem">Item encontrado en la BDD con los datos actuales</param>
         /// <returns>Retorna un objeto ADC con los valores actualizados</returns>
-        private ADC SetValuesUpdateItem(ADC item, ADC foundItem)
+        private async Task<ADC> SetValuesUpdateItemAsync(ADC item, ADC foundItem)
         {
             // - Si hay cambios en el status, realizar diferentes asignaciones
             if (foundItem.Status != item.Status)
@@ -534,12 +539,13 @@ namespace Arysoft.ARI.NF48.Api.Services
                         break;
 
                     case ADCStatusType.Inactive:
-                        foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                        throw new BusinessException("To set an ADC to Inactive, deactivate the associated Application Form.");
+                        //foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
                         break;
 
                     case ADCStatusType.Cancel:
                         if (foundItem.Status <= ADCStatusType.Active)
-                            foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
+                            foundItem.HistoricalDataJSON = await GetHistoricalDataJSONAsync(foundItem);
                         break;
                 }
             } // Si cambia el status
@@ -1005,17 +1011,23 @@ namespace Arysoft.ARI.NF48.Api.Services
             return item;
         } // RecalcularTotales
 
-        private string GetHistoricalDataJSON(ADC item)
+        private async Task<string> GetHistoricalDataJSONAsync(ADC item)
         {
             var _organizationRepository = new OrganizationRepository();
             var firstSite = item.ADCSites?
                 .FirstOrDefault(s => s.Status == StatusType.Active);
-            var isMultiStandard = _organizationRepository.IsMultiStandard(item.AuditCycle.OrganizationID);
+            bool isMultiStandard = await _organizationRepository.IsMultiStandardAsync(item.AuditCycle.OrganizationID);
 
             var historicalData = new
             {
                 IsMultiStandard = isMultiStandard,
-                AuditCycle = new {
+                Organization = new
+                {
+                    Name = item.AppForm?.Organization?.Name ?? string.Empty,
+                    Status = item.AppForm?.Organization?.Status ?? OrganizationStatusType.Nothing,
+                },
+                AuditCycle = new 
+                {
                     item.AuditCycle?.CycleType,
                     item.AuditCycle?.InitialStep,
                     item.AuditCycle?.Periodicity
