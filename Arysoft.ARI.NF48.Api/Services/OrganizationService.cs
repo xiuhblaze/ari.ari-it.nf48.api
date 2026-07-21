@@ -68,6 +68,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 );
             }
 
+            if (filters.StandardBase != null && filters.StandardBase != StandardBaseType.Nothing)
+            {
+                items = items.Where(e => e.OrganizationStandards
+                    .Any(os => os.Standard != null 
+                        && os.Standard.StandardBase == filters.StandardBase
+                        && os.Status != StatusType.Nothing
+                    ));
+            }
+
             // Filtrado por alertas de ciclos de certificación
             if (filters.CertificateCycleAlert != null && filters.CertificateCycleAlert != OrganizationCertificateCycleAlertType.Nothing)
             {

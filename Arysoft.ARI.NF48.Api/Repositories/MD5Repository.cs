@@ -39,7 +39,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// </summary>
         /// <param name="employees">Numero de empleados a buscar el rango</param>
         /// <param name="tableType">Tipo de tabla MD5, ya sea QMS, EMS o OHSMS</param>
-        /// <param name="riskLevel">Nivel de riesgo, solo necesario en algunos standards, por defautl es Medium</param>
+        /// <param name="riskLevel">Nivel de riesgo, solo necesario en algunos standards, por default es Medium</param>
         /// <returns></returns>
         public async Task<decimal> GetDaysAsync(
             int employees, 
