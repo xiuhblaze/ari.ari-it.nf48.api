@@ -589,13 +589,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The AppForm does not have any Sites.");
 
             var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            var maximumRiskLevelCategory = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
 
             // - Obtener los Sites del AppForm y agregarlos al ADC
-            foreach(var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
+            foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
             {
                 // var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
                 var employees = ADCSiteService.GetEmployees(site);
                 var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(employees, tableType);
+                var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevelCategory);
 
                 var adcSite = new ADCSite
                 {
@@ -603,9 +605,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     ADCID = item.ID,
                     SiteID = site.ID,
                     MD5ID = md5.ID,
-                    InitialMD5 = md5.Days,   //employeesMD5.InitialMD5,
-                    NoEmployees = employees, //employeesMD5.NoEmployees,
-                    TotalInitial = md5.Days, //employeesMD5.InitialMD5,
+                    InitialMD5 = days,
+                    NoEmployees = employees,
+                    TotalInitial = days,
                     Created = DateTime.UtcNow,
                     Updated = DateTime.UtcNow,
                     UpdatedUser = item.UpdatedUser,
@@ -656,15 +658,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                     continue; // El Site ya existe en el ADC, saltar al siguiente
 
                 var adcSite = new ADCSite();
-                // var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID, tableType, maximumRiskLevel);
                 var _noEmployees = ADCSiteService.GetEmployees(site);
-                var _initialMD5 = await md5Repository.GetDaysAsync(_noEmployees, tableType, maximumRiskLevel);
+                var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(_noEmployees, tableType);
+                var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevel);
 
                 adcSite.ID = Guid.NewGuid();
                 adcSite.ADCID = item.ID;
-                adcSite.SiteID = site.ID;
-                adcSite.InitialMD5 = _initialMD5; //employeesMD5.InitialMD5;
-                adcSite.NoEmployees = _noEmployees; //employeesMD5.NoEmployees;
+                adcSite.SiteID = site.ID; 
+                adcSite.MD5ID = md5.ID;
+                adcSite.InitialMD5 = days;
+                adcSite.NoEmployees = _noEmployees;
+                adcSite.TotalInitial = days;
                 adcSite.Status = StatusType.Active;
                 adcSite.Created = DateTime.UtcNow;
                 adcSite.Updated = DateTime.UtcNow;
@@ -696,6 +700,29 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await adcSiteRepository.DeleteByListToRemoveAsync(sitesToRemove);
             }
 
+            // Tercer foreach para actualizar los InitialMD5 de los sites que siguen en el ADC, en caso de que haya cambiado la categoria de Risk Level
+            List<ADCSite> adcSitesToUpdate = adcSiteRepository.Gets()
+                .Where(s => s.ADCID == item.ID
+                    && appForm.Sites.Any(a => a.ID == s.SiteID))
+                .ToList();
+
+            foreach (var adcSite in adcSitesToUpdate)
+            { 
+                var _noEmployees = await ADCSiteService.GetEmployeesAsync(adcSite.SiteID ?? Guid.Empty);
+                var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(_noEmployees, tableType);
+                var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevel);
+
+                adcSite.MD5ID = md5.ID;
+                adcSite.InitialMD5 = days;
+                adcSite.NoEmployees = _noEmployees;
+                adcSite.TotalInitial = days;
+                adcSite.Updated = DateTime.UtcNow;
+                adcSite.UpdatedUser = item.UpdatedUser;
+
+                adcSiteRepository.Update(adcSite); // Ver sino se necesita UpdateValues, pues ya se tiene el objeto completo
+            }
+
+            await adcSiteRepository.SaveChangesAsync();
         } // UpdateSitesToExistingADCAsync
 
         private async Task ProcesarADCAsync(ADC item)
@@ -1162,6 +1189,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                         alerts.Add(ADCAlertType.SitesMistmatch);
                 }
                 // Validando si cambia el numero de ADCSites vs el AppForm
+
+                
             } // if status < Inactive
 
             // Otras alertas...

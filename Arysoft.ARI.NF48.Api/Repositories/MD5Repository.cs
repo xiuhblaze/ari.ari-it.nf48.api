@@ -89,5 +89,16 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                     && m.Status == StatusType.Active)
                 .FirstOrDefaultAsync();
         } // GetByEmployees
+
+        // STATIC METHODS
+
+        public static decimal GetDaysByRiskLevel(MD5 item, RiskLevelCategory riskLevel)
+        {
+            return riskLevel == RiskLevelCategory.High ? item.HighDays ?? 0 
+                : riskLevel == RiskLevelCategory.Medium ? item.Days ?? 0 
+                : riskLevel == RiskLevelCategory.Low ? item.LowDays ?? 0 
+                : riskLevel == RiskLevelCategory.Limited ? item.LimDays ?? 0
+                : item.Days ?? 0;
+        } // GetDaysByRiskLevel
     }
 }
