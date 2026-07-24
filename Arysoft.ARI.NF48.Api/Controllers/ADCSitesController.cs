@@ -154,6 +154,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var itemsToUpdate = ADCSiteMapping.UpdateListDtoToADCSite(itemsUpdateDto);
 
+            // Si es multi estandard guardar los posibles archivos que contienen
+            // la evidencia para aplicar el MD11
             if (ADCSiteService.IsMultiStandard(itemsUpdateDto.Items.First().ID))
             {   
                 if (files != null && files.Count > 0)

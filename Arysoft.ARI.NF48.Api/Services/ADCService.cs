@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,15 +76,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             switch (filters.Order)
             {
-                //case ADCOrderType.Description:
-                //    items = items.OrderBy(e => e.Description);
-                //    break;
                 case ADCOrderType.Created:
                     items = items.OrderBy(e => e.Created);
                     break;
-                //case ADCOrderType.DescriptionDesc:
-                //    items = items.OrderBy(e => e.Description);
-                //    break;
                 case ADCOrderType.CreatedDesc:
                     items = items.OrderByDescending(e => e.Created);
                     break;
@@ -109,7 +104,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 if (alerts.Count > 0)
                 {
-                    if (alerts.Contains(ADCAlertType.SitesMistmatch))
+                    if (alerts.Contains(ADCAlertType.SitesMistmatch)
+                        || alerts.Contains(ADCAlertType.RiskLevelMistmatch))
                     { 
                         await UpdateSitesToExistingADCAsync(item);
                         _repository.DetachAllEntities();
@@ -153,7 +149,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The Application Form was not found.");
 
             await ValidateCreateItemAsync(item, appForm);
-            item = SetValuesCreateItem(item, appForm);
+            item = await SetValuesCreateItemAsync(item, appForm);
 
             try
             { 
@@ -173,7 +169,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             var tmpItem = await _tmpADCRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            tmpItem = await RecalcularTotalesAsync(tmpItem); // Calcula los MD5 y total de empleados
+            tmpItem = await RecalcularTotalesAsync(tmpItem);
+            _tmpADCRepository.Update(tmpItem);
 
             try
             {
@@ -318,6 +315,14 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // PROPOSAL
 
+        /// <summary>
+        /// Actualiza el ADC con el valor del ID de la Propuesta creando la relación
+        /// </summary>
+        /// <param name="adcID"></param>
+        /// <param name="proposalID"></param>
+        /// <param name="updatedUser"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task UpdateProposalIDAsync(Guid adcID, Guid proposalID, string updatedUser)
         {
             var foundItem = await _repository.GetAsync(adcID)
@@ -345,6 +350,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // UpdateProposalIDAsync
 
+        /// <summary>
+        /// Remueve el ID de la propuesta de un ADC eliminando la relación.
+        /// </summary>
+        /// <param name="adcID"></param>
+        /// <param name="updatedUser"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task RemoveProposalIDAsync(Guid adcID, string updatedUser)
         {
             var foundItem = await _repository.GetAsync(adcID)
@@ -418,11 +430,20 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         } // ValidateCreateItemAsync
 
-        private ADC SetValuesCreateItem(ADC item, AppForm appForm)
+        /// <summary>
+        /// Establece los valores minimos requeridos para crear un nuevo ADC
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="appForm"></param>
+        /// <returns></returns>
+        private async Task<ADC> SetValuesCreateItemAsync(ADC item, AppForm appForm)
         {
+            var riskLevelCategory = AuditCycleCalculations.GetMaxRiskLevelCategory(appForm);
+
             item.ID = Guid.NewGuid();
             item.AuditCycleID = appForm.AuditCycleID; 
             item.StandardID = appForm.StandardID.Value;
+            item.RiskLevelCategory = riskLevelCategory;
             item.CycleYear = appForm.CycleYear;
             item.Status = ADCStatusType.New;
             item.Created = DateTime.UtcNow;
@@ -541,7 +562,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     case ADCStatusType.Inactive:
                         throw new BusinessException("To set an ADC to Inactive, deactivate the associated Application Form.");
                         //foundItem.HistoricalDataJSON = GetHistoricalDataJSON(foundItem);
-                        break;
+                        //break;
 
                     case ADCStatusType.Cancel:
                         if (foundItem.Status <= ADCStatusType.Active)
@@ -552,7 +573,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Assigning values
 
-            //foundItem.Description = item.Description;
             foundItem.IncludePreAudit = item.IncludePreAudit ?? false;
             foundItem.TotalInitial = item.TotalInitial;
             foundItem.TotalMD11 = item.TotalMD11;
@@ -588,23 +608,26 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
 
-            var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-            var maximumRiskLevelCategory = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
+            var tableType = AuditCycleCalculations
+                .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            var maxRiskLevelCategory = AuditCycleCalculations
+                .GetMaxRiskLevelCategory(appForm);
 
             // - Obtener los Sites del AppForm y agregarlos al ADC
             foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
-            {
-                // var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
+            {   
                 var employees = ADCSiteService.GetEmployees(site);
-                var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(employees, tableType);
-                var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevelCategory);
+                var md5Item = await md5Repository
+                    .GetItemByEmployeesAsync(employees, tableType);
+                var days = AuditCycleCalculations
+                    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
                 var adcSite = new ADCSite
                 {
                     ID = Guid.NewGuid(),
                     ADCID = item.ID,
                     SiteID = site.ID,
-                    MD5ID = md5.ID,
+                    MD5ID = md5Item.ID,
                     InitialMD5 = days,
                     NoEmployees = employees,
                     TotalInitial = days,
@@ -643,14 +666,17 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
 
-            // TODO: Aun en pruebas este metodo -xB: 20260703
+            // TODO: Aun en pruebas este metodo -xB: 20260703, segimos: 20260723
+
             // Obtener el nivel de riesgo máximo del AppForm
-            var maximumRiskLevel = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
+            //var maximumRiskLevel = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
+            var maxRiskLevel = AuditCycleCalculations.GetMaxRiskLevelCategory(appForm);
 
             // Obtener de acuerdo con el standard, el tipo de tabla MD5 a consultar
-            var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-                
-            // - Obtener los Sites del AppForm y agregar solo los que no existen al ADC
+            //var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            var tableType = AuditCycleCalculations.GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+
+            // 1. Obtener los Sites del AppForm y agregar solo los que no existen al ADC
             foreach (var site in appForm.Sites
                 .Where(s => s.Status == StatusType.Active))
             {
@@ -659,13 +685,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 var adcSite = new ADCSite();
                 var _noEmployees = ADCSiteService.GetEmployees(site);
-                var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(_noEmployees, tableType);
-                var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevel);
+                //var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(_noEmployees, tableType);
+                var md5Item = await md5Repository.GetItemByEmployeesAsync(_noEmployees, tableType);
+                //var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevel);
+                var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
                 adcSite.ID = Guid.NewGuid();
                 adcSite.ADCID = item.ID;
                 adcSite.SiteID = site.ID; 
-                adcSite.MD5ID = md5.ID;
+                adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;
                 adcSite.NoEmployees = _noEmployees;
                 adcSite.TotalInitial = days;
@@ -685,7 +713,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             await adcSiteRepository.SaveChangesAsync();
 
-            // Segundo foreach para eliminar los Sites que no están en el AppForm
+            // 2. Eliminar los Sites que no están en el AppForm
             var sitesFromBDD = adcSiteRepository.Gets()
                 .Where(s => s.ADCID == item.ID)
                 .ToList();
@@ -700,7 +728,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await adcSiteRepository.DeleteByListToRemoveAsync(sitesToRemove);
             }
 
-            // Tercer foreach para actualizar los InitialMD5 de los sites que siguen en el ADC, en caso de que haya cambiado la categoria de Risk Level
+            // 3. Actualizar los InitialMD5 de los sites que siguen en el ADC, en caso de que haya cambiado la categoria de Risk Level
             List<ADCSite> adcSitesToUpdate = adcSiteRepository.Gets()
                 .Where(s => s.ADCID == item.ID
                     && appForm.Sites.Any(a => a.ID == s.SiteID))
@@ -709,10 +737,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             foreach (var adcSite in adcSitesToUpdate)
             { 
                 var _noEmployees = await ADCSiteService.GetEmployeesAsync(adcSite.SiteID ?? Guid.Empty);
-                var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(_noEmployees, tableType);
-                var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevel);
+                var md5Item = await md5Repository.GetItemByEmployeesAsync(_noEmployees, tableType);
+                var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
-                adcSite.MD5ID = md5.ID;
+                adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;
                 adcSite.NoEmployees = _noEmployees;
                 adcSite.TotalInitial = days;
@@ -723,6 +751,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             await adcSiteRepository.SaveChangesAsync();
+
         } // UpdateSitesToExistingADCAsync
 
         private async Task ProcesarADCAsync(ADC item)
@@ -738,8 +767,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The AppForm does not have any Sites.");
 
             //var adcSiteList = new List<ADCSite>();
-            var maximumRiskLevel = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
-            var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            //var maximumRiskLevel = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
+            var maxRiskLevelCategory = AuditCycleCalculations.GetMaxRiskLevelCategory(appForm);
+            //var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            var tableType = AuditCycleCalculations.GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
 
             // - Obtener los Sites del AppForm y agregarlos al ADC
             //HACK: Que pasa si se quita algun site del AppForm?
@@ -751,7 +782,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 //    .Where(s => s.Status == StatusType.Active)
                 //    .Sum(s => s.NoEmployees) ?? 0;
                 var _noEmployees = ADCSiteService.GetEmployees(site);
-                var _initialMD5 = await md5Repository.GetDaysAsync(_noEmployees, tableType, maximumRiskLevel);
+                //var _initialMD5 = await md5Repository.GetDaysAsync(_noEmployees, tableType, maxRiskLevelCategory);
+                var md5Item = await md5Repository.GetItemByEmployeesAsync(_noEmployees, tableType);
+                var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
                 //// - Obtener el MD5
                 //var initialMd5 = await md5Repository.GetDaysAsync(noEmployees);
@@ -765,7 +798,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .FirstOrDefault(s => s.SiteID == site.ID && s.ADCID == item.ID)
                     ?? new ADCSite();
 
-                adcSite.InitialMD5 = _initialMD5;
+                adcSite.InitialMD5 = days;
                 adcSite.NoEmployees = _noEmployees;
                 adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
@@ -1000,29 +1033,31 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var appFormRepository = new AppFormRepository();
             var md5Repository = new MD5Repository();
-            // HACK: Buscar los ADCSites de forma manual primero
+
+            var maxRiskLevelCategory = AuditCycleCalculations
+                .GetMaxRiskLevelCategory(item.AppForm);
 
             if (item.ADCSites != null && item.ADCSites.Any())
             {
                 var totalEmployees = 0;
-                var maximumRiskLevel = await appFormRepository.GetMaximumRiskLevelCategoryAsync(item.AppFormID);
-                var tableType = MD5Service.GetTableType(item.Standard?.StandardBase ?? StandardBaseType.Nothing);
+                var tableType = AuditCycleCalculations
+                    .GetMD5TableType(item.Standard?.StandardBase ?? StandardBaseType.Nothing);
 
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
                     adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
                     var _noEmployees = ADCSiteService.GetEmployees(adcSite.Site);
-                    var _initialMD5 = await md5Repository.GetDaysAsync(_noEmployees, tableType, maximumRiskLevel);
+                    var md5Item = await md5Repository
+                        .GetItemByEmployeesAsync(_noEmployees, tableType);
+                    var days = AuditCycleCalculations
+                        .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
                     if (_noEmployees != adcSite.NoEmployees)
                     { 
                         var adcSiteService = new ADCSiteService();
 
                         await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID);
-
-                        //adcSite.NoEmployees = _noEmployees; // Creo que esta asignación no se guarda nunca, se guarda en .UpdateEmployeesMD5Async una linea arriba
-                        //adcSite.InitialMD5 = _initialMD5;
                     }
 
                     totalEmployees += _noEmployees;
@@ -1034,6 +1069,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 item.TotalEmployees = 0;
             }
+
+            item.RiskLevelCategory = maxRiskLevelCategory;
 
             return item;
         } // RecalcularTotales
@@ -1092,8 +1129,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             return JsonSerializer.Serialize(historicalData);
         } // GetHistoricalDataJSON
 
-
-
         // STATIC METHODS
 
         /// <summary>
@@ -1117,7 +1152,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     foreach (var adcSite in item.ADCSites
                         .Where(adcsite => adcsite.Status == StatusType.Active))
                     {
-                        adcSite.Alerts = await ADCSiteService.GetAlertsAsync(adcSite);
+                        adcSite.Alerts = ADCSiteService.GetAlerts(adcSite);
 
                         if (adcSite.Alerts != null && adcSite.Alerts.Any())
                         {
@@ -1145,41 +1180,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                         alerts.Add(ADCAlertType.MainSiteMissing);
                 }
 
-                // Si el número de ADCSites no coincide con el número de Sites del AppForm
+                // Si el número de ADCSites no coincide con el número de
+                // sites o los sites del AppForm: SitesMistmatch
                 if (item.AppForm != null
                     && item.AppForm.Sites != null
                     && item.ADCSites != null)
                 {
                     if (!SitesMistmatch(item) && !alerts.Contains(ADCAlertType.SitesMistmatch))
                         alerts.Add(ADCAlertType.SitesMistmatch);
-
-                    //var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;
-                    //var noAppFormSites = item.AppForm.Sites.Count(site => site.Status == StatusType.Active);
-
-                    //if (noADCSites != noAppFormSites)
-                    //{
-                    //    if (!alerts.Contains(ADCAlertType.SitesMistmatch))
-                    //        alerts.Add(ADCAlertType.SitesMistmatch);
-                    //}
-                    //else 
-                    //{
-                    //    // verificar que sean los mismos Sites
-                    //    var sameSites = true;
-                    //    foreach (var site in item.AppForm.Sites
-                    //        .Where(site => site.Status == StatusType.Active))
-                    //    {
-                    //        if (!item.ADCSites.Any(adcsite => adcsite.SiteID == site.ID))                        
-                    //        {
-                    //            sameSites = false;
-                    //            break;
-                    //        }
-                    //    }
-
-                    //    if (!sameSites && !alerts.Contains(ADCAlertType.SitesMistmatch))
-                    //    {
-                    //        alerts.Add(ADCAlertType.SitesMistmatch);
-                    //    }
-                    //}
                 }
                 else
                 {
@@ -1188,9 +1196,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                     if (!alerts.Contains(ADCAlertType.SitesMistmatch))
                         alerts.Add(ADCAlertType.SitesMistmatch);
                 }
-                // Validando si cambia el numero de ADCSites vs el AppForm
 
-                
+                // Validar si el nivel de riesgo del ADC no coincide con el nivel de
+                // riesgo del AppForm.
+                var maxRiskLevelCategory = AuditCycleCalculations.GetMaxRiskLevelCategory(item.AppForm);
+                if (maxRiskLevelCategory != item.RiskLevelCategory)
+                {
+                    if (!alerts.Contains(ADCAlertType.RiskLevelMistmatch))
+                        alerts.Add(ADCAlertType.RiskLevelMistmatch);
+                }
+
             } // if status < Inactive
 
             // Otras alertas...
@@ -1198,6 +1213,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             return alerts;
         } // GetAlertsAsync
 
+        /// <summary>
+        /// Compara el numero de sitios y si son los mismos sitios, devuelve true 
+        /// si son los mismos, de lo contrario false.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private static bool SitesMistmatch(ADC item)
         {
             var noADCSites = item.ADCSites?.Count(adcsite => adcsite.Status == StatusType.Active) ?? 0;

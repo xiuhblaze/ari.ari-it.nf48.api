@@ -23,13 +23,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
         public static AppFormItemListDto AppFormToItemListDto(AppForm item)
         {
-            var category = RiskLevelCategory.Nothing;
+            var category = RiskLevelCategoryType.Nothing;
 
             if (item.RiskLevels != null && item.RiskLevels.Any())
             {
                 // Obtener el valor del RiskLevel más alto (high = 1)
                 category = item.RiskLevels.Min(r => r.Category) 
-                    ?? RiskLevelCategory.Nothing;
+                    ?? RiskLevelCategoryType.Nothing;
             }
 
             return new AppFormItemListDto

@@ -103,7 +103,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string StandardName { get; set; }
 
         // Obtener el valor del RiskLevel más alto
-        public RiskLevelCategory? RiskLevelCategory { get; set; }
+        public RiskLevelCategoryType? RiskLevelCategory { get; set; }
 
         public ICollection<string> Nacecodes { get; set; }
 

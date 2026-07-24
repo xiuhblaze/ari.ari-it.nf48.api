@@ -16,7 +16,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public CycleYearType? CycleYear { get; set; }
 
-        // public string Description { get; set; }
+        public RiskLevelCategoryType? RiskLevelCategory { get; set; }
 
         public bool? IncludePreAudit { get; set; }  // Indica si se debe incluir la pre-auditoría en la Propuesta (por default en False)
 

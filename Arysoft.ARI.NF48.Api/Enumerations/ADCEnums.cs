@@ -26,5 +26,6 @@
         EmployeesMistmatch, // Alerta de discrepancia en el número de empleados
         SitesMistmatch,     // Alerta de discrepancia en el número de sitios
         MainSiteMissing,    // Alerta de sitio principal faltante
+        RiskLevelMistmatch, // Alerta de discrepancia en el nivel de riesgo
     }
 }

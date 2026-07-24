@@ -4,6 +4,7 @@ using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -224,6 +225,44 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
+        /// <summary>
+        /// Obtiene el registro de MD5 correspondiente al número de empleados y tipo de 
+        /// tabla especificados (QMS, EMS o OHSMS).
+        /// </summary>
+        /// <param name="numEmployees"></param>
+        /// <param name="tableType"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task<MD5> GetItemByNumEmployeesAsync(int numEmployees, MD5TableType tableType)
+        {
+            if (numEmployees <= 0)
+                throw new BusinessException("The number of employees must be greater than zero");
+            if (tableType == MD5TableType.Nothing)
+                throw new BusinessException("The table type is required");
+
+            var md5Item = await _repository.GetItemByEmployeesAsync(numEmployees, tableType);
+
+            return md5Item;
+        } // GetItemByNumEmployeesAsync
+
+        /// <summary>
+        /// Obtiene el número de días iniciales de auditoria correspondiente al 
+        /// número de empleados, tipo de tabla y nivel de riesgo especificados, 
+        /// por default era QMS , pero se agrego el tipo EMS y OHSMS para poder 
+        /// obtener los dias de acuerdo al tipo de standard que se este evaluando.
+        /// </summary>
+        /// <param name="numEmployees"></param>
+        /// <param name="tableType"></param>
+        /// <param name="riskLevel"></param>
+        /// <returns></returns>
+        public async Task<decimal> GetInitialAuditDaysAsync(int numEmployees, MD5TableType tableType, RiskLevelCategoryType riskLevel = RiskLevelCategoryType.Medium)
+        {
+            var md5Item = await GetItemByNumEmployeesAsync(numEmployees, tableType);
+            if (md5Item == null) return 0;
+
+            return AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, riskLevel);
+        } // GetInitialAuditDaysAsync
+
         // PRIVATE
 
         private async Task ValidateDataAsync(MD5 item)
@@ -278,17 +317,17 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // STATIC
 
-        public static MD5TableType GetTableType(StandardBaseType standardBase)
-        {
-            return standardBase == StandardBaseType.ISO9K ? MD5TableType.QMS
-                : standardBase == StandardBaseType.ISO14K ? MD5TableType.EMS
-                : standardBase == StandardBaseType.ISO22K ? MD5TableType.OHSMS // De aquí para abajo estan en duda
-                : standardBase == StandardBaseType.ISO27K ? MD5TableType.QMS
-                : standardBase == StandardBaseType.ISO37K ? MD5TableType.EMS
-                : standardBase == StandardBaseType.ISO45K ? MD5TableType.OHSMS
-                : standardBase == StandardBaseType.HACCP ? MD5TableType.QMS
-                : throw new BusinessException("The standard base type is not valid");
-        } // GetDaysAsync
+        //public static MD5TableType GetTableType(StandardBaseType standardBase)
+        //{
+        //    return standardBase == StandardBaseType.ISO9K ? MD5TableType.QMS
+        //        : standardBase == StandardBaseType.ISO14K ? MD5TableType.EMS
+        //        : standardBase == StandardBaseType.ISO22K ? MD5TableType.OHSMS // De aquí para abajo estan en duda
+        //        : standardBase == StandardBaseType.ISO27K ? MD5TableType.QMS
+        //        : standardBase == StandardBaseType.ISO37K ? MD5TableType.EMS
+        //        : standardBase == StandardBaseType.ISO45K ? MD5TableType.OHSMS
+        //        : standardBase == StandardBaseType.HACCP ? MD5TableType.QMS
+        //        : throw new BusinessException("The standard base type is not valid");
+        //} // GetDaysAsync
 
     } // MD5Service
 }

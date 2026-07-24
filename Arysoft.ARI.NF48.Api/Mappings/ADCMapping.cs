@@ -27,7 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardID = item.StandardID,
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
-                //Description = item.Description,
+                RiskLevelCategory = item.RiskLevelCategory,
                 IncludePreAudit = item.IncludePreAudit ?? false,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
@@ -42,10 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 HistoricalDataJSON = item.HistoricalDataJSON,
                 // RELATIONS
                 AuditCycle = AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle),
-                //AuditCycleName = item.AuditCycle?.Name ?? string.Empty,
                 AppFormOrganizationName = item.AppForm?.Organization?.Name ?? string.Empty,
-                //AppFormStandardID = item.AppForm?.StandardID ?? Guid.Empty,
-                //AppFormStandardName = item.AppForm?.Standard?.Name ?? string.Empty,
                 StandardName = item.Standard?.Name ?? string.Empty,
                 NotesCount = item.Notes?.Count() ?? 0,
                 ADCSitesCount = item.ADCSites?.Count() ?? 0,
@@ -65,7 +62,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardID = item.StandardID,
                 ProposalID = item.ProposalID,
                 CycleYear = item.CycleYear,
-                //Description = item.Description,
+                RiskLevelCategory = item.RiskLevelCategory,
                 IncludePreAudit = item.IncludePreAudit ?? false,
                 TotalEmployees = item.TotalEmployees,
                 TotalInitial = item.TotalInitial,
@@ -123,7 +120,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ADC
             {
                 ID = itemDto.ID,
-                //Description = itemDto.Description,
                 IncludePreAudit = itemDto.IncludePreAudit,
                 TotalInitial = itemDto.TotalInitial,
                 TotalMD11 = itemDto.TotalMD11,
