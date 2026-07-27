@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Arysoft.ARI.NF48.Api.Tools;
 using System.Collections.Generic;
 // using System.Data.Entity.Spatial;
 using System.Linq;
@@ -40,11 +41,12 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status != StatusType.Nothing)
                         .Count() 
                     : 0,
-                EmployeesCount = item.Shifts != null 
-                    ? item.Shifts
-                        .Where(i => i.Status == StatusType.Active)
-                        .Sum(i => i.NoEmployees) ?? 0 
-                    : 0,
+                TotalWorkers = OrganizationCalculations.GetTotalWorkers(item),
+                //TotalWorkersCount = item.Shifts != null 
+                //    ? item.Shifts
+                //        .Where(i => i.Status == StatusType.Active)
+                //        .Sum(i => i.NoEmployees) ?? 0 
+                //    : 0,
                 Shifts = item.Shifts != null // Para el preview del AppForm
                     ? ShiftMapping.ShiftsToListDto(item.Shifts
                         .Where(i => i.Status != StatusType.Nothing))
@@ -116,7 +118,5 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemDeleteDtoToSite
-
-
     }
 }

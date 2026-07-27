@@ -9,11 +9,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        public string SiteDescription { get; set; }
+        // public string SiteDescription { get; set; }
 
         public ShiftType? Type { get; set; }
 
-        public int? NoEmployees { get; set; }
+        //public int? NoEmployees { get; set; }
+
+        public int? TotalWorkers { get; set; }
 
         public string ActivitiesDescription { get; set; }
 
@@ -40,7 +42,13 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public ShiftType? Type { get; set; }
 
-        public int? NoEmployees { get; set; }
+        //public int? NoEmployees { get; set; }
+
+        public int? WorkersOnSite { get; set; }
+
+        public int? WorkersOffSite { get; set; }
+
+        public int? TotalWorkers { get; set; }      // Calculado con WorkersOnSite + WorkersOffSite
 
         public string ActivitiesDescription { get; set; }
 
@@ -87,8 +95,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [Required]
         public ShiftType Type { get; set; }
 
-        [Required]
-        public int NoEmployees { get; set; }
+        [Required(ErrorMessage = "The number of employees is required")]
+        public int WorkersOnSite { get; set; }
+
+        public int? WorkersOffSite { get; set; }
 
         [StringLength(500)]
         public string ActivitiesDescription { get; set; }

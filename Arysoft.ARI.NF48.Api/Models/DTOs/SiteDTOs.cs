@@ -27,7 +27,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int ShiftsCount { get; set; }
 
-        public int EmployeesCount { get; set; }
+        public int TotalWorkers { get; set; }
 
         public IEnumerable<ShiftItemListDto> Shifts { get; set; }
 

@@ -13,11 +13,11 @@
     { 
         Nothing,
         Type,
-        NoEmployees,
+        Time,
         Status,
         Updated,
         TypeDesc,
-        NoEmployeesDesc,
+        TimeDesc,
         StatusDesc,
         UpdatedDesc
     }

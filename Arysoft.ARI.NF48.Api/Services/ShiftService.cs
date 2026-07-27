@@ -49,15 +49,20 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // HACK: En modo de prueba, no estoy seguro de vayan afuncionar correctamente
-            if (filters.ShiftStart != null)
-            {
-                items = items.Where(e => e.ShiftStart <= filters.ShiftStart && e.ShiftEnd >= filters.ShiftStart);
-            }
+            // -xB: Creo que ni se necesita jsjsjs
+            //if (filters.ShiftStart != null)
+            //{
+            //    items = items.Where(e => 
+            //        e.ShiftStart <= filters.ShiftStart 
+            //        && e.ShiftEnd >= filters.ShiftStart);
+            //}
 
-            if (filters.ShiftEnd != null)
-            {
-                items = items.Where(e => e.ShiftStart <= filters.ShiftEnd && e.ShiftEnd >= filters.ShiftEnd);
-             }
+            //if (filters.ShiftEnd != null)
+            //{
+            //    items = items.Where(e => 
+            //        e.ShiftStart <= filters.ShiftEnd 
+            //        && e.ShiftEnd >= filters.ShiftEnd);
+            //}
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
@@ -78,8 +83,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case ShiftOrderType.Type:
                     items = items.OrderBy(e => e.Type);
                     break;
-                case ShiftOrderType.NoEmployees:
-                    items = items.OrderBy(e => e.NoEmployees);
+                case ShiftOrderType.Time:
+                    items = items.OrderBy(e => e.ShiftStart);
                     break;
                 case ShiftOrderType.Status:
                     items = items.OrderBy(e => e.Status);
@@ -90,8 +95,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case ShiftOrderType.TypeDesc:
                     items = items.OrderByDescending(e => e.Type);
                     break;
-                case ShiftOrderType.NoEmployeesDesc:
-                    items = items.OrderByDescending(e => e.NoEmployees);
+                case ShiftOrderType.TimeDesc:
+                    items = items.OrderByDescending(e => e.ShiftStart);
                     break;
                 case ShiftOrderType.StatusDesc:
                     items = items.OrderByDescending(e => e.Status);
@@ -132,7 +137,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
-            // item.UpdatedUser = item.UpdatedUser;
 
             // Execute queries
 
@@ -150,19 +154,15 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _shiftRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.Status == StatusType.Nothing) item.Status = StatusType.Active;
-
-            // Validar si cambia el número de empleados, notificar a AppForm y a ADC
-            // que estén activos o menos y tengan asociado el Site que tiene el Shift
-            if (item.NoEmployees != foundItem.NoEmployees)
-            {
-                // realizar la notificación a AppForm y ADC
-            }
+            // validar que WorkersOnSite sea mayor a cero, -xB: considerar si es necesario
+            //if (item.WorkersOnSite <= 0)
+            //    throw new BusinessException("The number of employees on site must be greather than 0");
 
             // Assigning values
 
             foundItem.Type = item.Type;
-            foundItem.NoEmployees = item.NoEmployees;
+            foundItem.WorkersOnSite = item.WorkersOnSite;
+            foundItem.WorkersOffSite = item.WorkersOffSite;
             foundItem.ActivitiesDescription = item.ActivitiesDescription;
             foundItem.ShiftStart = item.ShiftStart;
             foundItem.ShiftEnd = item.ShiftEnd;
