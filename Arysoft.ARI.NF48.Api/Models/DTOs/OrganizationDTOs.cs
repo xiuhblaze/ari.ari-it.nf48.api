@@ -55,7 +55,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string SiteLocationURL { get; set; }
 
-        public int SitesEmployeesCount { get; set; }
+        // public int SitesEmployeesCount { get; set; }
+
+        public int TotalWorkers { get; set; }
 
         // public int CertificatesCount { get; set; }
 

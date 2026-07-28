@@ -1,5 +1,4 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using Arysoft.ARI.NF48.Api.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -56,7 +55,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int SitesCount { get; set; }
 
-        public int EmployeesCount { get; set; }
+        // public int EmployeesCount { get; set; }
+
+        public int TotalWorkers { get; set; }
 
         public List<object> AuditCycles { get; set; }
 

@@ -111,7 +111,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public ICollection<string> Sites { get; set; }
 
-        public int EmployeesCount { get; set; }
+        //public int EmployeesCount { get; set; }
+
+        public int TotalWorkers { get; set; }
 
         public int NotesCount { get; set; }
 

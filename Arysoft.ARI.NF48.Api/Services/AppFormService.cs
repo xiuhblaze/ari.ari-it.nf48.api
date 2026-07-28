@@ -641,24 +641,27 @@ namespace Arysoft.ARI.NF48.Api.Services
                             {
                                 sh.ID,
                                 sh.Type,
-                                sh.NoEmployees,
+                                sh.WorkersOnSite,
+                                sh.WorkersOffSite,
                                 sh.ActivitiesDescription,
                                 sh.ShiftStart,
                                 sh.ShiftEnd,
                                 sh.ShiftStart2,
                                 sh.ShiftEnd2,
                             }),
-                        EmployeesCount = s.Shifts
-                            .Where(sh => sh.Status == StatusType.Active)
-                            .Sum(sh => sh.NoEmployees)
+                        //EmployeesCount = s.Shifts
+                        //    .Where(sh => sh.Status == StatusType.Active)
+                        //    .Sum(sh => sh.NoEmployees)
+                        TotalWorkers = OrganizationCalculations.GetTotalWorkers(s)
                     }),
-                SitesEmployeesCount = item.Sites != null
-                    ? item.Sites
-                        .Where(s => s.Status == StatusType.Active)
-                        .Sum(s => s.Shifts
-                            .Where(sh => sh.Status == StatusType.Active)
-                            .Sum(sh => sh.NoEmployees)) ?? 0
-                    : 0,
+                //SitesEmployeesCount = item.Sites != null
+                //    ? item.Sites
+                //        .Where(s => s.Status == StatusType.Active)
+                //        .Sum(s => s.Shifts
+                //            .Where(sh => sh.Status == StatusType.Active)
+                //            .Sum(sh => sh.NoEmployees)) ?? 0
+                //    : 0,
+                TotalWorkers = OrganizationCalculations.GetTotalWorkers(item.Sites.ToList()),
                 NaceCodes = item.NaceCodes
                     .Where(nc => nc.Status == StatusType.Active)
                     .Select(nc => new 

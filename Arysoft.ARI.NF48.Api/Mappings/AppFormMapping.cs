@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Arysoft.ARI.NF48.Api.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -73,11 +74,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 HistoricalDataJSON = item.HistoricalDataJSON,
                 Status = item.Status,
                 // RELATIONS
-                OrganizationName = item.Organization != null 
-                    ? item.Organization.Name 
+                OrganizationName = item.Organization != null
+                    ? item.Organization.Name
                     : string.Empty,
                 AuditCycleName = item.AuditCycle != null
-                    ? item.AuditCycle.Name 
+                    ? item.AuditCycle.Name
                     : string.Empty,
                 StandardName = item.Standard != null
                     ? item.Standard.Name
@@ -102,14 +103,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Select(s => s.Description)
                         .ToList()
                     : new List<string>(),
-                EmployeesCount = item.Sites != null
-                    ? item.Sites.Where(i => i.Status == StatusType.Active)
-                        .Sum(i =>
-                        {
-                            Func<Shift, int?> selector = s => s.NoEmployees;
-                            return i.Shifts.Where(s => s.Status == StatusType.Active).Sum(selector) ?? 0;
-                        })
-                    : 0,
+                //EmployeesCount = item.Sites != null
+                //    ? item.Sites.Where(i => i.Status == StatusType.Active)
+                //        .Sum(i =>
+                //        {
+                //            Func<Shift, int?> selector = s => s.NoEmployees;
+                //            return i.Shifts.Where(s => s.Status == StatusType.Active).Sum(selector) ?? 0;
+                //        })
+                //    : 0,
+                TotalWorkers = OrganizationCalculations.GetTotalWorkers(item.Sites.ToList()),
                 NotesCount = item.Notes != null
                     ? item.Notes.Count
                     : 0,

@@ -115,7 +115,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Proposal> CreateAsync(Proposal item)
         {
-            var adcRepository = new ADCRepository();
+            //var adcRepository = new ADCRepository();
             
             await ValidateNewItemAsync(item);
             item = SetValuesForCreate(item);
@@ -559,11 +559,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // Ahora usa auditStepDays para crear/actualizar ProposalAudits
-            foreach (var entry in auditStepDays)
+            foreach (var (AuditStep, Days) in auditStepDays)
             {
                 // ejemplo: obtener el proposalAudit por step y asignar TotalAuditDays = entry.Days
                 var proposalAudit = await proposalAuditRepository
-                    .GetByProposalAndStepAsync(proposal.ID, entry.AuditStep);
+                    .GetByProposalAndStepAsync(proposal.ID, AuditStep);
 
                 if (proposalAudit == null)
                 {
@@ -571,8 +571,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     {
                         ID = Guid.NewGuid(),
                         ProposalID = proposal.ID,
-                        AuditStep = entry.AuditStep,
-                        TotalAuditDays = entry.Days,
+                        AuditStep = AuditStep,
+                        TotalAuditDays = Days,
                         Status = StatusType.Active,
                         Created = DateTime.UtcNow,
                         Updated = DateTime.UtcNow,
@@ -584,9 +584,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 else
                 {
                     // si ya existe actualizar días si es necesario
-                    if (proposalAudit.TotalAuditDays != entry.Days)
+                    if (proposalAudit.TotalAuditDays != Days)
                     {
-                        proposalAudit.TotalAuditDays = entry.Days;
+                        proposalAudit.TotalAuditDays = Days;
                         proposalAudit.Updated = DateTime.UtcNow;
                         proposalAudit.UpdatedUser = proposal.UpdatedUser;
                         proposalAuditRepository.Update(proposalAudit);
@@ -708,18 +708,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // Ahora usa auditStepDays para crear/actualizar ProposalAudits
-            foreach (var entry in auditStepDays)
+            foreach (var (AuditStep, Days) in auditStepDays)
             {
                 var proposalAudit = await proposalAuditRepository
-                    .GetByProposalAndStepAsync(proposal.ID, entry.AuditStep);
+                    .GetByProposalAndStepAsync(proposal.ID, AuditStep);
                 if (proposalAudit == null)
                 {
                     proposalAudit = new ProposalAudit
                     {
                         ID = Guid.NewGuid(),
                         ProposalID = proposal.ID,
-                        AuditStep = entry.AuditStep,
-                        TotalAuditDays = entry.Days,
+                        AuditStep = AuditStep,
+                        TotalAuditDays = Days,
                         Status = StatusType.Active,
                         Created = DateTime.UtcNow,
                         Updated = DateTime.UtcNow,
@@ -732,9 +732,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 else
                 {
                     // si ya existe actualizar días si es necesario
-                    if (proposalAudit.TotalAuditDays != entry.Days)
+                    if (proposalAudit.TotalAuditDays != Days)
                     {
-                        proposalAudit.TotalAuditDays = entry.Days;
+                        proposalAudit.TotalAuditDays = Days;
                         proposalAudit.Updated = DateTime.UtcNow;
                         proposalAudit.UpdatedUser = proposal.UpdatedUser;
 
@@ -902,7 +902,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Select(adc => new
                     {
                         //adc.Description,
-                        adc.TotalEmployees,
+                        adc.TotalWorkers,
                         TotalInitial = 0,
                         TotalMD11 = 0,
                         TotalSurveillance = 0

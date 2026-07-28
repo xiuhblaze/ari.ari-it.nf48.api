@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {   
             var auditCycles = new List<object>();
             var sitesCount = 0;
-            var employeesCount = 0;
+            var totalWorkers = 0;
 
             if (item.ADCs != null)
             {
@@ -49,15 +50,15 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 if (sites.Any())
                 {
                     sitesCount = sites.Count();
-
-                    foreach (var site in sites)
-                    {
-                        employeesCount += site.Status == StatusType.Active && site.Shifts.Any()
-                            ? site.Shifts
-                                .Where(i => i.Status == StatusType.Active)
-                                .Sum(i => i.NoEmployees) ?? 0
-                            : 0;
-                    }
+                    totalWorkers += OrganizationCalculations.GetTotalWorkers(sites.ToList());
+                    //foreach (var site in sites)
+                    //{
+                    //    employeesCount += site.Status == StatusType.Active && site.Shifts.Any()
+                    //        ? site.Shifts
+                    //            .Where(i => i.Status == StatusType.Active)
+                    //            .Sum(i => i.NoEmployees) ?? 0
+                    //        : 0;
+                    //}
                 }
             }
 
@@ -88,7 +89,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 NotesCount = item.Notes?.Count ?? 0,
                 // CALCULATED
                 SitesCount = sitesCount,
-                EmployeesCount = employeesCount,
+                //EmployeesCount = employeesCount,
+                TotalWorkers = totalWorkers,
                 AuditCycles = auditCycles,
                 // NOT MAPPED
                 Alerts = item.Alerts,
@@ -173,8 +175,8 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : new List<string>(),
                 TotalEmployees = item.ADCs != null
                     ? item.ADCs
-                        .Where(adc => adc.TotalEmployees.HasValue)
-                        .Select(adc => adc.TotalEmployees.Value)
+                        .Where(adc => adc.TotalWorkers.HasValue)
+                        .Select(adc => adc.TotalWorkers.Value)
                         .ToList()
                     : new List<int>(),
                 ADCSites = item.ADCs != null

@@ -122,7 +122,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<ADCSite> GetAsync(Guid id)
         {
             var _md5Repository = new MD5Repository();
-            var _appFormRepository = new AppFormRepository();
+            //var _appFormRepository = new AppFormRepository();
             var item = await _repository.GetAsync(id)
                 ?? throw new BusinessException("The record was not found");
 
@@ -140,13 +140,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var tableType = AuditCycleCalculations.GetMD5TableType(item.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
 
                 //var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
-                var _noEmployees = GetEmployees(item.Site ?? new Site());
-                var md5Item = await _md5Repository.GetItemByEmployeesAsync(_noEmployees, tableType);
+                var _totalWorkers = OrganizationCalculations.GetTotalWorkers(item.Site);
+                //var _noEmployees = GetEmployees(item.Site ?? new Site());
+                var md5Item = await _md5Repository.GetItemByEmployeesAsync(_totalWorkers, tableType);
                 var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
                 //var _initialMD5 = await _md5Repository.GetDaysAsync(_noEmployees, tableType, maximumRiskLevel);
 
                 item.InitialMD5 = days;
-                item.NoEmployees = _noEmployees;
+                //item.NoEmployees = _noEmployees;
+                item.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(item.Site);
+                item.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(item.Site);
+                item.TotalWorkers = _totalWorkers;
 
                 _repository.Update(item);
                 try
@@ -235,15 +239,20 @@ namespace Arysoft.ARI.NF48.Api.Services
                 .GetMD5TableType(foundItem.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);            
             var maxRiskLevelCategory = AuditCycleCalculations
                 .GetMaxRiskLevelCategory(appFormItem);            
-            var employees = GetEmployees(foundItem.Site ?? new Site());            
+            //var employees = GetEmployees(foundItem.Site ?? new Site());
+            var _totalWorkers = OrganizationCalculations.GetTotalWorkers(foundItem.Site);
+
             var md5Item = await new MD5Repository()
-                .GetItemByEmployeesAsync(employees, tableType);
+                .GetItemByEmployeesAsync(_totalWorkers, tableType);
             var days = AuditCycleCalculations
                 .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
             foundItem.MD5ID = md5Item.ID;
             foundItem.InitialMD5 = days;
-            foundItem.NoEmployees = employees;
+            //foundItem.NoEmployees = employees;
+            foundItem.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(foundItem.Site);
+            foundItem.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(foundItem.Site);
+            foundItem.TotalWorkers = _totalWorkers;
 
             // Execute queries
 
@@ -376,17 +385,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
             {
                 // NOTA: La mayoria de calculos se va a realizar en el frontend para que se aprueben en tiempo real
-                var employees = GetEmployees(foundItem.Site ?? new Site());
+                //var employees = GetEmployees(foundItem.Site ?? new Site());
+                var totalWorkers = OrganizationCalculations.GetTotalWorkers(foundItem.Site);
                 var tableType = AuditCycleCalculations
                     .GetMD5TableType(foundItem.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
                 var md5Item = await md5Repository
-                    .GetItemByEmployeesAsync(employees, tableType);
+                    .GetItemByEmployeesAsync(totalWorkers, tableType);
                 var days = AuditCycleCalculations
                     .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
                 foundItem.MD5ID = md5Item.ID;
                 foundItem.InitialMD5 = days;
-                foundItem.NoEmployees = employees;
+                foundItem.TotalWorkers = totalWorkers;
+                foundItem.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(foundItem.Site);
+                foundItem.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(foundItem.Site);
+                //foundItem.NoEmployees = employees;
             }
 
             foundItem.TotalInitial = item.TotalInitial;     // Se obtiene de la diferencia del InitialMD5 con la suma de todos los Concept Values, no debe reducirse más de un 30%
@@ -412,24 +425,24 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // STATICs
 
-        public static async Task<int> GetEmployeesAsync(Guid siteID)
-        {
-            var siteRepository = new SiteRepository();
-            var site = await siteRepository.GetAsync(siteID)
-                    ?? throw new BusinessException("The Site ID does not exist");
+        //public static async Task<int> GetEmployeesAsync(Guid siteID)
+        //{
+        //    var siteRepository = new SiteRepository();
+        //    var site = await siteRepository.GetAsync(siteID)
+        //            ?? throw new BusinessException("The Site ID does not exist");
             
-            return GetEmployees(site); // employeesCount;
-        } // GetEmployeesAsync
+        //    return GetEmployees(site); // employeesCount;
+        //} // GetEmployeesAsync
 
-        public static int GetEmployees(Site site)
-        {   
-            var employeesCount = site.Shifts != null
-                ? site.Shifts.Where(s => s.Status == StatusType.Active)
-                    .Sum(s => s.NoEmployees) ?? 0
-                : 0;
+        //public static int GetEmployees(Site site)
+        //{   
+        //    var employeesCount = site.Shifts != null
+        //        ? site.Shifts.Where(s => s.Status == StatusType.Active)
+        //            .Sum(s => s.NoEmployees) ?? 0
+        //        : 0;
 
-            return employeesCount;
-        } // GetEmployees
+        //    return employeesCount;
+        //} // GetEmployees
 
         //public static async Task<List<ADCSiteAlertType>> GetAlertsAsync(ADCSite item)
         //{
@@ -463,11 +476,12 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             var alerts = new List<ADCSiteAlertType>();
 
-            var noEmployees = item.Site.Shifts
-                .Where(s => s.Status == StatusType.Active)
-                .Sum(s => s.NoEmployees) ?? 0;
+            //var noEmployees = item.Site.Shifts
+            //    .Where(s => s.Status == StatusType.Active)
+            //    .Sum(s => s.NoEmployees) ?? 0;
+            var totalWorkers = OrganizationCalculations.GetTotalWorkers(item.Site);
 
-            if (noEmployees != (item.NoEmployees ?? 0))
+            if (totalWorkers != (item.TotalWorkers ?? 0))
             {
                 alerts.Add(ADCSiteAlertType.EmployeesMistmatch);
             }

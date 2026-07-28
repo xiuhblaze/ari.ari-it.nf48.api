@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,13 +40,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 .Where(c => c.Status == StatusType.Active)
                 .FirstOrDefault();
 
-            var employeesCount = item.Sites != null
-                ? item.Sites
-                    .Where((Site i) => i.Status == StatusType.Active)
-                    .Sum((Site i) => i.Shifts
-                        .Where((Shift s) => s.Status == StatusType.Active)
-                        .Sum((Shift s) => s.NoEmployees)) ?? 0
-                : 0;
+            //var employeesCount = item.Sites != null
+            //    ? item.Sites
+            //        .Where((Site i) => i.Status == StatusType.Active)
+            //        .Sum((Site i) => i.Shifts
+            //            .Where((Shift s) => s.Status == StatusType.Active)
+            //            .Sum((Shift s) => s.NoEmployees)) ?? 0
+            //    : 0;
 
             // Buscar dentro de todas las auditorias de la organizacion y sus ciclos,
             // la más próxima a ejecutarse.
@@ -77,7 +78,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? await AuditMapping.AuditToItemListDto(nextAudit)
                     : null,
                 AuditCyclesCount = item.AuditCycles != null
-                    ? item.AuditCycles.Where(i => 
+                    ? item.AuditCycles.Where(i =>
                         i.Status != StatusType.Nothing && i.Status != StatusType.Deleted)
                         .Count()
                     : 0,
@@ -85,34 +86,35 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? CompanyMapping.CompanyToListDto(item.Companies
                         .Where(c => c.Status != StatusType.Nothing))
                     : null,
-                ContactsCount = item.Contacts != null 
-                    ? item.Contacts.Where(i => i.Status == StatusType.Active).Count() 
+                ContactsCount = item.Contacts != null
+                    ? item.Contacts.Where(i => i.Status == StatusType.Active).Count()
                     : 0,
-                ContactName = mainContact != null  
+                ContactName = mainContact != null
                     ? Tools.Strings.FullName(mainContact.FirstName, mainContact.MiddleName, mainContact.LastName)
                     : string.Empty,
-                ContactEmail = mainContact != null 
-                    ? mainContact.Email 
+                ContactEmail = mainContact != null
+                    ? mainContact.Email
                     : string.Empty,
                 ContactPhone = mainContact != null
-                    ? mainContact.Phone 
+                    ? mainContact.Phone
                     : string.Empty,
-                NotesCount = item.Notes != null 
-                    ? item.Notes.Count() 
+                NotesCount = item.Notes != null
+                    ? item.Notes.Count()
                     : 0,
-                SitesCount = item.Sites != null 
-                    ? item.Sites.Where(i => i.Status == StatusType.Active).Count() 
+                SitesCount = item.Sites != null
+                    ? item.Sites.Where(i => i.Status == StatusType.Active).Count()
                     : 0,
-                SiteDescription = mainSite != null 
-                    ? mainSite.Description 
+                SiteDescription = mainSite != null
+                    ? mainSite.Description
                     : string.Empty,
-                SiteLocation = mainSite != null 
-                    ? mainSite.Address 
+                SiteLocation = mainSite != null
+                    ? mainSite.Address
                     : string.Empty,
                 SiteLocationURL = mainSite != null
                     ? mainSite.LocationURL
                     : string.Empty,
-                SitesEmployeesCount = employeesCount,
+                //SitesEmployeesCount = employeesCount,
+                TotalWorkers = OrganizationCalculations.GetTotalWorkers(item.Sites.ToList()),
                 Standards = item.OrganizationStandards != null
                     ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
                         .Where(os => os.Status != StatusType.Nothing))

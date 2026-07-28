@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
-using System.ComponentModel;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Tools
@@ -51,33 +52,107 @@ namespace Arysoft.ARI.NF48.Api.Tools
                 {
                     totalWorkers = site.Shifts
                         .Where(i => i.Status == StatusType.Active)
-                        .Sum(i => i.WorkersOnSite + i.WorkersOffSite) ?? 0;
+                        .Sum(i => GetTotalWorkers(i));
+                        //.Sum(i => (i.WorkersOnSite ?? 0) + (i.WorkersOffSite ?? 0));
                 }
                 else
                 {
                     totalWorkers = site.Shifts
-                        .Sum(i => i.WorkersOnSite + i.WorkersOffSite) ?? 0;
+                        .Sum(i => GetTotalWorkers(i));
+                        //.Sum(i => (i.WorkersOnSite ?? 0) + (i.WorkersOffSite ?? 0));
                 }
-
-                //foreach (Shift shift in site.Shifts)
-                //{
-                //    if (onlyActive)
-                //    {
-                //        if (shift.Status == StatusType.Active)
-                //        {
-                //            totalWorkers += GetTotalWorkers(shift.WorkersOnSite, shift.WorkersOffSite);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        totalWorkers += GetTotalWorkers(shift.WorkersOnSite, shift.WorkersOffSite);
-                //    }
-                //}
 
                 return totalWorkers;
             }
 
             return 0;
         } // GetTotalWorkers
+
+        /// <summary>
+        /// Obtiene el total de trabajadores de la lista de sitios especificados,
+        /// se puede indicar del total o solo de los sitios y turnos activos (por default)
+        /// </summary>
+        /// <param name="sites">Lista de sitios a revisar</param>
+        /// <param name="onlyActive">Indica si solo se deben de contar los activos (true)</param>
+        /// <returns></returns>
+        public static int GetTotalWorkers(List<Site> sites, bool onlyActive = true)
+        {
+            if (sites == null || sites.Count == 0)
+                return 0;
+
+            int totalWorkers = 0;
+
+            if (onlyActive)
+            {
+                //totalWorkers = sites.Where(i => i.Status == StatusType.Active)
+                //    .Sum(i =>
+                //    {
+                //        Func<Shift, int> selector = s => (s.WorkersOnSite ?? 0) + (s.WorkersOffSite ?? 0);
+                //        return i.Shifts
+                //            .Where(s => s.Status == StatusType.Active)
+                //            .Sum(selector);
+                //    });
+                totalWorkers = sites.Where(i => i.Status == StatusType.Active)
+                    .Sum(i => GetTotalWorkers(i, onlyActive));
+            }
+            else
+            {
+                //totalWorkers = sites.Sum(i =>
+                //    {
+                //        Func<Shift, int> selector = s => (s.WorkersOnSite ?? 0) + (s.WorkersOffSite ?? 0);
+                //        return i.Shifts.Sum(selector);
+                //    });
+                totalWorkers = sites.Sum(i => GetTotalWorkers(i, onlyActive));
+            }
+
+            return totalWorkers;
+        } // GetTotalWorkers
+
+        // Workers On Site
+
+        public static int GetWorkersOnSite(Site site, bool onlyActive = true)
+        {
+            if (site == null || site.Shifts == null || !site.Shifts.Any()) 
+                return 0;
+
+            int workersOnSite = 0;
+
+            if (onlyActive)
+            {
+                workersOnSite = site.Shifts
+                    .Where(i => i.Status == StatusType.Active)
+                    .Sum(i => i.WorkersOnSite ?? 0);
+            }
+            else {
+                workersOnSite = site.Shifts
+                    .Sum(i => i.WorkersOnSite ?? 0);
+            }
+
+            return workersOnSite;
+        } // GetWorkersOnSite
+
+        // Workers Off Site
+
+        public static int GetWorkersOffSite(Site site, bool onlyActive = true)
+        {
+            if (site == null || site.Shifts == null || !site.Shifts.Any())
+                return 0;
+
+            int workersOffSite = 0;
+
+            if (onlyActive)
+            {
+                workersOffSite = site.Shifts
+                    .Where(i => i.Status == StatusType.Active)
+                    .Sum(i => i.WorkersOffSite ?? 0);
+            }
+            else
+            {
+                workersOffSite = site.Shifts
+                    .Sum(i => i.WorkersOffSite ?? 0);
+            }
+
+            return workersOffSite;
+        } // GetWorkersOnSite
     }
 }

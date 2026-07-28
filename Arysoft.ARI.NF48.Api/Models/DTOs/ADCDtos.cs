@@ -23,7 +23,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public bool? IncludePreAudit { get; set; }
 
-        public int? TotalEmployees { get; set; }
+        //public int? TotalEmployees { get; set; }
+        public int? TotalWorkers { get; set; }
 
         public decimal? TotalInitial { get; set; }
 
@@ -83,7 +84,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public bool? IncludePreAudit { get; set; }
 
-        public int? TotalEmployees { get; set; }
+        //public int? TotalEmployees { get; set; }
+        public int? TotalWorkers { get; set; }
 
         public decimal? TotalInitial { get; set; }
 
