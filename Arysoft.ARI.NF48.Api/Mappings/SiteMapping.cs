@@ -41,12 +41,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status != StatusType.Nothing)
                         .Count() 
                     : 0,
+                TotalWorkersOnSite = OrganizationCalculations.GetWorkersOnSite(item),
+                TotalWorkersOffSite = OrganizationCalculations.GetWorkersOffSite(item),
                 TotalWorkers = OrganizationCalculations.GetTotalWorkers(item),
-                //TotalWorkersCount = item.Shifts != null 
-                //    ? item.Shifts
-                //        .Where(i => i.Status == StatusType.Active)
-                //        .Sum(i => i.NoEmployees) ?? 0 
-                //    : 0,
                 Shifts = item.Shifts != null // Para el preview del AppForm
                     ? ShiftMapping.ShiftsToListDto(item.Shifts
                         .Where(i => i.Status != StatusType.Nothing))

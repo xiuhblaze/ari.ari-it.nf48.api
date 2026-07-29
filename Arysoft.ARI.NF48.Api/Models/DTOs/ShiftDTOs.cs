@@ -9,11 +9,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         public Guid ID { get; set; }
 
-        // public string SiteDescription { get; set; }
-
         public ShiftType? Type { get; set; }
 
-        //public int? NoEmployees { get; set; }
+        public int? WorkersOnSite { get; set; }
+
+        public int? WorkersOffSite { get; set; }
 
         public int? TotalWorkers { get; set; }
 
@@ -32,7 +32,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public StatusType Status { get; set; }
 
         public int NotesCount { get; set; }
-    }
+    } // ShiftItemListDto
 
     public class ShiftItemDetailDto
     {
@@ -42,13 +42,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public ShiftType? Type { get; set; }
 
-        //public int? NoEmployees { get; set; }
-
         public int? WorkersOnSite { get; set; }
 
         public int? WorkersOffSite { get; set; }
 
-        public int? TotalWorkers { get; set; }      // Calculado con WorkersOnSite + WorkersOffSite
+        public int? TotalWorkers { get; set; }
 
         public string ActivitiesDescription { get; set; }
 

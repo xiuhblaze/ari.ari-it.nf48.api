@@ -25,11 +25,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return new ShiftItemListDto
             {
                 ID = item.ID,
-                //SiteDescription = item.Site != null 
-                //    ? item.Site.Description
-                //    : string.Empty,
                 Type = item.Type,
-                //NoEmployees = item.NoEmployees,
+                WorkersOnSite = item.WorkersOnSite ?? 0,
+                WorkersOffSite = item.WorkersOffSite ?? 0,
                 TotalWorkers = OrganizationCalculations.GetTotalWorkers(item),
                 ActivitiesDescription = item.ActivitiesDescription,
                 ShiftStart = item.ShiftStart,
@@ -51,7 +49,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 SiteID = item.SiteID,
                 Type = item.Type,
-                //NoEmployees = item.NoEmployees,
                 WorkersOnSite = item.WorkersOnSite ?? 0,
                 WorkersOffSite = item.WorkersOffSite ?? 0,
                 TotalWorkers = OrganizationCalculations.GetTotalWorkers(item),
@@ -94,7 +91,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             {
                 ID = itemDto.ID,
                 Type = itemDto.Type,
-                //NoEmployees = itemDto.NoEmployees,
                 WorkersOnSite = itemDto.WorkersOnSite,
                 WorkersOffSite = itemDto.WorkersOffSite,
                 ActivitiesDescription = itemDto.ActivitiesDescription,

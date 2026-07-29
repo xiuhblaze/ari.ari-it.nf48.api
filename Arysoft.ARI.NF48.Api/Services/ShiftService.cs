@@ -154,9 +154,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _shiftRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            // validar que WorkersOnSite sea mayor a cero, -xB: considerar si es necesario
-            //if (item.WorkersOnSite <= 0)
-            //    throw new BusinessException("The number of employees on site must be greather than 0");
+            // Validar que al menos WorkersOnSite o WorkersOffSite sea mayor a cero
+            if (item.WorkersOnSite == 0 && item.WorkersOffSite == 0)
+                throw new BusinessException("The number of employees must have a value");
 
             // Assigning values
 
