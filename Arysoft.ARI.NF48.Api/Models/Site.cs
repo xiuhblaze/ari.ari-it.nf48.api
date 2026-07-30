@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using System;
 using System.Collections.Generic;
 //using System.Data.Entity.Spatial;
 
@@ -15,6 +16,8 @@ namespace Arysoft.ARI.NF48.Api.Models
         public string Address { get; set; }
 
         public string Country { get; set; }
+
+        public SiteType Type { get; set; }
 
         // public DbGeography LocationGPS { get; set; }
 

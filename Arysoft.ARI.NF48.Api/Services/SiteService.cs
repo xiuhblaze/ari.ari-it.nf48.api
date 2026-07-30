@@ -7,6 +7,7 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -68,11 +69,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.IsMainSite)
                         .ThenBy(e => e.Description);
                     break;
-                case SiteOrderType.Status:
-                    items = items.OrderBy(e => e.Status);
-                    break;
-                case SiteOrderType.Updated:
-                    items = items.OrderBy(e => e.Updated);
+                case SiteOrderType.Type:
+                    items = items.OrderBy(e => e.Type)
+                        .ThenBy(e => e.Description);
                     break;
                 case SiteOrderType.DescriptionDesc:
                     items = items.OrderByDescending(e => e.Description);
@@ -81,11 +80,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.IsMainSite)
                         .ThenByDescending(e => e.Description);
                     break;
-                case SiteOrderType.StatusDesc:
-                    items = items.OrderByDescending(e => e.Status);
-                    break;
-                case SiteOrderType.UpdatedDesc:
-                    items = items.OrderByDescending(e => e.Updated);
+                case SiteOrderType.TypeDesc:
+                    items = items.OrderByDescending(e => e.Type)
+                        .ThenByDescending(e => e.Description);
                     break;
                 default:
                     items = items.OrderByDescending(e => e.IsMainSite)
@@ -186,7 +183,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _siteRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.IsMainSite)
+            if (item.IsMainSite || item.Type == SiteType.Main)
             {
                 await _siteRepository.SetToNotSiteMainAsync(foundItem.OrganizationID);
             }
@@ -194,9 +191,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             foundItem.Description = item.Description;
-            foundItem.IsMainSite = item.IsMainSite;
+            foundItem.IsMainSite = item.Type == SiteType.Main; // item.IsMainSite;
             foundItem.Address = item.Address;
             foundItem.Country = item.Country;
+            foundItem.Type = item.Type;
             //foundItem.LocationGPS = item.LocationGPS;
             foundItem.LocationURL = item.LocationURL;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing

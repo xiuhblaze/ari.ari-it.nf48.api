@@ -34,6 +34,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
                 Country = item.Country,
+                Type = item.Type,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 ShiftsCount = item.Shifts != null 
@@ -61,6 +62,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsMainSite = item.IsMainSite,
                 Address = item.Address,
                 Country = item.Country,
+                Type = item.Type,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 Created = item.Created,
@@ -94,6 +96,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 IsMainSite = itemDto.IsMainSite,
                 Address = itemDto.Address,
                 Country = itemDto.Country,
+                Type = itemDto.Type,
                 LocationURL = itemDto.LocationURL,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

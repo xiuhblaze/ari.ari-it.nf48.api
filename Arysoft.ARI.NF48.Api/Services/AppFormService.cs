@@ -792,7 +792,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var organization = await organizationRepository.GetAsync(appForm.OrganizationID)
                 ?? throw new BusinessException("AddMainSiteAsync: The organization was not found");
             var mainSite = organization.Sites
-                .Where(s => s.Status == StatusType.Active && s.IsMainSite)
+                .Where(s => s.Status == StatusType.Active && (s.IsMainSite || s.Type == SiteType.Main))
                 .FirstOrDefault();
 
             if (mainSite != null)

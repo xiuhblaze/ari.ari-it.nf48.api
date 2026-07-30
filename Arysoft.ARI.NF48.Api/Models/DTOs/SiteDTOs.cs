@@ -21,6 +21,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Country { get; set; }
 
+        public SiteType Type { get; set; }
+
         public string LocationURL { get; set; }
 
         public StatusType Status { get; set; }
@@ -50,6 +52,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string Address { get; set; }
 
         public string Country { get; set; }
+
+        public SiteType Type { get; set; }
 
         public string LocationURL { get; set; }
 
@@ -94,6 +98,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         [StringLength(50)]
         public string Country { get; set; }
+
+        [Required]
+        public SiteType Type { get; set; }
 
         [StringLength(250)]
         public string LocationURL { get; set; }

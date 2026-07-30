@@ -359,7 +359,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 throw new BusinessException("The application form is not active, can't be remove sites");
             var siteItem = await _siteRepository.FindAsync(siteID)
                 ?? throw new BusinessException("The site related was not found");
-            if (siteItem.IsMainSite)
+            if (siteItem.IsMainSite || siteItem.Type == SiteType.Main)
                 throw new BusinessException("The main site can't be removed from the application form");
 
             if (!foundItem.Sites.Contains(siteItem))
