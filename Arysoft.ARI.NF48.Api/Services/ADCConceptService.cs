@@ -39,7 +39,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 filters.Text = filters.Text.Trim().ToLower();
                 items = items.Where(e =>                    
                     (e.Description != null && e.Description.ToLower().Contains(filters.Text))
-                    // || (e.UpdatedUser != null && e.UpdatedUser.ToLower().Contains(filters.Text))
+                    || (e.HelpText != null && e.HelpText.ToLower().Contains(filters.Text))
+                    || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -81,8 +82,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                         .ThenByDescending(i => i.IndexSort);
                     break;
                 default:
-                    items = items.OrderBy(i => i.IndexSort)
-                        .ThenBy(i => i.Description);
+                    items = items.OrderBy(i => i.StandardID)
+                        .ThenBy(i => i.IndexSort);
                     break;
             }
 
@@ -174,6 +175,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Decrease = item.Decrease;
             foundItem.IncreaseUnit = item.IncreaseUnit; 
             foundItem.DecreaseUnit = item.DecreaseUnit;
+            foundItem.HelpText = item.HelpText;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active

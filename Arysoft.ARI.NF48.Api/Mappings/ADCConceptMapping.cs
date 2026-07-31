@@ -31,6 +31,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Decrease = item.Decrease,
                 IncreaseUnit = item.IncreaseUnit,
                 DecreaseUnit = item.DecreaseUnit,
+                HelpText = item.HelpText,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 StandardName = item.Standard != null
@@ -52,6 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Decrease = item.Decrease,
                 IncreaseUnit = item.IncreaseUnit,
                 DecreaseUnit = item.DecreaseUnit,
+                HelpText = item.HelpText,
                 ExtraInfo = item.ExtraInfo,
                 Status = item.Status,
                 Created = item.Created,
@@ -84,6 +86,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Decrease = itemDto.Decrease,
                 IncreaseUnit = itemDto.IncreaseUnit,
                 DecreaseUnit = itemDto.DecreaseUnit,
+                HelpText = itemDto.HelpText,
                 ExtraInfo = itemDto.ExtraInfo,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

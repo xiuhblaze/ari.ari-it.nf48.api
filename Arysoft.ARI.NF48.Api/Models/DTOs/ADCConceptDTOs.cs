@@ -23,7 +23,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ADCConceptUnitType? IncreaseUnit { get; set; }
         
         public ADCConceptUnitType? DecreaseUnit { get; set; }
-        
+
+        public string HelpText { get; set; }
+
         public string ExtraInfo { get; set; }
 
         public StatusType Status { get; set; }
@@ -52,6 +54,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ADCConceptUnitType? IncreaseUnit { get; set; }
 
         public ADCConceptUnitType? DecreaseUnit { get; set; }
+
+        public string HelpText { get; set; }
 
         public string ExtraInfo { get; set; }
 
@@ -97,6 +101,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public ADCConceptUnitType? IncreaseUnit { get; set; }
 
         public ADCConceptUnitType? DecreaseUnit { get; set; }
+
+        [StringLength(500)]
+        public string HelpText { get; set; }
 
         [StringLength(500)]
         public string ExtraInfo { get; set; }

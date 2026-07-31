@@ -395,7 +395,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <remarks>
         /// Autor: xBlaze
         /// Creacion: 21-01-2026
-        /// Ultima Modificacion: 2026-07-02
+        /// Ultima Modificacion: 2026-07-31
         /// </remarks>
         private async Task ValidateCreateItemAsync(ADC item, AppForm appForm)
         {
@@ -420,8 +420,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validar que sea de un Standard valido, por lo pronto:
             // * ISO 9001
             // * ISO 14001
+            // * ISO 45001
             if (appForm.Standard.StandardBase != StandardBaseType.ISO9K 
-                && appForm.Standard.StandardBase != StandardBaseType.ISO14K)
+                && appForm.Standard.StandardBase != StandardBaseType.ISO14K
+                && appForm.Standard.StandardBase != StandardBaseType.ISO45K)
                 throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
 
             // Validar que el AppForm tenga un Sitio principal activo
@@ -616,7 +618,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Obtener los Sites del AppForm y agregarlos al ADC
             foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
             {   
-                //var employees = ADCSiteService.GetEmployees(site);
                 var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
                 var md5Item = await md5Repository
                     .GetItemByEmployeesAsync(totalWorkers, tableType);
@@ -630,7 +631,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     SiteID = site.ID,
                     MD5ID = md5Item.ID,
                     InitialMD5 = days,
-                    //NoEmployees = employees,
                     TotalWorkers = totalWorkers,
                     WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
                     WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
@@ -673,11 +673,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             // TODO: Aun en pruebas este metodo -xB: 20260703, segimos: 20260723
 
             // Obtener el nivel de riesgo máximo del AppForm
-            //var maximumRiskLevel = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
             var maxRiskLevel = AuditCycleCalculations.GetMaxRiskLevelCategory(appForm);
 
             // Obtener de acuerdo con el standard, el tipo de tabla MD5 a consultar
-            //var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
             var tableType = AuditCycleCalculations.GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
 
             // 1. Obtener los Sites del AppForm y agregar solo los que no existen al ADC
@@ -688,11 +686,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     continue; // El Site ya existe en el ADC, saltar al siguiente
 
                 var adcSite = new ADCSite();
-                //var _noEmployees = ADCSiteService.GetEmployees(site);
                 var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
-                //var md5 = await ADCSiteService.GetMD5ByEmployeesAsync(_noEmployees, tableType);
                 var md5Item = await md5Repository.GetItemByEmployeesAsync(totalWorkers, tableType);
-                //var days = MD5Repository.GetDaysByRiskLevel(md5, maximumRiskLevel);
                 var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
                 adcSite.ID = Guid.NewGuid();
@@ -700,7 +695,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 adcSite.SiteID = site.ID; 
                 adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;
-                //adcSite.NoEmployees = _noEmployees;
                 adcSite.TotalWorkers = totalWorkers;
                 adcSite.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site);
                 adcSite.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site);
@@ -744,14 +738,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foreach (var adcSite in adcSitesToUpdate)
             {
-                //var _noEmployees = await ADCSiteService.GetEmployeesAsync(adcSite.SiteID ?? Guid.Empty);
                 var totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
                 var md5Item = await md5Repository.GetItemByEmployeesAsync(totalWorkers, tableType);
                 var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
                 adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;
-                //adcSite.NoEmployees = _noEmployees;
                 adcSite.TotalWorkers = totalWorkers;
                 adcSite.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(adcSite.Site);
                 adcSite.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(adcSite.Site);
@@ -920,8 +912,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         private async Task<List<ADCSiteAudit>> AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm, bool isMultisite)
         {
-            var cycleType = appForm.AuditCycle.CycleType ?? AuditCycleType.Nothing; // currentAuditCycleStandard.CycleType ?? AuditCycleType.Nothing;
-            var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing; // currentAuditCycleStandard.InitialStep ?? AuditStepType.Nothing;
+            var cycleType = appForm.AuditCycle.CycleType ?? AuditCycleType.Nothing;
+            var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing;
             var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
 
             if (cycleType == AuditCycleType.Nothing 
@@ -1055,7 +1047,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (item.ADCSites != null && item.ADCSites.Any())
             {
-                //var totalEmployees = 0;
                 var totalWorkers = 0;
                 var tableType = AuditCycleCalculations
                     .GetMD5TableType(item.Standard?.StandardBase ?? StandardBaseType.Nothing);
@@ -1064,7 +1055,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
                     adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
-                    //var _noEmployees = ADCSiteService.GetEmployees(adcSite.Site);
                     var _totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
                     var md5Item = await md5Repository
                         .GetItemByEmployeesAsync(_totalWorkers, tableType);
