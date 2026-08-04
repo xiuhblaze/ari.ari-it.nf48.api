@@ -29,6 +29,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = item.SubCategory,
                 SubCategoryDescription = item.SubCategoryDescription,
                 Examples = item.Examples,
+                BasicDaysTD = item.BasicDaysTD,
+                HACCPDaysTH = item.HACCPDaysTH,
+                Version = item.Version,
                 AccreditedStatus = item.AccreditedStatus,
                 Status = item.Status
             };
@@ -45,6 +48,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = item.SubCategory,
                 SubCategoryDescription = item.SubCategoryDescription,
                 Examples = item.Examples,
+                BasicDaysTD = item.BasicDaysTD,
+                HACCPDaysTH = item.HACCPDaysTH,
+                Version = item.Version,
                 AccreditedStatus = item.AccreditedStatus,
                 Status = item.Status,
                 Created = item.Created,
@@ -72,6 +78,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SubCategory = itemDto.SubCategory,
                 SubCategoryDescription = itemDto.SubCategoryDescription,
                 Examples = itemDto.Examples,
+                BasicDaysTD = itemDto.BasicDaysTD,
+                HACCPDaysTH = itemDto.HACCPDaysTH,
+                Version = itemDto.Version,
                 AccreditedStatus = itemDto.AccreditedStatus,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser

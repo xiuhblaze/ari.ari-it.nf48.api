@@ -138,6 +138,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.SubCategory = item.SubCategory;
             foundItem.SubCategoryDescription = item.SubCategoryDescription;
             foundItem.Examples = item.Examples;
+            foundItem.BasicDaysTD = item.BasicDaysTD ?? 0;
+            foundItem.HACCPDaysTH = item.HACCPDaysTH ?? 0;
+            foundItem.Version = item.Version;
             foundItem.AccreditedStatus = item.AccreditedStatus 
                 ?? Category22KAccreditedType.Nothing;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing

@@ -40,6 +40,18 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(100);
 
             modelBuilder.Entity<Category22K>()
+                .Property(m => m.BasicDaysTD)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<Category22K>()
+                .Property(m => m.HACCPDaysTH)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<Category22K>()
+                .Property(m => m.Version)
+                .HasMaxLength(25);
+
+            modelBuilder.Entity<Category22K>()
                 .Property(m => m.Status)
                 .IsRequired();
 

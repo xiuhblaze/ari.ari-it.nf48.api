@@ -16,6 +16,12 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Examples { get; set; }
 
+        public decimal? BasicDaysTD { get; set; }
+
+        public decimal? HACCPDaysTH { get; set; }
+
+        public string Version { get; set; }
+
         public Category22KAccreditedType? AccreditedStatus { get; set; }
     }
 }
