@@ -23,6 +23,22 @@ namespace Arysoft.ARI.NF48.Api.Tools
                 : md5.Days ?? 0;
         } // GetDaysByRiskLevelCategory
 
+        //TODO: AQUI VOY TAMBIEN
+        public static decimal GetInitialAuditDaysForISO22K(
+            decimal days, 
+            Category22K category22K,
+            int haccpCount
+        )
+        {   
+            days += category22K?.BasicDaysTD ?? 0;
+            if (haccpCount > 1)
+            {
+                int additionalHACCPDays = haccpCount - 1;
+                days += additionalHACCPDays * (category22K?.HACCPDaysTH ?? 0);
+            }
+            return days;
+        } // GetInitialAuditDaysForISO22K
+
         /// <summary>
         /// Calcula el nivel de riesgo máximo del AppForm recibido.
         /// Dejar por defecto Medium si no hay niveles de riesgo o 
@@ -48,13 +64,13 @@ namespace Arysoft.ARI.NF48.Api.Tools
 
         public static MD5TableType GetMD5TableType(StandardBaseType standardBase)
         {
-            return standardBase == StandardBaseType.ISO9K ? MD5TableType.QMS
-                : standardBase == StandardBaseType.ISO14K ? MD5TableType.EMS
-                : standardBase == StandardBaseType.ISO22K ? MD5TableType.OHSMS // TODO: De aquí para abajo están en duda
-                : standardBase == StandardBaseType.ISO27K ? MD5TableType.QMS
-                : standardBase == StandardBaseType.ISO37K ? MD5TableType.EMS
-                : standardBase == StandardBaseType.ISO45K ? MD5TableType.OHSMS
-                : standardBase == StandardBaseType.HACCP ? MD5TableType.QMS
+            return standardBase == StandardBaseType.ISO9K ? MD5TableType.QMS    // Ok
+                : standardBase == StandardBaseType.ISO14K ? MD5TableType.EMS    // Ok
+                : standardBase == StandardBaseType.ISO22K ? MD5TableType.FTE    // Este tiene su propia lista, no es MD5, pero se puede quedar aquí
+                : standardBase == StandardBaseType.ISO27K ? MD5TableType.QMS    // En duda
+                : standardBase == StandardBaseType.ISO37K ? MD5TableType.EMS    // En duda
+                : standardBase == StandardBaseType.ISO45K ? MD5TableType.OHSMS  // Ok
+                : standardBase == StandardBaseType.HACCP ? MD5TableType.QMS     // En duda
                 : throw new BusinessException("The standard base type is not valid");
         } // GetMD5TableType
     } // AuditCycleCalculations

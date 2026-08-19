@@ -20,7 +20,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public decimal? HACCPDaysTH { get; set; }
 
-        public string Version { get; set; }
+        public Categories22KVersionType? Version { get; set; }
 
         public Category22KAccreditedType? AccreditedStatus { get; set; }
     }

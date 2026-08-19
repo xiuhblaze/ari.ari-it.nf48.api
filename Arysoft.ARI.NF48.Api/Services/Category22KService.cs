@@ -42,6 +42,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 );
             }
 
+            if (filters.Version != null && filters.Version != Categories22KVersionType.Nothing)
+            {
+                items = items.Where(e => e.Version == filters.Version);
+            }
+
             if (filters.Accredited != null && filters.Accredited != Category22KAccreditedType.Nothing)
             {
                 items = items.Where(e => e.AccreditedStatus == filters.Accredited);
@@ -71,6 +76,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Category)
                         .ThenBy(e => e.SubCategory);
                     break;
+                case Category22KOrderType.Version:
+                    items = items.OrderBy(e => e.Version)
+                        .ThenBy(e => e.Category)
+                        .ThenBy(e => e.SubCategory);
+                    break;
                 case Category22KOrderType.ClusterDesc:
                     items = items.OrderByDescending(e => e.Cluster)
                         .ThenByDescending(e => e.Category);
@@ -79,9 +89,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Category)
                         .ThenByDescending(e => e.SubCategory);
                     break;
+                case Category22KOrderType.VersionDesc:
+                    items = items.OrderByDescending(e => e.Version)
+                        .ThenByDescending(e => e.Category)
+                        .ThenByDescending(e => e.SubCategory);
+                    break;
                 default:
-                    items = items.OrderBy(e => e.Category)
-                        .ThenBy(e => e.SubCategory); 
+                    items = items.OrderBy(e => e.Version)
+                        .ThenBy(e => e.Category)
+                        .ThenBy(e => e.SubCategory);
                     break;
             }
 
@@ -127,8 +143,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - Que no haya duplicados
-            if (await _category22KRepository.ExistByCategorySubCategoryAsync(item.Category, item.SubCategory, item.ID))
-                throw new BusinessException("The Category and sub category already exist");
+            if (await _category22KRepository.ExistByCategorySubCategoryAsync(item))
+                throw new BusinessException("The Category and sub category already exist for the specified version");
 
             // Assigning values
 
@@ -138,8 +154,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.SubCategory = item.SubCategory;
             foundItem.SubCategoryDescription = item.SubCategoryDescription;
             foundItem.Examples = item.Examples;
-            foundItem.BasicDaysTD = item.BasicDaysTD ?? 0;
-            foundItem.HACCPDaysTH = item.HACCPDaysTH ?? 0;
+            foundItem.BasicDaysTD = item.BasicDaysTD;
+            foundItem.HACCPDaysTH = item.HACCPDaysTH;
             foundItem.Version = item.Version;
             foundItem.AccreditedStatus = item.AccreditedStatus 
                 ?? Category22KAccreditedType.Nothing;

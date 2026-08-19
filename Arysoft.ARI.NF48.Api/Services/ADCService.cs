@@ -420,9 +420,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validar que sea de un Standard valido, por lo pronto:
             // * ISO 9001
             // * ISO 14001
+            // * ISO 22000
             // * ISO 45001
             if (appForm.Standard.StandardBase != StandardBaseType.ISO9K 
                 && appForm.Standard.StandardBase != StandardBaseType.ISO14K
+                && appForm.Standard.StandardBase != StandardBaseType.ISO22K
                 && appForm.Standard.StandardBase != StandardBaseType.ISO45K)
                 throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
 
@@ -624,6 +626,20 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var days = AuditCycleCalculations
                     .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
+                // Si es 22K sumar los días TD y TH en base a la categoria indicada en el AppForm
+                if (item.Standard.StandardBase == StandardBaseType.ISO22K)
+                {
+                    var category22K = appForm.Category22K
+                        ?? throw new BusinessException("The AppForm associated has an invalid Category22K.");
+
+                    days += category22K.BasicDaysTD ?? 0;                    
+                    if (appForm.HACCPCount.HasValue && appForm.HACCPCount.Value > 1) // multiplicar por cada HACCP adicional
+                    { 
+                        int additionalHACCPDays = appForm.HACCPCount.Value - 1;
+                        days += (category22K.HACCPDaysTH ?? 0) * additionalHACCPDays;
+                    }
+                }
+
                 var adcSite = new ADCSite
                 {
                     ID = Guid.NewGuid(),
@@ -741,6 +757,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
                 var md5Item = await md5Repository.GetItemByEmployeesAsync(totalWorkers, tableType);
                 var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
+
+                //TODO: Falta validar para ISO22K  <- AQUI VOY
 
                 adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;
@@ -1033,15 +1051,15 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         /// <summary>
         /// Calcula los valores para un ADCSite tanto su numero de empleados como
-        /// el numero de dias en base a MD5, así como el Total de Empleados del ADC
+        /// el numero de dias en base a Employees Range (antes MD5), así como el 
+        /// Total de Empleados del ADC
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
         private async Task<ADC> RecalcularTotalesAsync(ADC item) 
         {
-            var appFormRepository = new AppFormRepository();
-            var md5Repository = new MD5Repository();
-
+            //var appFormRepository = new AppFormRepository();
+            //var md5Repository = new MD5Repository();
             var maxRiskLevelCategory = AuditCycleCalculations
                 .GetMaxRiskLevelCategory(item.AppForm);
 
@@ -1056,16 +1074,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 {
                     adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
                     var _totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
-                    var md5Item = await md5Repository
-                        .GetItemByEmployeesAsync(_totalWorkers, tableType);
-                    var days = AuditCycleCalculations
-                        .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
+                    //var md5Item = await md5Repository
+                    //    .GetItemByEmployeesAsync(_totalWorkers, tableType);
+                    //var days = AuditCycleCalculations
+                    //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
-                    if (_totalWorkers != adcSite.TotalWorkers)
+                    if (_totalWorkers != adcSite.TotalWorkers) // Si el total de empleados del site ha cambiado
                     { 
                         var adcSiteService = new ADCSiteService();
-
-                        await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID);
+                        await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID); // Aquí se actualiza el MD5ID y el total de dias iniciales (InitialMD5)
                     }
 
                     totalWorkers += _totalWorkers;

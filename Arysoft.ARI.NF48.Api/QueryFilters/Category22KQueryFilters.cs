@@ -10,6 +10,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public StatusType? Status { get; set; }
 
+        public Categories22KVersionType? Version { get; set; }
+
         public Category22KOrderType Order { get; set; }
     }
 }

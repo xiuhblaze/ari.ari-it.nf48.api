@@ -238,20 +238,32 @@ namespace Arysoft.ARI.NF48.Api.Services
             var tableType = AuditCycleCalculations
                 .GetMD5TableType(foundItem.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);            
             var maxRiskLevelCategory = AuditCycleCalculations
-                .GetMaxRiskLevelCategory(appFormItem);            
-            //var employees = GetEmployees(foundItem.Site ?? new Site());
-            var _totalWorkers = OrganizationCalculations.GetTotalWorkers(foundItem.Site);
-
+                .GetMaxRiskLevelCategory(appFormItem);
+            var _totalWorkers = OrganizationCalculations
+                .GetTotalWorkers(foundItem.Site);
             var md5Item = await new MD5Repository()
                 .GetItemByEmployeesAsync(_totalWorkers, tableType);
             var days = AuditCycleCalculations
                 .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
+            if (appFormItem.Standard.StandardBase == StandardBaseType.ISO22K)
+            {
+                var category22K = appFormItem.Category22K 
+                    ?? throw new BusinessException("The AppForm associated has an invalid Category22K.");
+                days += category22K?.BasicDaysTD ?? 0;
+                if (appFormItem.HACCPCount.HasValue && appFormItem.HACCPCount.Value > 1)
+                {
+                    int additionalHACCPDays = appFormItem.HACCPCount.Value - 1;
+                    days += additionalHACCPDays * (category22K?.HACCPDaysTH ?? 0);
+                }
+            }
+
             foundItem.MD5ID = md5Item.ID;
             foundItem.InitialMD5 = days;
-            //foundItem.NoEmployees = employees;
-            foundItem.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(foundItem.Site);
-            foundItem.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(foundItem.Site);
+            foundItem.WorkersOnSite = OrganizationCalculations
+                .GetWorkersOnSite(foundItem.Site);
+            foundItem.WorkersOffSite = OrganizationCalculations
+                .GetWorkersOffSite(foundItem.Site);
             foundItem.TotalWorkers = _totalWorkers;
 
             // Execute queries

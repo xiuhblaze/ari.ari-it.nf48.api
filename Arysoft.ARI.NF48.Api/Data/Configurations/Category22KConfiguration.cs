@@ -48,10 +48,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasPrecision(5, 2);
 
             modelBuilder.Entity<Category22K>()
-                .Property(m => m.Version)
-                .HasMaxLength(25);
-
-            modelBuilder.Entity<Category22K>()
                 .Property(m => m.Status)
                 .IsRequired();
 
