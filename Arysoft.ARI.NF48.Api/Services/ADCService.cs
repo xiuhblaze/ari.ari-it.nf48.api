@@ -629,15 +629,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 // Si es 22K sumar los días TD y TH en base a la categoria indicada en el AppForm
                 if (item.Standard.StandardBase == StandardBaseType.ISO22K)
                 {
-                    var category22K = appForm.Category22K
-                        ?? throw new BusinessException("The AppForm associated has an invalid Category22K.");
+                    days = AuditCycleCalculations
+                        .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);
+                    //var category22K = appForm.Category22K
+                    //    ?? throw new BusinessException("The AppForm associated has an invalid Category22K.");
 
-                    days += category22K.BasicDaysTD ?? 0;                    
-                    if (appForm.HACCPCount.HasValue && appForm.HACCPCount.Value > 1) // multiplicar por cada HACCP adicional
-                    { 
-                        int additionalHACCPDays = appForm.HACCPCount.Value - 1;
-                        days += (category22K.HACCPDaysTH ?? 0) * additionalHACCPDays;
-                    }
+                    //days += category22K.BasicDaysTD ?? 0;                    
+                    //if (appForm.HACCPCount.HasValue && appForm.HACCPCount.Value > 1) // multiplicar por cada HACCP adicional
+                    //{ 
+                    //    int additionalHACCPDays = appForm.HACCPCount.Value - 1;
+                    //    days += (category22K.HACCPDaysTH ?? 0) * additionalHACCPDays;
+                    //}
                 }
 
                 var adcSite = new ADCSite
@@ -759,6 +761,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
                 //TODO: Falta validar para ISO22K  <- AQUI VOY
+                if (item.Standard.StandardBase == StandardBaseType.ISO22K)
+                {
+                    days = AuditCycleCalculations
+                        .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);
+                }
 
                 adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;

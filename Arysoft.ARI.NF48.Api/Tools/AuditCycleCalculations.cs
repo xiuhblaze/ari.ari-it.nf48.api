@@ -23,7 +23,14 @@ namespace Arysoft.ARI.NF48.Api.Tools
                 : md5.Days ?? 0;
         } // GetDaysByRiskLevelCategory
 
-        //TODO: AQUI VOY TAMBIEN
+        /// <summary>
+        /// Obtiene la suma adicional de dias iniciales según la categoría
+        /// ISO 22000 y el número de planes HACCP.
+        /// </summary>
+        /// <param name="days"></param>
+        /// <param name="category22K"></param>
+        /// <param name="haccpCount"></param>
+        /// <returns></returns>
         public static decimal GetInitialAuditDaysForISO22K(
             decimal days, 
             Category22K category22K,
