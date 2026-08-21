@@ -627,7 +627,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
                 // Si es 22K sumar los días TD y TH en base a la categoria indicada en el AppForm
-                if (item.Standard.StandardBase == StandardBaseType.ISO22K)
+                if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
                 {
                     days = AuditCycleCalculations
                         .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);
@@ -760,8 +760,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var md5Item = await md5Repository.GetItemByEmployeesAsync(totalWorkers, tableType);
                 var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
-                //TODO: Falta validar para ISO22K  <- AQUI VOY
-                if (item.Standard.StandardBase == StandardBaseType.ISO22K)
+                if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
                 {
                     days = AuditCycleCalculations
                         .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);

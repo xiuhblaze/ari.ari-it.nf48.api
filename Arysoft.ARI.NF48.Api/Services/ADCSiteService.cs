@@ -250,14 +250,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 days = AuditCycleCalculations
                     .GetInitialAuditDaysForISO22K(days, appFormItem.Category22K, appFormItem.HACCPCount ?? 0);
-                //var category22K = appFormItem.Category22K 
-                //    ?? throw new BusinessException("The AppForm associated has an invalid Category22K.");
-                //days += category22K?.BasicDaysTD ?? 0;
-                //if (appFormItem.HACCPCount.HasValue && appFormItem.HACCPCount.Value > 1)
-                //{
-                //    int additionalHACCPDays = appFormItem.HACCPCount.Value - 1;
-                //    days += additionalHACCPDays * (category22K?.HACCPDaysTH ?? 0);
-                //}
             }
 
             foundItem.MD5ID = md5Item.ID;

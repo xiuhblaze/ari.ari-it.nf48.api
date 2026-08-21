@@ -22,6 +22,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public ADCConceptUnitType? DecreaseUnit { get; set; }
 
+        public ADCConceptCustomFunctionType? CustomFunction { get; set; }
+
         public string HelpText { get; set; }
 
         public string ExtraInfo { get; set; }

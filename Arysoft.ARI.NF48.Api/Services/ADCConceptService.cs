@@ -175,6 +175,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Decrease = item.Decrease;
             foundItem.IncreaseUnit = item.IncreaseUnit; 
             foundItem.DecreaseUnit = item.DecreaseUnit;
+            foundItem.CustomFunction = item.CustomFunction;
             foundItem.HelpText = item.HelpText;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
