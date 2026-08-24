@@ -8,6 +8,7 @@ using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -162,7 +163,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCService.AddAsync: {ex.Message}");
             }
 
-            await AddSitesToNewADCAsync(item); // Agregar los Sites del AppForm al ADC
+            // Agregar los Sites del AppForm al ADC en ADCSites
+            if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
+            {
+                await ADCSitesToNewISO22KADCAsync(item);
+            }
+            else
+            {
+                await AddSitesToNewADCAsync(item); 
+            }
 
             // Recargar todo el item para recalcular los totales y MD5,
             // pues los ADCSites se agregaron en la bdd
@@ -626,22 +635,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var days = AuditCycleCalculations
                     .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
-                // Si es 22K sumar los días TD y TH en base a la categoria indicada en el AppForm
-                if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
-                {
-                    days = AuditCycleCalculations
-                        .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);
-                    //var category22K = appForm.Category22K
-                    //    ?? throw new BusinessException("The AppForm associated has an invalid Category22K.");
-
-                    //days += category22K.BasicDaysTD ?? 0;                    
-                    //if (appForm.HACCPCount.HasValue && appForm.HACCPCount.Value > 1) // multiplicar por cada HACCP adicional
-                    //{ 
-                    //    int additionalHACCPDays = appForm.HACCPCount.Value - 1;
-                    //    days += (category22K.HACCPDaysTH ?? 0) * additionalHACCPDays;
-                    //}
-                }
-
                 var adcSite = new ADCSite
                 {
                     ID = Guid.NewGuid(),
@@ -660,6 +653,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 };
                 adcSiteRepository.Add(adcSite);
 
+                // HACK: Considerar solo agregarlos en el sitio principal (IsMainSite)
                 // Agregar los ADCConceptValues si no existen
                 await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
 
@@ -669,6 +663,85 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             await adcSiteRepository.SaveChangesAsync();
         } // AddSitesToNewADCAsync
+
+        /// <summary>
+        /// Agrega los sites para un nuevo ADC en base a los sites del AppForm, 
+        /// pero con reglas especiales para ISO 22000
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        private async Task ADCSitesToNewISO22KADCAsync(ADC item)
+        {
+            var appFormRepository = new AppFormRepository();
+            var adcSiteRepository = new ADCSiteRepository();
+            var md5Repository = new MD5Repository();
+            var appForm = await appFormRepository.GetAsync(item.AppFormID)
+                ?? throw new BusinessException("The AppForm was not found.");
+
+            if (appForm.Sites == null || !appForm.Sites.Any())
+                throw new BusinessException("The AppForm does not have any Sites.");
+
+            var tableType = AuditCycleCalculations
+                .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            var maxRiskLevelCategory = AuditCycleCalculations
+                .GetMaxRiskLevelCategory(appForm);
+
+            // 1. Obtener el total de empleados de todos los Sites
+            // 2. Calcular los valores de TD y TH, es en general para todos los sites
+            // 3. Entregar el calculo de empleados TFTE para registrarlo en el sitio main
+            // 4. Para el resto de sitios, el numero de dias es el 50% de TD + TH + TFTE
+            var totalEmployeesAllSites = OrganizationCalculations
+                .GetTotalWorkers(appForm.Sites.ToList());
+            var md5ItemAllSites = await md5Repository
+                .GetItemByEmployeesAsync(totalEmployeesAllSites, tableType);
+            var mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
+            mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
+
+            foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
+            {
+                var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
+                var adcSite = new ADCSite
+                { 
+                    ID = Guid.NewGuid(),
+                    ADCID = item.ID,
+                    SiteID = site.ID,
+                    TotalWorkers = totalWorkers,
+                    WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
+                    WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
+                    Created = DateTime.UtcNow,
+                    Updated = DateTime.UtcNow,
+                    UpdatedUser = item.UpdatedUser,
+                    Status = StatusType.Active
+                };
+
+                if (site.IsMainSite)
+                {
+                    adcSite.InitialMD5 = mainDays;
+                    adcSite.TotalInitial = mainDays;
+
+                    adcSiteRepository.Add(adcSite);
+                    // Agregar los ADCConceptValues si no existen - xB: 20260703 - En teoria
+                    // solo se necesitan una sola vez, no por cada sitio
+                    await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+                }
+                else 
+                { 
+                    var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario
+                    adcSite.InitialMD5 = halfDays; 
+                    adcSite.TotalInitial = halfDays;
+
+                    adcSiteRepository.Add(adcSite);
+                }
+
+                // Agregar los ADCSiteAudits si no existen
+                await AddADCSiteAuditsAsync(adcSite, appForm, appForm.Sites.Count > 1);
+            } // foreach site
+
+            await adcSiteRepository.SaveChangesAsync();
+        } // ADCSitesToNewISO22KADCAsync
 
         /// <summary>
         /// Revisa un ADC existente y actualiza sus sites en base a los sites del AppForm
@@ -691,11 +764,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             // TODO: Aun en pruebas este metodo -xB: 20260703, segimos: 20260723
 
             // Obtener el nivel de riesgo máximo del AppForm
-            var maxRiskLevel = AuditCycleCalculations.GetMaxRiskLevelCategory(appForm);
-
+            var maxRiskLevel = AuditCycleCalculations
+                .GetMaxRiskLevelCategory(appForm);
             // Obtener de acuerdo con el standard, el tipo de tabla MD5 a consultar
-            var tableType = AuditCycleCalculations.GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-
+            var tableType = AuditCycleCalculations
+                .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
             // 1. Obtener los Sites del AppForm y agregar solo los que no existen al ADC
             foreach (var site in appForm.Sites
                 .Where(s => s.Status == StatusType.Active))
@@ -704,9 +777,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                     continue; // El Site ya existe en el ADC, saltar al siguiente
 
                 var adcSite = new ADCSite();
-                var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
-                var md5Item = await md5Repository.GetItemByEmployeesAsync(totalWorkers, tableType);
-                var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
+                var totalWorkers = OrganizationCalculations
+                    .GetTotalWorkers(site);
+                var md5Item = await md5Repository
+                    .GetItemByEmployeesAsync(totalWorkers, tableType);
+                var days = AuditCycleCalculations
+                    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
                 adcSite.ID = Guid.NewGuid();
                 adcSite.ADCID = item.ID;
@@ -781,99 +857,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             await adcSiteRepository.SaveChangesAsync();
 
         } // UpdateSitesToExistingADCAsync
-
-        private async Task ProcesarADCAsync(ADC item)
-        {
-            var appFormRepository = new AppFormRepository();
-            var adcSiteRepository = new ADCSiteRepository();
-            var md5Repository = new MD5Repository();
-
-            var appForm = await appFormRepository.GetAsync(item.AppFormID)
-                ?? throw new BusinessException("The AppForm was not found.");
-
-            if (appForm.Sites == null || !appForm.Sites.Any())
-                throw new BusinessException("The AppForm does not have any Sites.");
-
-            //var adcSiteList = new List<ADCSite>();
-            //var maximumRiskLevel = await appFormRepository.GetMaximumRiskLevelCategoryAsync(appForm.ID);
-            var maxRiskLevelCategory = AuditCycleCalculations.GetMaxRiskLevelCategory(appForm);
-            //var tableType = MD5Service.GetTableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-            var tableType = AuditCycleCalculations.GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-
-            // - Obtener los Sites del AppForm y agregarlos al ADC
-            //HACK: Que pasa si se quita algun site del AppForm?
-            foreach (var site in appForm.Sites
-                .Where(s => s.Status == StatusType.Active))
-            {
-                //// - Obtener los Empleados de cada turno y sumarlos
-                //var noEmployees = site.Shifts
-                //    .Where(s => s.Status == StatusType.Active)
-                //    .Sum(s => s.NoEmployees) ?? 0;
-                //var _noEmployees = ADCSiteService.GetEmployees(site);
-                var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
-                //var _initialMD5 = await md5Repository.GetDaysAsync(_noEmployees, tableType, maxRiskLevelCategory);
-                var md5Item = await md5Repository.GetItemByEmployeesAsync(totalWorkers, tableType);
-                var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
-
-                //// - Obtener el MD5
-                //var initialMd5 = await md5Repository.GetDaysAsync(noEmployees);
-                ////var adcSite = item.ADCSites != null
-                ////    ? item.ADCSites.FirstOrDefault(s => s.SiteID == site.ID) ?? new ADCSite()
-                ////    : new ADCSite();
-
-                //var employeesMD5 = await ADCSiteService.GetEmployeesMD5Async(site.ID);
-
-                var adcSite = adcSiteRepository.Gets()
-                    .FirstOrDefault(s => s.SiteID == site.ID && s.ADCID == item.ID)
-                    ?? new ADCSite();
-
-                adcSite.InitialMD5 = days;
-                //adcSite.NoEmployees = _noEmployees;
-                adcSite.TotalWorkers = totalWorkers;
-                adcSite.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site);
-                adcSite.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site);
-                adcSite.Updated = DateTime.UtcNow;
-                adcSite.UpdatedUser = item.UpdatedUser;
-
-                if (adcSite.ID == Guid.Empty)
-                {
-                    adcSite.ID = Guid.NewGuid();
-                    adcSite.ADCID = item.ID;
-                    adcSite.SiteID = site.ID;
-                    adcSite.Created = DateTime.UtcNow;
-                    adcSite.Status = StatusType.Active;
-
-                    adcSiteRepository.Add(adcSite);
-                    //adcSiteList.Add(adcSite);
-                }
-                else 
-                { 
-                    adcSiteRepository.Update(adcSite);
-                    //adcSiteList.Add(adcSite);
-                }
-
-                // Agregar los ADCConceptValues si no existen
-                await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
-            } // foreach site
-
-            // HACK: Hacer un segundo foreach para eliminar los Sites que no están en el AppForm
-            var adcSitesFromBDD = adcSiteRepository.Gets()
-                .Where(s => s.ADCID == item.ID);
-
-            if (adcSitesFromBDD != null) // Esto aun no funciona, pues no se han subido a la bdd los nuevos sites en este momento
-            {
-                // - Eliminar los Sites que no están en el AppForm
-                var sitesToRemove = adcSitesFromBDD
-                    .Where(s => !appForm.Sites.Any(a => a.ID == s.SiteID))
-                    .ToList();
-                foreach (var siteToRemove in sitesToRemove)
-                {
-                    adcSiteRepository.Delete(siteToRemove);
-                }
-            }
-
-            await adcSiteRepository.SaveChangesAsync();
-        } // ProcesarADC
 
         /// <summary>
         /// Agrega los ADCConceptValues a un ADCSite en base a los ADCConcepts del Standard
@@ -1105,6 +1088,57 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return item;
         } // RecalcularTotales
+
+        private async Task<ADC> RecalcularTotalesForISO22KAsync(ADC item)
+        {
+            var md5Repository = new MD5Repository();
+
+            var appForm = item.AppForm 
+                ?? throw new BusinessException("The AppForm is required to recalculate totals for ISO 22000.");
+            var tableType = AuditCycleCalculations
+                .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            var maxRiskLevelCategory = AuditCycleCalculations
+                .GetMaxRiskLevelCategory(appForm);
+            var totalEmployeesAllSites = OrganizationCalculations
+                .GetTotalWorkers(appForm.Sites.ToList());
+            var md5ItemAllSites = await md5Repository
+                .GetItemByEmployeesAsync(totalEmployeesAllSites, tableType);
+            var mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
+            mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
+
+            if (item.ADCSites != null && item.ADCSites.Any())
+            {
+                foreach (var adcSite in item.ADCSites
+                    .Where(adcsite => adcsite.Status == StatusType.Active))
+                {
+                    adcSite.MD5ID = md5ItemAllSites.ID;
+                    adcSite.WorkersOnSite = OrganizationCalculations
+                        .GetWorkersOnSite(adcSite.Site);
+                    adcSite.WorkersOffSite = OrganizationCalculations
+                        .GetWorkersOffSite(adcSite.Site);
+                    adcSite.TotalWorkers = OrganizationCalculations
+                        .GetTotalWorkers(adcSite.WorkersOnSite, adcSite.WorkersOffSite);
+
+                    if (adcSite.Site.IsMainSite)
+                    {
+                        adcSite.InitialMD5 = mainDays;
+                        adcSite.TotalInitial = mainDays;
+                    }
+                    else
+                    {
+                        var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario 
+                        adcSite.InitialMD5 = halfDays;
+                        adcSite.TotalInitial = halfDays;
+                    }
+                }
+            }
+
+            //TODO: AQui me quedé, falta terminar la función para 22K
+
+            return item;
+        } // RecalcularTotalesForISO22KAsync
 
         private async Task<string> GetHistoricalDataJSONAsync(ADC item)
         {

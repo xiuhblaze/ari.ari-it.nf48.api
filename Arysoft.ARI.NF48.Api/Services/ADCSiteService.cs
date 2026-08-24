@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Http.Results;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
@@ -122,32 +121,27 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task<ADCSite> GetAsync(Guid id)
         {
             var _md5Repository = new MD5Repository();
-            //var _appFormRepository = new AppFormRepository();
             var item = await _repository.GetAsync(id)
                 ?? throw new BusinessException("The record was not found");
 
             // Get alerts
-            //var alerts = await GetAlertsAsync(item);
             var alerts = GetAlerts(item);
 
             if (alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
             {
                 // Volver a obtener el MD5 y guardar antes de enviar
-                
-                //var maximumRiskLevel = await _appFormRepository.GetMaximumRiskLevelCategoryAsync(item.ADC?.AppFormID ?? Guid.Empty);
-                var maxRiskLevelCategory = AuditCycleCalculations.GetMaxRiskLevelCategory(item.ADC?.AppForm ?? new AppForm());
-                //var tableType = MD5Service.GetTableType(item.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
-                var tableType = AuditCycleCalculations.GetMD5TableType(item.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
-
-                //var employeesMD5 = await GetEmployeesMD5Async(item.SiteID ?? Guid.Empty);
-                var _totalWorkers = OrganizationCalculations.GetTotalWorkers(item.Site);
-                //var _noEmployees = GetEmployees(item.Site ?? new Site());
-                var md5Item = await _md5Repository.GetItemByEmployeesAsync(_totalWorkers, tableType);
-                var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
-                //var _initialMD5 = await _md5Repository.GetDaysAsync(_noEmployees, tableType, maximumRiskLevel);
+                var maxRiskLevelCategory = AuditCycleCalculations
+                    .GetMaxRiskLevelCategory(item.ADC?.AppForm ?? new AppForm());
+                var tableType = AuditCycleCalculations
+                    .GetMD5TableType(item.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
+                var _totalWorkers = OrganizationCalculations
+                    .GetTotalWorkers(item.Site);
+                var md5Item = await _md5Repository
+                    .GetItemByEmployeesAsync(_totalWorkers, tableType);
+                var days = AuditCycleCalculations
+                    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
                 item.InitialMD5 = days;
-                //item.NoEmployees = _noEmployees;
                 item.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(item.Site);
                 item.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(item.Site);
                 item.TotalWorkers = _totalWorkers;
@@ -481,10 +475,6 @@ namespace Arysoft.ARI.NF48.Api.Services
         public static List<ADCSiteAlertType> GetAlerts(ADCSite item)
         {
             var alerts = new List<ADCSiteAlertType>();
-
-            //var noEmployees = item.Site.Shifts
-            //    .Where(s => s.Status == StatusType.Active)
-            //    .Sum(s => s.NoEmployees) ?? 0;
             var totalWorkers = OrganizationCalculations.GetTotalWorkers(item.Site);
 
             if (totalWorkers != (item.TotalWorkers ?? 0))
@@ -492,7 +482,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 alerts.Add(ADCSiteAlertType.EmployeesMistmatch);
             }
 
-            //// Concept value decrease exceeded
+            //// Concept value decrease exceeded - xB: 20260824 Creo que no se van a necesitar
             //if (item.TotalInitial != null && item.TotalInitial > 0
             //    && item.MD11 != null && item.MD11 < 0.7m * item.TotalInitial)
             //{
