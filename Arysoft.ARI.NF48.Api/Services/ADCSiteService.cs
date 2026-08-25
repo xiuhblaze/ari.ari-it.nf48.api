@@ -240,12 +240,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             var days = AuditCycleCalculations
                 .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
-            if (appFormItem.Standard.StandardBase == StandardBaseType.ISO22K)
-            {
-                days = AuditCycleCalculations
-                    .GetInitialAuditDaysForISO22K(days, appFormItem.Category22K, appFormItem.HACCPCount ?? 0);
-            }
-
             foundItem.MD5ID = md5Item.ID;
             foundItem.InitialMD5 = days;
             foundItem.WorkersOnSite = OrganizationCalculations
@@ -266,6 +260,53 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"ADCSite.UpdateEmployeesMD5Async: {ex.Message}");
             }
         } // UpdateEmployeesMD5Async
+
+        public async Task UpdateEmployeesDaysISO22KAsync(
+            Guid id, 
+            Guid md5ID,
+            decimal mainDays
+        )
+        {
+            var foundItem = await _repository.GetAsync(id)
+                ?? throw new BusinessException("The record to update was not found");
+            var appForm = foundItem.ADC?.AppForm;
+
+            if (appForm != null && foundItem.ADC != null)
+            {
+                appForm = await new AppFormRepository().GetAsync(foundItem.ADC.AppFormID)
+                    ?? throw new BusinessException("The Application Form associated with the ADC was not found");
+            }
+
+            foundItem.MD5ID = md5ID;
+            foundItem.WorkersOnSite = OrganizationCalculations
+                .GetWorkersOnSite(foundItem.Site);
+            foundItem.WorkersOffSite = OrganizationCalculations
+                .GetWorkersOffSite(foundItem.Site);
+            foundItem.TotalWorkers = OrganizationCalculations
+                .GetTotalWorkers(foundItem.WorkersOnSite, foundItem.WorkersOffSite);
+
+            if (foundItem.Site.IsMainSite)
+            {
+                foundItem.InitialMD5 = mainDays;
+                foundItem.TotalInitial = mainDays;
+            }
+            else
+            {
+                var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario 
+                foundItem.InitialMD5 = halfDays;
+                foundItem.TotalInitial = halfDays;
+            }
+
+            try
+            {
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCSite.UpdateEmployeesDaysISO22KAsync: {ex.Message}");
+            }
+        } // UpdateEmployeesDaysISO22KAsync
 
         public async Task<List<ADCSite>> UpdateListAsync(List<ADCSite> adcSites)
         {

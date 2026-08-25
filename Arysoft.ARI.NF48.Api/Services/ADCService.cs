@@ -8,7 +8,7 @@ using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
+//using System.Security.Policy;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -114,7 +114,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                             ?? throw new BusinessException("The ADC was not found after update sites.");
                     }
 
-                    item = await RecalcularTotalesAsync(item);
+                    // HACK: Revisar que realmente se actualice la información cuando es ISO22K
+                    if (item.AppForm.Standard.StandardBase == StandardBaseType.ISO22K)
+                        item = await RecalcularTotalesISO22KAsync(item);
+                    else
+                        item = await RecalcularTotalesAsync(item);
 
                     try
                     {
@@ -178,7 +182,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             var tmpItem = await _tmpADCRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
-            tmpItem = await RecalcularTotalesAsync(tmpItem);
+            if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
+            {
+                tmpItem = await RecalcularTotalesISO22KAsync(tmpItem);
+            }
+            else
+            {
+                tmpItem = await RecalcularTotalesAsync(tmpItem);
+            }
             _tmpADCRepository.Update(tmpItem);
 
             try
@@ -462,6 +473,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
 
+            if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
+            { 
+                var extraInfoData = new
+                {
+                    appForm.Category22KID,
+                    appForm.HACCPCount,
+                };            
+                item.ExtraInfoJSON = JsonSerializer.Serialize(extraInfoData);
+            }
+
             return item;
         } // SetValuesCreateItem
 
@@ -518,7 +539,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
             }
 
-            // Validar que si se marca IncludePreAudit, el ciclo de auditoria sea Initial y no tenga un registro de 
+            // Validar que si se marca IncludePreAudit, el ciclo de auditoria sea Initial
+            // y no tenga un registro de Pre-Audit
             if (item.IncludePreAudit ?? false) {
 
                 if (!await _repository.IsAuditCycleTypeByADCID(foundItem.ID, AuditCycleType.Initial))
@@ -599,6 +621,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                     : foundItem.Status;
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
+
+            if (foundItem.AppForm.Standard.StandardBase == StandardBaseType.ISO22K)
+            {
+                var extraInfoData = new
+                {
+                    foundItem.AppForm.Category22KID,
+                    foundItem.AppForm.HACCPCount,
+                };
+                foundItem.ExtraInfoJSON = JsonSerializer.Serialize(extraInfoData);
+            }
 
             return foundItem;
         } // SetValuesUpdateItem
@@ -699,6 +731,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
             mainDays = AuditCycleCalculations
                 .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
+            var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario
 
             foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
             {
@@ -721,18 +754,15 @@ namespace Arysoft.ARI.NF48.Api.Services
                 {
                     adcSite.InitialMD5 = mainDays;
                     adcSite.TotalInitial = mainDays;
-
                     adcSiteRepository.Add(adcSite);
                     // Agregar los ADCConceptValues si no existen - xB: 20260703 - En teoria
                     // solo se necesitan una sola vez, no por cada sitio
                     await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
                 }
                 else 
-                { 
-                    var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario
+                {
                     adcSite.InitialMD5 = halfDays; 
                     adcSite.TotalInitial = halfDays;
-
                     adcSiteRepository.Add(adcSite);
                 }
 
@@ -761,7 +791,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
 
-            // TODO: Aun en pruebas este metodo -xB: 20260703, segimos: 20260723
+            // TODO: Aun en pruebas este metodo -xB: 20260703,
+            //   segimos: 20260723, continua trabajando bien: 20260825
+            //   - Considerar la opción de refactorizar para que sea mas simple y
+            //     no se repita tanto código, pero por ahora funciona
 
             // Obtener el nivel de riesgo máximo del AppForm
             var maxRiskLevel = AuditCycleCalculations
@@ -790,14 +823,16 @@ namespace Arysoft.ARI.NF48.Api.Services
                 adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;
                 adcSite.TotalWorkers = totalWorkers;
-                adcSite.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site);
-                adcSite.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site);
+                adcSite.WorkersOnSite = OrganizationCalculations
+                    .GetWorkersOnSite(site);
+                adcSite.WorkersOffSite = OrganizationCalculations
+                    .GetWorkersOffSite(site);
                 adcSite.TotalInitial = days;
                 adcSite.Status = StatusType.Active;
                 adcSite.Created = DateTime.UtcNow;
                 adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
-        
+
                 adcSiteRepository.Add(adcSite);
 
                 // Agregar los ADCConceptValues si no existen
@@ -832,9 +867,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foreach (var adcSite in adcSitesToUpdate)
             {
-                var totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
-                var md5Item = await md5Repository.GetItemByEmployeesAsync(totalWorkers, tableType);
-                var days = AuditCycleCalculations.GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
+                var totalWorkers = OrganizationCalculations
+                    .GetTotalWorkers(adcSite.Site);
+                var md5Item = await md5Repository
+                    .GetItemByEmployeesAsync(totalWorkers, tableType);
+                var days = AuditCycleCalculations
+                    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
                 if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
                 {
@@ -845,8 +883,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 adcSite.MD5ID = md5Item.ID;
                 adcSite.InitialMD5 = days;
                 adcSite.TotalWorkers = totalWorkers;
-                adcSite.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(adcSite.Site);
-                adcSite.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(adcSite.Site);
+                adcSite.WorkersOnSite = OrganizationCalculations
+                    .GetWorkersOnSite(adcSite.Site);
+                adcSite.WorkersOffSite = OrganizationCalculations
+                    .GetWorkersOffSite(adcSite.Site);
                 adcSite.TotalInitial = days;
                 adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
@@ -1047,8 +1087,6 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <returns></returns>
         private async Task<ADC> RecalcularTotalesAsync(ADC item) 
         {
-            //var appFormRepository = new AppFormRepository();
-            //var md5Repository = new MD5Repository();
             var maxRiskLevelCategory = AuditCycleCalculations
                 .GetMaxRiskLevelCategory(item.AppForm);
 
@@ -1063,11 +1101,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 {
                     adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
                     var _totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
-                    //var md5Item = await md5Repository
-                    //    .GetItemByEmployeesAsync(_totalWorkers, tableType);
-                    //var days = AuditCycleCalculations
-                    //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
-
+         
                     if (_totalWorkers != adcSite.TotalWorkers) // Si el total de empleados del site ha cambiado
                     { 
                         var adcSiteService = new ADCSiteService();
@@ -1089,12 +1123,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             return item;
         } // RecalcularTotales
 
-        private async Task<ADC> RecalcularTotalesForISO22KAsync(ADC item)
+        private async Task<ADC> RecalcularTotalesISO22KAsync(ADC item)
         {
             var md5Repository = new MD5Repository();
 
             var appForm = item.AppForm 
                 ?? throw new BusinessException("The AppForm is required to recalculate totals for ISO 22000.");
+            
             var tableType = AuditCycleCalculations
                 .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
             var maxRiskLevelCategory = AuditCycleCalculations
@@ -1108,37 +1143,26 @@ namespace Arysoft.ARI.NF48.Api.Services
             mainDays = AuditCycleCalculations
                 .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
 
+            // Haya cambiado algo o no, recalcular los valores de los ADCSites
+
             if (item.ADCSites != null && item.ADCSites.Any())
             {
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
-                    adcSite.MD5ID = md5ItemAllSites.ID;
-                    adcSite.WorkersOnSite = OrganizationCalculations
-                        .GetWorkersOnSite(adcSite.Site);
-                    adcSite.WorkersOffSite = OrganizationCalculations
-                        .GetWorkersOffSite(adcSite.Site);
-                    adcSite.TotalWorkers = OrganizationCalculations
-                        .GetTotalWorkers(adcSite.WorkersOnSite, adcSite.WorkersOffSite);
-
-                    if (adcSite.Site.IsMainSite)
-                    {
-                        adcSite.InitialMD5 = mainDays;
-                        adcSite.TotalInitial = mainDays;
-                    }
-                    else
-                    {
-                        var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario 
-                        adcSite.InitialMD5 = halfDays;
-                        adcSite.TotalInitial = halfDays;
-                    }
+                    var adcSiteService = new ADCSiteService();
+                    await adcSiteService.UpdateEmployeesDaysISO22KAsync(
+                        adcSite.ID, 
+                        md5ItemAllSites.ID,
+                        mainDays
+                    );
                 }
             }
-
-            //TODO: AQui me quedé, falta terminar la función para 22K
+            
+            item.TotalWorkers = totalEmployeesAllSites;
 
             return item;
-        } // RecalcularTotalesForISO22KAsync
+        } // RecalcularTotalesISO22KAsync
 
         private async Task<string> GetHistoricalDataJSONAsync(ADC item)
         {
@@ -1236,7 +1260,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 } // Validando si cambia el numero de empleados
 
                 // Si falta asignar el sitio principal (que hayan
-                // actualizado los sitios y no esté le principal) o lo que sea
+                // actualizado los sitios y no esté el principal) o algo así
                 if (!item.ADCSites.Any(adcs => adcs.Site.IsMainSite
                     && adcs.Status == StatusType.Active
                     && adcs.Site.Status == StatusType.Active))
@@ -1271,9 +1295,35 @@ namespace Arysoft.ARI.NF48.Api.Services
                         alerts.Add(ADCAlertType.RiskLevelMistmatch);
                 }
 
-            } // if status < Inactive
+                // Si es Standard es ISO 22K y cambió en el AppForm la categoría de
+                // ISO 22K o el número de planes HACCP
+                if (item.Standard?.StandardBase == StandardBaseType.ISO22K)
+                {
+                    Guid? categoryID = null;
+                    int? haccpCount = null;
 
-            // Otras alertas...
+                    using (var doc = JsonDocument.Parse(item.ExtraInfoJSON))
+                    {
+                        var root = doc.RootElement;
+                        categoryID = root.GetNullableGuid("Category22KID");
+                        haccpCount = root.GetNullableInt("HACCPCount");
+                    }
+
+                    // Cambió la categoría de ISO 22K
+                    if (item.AppForm.Category22KID != categoryID)
+                    {
+                        if (!alerts.Contains(ADCAlertType.Category22KMistmatch))
+                            alerts.Add(ADCAlertType.Category22KMistmatch);
+                    }
+
+                    // Cambió el número de planes HACCP
+                    if (item.AppForm.HACCPCount != haccpCount)
+                    {
+                        if (!alerts.Contains(ADCAlertType.HACCPCountMistmatch))
+                            alerts.Add(ADCAlertType.HACCPCountMistmatch);
+                    }
+                } // Si es ISO 22K
+            } // if status < Inactive
 
             return alerts;
         } // GetAlertsAsync

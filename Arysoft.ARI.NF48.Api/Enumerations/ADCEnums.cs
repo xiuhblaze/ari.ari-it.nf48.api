@@ -22,10 +22,12 @@
     }
 
     public enum ADCAlertType { 
-        Nothing,            // No hay alerta
-        EmployeesMistmatch, // Alerta de discrepancia en el número de empleados
-        SitesMistmatch,     // Alerta de discrepancia en el número de sitios
-        MainSiteMissing,    // Alerta de sitio principal faltante
-        RiskLevelMistmatch, // Alerta de discrepancia en el nivel de riesgo
+        Nothing,                // No hay alerta
+        EmployeesMistmatch,     // Alerta de discrepancia en el número de empleados
+        SitesMistmatch,         // Alerta de discrepancia en el número de sitios
+        MainSiteMissing,        // Alerta de sitio principal faltante
+        RiskLevelMistmatch,     // Alerta de discrepancia en el nivel de riesgo
+        Category22KMistmatch,   // Alerta de discrepancia en la categoría ISO 22000
+        HACCPCountMistmatch,    // Alerta de discrepancia en el número de planes HACCP
     }
 }

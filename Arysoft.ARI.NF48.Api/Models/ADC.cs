@@ -41,6 +41,8 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         // INTERNAL
 
+        public string ExtraInfoJSON { get; set; }
+
         public string HistoricalDataJSON { get; set; }
 
         // RELATIONS

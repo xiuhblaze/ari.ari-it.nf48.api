@@ -79,21 +79,21 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetADCSite
 
-        [HttpPost]
-        [ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]
-        public async Task<IHttpActionResult> PostADCSite([FromBody] ADCSiteItemCreateDto itemCreateDto)
-        {
-            if (!ModelState.IsValid)
-                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+        //[HttpPost]
+        //[ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]
+        //public async Task<IHttpActionResult> PostADCSite([FromBody] ADCSiteItemCreateDto itemCreateDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            var item = ADCSiteMapping
-                .ItemCreateDtoToADCSite(itemCreateDto);
-            var itemDto = ADCSiteMapping
-                .ADCSiteToItemDetailDto(await _service.AddAsync(item));
-            var response = new ApiResponse<ADCSiteItemDetailDto>(itemDto);
+        //    var item = ADCSiteMapping
+        //        .ItemCreateDtoToADCSite(itemCreateDto);
+        //    var itemDto = ADCSiteMapping
+        //        .ADCSiteToItemDetailDto(await _service.AddAsync(item));
+        //    var response = new ApiResponse<ADCSiteItemDetailDto>(itemDto);
 
-            return Ok(response);
-        } // PostADCSite
+        //    return Ok(response);
+        //} // PostADCSite - xB: Estos se crean desde el proceso de creación de ADC, no desde el endpoint
 
         [HttpPut]
         [ResponseType(typeof(ApiResponse<ADCSiteItemDetailDto>))]

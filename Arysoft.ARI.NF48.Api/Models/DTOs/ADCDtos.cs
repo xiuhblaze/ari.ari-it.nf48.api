@@ -209,4 +209,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCDeleteDto
+
+    public class ADCExtraInfo22KDto
+    {
+        public Guid? Category22KID { get; set; }
+        public int? HACCPCount { get; set; }
+    }
 }

@@ -606,6 +606,7 @@
     <Compile Include="Tools\FullName.cs" />
     <Compile Include="Tools\GetModelStateErrors.cs" />
     <Compile Include="Tools\GlobalCorsPolicyAttribute.cs" />
+    <Compile Include="Tools\JsonElementExtensions.cs" />
     <Compile Include="Tools\OrganizationCalculations.cs" />
     <Compile Include="Tools\TokenGenerator.cs" />
     <Compile Include="Tools\TokenValidationHandler.cs" />
