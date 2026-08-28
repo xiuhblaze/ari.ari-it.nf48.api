@@ -8,7 +8,6 @@ using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-//using System.Security.Policy;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -653,36 +652,40 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
 
-            var tableType = AuditCycleCalculations
-                .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-            var maxRiskLevelCategory = AuditCycleCalculations
-                .GetMaxRiskLevelCategory(appForm);
+            //var tableType = AuditCycleCalculations
+            //    .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            //var maxRiskLevelCategory = AuditCycleCalculations
+            //    .GetMaxRiskLevelCategory(appForm);
 
             // - Obtener los Sites del AppForm y agregarlos al ADC
             foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
             {   
-                var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
-                var md5Item = await md5Repository
-                    .GetItemByEmployeesAsync(totalWorkers, tableType);
-                var days = AuditCycleCalculations
-                    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
+                //var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
+                //var md5Item = await md5Repository
+                //    .GetItemByEmployeesAsync(totalWorkers, tableType);
+                //var days = AuditCycleCalculations
+                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
 
-                var adcSite = new ADCSite
-                {
-                    ID = Guid.NewGuid(),
-                    ADCID = item.ID,
-                    SiteID = site.ID,
-                    MD5ID = md5Item.ID,
-                    InitialMD5 = days,
-                    TotalWorkers = totalWorkers,
-                    WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
-                    WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
-                    TotalInitial = days,
-                    Created = DateTime.UtcNow,
-                    Updated = DateTime.UtcNow,
-                    UpdatedUser = item.UpdatedUser,
-                    Status = StatusType.Active
-                };
+                //var adcSite = new ADCSite
+                //{
+                //    ID = Guid.NewGuid(),
+                //    ADCID = item.ID,
+                //    SiteID = site.ID,
+                //    MD5ID = md5Item.ID,
+                //    InitialMD5 = days,
+                //    TotalWorkers = totalWorkers,
+                //    WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
+                //    WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
+                //    TotalInitial = days,
+                //    Created = DateTime.UtcNow,
+                //    Updated = DateTime.UtcNow,
+                //    UpdatedUser = item.UpdatedUser,
+                //    Status = StatusType.Active
+                //};
+
+                var adcSite = await ADCSiteService.CreateInitialDataAsync(item, site);
+                adcSite.UpdatedUser = item.UpdatedUser;
+
                 adcSiteRepository.Add(adcSite);
 
                 // HACK: Considerar solo agregarlos en el sitio principal (IsMainSite)
@@ -806,31 +809,33 @@ namespace Arysoft.ARI.NF48.Api.Services
             foreach (var site in appForm.Sites
                 .Where(s => s.Status == StatusType.Active))
             {
-                if (adcSiteRepository.Gets().Any(s => s.SiteID == site.ID && s.ADCID == item.ID))
-                    continue; // El Site ya existe en el ADC, saltar al siguiente
+                if (adcSiteRepository.Gets()
+                    .Any(s => s.SiteID == site.ID && s.ADCID == item.ID)
+                ) continue; // El Site ya existe en el ADC, saltar al siguiente
 
-                var adcSite = new ADCSite();
-                var totalWorkers = OrganizationCalculations
-                    .GetTotalWorkers(site);
-                var md5Item = await md5Repository
-                    .GetItemByEmployeesAsync(totalWorkers, tableType);
-                var days = AuditCycleCalculations
-                    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
+                var adcSite = await ADCSiteService.CreateInitialDataAsync(item, site);
+                //var adcSite = new ADCSite();
+                //var totalWorkers = OrganizationCalculations
+                //    .GetTotalWorkers(site);
+                //var md5Item = await md5Repository
+                //    .GetItemByEmployeesAsync(totalWorkers, tableType);
+                //var days = AuditCycleCalculations
+                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
-                adcSite.ID = Guid.NewGuid();
-                adcSite.ADCID = item.ID;
-                adcSite.SiteID = site.ID; 
-                adcSite.MD5ID = md5Item.ID;
-                adcSite.InitialMD5 = days;
-                adcSite.TotalWorkers = totalWorkers;
-                adcSite.WorkersOnSite = OrganizationCalculations
-                    .GetWorkersOnSite(site);
-                adcSite.WorkersOffSite = OrganizationCalculations
-                    .GetWorkersOffSite(site);
-                adcSite.TotalInitial = days;
-                adcSite.Status = StatusType.Active;
-                adcSite.Created = DateTime.UtcNow;
-                adcSite.Updated = DateTime.UtcNow;
+                //adcSite.ID = Guid.NewGuid();
+                //adcSite.ADCID = item.ID;
+                //adcSite.SiteID = site.ID; 
+                //adcSite.MD5ID = md5Item.ID;
+                //adcSite.InitialMD5 = days;
+                //adcSite.TotalWorkers = totalWorkers;
+                //adcSite.WorkersOnSite = OrganizationCalculations
+                //    .GetWorkersOnSite(site);
+                //adcSite.WorkersOffSite = OrganizationCalculations
+                //    .GetWorkersOffSite(site);
+                //adcSite.TotalInitial = days;
+                //adcSite.Status = StatusType.Active;
+                //adcSite.Created = DateTime.UtcNow;
+                //adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
 
                 adcSiteRepository.Add(adcSite);
@@ -859,7 +864,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await adcSiteRepository.DeleteByListToRemoveAsync(sitesToRemove);
             }
 
-            // 3. Actualizar los InitialMD5 de los sites que siguen en el ADC, en caso de que haya cambiado la categoria de Risk Level
+            // 3. Actualizar los InitialMD5 de los sites que siguen en el ADC,
+            // en caso de que haya cambiado la categoria de Risk Level
             List<ADCSite> adcSitesToUpdate = adcSiteRepository.Gets()
                 .Where(s => s.ADCID == item.ID
                     && appForm.Sites.Any(a => a.ID == s.SiteID))
@@ -867,28 +873,36 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foreach (var adcSite in adcSitesToUpdate)
             {
-                var totalWorkers = OrganizationCalculations
-                    .GetTotalWorkers(adcSite.Site);
-                var md5Item = await md5Repository
-                    .GetItemByEmployeesAsync(totalWorkers, tableType);
-                var days = AuditCycleCalculations
-                    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
+                //var totalWorkers = OrganizationCalculations
+                //    .GetTotalWorkers(adcSite.Site);
+                //var md5Item = await md5Repository
+                //    .GetItemByEmployeesAsync(totalWorkers, tableType);
+                //var days = AuditCycleCalculations
+                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
 
-                if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
-                {
-                    days = AuditCycleCalculations
-                        .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);
-                }
+                //if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
+                //{
+                //    days = AuditCycleCalculations
+                //        .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);
+                //}
 
-                adcSite.MD5ID = md5Item.ID;
-                adcSite.InitialMD5 = days;
-                adcSite.TotalWorkers = totalWorkers;
-                adcSite.WorkersOnSite = OrganizationCalculations
-                    .GetWorkersOnSite(adcSite.Site);
-                adcSite.WorkersOffSite = OrganizationCalculations
-                    .GetWorkersOffSite(adcSite.Site);
-                adcSite.TotalInitial = days;
-                adcSite.Updated = DateTime.UtcNow;
+                //adcSite.MD5ID = md5Item.ID;
+                //adcSite.InitialMD5 = days;
+                //adcSite.TotalWorkers = totalWorkers;
+                //adcSite.WorkersOnSite = OrganizationCalculations
+                //    .GetWorkersOnSite(adcSite.Site);
+                //adcSite.WorkersOffSite = OrganizationCalculations
+                //    .GetWorkersOffSite(adcSite.Site);
+                //adcSite.TotalInitial = days;
+                //adcSite.Updated = DateTime.UtcNow;
+                var _adcSite = await ADCSiteService.RefreshInitialDataAsync(adcSite);
+
+                adcSite.MD5ID = _adcSite.MD5ID;
+                adcSite.InitialMD5 = _adcSite.InitialMD5;
+                adcSite.TotalWorkers = _adcSite.TotalWorkers;
+                adcSite.WorkersOnSite = _adcSite.WorkersOnSite;
+                adcSite.WorkersOffSite = _adcSite.WorkersOffSite;
+                adcSite.TotalInitial = _adcSite.TotalInitial;
                 adcSite.UpdatedUser = item.UpdatedUser;
 
                 adcSiteRepository.Update(adcSite); // Ver sino se necesita UpdateValues, pues ya se tiene el objeto completo
@@ -1129,15 +1143,16 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var appForm = item.AppForm 
                 ?? throw new BusinessException("The AppForm is required to recalculate totals for ISO 22000.");
-            
-            var tableType = AuditCycleCalculations
-                .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+
+            //var tableType = AuditCycleCalculations
+            //    .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
+            //MD5TableType tableType = MD5TableType.FTE; // Para ISO 22000, siempre se usa FTE para calcular los días de auditoría
             var maxRiskLevelCategory = AuditCycleCalculations
                 .GetMaxRiskLevelCategory(appForm);
             var totalEmployeesAllSites = OrganizationCalculations
                 .GetTotalWorkers(appForm.Sites.ToList());
             var md5ItemAllSites = await md5Repository
-                .GetItemByEmployeesAsync(totalEmployeesAllSites, tableType);
+                .GetItemByEmployeesAsync(totalEmployeesAllSites, MD5TableType.FTE);
             var mainDays = AuditCycleCalculations
                 .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
             mainDays = AuditCycleCalculations
