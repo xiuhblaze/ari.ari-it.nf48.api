@@ -26,7 +26,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // METHODS
 
-        // CRUD
+        #region " CRUD "
 
         public PagedList<ADC> Gets(ADCQueryFilters filters)
         {
@@ -115,9 +115,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                     // HACK: Revisar que realmente se actualice la información cuando es ISO22K
                     if (item.AppForm.Standard.StandardBase == StandardBaseType.ISO22K)
-                        item = await RecalcularTotalesISO22KAsync(item);
+                        item = await RefreshInitialDataISO22KAsync(item);
                     else
-                        item = await RecalcularTotalesAsync(item);
+                        item = await RefreshInitialDataAsync(item);
 
                     try
                     {
@@ -183,11 +183,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
             {
-                tmpItem = await RecalcularTotalesISO22KAsync(tmpItem);
+                tmpItem = await RefreshInitialDataISO22KAsync(tmpItem);
             }
             else
             {
-                tmpItem = await RecalcularTotalesAsync(tmpItem);
+                tmpItem = await RefreshInitialDataAsync(tmpItem);
             }
             _tmpADCRepository.Update(tmpItem);
 
@@ -297,7 +297,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
-        // CASOS DE USO
+        #endregion
+
+        #region " CASOS DE USO "
 
         /// <summary>
         /// Establece el status de un ADC a Inactive
@@ -399,7 +401,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // RemoveProposalIDAsync
 
-        // PRIVATE
+        #endregion // CASOS DE USO
+
+        #region " PRIVATE "
 
         // - Create Item
 
@@ -652,6 +656,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
 
+            item.AppForm = appForm; // item no trae el AppForm porque es nuevo y se necesita en CreateInitialDataAsync
+
             //var tableType = AuditCycleCalculations
             //    .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
             //var maxRiskLevelCategory = AuditCycleCalculations
@@ -719,8 +725,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var tableType = AuditCycleCalculations
                 .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-            var maxRiskLevelCategory = AuditCycleCalculations
-                .GetMaxRiskLevelCategory(appForm);
+            //var maxRiskLevelCategory = AuditCycleCalculations // Pos es solo para 22K - 
+            //    .GetMaxRiskLevelCategory(appForm);
 
             // 1. Obtener el total de empleados de todos los Sites
             // 2. Calcular los valores de TD y TH, es en general para todos los sites
@@ -730,43 +736,53 @@ namespace Arysoft.ARI.NF48.Api.Services
                 .GetTotalWorkers(appForm.Sites.ToList());
             var md5ItemAllSites = await md5Repository
                 .GetItemByEmployeesAsync(totalEmployeesAllSites, tableType);
-            var mainDays = AuditCycleCalculations
-                .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
-            mainDays = AuditCycleCalculations
-                .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
-            var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario
+            //var mainDays = AuditCycleCalculations
+            //    .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
+            //mainDays = AuditCycleCalculations
+            //    .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
+            //var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario
+
+            item.AppForm = appForm; // item no trae el AppForm porque es nuevo y se necesita en CreateInitialDataAsync
 
             foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
             {
-                var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
-                var adcSite = new ADCSite
-                { 
-                    ID = Guid.NewGuid(),
-                    ADCID = item.ID,
-                    SiteID = site.ID,
-                    TotalWorkers = totalWorkers,
-                    WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
-                    WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
-                    Created = DateTime.UtcNow,
-                    Updated = DateTime.UtcNow,
-                    UpdatedUser = item.UpdatedUser,
-                    Status = StatusType.Active
-                };
+                //var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
+                //var adcSite = new ADCSite
+                //{ 
+                //    ID = Guid.NewGuid(),
+                //    ADCID = item.ID,
+                //    SiteID = site.ID,
+                //    TotalWorkers = totalWorkers,
+                //    WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
+                //    WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
+                //    Created = DateTime.UtcNow,
+                //    Updated = DateTime.UtcNow,
+                //    UpdatedUser = item.UpdatedUser,
+                //    Status = StatusType.Active
+                //};
+
+                //if (site.IsMainSite)
+                //{
+                //    adcSite.InitialMD5 = mainDays;
+                //    adcSite.TotalInitial = mainDays;
+                //    adcSiteRepository.Add(adcSite);
+                //    // Agregar los ADCConceptValues si no existen - xB: 20260703 - En teoria
+                //    // solo se necesitan una sola vez, no por cada sitio
+                //    await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+                //}
+                //else 
+                //{
+                //    adcSite.InitialMD5 = halfDays; 
+                //    adcSite.TotalInitial = halfDays;
+                //    adcSiteRepository.Add(adcSite);
+                //}
+                var adcSite = await ADCSiteService.CreateISO22KInitialDataAsync(item, site, md5ItemAllSites);
+                adcSite.UpdatedUser = item.UpdatedUser;
+                adcSiteRepository.Add(adcSite);
 
                 if (site.IsMainSite)
                 {
-                    adcSite.InitialMD5 = mainDays;
-                    adcSite.TotalInitial = mainDays;
-                    adcSiteRepository.Add(adcSite);
-                    // Agregar los ADCConceptValues si no existen - xB: 20260703 - En teoria
-                    // solo se necesitan una sola vez, no por cada sitio
                     await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
-                }
-                else 
-                {
-                    adcSite.InitialMD5 = halfDays; 
-                    adcSite.TotalInitial = halfDays;
-                    adcSiteRepository.Add(adcSite);
                 }
 
                 // Agregar los ADCSiteAudits si no existen
@@ -986,70 +1002,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var adcSiteAuditRepository = new ADCSiteAuditRepository();
             var listADCSiteAudits = new List<ADCSiteAudit>();
-            var stepList = new List<AuditStepType>();
+            var stepList = GetStepList(cycleType, initialStep, periodicity);
             var hasChanges = false;
-
-            switch (cycleType)
-            {
-                case AuditCycleType.Initial:
-                    stepList.Add(AuditStepType.Stage1); // para registrar los días de ST1
-                    stepList.Add(AuditStepType.Stage2);
-                    stepList.Add(AuditStepType.Surveillance1);
-                    stepList.Add(AuditStepType.Surveillance2);
-                    if (periodicity == AuditCyclePeriodicityType.Biannual)
-                    {
-                        stepList.Add(AuditStepType.Surveillance3);
-                        stepList.Add(AuditStepType.Surveillance4);
-                        stepList.Add(AuditStepType.Surveillance5);
-                    }
-                    break;
-                case AuditCycleType.Recertification:
-                    stepList.Add(AuditStepType.Recertification);
-                    stepList.Add(AuditStepType.Surveillance1);
-                    stepList.Add(AuditStepType.Surveillance2);
-                    if (periodicity == AuditCyclePeriodicityType.Biannual)
-                    {
-                        stepList.Add(AuditStepType.Surveillance3);
-                        stepList.Add(AuditStepType.Surveillance4);
-                        stepList.Add(AuditStepType.Surveillance5);
-                    }
-                    break;
-                case AuditCycleType.Transfer:
-                    switch (initialStep)
-                    {
-                        case AuditStepType.Recertification:
-                            stepList.Add(AuditStepType.Recertification);
-                            stepList.Add(AuditStepType.Surveillance1);
-                            stepList.Add(AuditStepType.Surveillance2);
-                            if (periodicity == AuditCyclePeriodicityType.Biannual)
-                            {
-                                stepList.Add(AuditStepType.Surveillance3);
-                                stepList.Add(AuditStepType.Surveillance4);
-                                stepList.Add(AuditStepType.Surveillance5);
-                            }
-                            break;
-                        case AuditStepType.Surveillance1:
-                            stepList.Add(AuditStepType.Surveillance1);
-                            stepList.Add(AuditStepType.Surveillance2);
-                            if (periodicity == AuditCyclePeriodicityType.Biannual)
-                            {
-                                stepList.Add(AuditStepType.Surveillance3);
-                                stepList.Add(AuditStepType.Surveillance4);
-                                stepList.Add(AuditStepType.Surveillance5);
-                            }
-                            break;
-                        case AuditStepType.Surveillance2:
-                            stepList.Add(AuditStepType.Surveillance2);
-                            if (periodicity == AuditCyclePeriodicityType.Biannual)
-                            {
-                                stepList.Add(AuditStepType.Surveillance3);
-                                stepList.Add(AuditStepType.Surveillance4);
-                                stepList.Add(AuditStepType.Surveillance5);
-                            }
-                            break;
-                    }
-                    break;
-            }
 
             foreach (AuditStepType step in stepList)
             {
@@ -1093,13 +1047,13 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // AddADCSiteAuditsAsync
 
         /// <summary>
-        /// Calcula los valores para un ADCSite tanto su numero de empleados como
+        /// Actualiza los valores para un ADCSite tanto su numero de empleados como
         /// el numero de dias en base a Employees Range (antes MD5), así como el 
         /// Total de Empleados del ADC
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        private async Task<ADC> RecalcularTotalesAsync(ADC item) 
+        private async Task<ADC> RefreshInitialDataAsync(ADC item) 
         {
             var maxRiskLevelCategory = AuditCycleCalculations
                 .GetMaxRiskLevelCategory(item.AppForm);
@@ -1107,19 +1061,20 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.ADCSites != null && item.ADCSites.Any())
             {
                 var totalWorkers = 0;
-                var tableType = AuditCycleCalculations
-                    .GetMD5TableType(item.Standard?.StandardBase ?? StandardBaseType.Nothing);
+                //var tableType = AuditCycleCalculations
+                //    .GetMD5TableType(item.Standard?.StandardBase ?? StandardBaseType.Nothing);
 
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
-                    adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
+                    //adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
                     var _totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
          
                     if (_totalWorkers != adcSite.TotalWorkers) // Si el total de empleados del site ha cambiado
                     { 
                         var adcSiteService = new ADCSiteService();
-                        await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID); // Aquí se actualiza el MD5ID y el total de dias iniciales (InitialMD5)
+                        await adcSiteService.UpdateInitialDataAsync(adcSite.ID); // Aquí se actualiza el total de empleados y el total de dias iniciales (InitialMD5)
+                        //await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID); // Aquí se actualiza el MD5ID y el total de dias iniciales (InitialMD5)
                     }
 
                     totalWorkers += _totalWorkers;
@@ -1135,9 +1090,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             item.RiskLevelCategory = maxRiskLevelCategory;
 
             return item;
-        } // RecalcularTotales
+        } // RefreshInitialDataAsync
 
-        private async Task<ADC> RecalcularTotalesISO22KAsync(ADC item)
+        private async Task<ADC> RefreshInitialDataISO22KAsync(ADC item)
         {
             var md5Repository = new MD5Repository();
 
@@ -1147,16 +1102,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             //var tableType = AuditCycleCalculations
             //    .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
             //MD5TableType tableType = MD5TableType.FTE; // Para ISO 22000, siempre se usa FTE para calcular los días de auditoría
-            var maxRiskLevelCategory = AuditCycleCalculations
-                .GetMaxRiskLevelCategory(appForm);
+            //var maxRiskLevelCategory = AuditCycleCalculations
+            //    .GetMaxRiskLevelCategory(appForm);
             var totalEmployeesAllSites = OrganizationCalculations
                 .GetTotalWorkers(appForm.Sites.ToList());
-            var md5ItemAllSites = await md5Repository
-                .GetItemByEmployeesAsync(totalEmployeesAllSites, MD5TableType.FTE);
-            var mainDays = AuditCycleCalculations
-                .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
-            mainDays = AuditCycleCalculations
-                .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
+            //var md5ItemAllSites = await md5Repository
+            //    .GetItemByEmployeesAsync(totalEmployeesAllSites, MD5TableType.FTE);
+            //var mainDays = AuditCycleCalculations
+            //    .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, RiskLevelCategoryType.Medium);
+            //mainDays = AuditCycleCalculations
+            //    .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
 
             // Haya cambiado algo o no, recalcular los valores de los ADCSites
 
@@ -1166,18 +1121,19 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
                     var adcSiteService = new ADCSiteService();
-                    await adcSiteService.UpdateEmployeesDaysISO22KAsync(
-                        adcSite.ID, 
-                        md5ItemAllSites.ID,
-                        mainDays
-                    );
+                    await adcSiteService.UpdateISO22KInitialDataAsync(adcSite.ID);
+                    //await adcSiteService.UpdateEmployeesDaysISO22KAsync(
+                    //    adcSite.ID, 
+                    //    md5ItemAllSites.ID,
+                    //    mainDays
+                    //);
                 }
             }
             
             item.TotalWorkers = totalEmployeesAllSites;
 
             return item;
-        } // RecalcularTotalesISO22KAsync
+        } // RefreshInitialDataISO22KAsync
 
         private async Task<string> GetHistoricalDataJSONAsync(ADC item)
         {
@@ -1233,7 +1189,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             return JsonSerializer.Serialize(historicalData);
         } // GetHistoricalDataJSON
 
-        // STATIC METHODS
+        #endregion // PRIVATE
+
+        #region STATIC METHODS
 
         /// <summary>
         /// Revisa de un ADC si tiene alertas y cuáles son
@@ -1311,7 +1269,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 }
 
                 // Si es Standard es ISO 22K y cambió en el AppForm la categoría de
-                // ISO 22K o el número de planes HACCP
+                // ISO 22K o el número de planes HACCP, cualquiera de estas dos
+                // situaciones puede cambiar el número de días de auditoría, por
+                // lo que se debe alertar al usuario
                 if (item.Standard?.StandardBase == StandardBaseType.ISO22K)
                 {
                     Guid? categoryID = null;
@@ -1370,5 +1330,84 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return true;
         } // SitesMistmatch
+
+        /// <summary>
+        /// Obtiene la lista de pasos de auditoría que corresponden a un ciclo de auditoría, 
+        /// considerando el tipo de ciclo, el paso inicial y la periodicidad.
+        /// </summary>
+        /// <param name="cycleType">Tipo de ciclo, ya sea Inicial, de Recertificación o de Transferencia</param>
+        /// <param name="initialStep">Paso inicial del ciclo - para ciclos de Transferencia</param>
+        /// <param name="periodicity">Periodicidad del ciclo</param>
+        /// <returns>Lista de pasos de auditoría correspondientes</returns>
+        private static List<AuditStepType> GetStepList(AuditCycleType cycleType, AuditStepType initialStep, AuditCyclePeriodicityType periodicity)
+        {
+            var stepList = new List<AuditStepType>();
+
+            switch (cycleType)
+            {
+                case AuditCycleType.Initial:
+                    stepList.Add(AuditStepType.Stage1); // para registrar los días de ST1
+                    stepList.Add(AuditStepType.Stage2);
+                    stepList.Add(AuditStepType.Surveillance1);
+                    stepList.Add(AuditStepType.Surveillance2);
+                    if (periodicity == AuditCyclePeriodicityType.Biannual)
+                    {
+                        stepList.Add(AuditStepType.Surveillance3);
+                        stepList.Add(AuditStepType.Surveillance4);
+                        stepList.Add(AuditStepType.Surveillance5);
+                    }
+                    break;
+                case AuditCycleType.Recertification:
+                    stepList.Add(AuditStepType.Recertification);
+                    stepList.Add(AuditStepType.Surveillance1);
+                    stepList.Add(AuditStepType.Surveillance2);
+                    if (periodicity == AuditCyclePeriodicityType.Biannual)
+                    {
+                        stepList.Add(AuditStepType.Surveillance3);
+                        stepList.Add(AuditStepType.Surveillance4);
+                        stepList.Add(AuditStepType.Surveillance5);
+                    }
+                    break;
+                case AuditCycleType.Transfer:
+                    switch (initialStep)
+                    {
+                        case AuditStepType.Recertification:
+                            stepList.Add(AuditStepType.Recertification);
+                            stepList.Add(AuditStepType.Surveillance1);
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                        case AuditStepType.Surveillance1:
+                            stepList.Add(AuditStepType.Surveillance1);
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                        case AuditStepType.Surveillance2:
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                    }
+                    break;
+            }
+
+            return stepList;
+        } // GetStepList
+
+        #endregion // STATIC METHODS
     }
 }

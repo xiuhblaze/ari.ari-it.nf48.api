@@ -227,6 +227,32 @@ namespace Arysoft.ARI.NF48.Api.Services
             return foundItem;
         } // UpdateAsync
 
+        public async Task UpdateInitialDataAsync(Guid adcSiteID)
+        {
+            var foundItem = await _repository.GetAsync(adcSiteID)
+                ?? throw new BusinessException("The record to update was not found");
+
+            var refreshedItem = await RefreshInitialDataAsync(foundItem);
+
+            foundItem.MD5ID = refreshedItem.MD5ID;
+            foundItem.InitialMD5 = refreshedItem.InitialMD5;
+            foundItem.TotalWorkers = refreshedItem.TotalWorkers;
+            foundItem.WorkersOnSite = refreshedItem.WorkersOnSite;
+            foundItem.WorkersOffSite = refreshedItem.WorkersOffSite;
+            
+            // Execute queries
+            
+            try
+            {
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCSite.UpdateInitialDataAsync: {ex.Message}");
+            }
+        } // UpdateInitialDataAsync
+
         [Obsolete("Use RefreshInitialDataAsync instead", false)]
         public async Task UpdateEmployeesMD5Async(Guid adcSiteID)
         {
@@ -272,14 +298,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // UpdateEmployeesMD5Async
 
-        public async Task UpdateEmployeesDaysISO22KAsync(
-            Guid id, 
-            Guid md5ID,
-            decimal mainDays
-        )
+        public async Task UpdateISO22KInitialDataAsync(Guid adcSiteID)
         {
-            var foundItem = await _repository.GetAsync(id)
+            var foundItem = await _repository.GetAsync(adcSiteID)
                 ?? throw new BusinessException("The record to update was not found");
+
+            var refreshedItem = await RefreshISO22KInitialDataAsync(foundItem);
+
+            foundItem.MD5ID = refreshedItem.MD5ID;
+            foundItem.InitialMD5 = refreshedItem.InitialMD5;
+            foundItem.TotalWorkers = refreshedItem.TotalWorkers;
+            foundItem.WorkersOnSite = refreshedItem.WorkersOnSite;
+            foundItem.WorkersOffSite = refreshedItem.WorkersOffSite;
             //var appForm = foundItem.ADC?.AppForm;
 
             //if (appForm == null && foundItem.ADC != null)
@@ -288,25 +318,25 @@ namespace Arysoft.ARI.NF48.Api.Services
             //        ?? throw new BusinessException("The Application Form associated with the ADC was not found");
             //}
 
-            foundItem.MD5ID = md5ID;
-            foundItem.WorkersOnSite = OrganizationCalculations
-                .GetWorkersOnSite(foundItem.Site);
-            foundItem.WorkersOffSite = OrganizationCalculations
-                .GetWorkersOffSite(foundItem.Site);
-            foundItem.TotalWorkers = OrganizationCalculations
-                .GetTotalWorkers(foundItem.WorkersOnSite, foundItem.WorkersOffSite);
+            //foundItem.MD5ID = md5ID;
+            //foundItem.WorkersOnSite = OrganizationCalculations
+            //    .GetWorkersOnSite(foundItem.Site);
+            //foundItem.WorkersOffSite = OrganizationCalculations
+            //    .GetWorkersOffSite(foundItem.Site);
+            //foundItem.TotalWorkers = OrganizationCalculations
+            //    .GetTotalWorkers(foundItem.WorkersOnSite, foundItem.WorkersOffSite);
 
-            if (foundItem.Site.IsMainSite)
-            {
-                foundItem.InitialMD5 = mainDays;
-                foundItem.TotalInitial = mainDays;
-            }
-            else
-            {
-                var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario 
-                foundItem.InitialMD5 = halfDays;
-                foundItem.TotalInitial = halfDays;
-            }
+            //if (foundItem.Site.IsMainSite)
+            //{
+            //    foundItem.InitialMD5 = mainDays;
+            //    foundItem.TotalInitial = mainDays;
+            //}
+            //else
+            //{
+            //    var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario 
+            //    foundItem.InitialMD5 = halfDays;
+            //    foundItem.TotalInitial = halfDays;
+            //}
 
             try
             {
@@ -335,14 +365,14 @@ namespace Arysoft.ARI.NF48.Api.Services
                 //var listConceptValues = new List<ADCConceptValue>();
 
                 await ValidateUpdateItemAsync(adcSite, foundItem);
-                //if (adcSite.ADC?.Standard?.StandardBase == StandardBaseType.ISO22K)
-                //{
-                //    await SetValuesUpdateItemISO22KAsync(adcSite, foundItem);
-                //}
-                //else
-                //{
+                if (adcSite.ADC?.Standard?.StandardBase == StandardBaseType.ISO22K)
+                { //TODO: AQUI VOY - Es necesario actualizar esta función
+                    await SetValuesUpdateItemISO22KAsync(adcSite, foundItem);
+                }
+                else
+                {
                     await SetValuesUpdateItemAsync(adcSite, foundItem);
-                //}
+                }
 
                 //if (adcSite.ADCConceptValues?.Any() ?? false) // en adcSite.ADCConceptValues traigo los nuevos valores
                 //{
@@ -407,7 +437,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
-        // PRIVATE
+        #region " PRIVATE "
 
         private async Task ValidateUpdateItemAsync(ADCSite item, ADCSite foundItem)
         {   
@@ -445,6 +475,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // NOTA: La mayoria de calculos se va a realizar en el frontend para que se
                 // aprueben en tiempo real
+                // NOTA 2: En teorian no deberia necesitarse esto, pues al enviarlo al
+                // frontend desde ADCService.GetAsync ya se calculan los valores de
+                // InitialMD5, TotalWorkers, WorkersOnSite y WorkersOffSite y no cambian
                 item = await RefreshInitialDataAsync(item);
                 //var totalWorkers = OrganizationCalculations.GetTotalWorkers(foundItem.Site);
                 //var tableType = AuditCycleCalculations
@@ -520,6 +553,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         //} // SetValuesUpdateItemISO22KAsync
 
+        #endregion " PRIVATE "
 
         #region " STATICS "
 
@@ -575,6 +609,45 @@ namespace Arysoft.ARI.NF48.Api.Services
             return adcSite;
         } // CreateInitialDataAsync
 
+        public static async Task<ADCSite> CreateISO22KInitialDataAsync(ADC adc, Site site, MD5 md5)
+        {
+            if (adc.AppForm == null)
+                throw new BusinessException("The ADC's AppForm is required to create the initial data for ADCSite.");
+
+            var mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysByRiskLevelCategory(md5, RiskLevelCategoryType.Medium);
+            var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
+            mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysForISO22K(mainDays, adc.AppForm.Category22K, adc.AppForm.HACCPCount ?? 0);
+            var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario
+
+            var adcSite = new ADCSite { 
+                ID = Guid.NewGuid(),
+                ADCID = adc.ID,
+                SiteID = site.ID,
+                MD5ID = md5.ID,
+                TotalWorkers = totalWorkers,
+                WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
+                WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
+                Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
+                Status = StatusType.Active
+            };
+
+            if (site.IsMainSite)
+            { 
+                adcSite.InitialMD5 = mainDays;
+                adcSite.TotalInitial = mainDays;
+            }
+            else
+            {
+                adcSite.InitialMD5 = halfDays;
+                adcSite.TotalInitial = halfDays;
+            }
+
+            return adcSite;
+        } // CreateISO22KInitialDataAsync
+
         /// <summary>
         /// Refresca los datos iniciales de un ADCSite, recalculando los 
         /// valores de InitialMD5, TotalWorkers, WorkersOnSite y 
@@ -610,6 +683,51 @@ namespace Arysoft.ARI.NF48.Api.Services
             
             return adcSite;
         } // RefreshInitialDataAsync
+
+        public static async Task<ADCSite> RefreshISO22KInitialDataAsync(ADCSite adcSite)
+        {
+            var appFormRepository = new AppFormRepository();
+            var md5Repository = new MD5Repository();
+            var adcSiteRepository = new ADCSiteRepository();
+
+            var foundItem = await adcSiteRepository.GetAsync(adcSite.ID, true)
+                ?? throw new BusinessException("The record to refresh was not found");
+
+            var appForm = await appFormRepository.GetAsync(foundItem.ADC.AppFormID)
+                ?? throw new BusinessException("The AppForm for refresh initial data was not found.");
+
+            var totalEmployeesAllSites = OrganizationCalculations
+                .GetTotalWorkers(appForm.Sites.ToList());
+            var md5ItemAllSites = await md5Repository
+                .GetItemByEmployeesAsync(totalEmployeesAllSites, MD5TableType.FTE);
+
+            var mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, RiskLevelCategoryType.Medium);
+            mainDays = AuditCycleCalculations
+                .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
+
+            adcSite.MD5ID = md5ItemAllSites.ID;
+            adcSite.WorkersOnSite = OrganizationCalculations
+                .GetWorkersOnSite(foundItem.Site);
+            adcSite.WorkersOffSite = OrganizationCalculations
+                .GetWorkersOffSite(foundItem.Site);
+            adcSite.TotalWorkers = OrganizationCalculations
+                .GetTotalWorkers(foundItem.WorkersOnSite, foundItem.WorkersOffSite);
+
+            if (foundItem.Site.IsMainSite)
+            {
+                adcSite.InitialMD5 = mainDays;
+                //adcSite.TotalInitial = mainDays;
+            }
+            else
+            {
+                var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario 
+                adcSite.InitialMD5 = halfDays;
+                //adcSite.TotalInitial = halfDays;
+            }
+
+            return adcSite;
+        } // RefreshISO22KInitialDataAsync
 
         //public static async Task<List<ADCSiteAlertType>> GetAlertsAsync(ADCSite item)
         //{
