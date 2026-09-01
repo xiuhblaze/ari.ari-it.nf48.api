@@ -829,7 +829,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // TODO: Considerar el validar por fechas de aplicación, que no este el año 2 un año fisico antes que año 1, etc.
 
             var standardRepository = new StandardRepository();
-
+            
             if (currentItem.Status == AppFormStatusType.Inactive
                 || currentItem.Status == AppFormStatusType.Deleted)
                 throw new BusinessException("The record is not editable");
@@ -1008,6 +1008,8 @@ namespace Arysoft.ARI.NF48.Api.Services
         // ISO 22K & HACCP
         private async Task ValidateAppFormFor22KAsync(AppForm newItem, AppForm currentItem)
         {
+            var category22KRepository = new Category22KRepository();
+
             var item = newItem.Status == currentItem.Status // El status no ha cambiado
                 ? currentItem
                 : newItem;
@@ -1015,8 +1017,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.Status >= AppFormStatusType.ApplicantReview
                 && item.Status <= AppFormStatusType.Active)
             {
-                if (item.Category22KID == null || item.Category22KID == Guid.Empty)
+                if (!newItem.Category22KID.HasValue || newItem.Category22KID.Value == Guid.Empty)
                     throw new BusinessException("The Application Form must have a category assigned");
+
+                var category22K = await category22KRepository.GetAsync(newItem.Category22KID.Value)
+                    ?? throw new BusinessException("The 22K Category is not found");
+                if (category22K.Status != StatusType.Active)
+                    throw new BusinessException("The Application Form must have an active category assigned");
 
                 if (item.HACCPCount == null || item.HACCPCount <= 0)
                     throw new BusinessException("The Application Form must have a valid HACCP number assigned");

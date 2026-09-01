@@ -104,8 +104,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 if (alerts.Count > 0)
                 {
-                    if (alerts.Contains(ADCAlertType.SitesMistmatch)
-                        || alerts.Contains(ADCAlertType.RiskLevelMistmatch))
+                    if (alerts.Contains(ADCAlertType.SitesMistmatch))
                     { 
                         await UpdateSitesToExistingADCAsync(item);
                         _repository.DetachAllEntities();
@@ -113,7 +112,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                             ?? throw new BusinessException("The ADC was not found after update sites.");
                     }
 
-                    // HACK: Revisar que realmente se actualice la información cuando es ISO22K
+                    //NOTA: Aun para las otras alertas no necesita algun proceso en
+                    //      particular, con hacer RefreshInitialData... es suficiente
+
                     if (item.AppForm.Standard.StandardBase == StandardBaseType.ISO22K)
                         item = await RefreshInitialDataISO22KAsync(item);
                     else
@@ -129,6 +130,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         throw new BusinessException($"ADCService.GetAsync.Update.RecalcularTotales: {ex.Message}");
                     }
 
+                    _repository.DetachAllEntities();
                     item = await _repository.GetAsync(item.ID)
                         ?? throw new BusinessException("The ADC was not found after and recalculation.");
                 }
@@ -182,13 +184,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ?? throw new BusinessException("The ADC was not found after creation.");
 
             if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
-            {
                 tmpItem = await RefreshInitialDataISO22KAsync(tmpItem);
-            }
             else
-            {
                 tmpItem = await RefreshInitialDataAsync(tmpItem);
-            }
             _tmpADCRepository.Update(tmpItem);
 
             try
@@ -227,40 +225,40 @@ namespace Arysoft.ARI.NF48.Api.Services
             return toUpdateItem;
         } // UpdateAsync
 
-        public async Task<ADC> UpdateCompleteADCAsync(ADC item)
-        {
-            var foundItem = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found");
+        //public async Task<ADC> UpdateCompleteADCAsync(ADC item)
+        //{
+        //    var foundItem = await _repository.GetAsync(item.ID)
+        //        ?? throw new BusinessException("The record to update was not found");
 
-            var _adcSitesService = new ADCSiteService();
+        //    var _adcSitesService = new ADCSiteService();
 
-            await ValidateUpdateItemAsync(item, foundItem);
-            await SetValuesUpdateItemAsync(item, foundItem);
+        //    await ValidateUpdateItemAsync(item, foundItem);
+        //    await SetValuesUpdateItemAsync(item, foundItem);
 
-            foundItem.Alerts = await GetAlertsAsync(foundItem);
+        //    foundItem.Alerts = await GetAlertsAsync(foundItem);
 
-            var listSites = new List<ADCSite>();
+        //    var listSites = new List<ADCSite>();
 
-            if (item.ADCSites?.Any() ?? false) // en item.ADCSites traigo los nuevos valores
-            {
-                listSites = await _adcSitesService
-                    .UpdateListAsync(item.ADCSites.ToList());
-            }
+        //    if (item.ADCSites?.Any() ?? false) // en item.ADCSites traigo los nuevos valores
+        //    {
+        //        listSites = await _adcSitesService
+        //            .UpdateListAsync(item.ADCSites.ToList());
+        //    }
 
-            try
-            {
-                _repository.Update(foundItem);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"ADCService.UpdateCompleteADCAsync: {ex.Message}");
-            }
+        //    try
+        //    {
+        //        _repository.Update(foundItem);
+        //        await _repository.SaveChangesAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new BusinessException($"ADCService.UpdateCompleteADCAsync: {ex.Message}");
+        //    }
 
-            foundItem.ADCSites = listSites;            
+        //    foundItem.ADCSites = listSites;            
             
-            return foundItem;
-        } // UpdateListAsync
+        //    return foundItem;
+        //} // UpdateListAsync
 
         public async Task DeleteAsync(ADC item)
         {
@@ -441,10 +439,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The Application Form already has a ADC with the same Cycle Year");
 
             // Validar que sea de un Standard valido, por lo pronto:
-            // * ISO 9001
-            // * ISO 14001
-            // * ISO 22000
-            // * ISO 45001
+            // ISO 9001, ISO 14001, ISO 22000, ISO 45001
             if (appForm.Standard.StandardBase != StandardBaseType.ISO9K 
                 && appForm.Standard.StandardBase != StandardBaseType.ISO14K
                 && appForm.Standard.StandardBase != StandardBaseType.ISO22K
@@ -454,6 +449,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validar que el AppForm tenga un Sitio principal activo
             if (!appForm.Sites.Any(s => s.IsMainSite && s.Status == StatusType.Active))
                 throw new BusinessException("The Application Form must have an active main Site to create an ADC.");
+
+            // Validaciones por Standard
+            if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
+            {
+                // Validaciones específicas para ISO 22000
+                if (appForm.Category22KID == null || appForm.Category22KID == Guid.Empty)
+                    throw new BusinessException("The Application Form must have a Category 22K to create an ADC.");
+
+                if (appForm.Category22K == null || appForm.Category22K.Status != StatusType.Active)
+                    throw new BusinessException("The Application Form must have an active Category 22K to create an ADC.");
+
+                if (appForm.HACCPCount == null || appForm.HACCPCount <= 0)
+                    throw new BusinessException("The application form must include at least one HACCP process for creating an ADC.");
+
+            }
 
         } // ValidateCreateItemAsync
 
@@ -658,37 +668,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             item.AppForm = appForm; // item no trae el AppForm porque es nuevo y se necesita en CreateInitialDataAsync
 
-            //var tableType = AuditCycleCalculations
-            //    .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-            //var maxRiskLevelCategory = AuditCycleCalculations
-            //    .GetMaxRiskLevelCategory(appForm);
-
             // - Obtener los Sites del AppForm y agregarlos al ADC
             foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
             {   
-                //var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
-                //var md5Item = await md5Repository
-                //    .GetItemByEmployeesAsync(totalWorkers, tableType);
-                //var days = AuditCycleCalculations
-                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
-
-                //var adcSite = new ADCSite
-                //{
-                //    ID = Guid.NewGuid(),
-                //    ADCID = item.ID,
-                //    SiteID = site.ID,
-                //    MD5ID = md5Item.ID,
-                //    InitialMD5 = days,
-                //    TotalWorkers = totalWorkers,
-                //    WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
-                //    WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
-                //    TotalInitial = days,
-                //    Created = DateTime.UtcNow,
-                //    Updated = DateTime.UtcNow,
-                //    UpdatedUser = item.UpdatedUser,
-                //    Status = StatusType.Active
-                //};
-
                 var adcSite = await ADCSiteService.CreateInitialDataAsync(item, site);
                 adcSite.UpdatedUser = item.UpdatedUser;
 
@@ -736,46 +718,11 @@ namespace Arysoft.ARI.NF48.Api.Services
                 .GetTotalWorkers(appForm.Sites.ToList());
             var md5ItemAllSites = await md5Repository
                 .GetItemByEmployeesAsync(totalEmployeesAllSites, tableType);
-            //var mainDays = AuditCycleCalculations
-            //    .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
-            //mainDays = AuditCycleCalculations
-            //    .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
-            //var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario
 
             item.AppForm = appForm; // item no trae el AppForm porque es nuevo y se necesita en CreateInitialDataAsync
 
             foreach (var site in appForm.Sites.Where(s => s.Status == StatusType.Active))
-            {
-                //var totalWorkers = OrganizationCalculations.GetTotalWorkers(site);
-                //var adcSite = new ADCSite
-                //{ 
-                //    ID = Guid.NewGuid(),
-                //    ADCID = item.ID,
-                //    SiteID = site.ID,
-                //    TotalWorkers = totalWorkers,
-                //    WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(site),
-                //    WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(site),
-                //    Created = DateTime.UtcNow,
-                //    Updated = DateTime.UtcNow,
-                //    UpdatedUser = item.UpdatedUser,
-                //    Status = StatusType.Active
-                //};
-
-                //if (site.IsMainSite)
-                //{
-                //    adcSite.InitialMD5 = mainDays;
-                //    adcSite.TotalInitial = mainDays;
-                //    adcSiteRepository.Add(adcSite);
-                //    // Agregar los ADCConceptValues si no existen - xB: 20260703 - En teoria
-                //    // solo se necesitan una sola vez, no por cada sitio
-                //    await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
-                //}
-                //else 
-                //{
-                //    adcSite.InitialMD5 = halfDays; 
-                //    adcSite.TotalInitial = halfDays;
-                //    adcSiteRepository.Add(adcSite);
-                //}
+            {   
                 var adcSite = await ADCSiteService.CreateISO22KInitialDataAsync(item, site, md5ItemAllSites);
                 adcSite.UpdatedUser = item.UpdatedUser;
                 adcSiteRepository.Add(adcSite);
@@ -810,11 +757,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (appForm.Sites == null || !appForm.Sites.Any())
                 throw new BusinessException("The AppForm does not have any Sites.");
 
-            // TODO: Aun en pruebas este metodo -xB: 20260703,
-            //   segimos: 20260723, continua trabajando bien: 20260825
-            //   - Considerar la opción de refactorizar para que sea mas simple y
-            //     no se repita tanto código, pero por ahora funciona
-
             // Obtener el nivel de riesgo máximo del AppForm
             var maxRiskLevel = AuditCycleCalculations
                 .GetMaxRiskLevelCategory(appForm);
@@ -830,28 +772,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ) continue; // El Site ya existe en el ADC, saltar al siguiente
 
                 var adcSite = await ADCSiteService.CreateInitialDataAsync(item, site);
-                //var adcSite = new ADCSite();
-                //var totalWorkers = OrganizationCalculations
-                //    .GetTotalWorkers(site);
-                //var md5Item = await md5Repository
-                //    .GetItemByEmployeesAsync(totalWorkers, tableType);
-                //var days = AuditCycleCalculations
-                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
-
-                //adcSite.ID = Guid.NewGuid();
-                //adcSite.ADCID = item.ID;
-                //adcSite.SiteID = site.ID; 
-                //adcSite.MD5ID = md5Item.ID;
-                //adcSite.InitialMD5 = days;
-                //adcSite.TotalWorkers = totalWorkers;
-                //adcSite.WorkersOnSite = OrganizationCalculations
-                //    .GetWorkersOnSite(site);
-                //adcSite.WorkersOffSite = OrganizationCalculations
-                //    .GetWorkersOffSite(site);
-                //adcSite.TotalInitial = days;
-                //adcSite.Status = StatusType.Active;
-                //adcSite.Created = DateTime.UtcNow;
-                //adcSite.Updated = DateTime.UtcNow;
                 adcSite.UpdatedUser = item.UpdatedUser;
 
                 adcSiteRepository.Add(adcSite);
@@ -888,29 +808,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 .ToList();
 
             foreach (var adcSite in adcSitesToUpdate)
-            {
-                //var totalWorkers = OrganizationCalculations
-                //    .GetTotalWorkers(adcSite.Site);
-                //var md5Item = await md5Repository
-                //    .GetItemByEmployeesAsync(totalWorkers, tableType);
-                //var days = AuditCycleCalculations
-                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
-
-                //if (appForm.Standard.StandardBase == StandardBaseType.ISO22K)
-                //{
-                //    days = AuditCycleCalculations
-                //        .GetInitialAuditDaysForISO22K(days, appForm.Category22K, appForm.HACCPCount ?? 0);
-                //}
-
-                //adcSite.MD5ID = md5Item.ID;
-                //adcSite.InitialMD5 = days;
-                //adcSite.TotalWorkers = totalWorkers;
-                //adcSite.WorkersOnSite = OrganizationCalculations
-                //    .GetWorkersOnSite(adcSite.Site);
-                //adcSite.WorkersOffSite = OrganizationCalculations
-                //    .GetWorkersOffSite(adcSite.Site);
-                //adcSite.TotalInitial = days;
-                //adcSite.Updated = DateTime.UtcNow;
+            {   
                 var _adcSite = await ADCSiteService.RefreshInitialDataAsync(adcSite);
 
                 adcSite.MD5ID = _adcSite.MD5ID;
@@ -1061,20 +959,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.ADCSites != null && item.ADCSites.Any())
             {
                 var totalWorkers = 0;
-                //var tableType = AuditCycleCalculations
-                //    .GetMD5TableType(item.Standard?.StandardBase ?? StandardBaseType.Nothing);
 
                 foreach (var adcSite in item.ADCSites
                     .Where(adcsite => adcsite.Status == StatusType.Active))
                 {
-                    //adcSite.TotalInitial = adcSite.InitialMD5 ?? 0;
                     var _totalWorkers = OrganizationCalculations.GetTotalWorkers(adcSite.Site);
          
                     if (_totalWorkers != adcSite.TotalWorkers) // Si el total de empleados del site ha cambiado
                     { 
                         var adcSiteService = new ADCSiteService();
                         await adcSiteService.UpdateInitialDataAsync(adcSite.ID); // Aquí se actualiza el total de empleados y el total de dias iniciales (InitialMD5)
-                        //await adcSiteService.UpdateEmployeesMD5Async(adcSite.ID); // Aquí se actualiza el MD5ID y el total de dias iniciales (InitialMD5)
                     }
 
                     totalWorkers += _totalWorkers;
@@ -1098,23 +992,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             var appForm = item.AppForm 
                 ?? throw new BusinessException("The AppForm is required to recalculate totals for ISO 22000.");
-
-            //var tableType = AuditCycleCalculations
-            //    .GetMD5TableType(appForm.Standard?.StandardBase ?? StandardBaseType.Nothing);
-            //MD5TableType tableType = MD5TableType.FTE; // Para ISO 22000, siempre se usa FTE para calcular los días de auditoría
-            //var maxRiskLevelCategory = AuditCycleCalculations
-            //    .GetMaxRiskLevelCategory(appForm);
             var totalEmployeesAllSites = OrganizationCalculations
                 .GetTotalWorkers(appForm.Sites.ToList());
-            //var md5ItemAllSites = await md5Repository
-            //    .GetItemByEmployeesAsync(totalEmployeesAllSites, MD5TableType.FTE);
-            //var mainDays = AuditCycleCalculations
-            //    .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, RiskLevelCategoryType.Medium);
-            //mainDays = AuditCycleCalculations
-            //    .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
 
             // Haya cambiado algo o no, recalcular los valores de los ADCSites
-
             if (item.ADCSites != null && item.ADCSites.Any())
             {
                 foreach (var adcSite in item.ADCSites
@@ -1122,11 +1003,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 {
                     var adcSiteService = new ADCSiteService();
                     await adcSiteService.UpdateISO22KInitialDataAsync(adcSite.ID);
-                    //await adcSiteService.UpdateEmployeesDaysISO22KAsync(
-                    //    adcSite.ID, 
-                    //    md5ItemAllSites.ID,
-                    //    mainDays
-                    //);
                 }
             }
             

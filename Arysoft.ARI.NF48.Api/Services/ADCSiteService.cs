@@ -127,27 +127,11 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Get alerts
             var alerts = GetAlerts(item);
 
-// TODO: Aun falta validar esta funcion para ISO22K
-
             if (alerts.Contains(ADCSiteAlertType.EmployeesMistmatch))
             {
-                // Volver a obtener el MD5 y guardar antes de enviar
-                //var maxRiskLevelCategory = AuditCycleCalculations
-                //    .GetMaxRiskLevelCategory(item.ADC?.AppForm ?? new AppForm());
-                //var tableType = AuditCycleCalculations
-                //    .GetMD5TableType(item.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
-                //var _totalWorkers = OrganizationCalculations
-                //    .GetTotalWorkers(item.Site);
-                //var md5Item = await _md5Repository
-                //    .GetItemByEmployeesAsync(_totalWorkers, tableType);
-                //var days = AuditCycleCalculations
-                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevelCategory);
-
-                //item.InitialMD5 = days;
-                //item.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(item.Site);
-                //item.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(item.Site);
-                //item.TotalWorkers = _totalWorkers;
-                item = await RefreshInitialDataAsync(item);
+                item = item.ADC.Standard.StandardBase == StandardBaseType.ISO22K
+                    ? await RefreshISO22KInitialDataAsync(item)
+                    : await RefreshInitialDataAsync(item);
 
                 _repository.Update(item);
                 try
@@ -203,15 +187,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             // HACK: IMPORTANTE Ver que realmente se va a seguir actualizando despues de que sea Inactive
 
             await ValidateUpdateItemAsync(item, foundItem);
-            //if (foundItem.ADC.Standard?.StandardBase == StandardBaseType.ISO22K)
-            //{
-            //    await SetValuesUpdateItemISO22KAsync(item, foundItem);
-            //}
-            //else
-            //{
-                await SetValuesUpdateItemAsync(item, foundItem);
-            //}
-
+            await SetValuesUpdateItemAsync(item, foundItem);
+            
             // Execute queries
 
             try
@@ -364,15 +341,8 @@ namespace Arysoft.ARI.NF48.Api.Services
                     ?? throw new BusinessException($"One of the records (ADC Site) to Update was not found: {adcSite.ID}");
                 //var listConceptValues = new List<ADCConceptValue>();
 
-                await ValidateUpdateItemAsync(adcSite, foundItem);
-                if (adcSite.ADC?.Standard?.StandardBase == StandardBaseType.ISO22K)
-                { //TODO: AQUI VOY - Es necesario actualizar esta función
-                    await SetValuesUpdateItemISO22KAsync(adcSite, foundItem);
-                }
-                else
-                {
-                    await SetValuesUpdateItemAsync(adcSite, foundItem);
-                }
+                await ValidateUpdateItemAsync(adcSite, foundItem);               
+                await SetValuesUpdateItemAsync(adcSite, foundItem);
 
                 //if (adcSite.ADCConceptValues?.Any() ?? false) // en adcSite.ADCConceptValues traigo los nuevos valores
                 //{
@@ -458,14 +428,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         } // ValidateUpdateItemAsync
 
         private async Task SetValuesUpdateItemAsync(ADCSite item, ADCSite foundItem)
-        {
-            //var appFormRepository = new AppFormRepository();
-            //var md5Repository = new MD5Repository();
-
-            //var appForm = await appFormRepository.GetAsync(foundItem.ADC.AppFormID)
-            //    ?? throw new BusinessException($"The AppForm was not found: {foundItem.ADC.AppFormID}.");
-            //var maxRiskLevel = AuditCycleCalculations.GetMaxRiskLevelCategory(appForm);
-
+        {   
             if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
             {
                 foundItem.SiteID = item.SiteID; // Solo se asigna si es nuevo
@@ -475,17 +438,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 // NOTA: La mayoria de calculos se va a realizar en el frontend para que se
                 // aprueben en tiempo real
-                // NOTA 2: En teorian no deberia necesitarse esto, pues al enviarlo al
+                // NOTA 2: En teoria no deberia necesitarse esto, pues al enviarlo al
                 // frontend desde ADCService.GetAsync ya se calculan los valores de
                 // InitialMD5, TotalWorkers, WorkersOnSite y WorkersOffSite y no cambian
-                item = await RefreshInitialDataAsync(item);
-                //var totalWorkers = OrganizationCalculations.GetTotalWorkers(foundItem.Site);
-                //var tableType = AuditCycleCalculations
-                //    .GetMD5TableType(foundItem.ADC?.Standard?.StandardBase ?? StandardBaseType.Nothing);
-                //var md5Item = await md5Repository
-                //    .GetItemByEmployeesAsync(totalWorkers, tableType);
-                //var days = AuditCycleCalculations
-                //    .GetInitialAuditDaysByRiskLevelCategory(md5Item, maxRiskLevel);
+                item = foundItem.ADC.Standard.StandardBase == StandardBaseType.ISO22K
+                    ? await RefreshISO22KInitialDataAsync(item)
+                    : await RefreshInitialDataAsync(item);
 
                 foundItem.MD5ID = item.ID;
                 foundItem.InitialMD5 = item.InitialMD5;
@@ -514,44 +472,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Updated = DateTime.UtcNow;
             foundItem.UpdatedUser = item.UpdatedUser;
         } // SetValuesUpdateItemAsync
-
-        //private async Task SetValuesUpdateItemISO22KAsync(ADCSite item, ADCSite foundItem)
-        //{
-        //    var appFormRepository = new AppFormRepository();
-        //    var md5Repository = new MD5Repository();
-
-        //    var appForm = await appFormRepository.GetAsync(foundItem.ADC.AppFormID)
-        //        ?? throw new BusinessException($"The AppForm was not found: {foundItem.ADC.AppFormID}.");
-        //    var maxRiskLevelCategory = AuditCycleCalculations
-        //        .GetMaxRiskLevelCategory(appForm);
-
-        //    if (foundItem.Status == StatusType.Nothing) // Si es nuevo...
-        //    {
-        //        foundItem.SiteID = item.SiteID; // Solo se asigna si es nuevo
-        //    }
-
-        //    var totalEmployeesAllSites = OrganizationCalculations
-        //        .GetTotalWorkers(appForm.Sites.ToList());
-        //    var md5ItemAllSites = await md5Repository
-        //        .GetItemByEmployeesAsync(totalEmployeesAllSites, MD5TableType.FTE);
-        //    var mainDays = AuditCycleCalculations
-        //        .GetInitialAuditDaysByRiskLevelCategory(md5ItemAllSites, maxRiskLevelCategory);
-        //    mainDays = AuditCycleCalculations
-        //        .GetInitialAuditDaysForISO22K(mainDays, appForm.Category22K, appForm.HACCPCount ?? 0);
-
-        //    if (item.Status < StatusType.Inactive) // Si está activo o es nuevo, recalcular
-        //    {
-
-        //        foundItem.MD5ID = md5ItemAllSites.ID;
-        //        foundItem.InitialMD5 = days;
-        //        foundItem.TotalWorkers = totalWorkers;
-        //        foundItem.WorkersOnSite = OrganizationCalculations.GetWorkersOnSite(foundItem.Site);
-        //        foundItem.WorkersOffSite = OrganizationCalculations.GetWorkersOffSite(foundItem.Site);
-        //    }
-
-        //    //TODO: AQUI VOY
-
-        //} // SetValuesUpdateItemISO22KAsync
 
         #endregion " PRIVATE "
 
@@ -712,7 +632,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             adcSite.WorkersOffSite = OrganizationCalculations
                 .GetWorkersOffSite(foundItem.Site);
             adcSite.TotalWorkers = OrganizationCalculations
-                .GetTotalWorkers(foundItem.WorkersOnSite, foundItem.WorkersOffSite);
+                .GetTotalWorkers(adcSite.WorkersOnSite, adcSite.WorkersOffSite);
 
             if (foundItem.Site.IsMainSite)
             {

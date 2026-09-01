@@ -20,7 +20,6 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public bool? IncludePreAudit { get; set; }  // Indica si se debe incluir la pre-auditoría en la Propuesta (por default en False)
 
-        //public int? TotalEmployees { get; set; }
         public int? TotalWorkers { get; set; }
 
         public decimal? TotalInitial { get; set; }

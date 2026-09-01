@@ -29,7 +29,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 CycleYear = item.CycleYear,
                 RiskLevelCategory = item.RiskLevelCategory,
                 IncludePreAudit = item.IncludePreAudit ?? false,
-                //TotalEmployees = item.TotalEmployees,
                 TotalWorkers = item.TotalWorkers,
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
@@ -65,7 +64,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 CycleYear = item.CycleYear,
                 RiskLevelCategory = item.RiskLevelCategory,
                 IncludePreAudit = item.IncludePreAudit ?? false,
-                //TotalEmployees = item.TotalEmployees,
                 TotalWorkers = item.TotalWorkers,
                 TotalInitial = item.TotalInitial,
                 TotalMD11 = item.TotalMD11,
@@ -80,6 +78,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = item.UpdatedUser,
                 // INTERNAL
                 HistoricalDataJSON = item.HistoricalDataJSON,
+                ExtraInfoJSON = item.ExtraInfoJSON,
                 // RELATIONS
                 AuditCycle = item.AuditCycle != null
                     ? AuditCycleMapping.AuditCycleToItemListDto(item.AuditCycle)
