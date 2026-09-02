@@ -18,6 +18,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 query = query.AsNoTracking();
 
             return await query
+                .Include(m => m.AuditCycle)
                 .Include(m => m.AppForm)
                 .Include("AppForm.Standard")
                 .Include("AppForm.RiskLevels")

@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Tools
@@ -80,5 +81,82 @@ namespace Arysoft.ARI.NF48.Api.Tools
                 : standardBase == StandardBaseType.HACCP ? MD5TableType.QMS     // En duda
                 : throw new BusinessException("The standard base type is not valid");
         } // GetMD5TableType
+
+        /// <summary>
+        /// Obtiene la lista de pasos de auditoría que corresponden a un ciclo de auditoría, 
+        /// considerando el tipo de ciclo, el paso inicial y la periodicidad.
+        /// </summary>
+        /// <param name="cycleType">Tipo de ciclo, ya sea Inicial, de Recertificación o de Transferencia</param>
+        /// <param name="initialStep">Paso inicial del ciclo - para ciclos de Transferencia</param>
+        /// <param name="periodicity">Periodicidad del ciclo</param>
+        /// <returns>Lista de pasos de auditoría correspondientes</returns>
+        public static List<AuditStepType> GetStepList(AuditCycleType cycleType, AuditStepType initialStep, AuditCyclePeriodicityType periodicity)
+        {
+            var stepList = new List<AuditStepType>();
+
+            switch (cycleType)
+            {
+                case AuditCycleType.Initial:
+                    stepList.Add(AuditStepType.Stage1); // para registrar los días de ST1
+                    stepList.Add(AuditStepType.Stage2);
+                    stepList.Add(AuditStepType.Surveillance1);
+                    stepList.Add(AuditStepType.Surveillance2);
+                    if (periodicity == AuditCyclePeriodicityType.Biannual)
+                    {
+                        stepList.Add(AuditStepType.Surveillance3);
+                        stepList.Add(AuditStepType.Surveillance4);
+                        stepList.Add(AuditStepType.Surveillance5);
+                    }
+                    break;
+                case AuditCycleType.Recertification:
+                    stepList.Add(AuditStepType.Recertification);
+                    stepList.Add(AuditStepType.Surveillance1);
+                    stepList.Add(AuditStepType.Surveillance2);
+                    if (periodicity == AuditCyclePeriodicityType.Biannual)
+                    {
+                        stepList.Add(AuditStepType.Surveillance3);
+                        stepList.Add(AuditStepType.Surveillance4);
+                        stepList.Add(AuditStepType.Surveillance5);
+                    }
+                    break;
+                case AuditCycleType.Transfer:
+                    switch (initialStep)
+                    {
+                        case AuditStepType.Recertification:
+                            stepList.Add(AuditStepType.Recertification);
+                            stepList.Add(AuditStepType.Surveillance1);
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                        case AuditStepType.Surveillance1:
+                            stepList.Add(AuditStepType.Surveillance1);
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                        case AuditStepType.Surveillance2:
+                            stepList.Add(AuditStepType.Surveillance2);
+                            if (periodicity == AuditCyclePeriodicityType.Biannual)
+                            {
+                                stepList.Add(AuditStepType.Surveillance3);
+                                stepList.Add(AuditStepType.Surveillance4);
+                                stepList.Add(AuditStepType.Surveillance5);
+                            }
+                            break;
+                    }
+                    break;
+            }
+
+            return stepList;
+        } // GetStepList
     } // AuditCycleCalculations
 }

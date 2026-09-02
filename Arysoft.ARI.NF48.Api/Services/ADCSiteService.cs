@@ -287,34 +287,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.TotalWorkers = refreshedItem.TotalWorkers;
             foundItem.WorkersOnSite = refreshedItem.WorkersOnSite;
             foundItem.WorkersOffSite = refreshedItem.WorkersOffSite;
-            //var appForm = foundItem.ADC?.AppForm;
-
-            //if (appForm == null && foundItem.ADC != null)
-            //{
-            //    appForm = await new AppFormRepository().GetAsync(foundItem.ADC.AppFormID)
-            //        ?? throw new BusinessException("The Application Form associated with the ADC was not found");
-            //}
-
-            //foundItem.MD5ID = md5ID;
-            //foundItem.WorkersOnSite = OrganizationCalculations
-            //    .GetWorkersOnSite(foundItem.Site);
-            //foundItem.WorkersOffSite = OrganizationCalculations
-            //    .GetWorkersOffSite(foundItem.Site);
-            //foundItem.TotalWorkers = OrganizationCalculations
-            //    .GetTotalWorkers(foundItem.WorkersOnSite, foundItem.WorkersOffSite);
-
-            //if (foundItem.Site.IsMainSite)
-            //{
-            //    foundItem.InitialMD5 = mainDays;
-            //    foundItem.TotalInitial = mainDays;
-            //}
-            //else
-            //{
-            //    var halfDays = mainDays / 2; // El 50% del sitio principal, para cualquier sitio secundario 
-            //    foundItem.InitialMD5 = halfDays;
-            //    foundItem.TotalInitial = halfDays;
-            //}
-
+            
             try
             {
                 _repository.Update(foundItem);
@@ -341,7 +314,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     ?? throw new BusinessException($"One of the records (ADC Site) to Update was not found: {adcSite.ID}");
                 //var listConceptValues = new List<ADCConceptValue>();
 
-                await ValidateUpdateItemAsync(adcSite, foundItem);               
+                await ValidateUpdateItemAsync(adcSite, foundItem);
                 await SetValuesUpdateItemAsync(adcSite, foundItem);
 
                 //if (adcSite.ADCConceptValues?.Any() ?? false) // en adcSite.ADCConceptValues traigo los nuevos valores
@@ -360,7 +333,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (areUpdatedItems)
             {
                 try
-                { 
+                {
                     await _repository.SaveChangesAsync();
                 }
                 catch (Exception ex)
