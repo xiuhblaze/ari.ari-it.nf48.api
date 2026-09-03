@@ -1,6 +1,5 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,13 +52,11 @@ namespace Arysoft.ARI.NF48.Api.Tools
                     totalWorkers = site.Shifts
                         .Where(i => i.Status == StatusType.Active)
                         .Sum(i => GetTotalWorkers(i));
-                        //.Sum(i => (i.WorkersOnSite ?? 0) + (i.WorkersOffSite ?? 0));
                 }
                 else
                 {
                     totalWorkers = site.Shifts
                         .Sum(i => GetTotalWorkers(i));
-                        //.Sum(i => (i.WorkersOnSite ?? 0) + (i.WorkersOffSite ?? 0));
                 }
 
                 return totalWorkers;
@@ -84,24 +81,11 @@ namespace Arysoft.ARI.NF48.Api.Tools
 
             if (onlyActive)
             {
-                //totalWorkers = sites.Where(i => i.Status == StatusType.Active)
-                //    .Sum(i =>
-                //    {
-                //        Func<Shift, int> selector = s => (s.WorkersOnSite ?? 0) + (s.WorkersOffSite ?? 0);
-                //        return i.Shifts
-                //            .Where(s => s.Status == StatusType.Active)
-                //            .Sum(selector);
-                //    });
                 totalWorkers = sites.Where(i => i.Status == StatusType.Active)
                     .Sum(i => GetTotalWorkers(i, onlyActive));
             }
             else
             {
-                //totalWorkers = sites.Sum(i =>
-                //    {
-                //        Func<Shift, int> selector = s => (s.WorkersOnSite ?? 0) + (s.WorkersOffSite ?? 0);
-                //        return i.Shifts.Sum(selector);
-                //    });
                 totalWorkers = sites.Sum(i => GetTotalWorkers(i, onlyActive));
             }
 

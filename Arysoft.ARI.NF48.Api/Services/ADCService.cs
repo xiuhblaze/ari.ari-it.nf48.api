@@ -228,41 +228,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             return toUpdateItem;
         } // UpdateAsync
 
-        //public async Task<ADC> UpdateCompleteADCAsync(ADC item)
-        //{
-        //    var foundItem = await _repository.GetAsync(item.ID)
-        //        ?? throw new BusinessException("The record to update was not found");
-
-        //    var _adcSitesService = new ADCSiteService();
-
-        //    await ValidateUpdateItemAsync(item, foundItem);
-        //    await SetValuesUpdateItemAsync(item, foundItem);
-
-        //    foundItem.Alerts = await GetAlertsAsync(foundItem);
-
-        //    var listSites = new List<ADCSite>();
-
-        //    if (item.ADCSites?.Any() ?? false) // en item.ADCSites traigo los nuevos valores
-        //    {
-        //        listSites = await _adcSitesService
-        //            .UpdateListAsync(item.ADCSites.ToList());
-        //    }
-
-        //    try
-        //    {
-        //        _repository.Update(foundItem);
-        //        await _repository.SaveChangesAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new BusinessException($"ADCService.UpdateCompleteADCAsync: {ex.Message}");
-        //    }
-
-        //    foundItem.ADCSites = listSites;            
-            
-        //    return foundItem;
-        //} // UpdateListAsync
-
         public async Task DeleteAsync(ADC item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
@@ -696,9 +661,11 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 adcSiteRepository.Add(adcSite);
 
-                // HACK: Considerar solo agregarlos en el sitio principal (IsMainSite)
-                // Agregar los ADCConceptValues si no existen
-                await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+                if (site.IsMainSite)
+                {
+                    // Agregar los ADCConceptValues si no existen, solo al sitio principal
+                    await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+                }
 
                 // Agregar los ADCSiteAudits si no existen
                 await _adcSiteAuditService.AddADCSiteAuditsAsync(adcSite, appForm);
@@ -798,7 +765,10 @@ namespace Arysoft.ARI.NF48.Api.Services
                 adcSiteRepository.Add(adcSite);
 
                 // Agregar los ADCConceptValues si no existen
-                await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+                if (site.IsMainSite)
+                {
+                    await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
+                }
                 // Agrega los ADCSiteAudits si no existen - NOTE: Puede que lo tenga que quitar y solo utilizar el de SyncADCSiteAuditsAsync
                 //await _adcSiteAuditService.AddADCSiteAuditsAsync(adcSite, appForm);
 
@@ -916,7 +886,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         //    var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing;
         //    var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
 
-        //    if (cycleType == AuditCycleType.Nothing 
+        //    if (cycleType == AuditCycleType.Nothing
         //        || (cycleType == AuditCycleType.Transfer && initialStep == AuditStepType.Nothing))
         //        throw new BusinessException("The Audit Cycle Type or Initial Step are not valid, can't be generate the ADCSiteAudits.");
 
@@ -941,8 +911,8 @@ namespace Arysoft.ARI.NF48.Api.Services
         //            ADCSiteID = adcSite.ID,
         //            Value = isOneOrMainSite, // si es un solo sitio o es el principal, por default en true (el sitio recibe todas las auditorias)
         //            AuditStep = step,
-        //            Days = isOneOrMainSite && step == AuditStepType.Stage1 
-        //                ? (decimal?)1 
+        //            Days = isOneOrMainSite && step == AuditStepType.Stage1
+        //                ? (decimal?)1
         //                : null,
         //            Status = StatusType.Active,
         //            Created = DateTime.UtcNow,
@@ -1140,13 +1110,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                     using (var doc = JsonDocument.Parse(item.ExtraInfoJSON))
                     {
                         var root = doc.RootElement;
-//TODO: Probar esto, tal parece que no esta entrando y ExtraInfoJSON tiene información
-                        // Solo comparamos si la propiedad CycleType existe y es de tipo string
-                        if (root.TryGetProperty("CycleType", out var cycleTypeProperty)
-                            && cycleTypeProperty.ValueKind == JsonValueKind.String)
+
+                        var cycleType = root.GetNullableInt("CycleType");
+                        if (cycleType.HasValue)
                         {
-                            var cycleType = cycleTypeProperty.GetString();
-                            if (cycleType != item.AuditCycle.CycleType.ToString()
+                            var cycleTypeEnum = (AuditCycleType)cycleType.Value;
+                            if (cycleTypeEnum != item.AuditCycle.CycleType
                                 && !alerts.Contains(ADCAlertType.CycleTypeMistmatch))
                             {
                                 alerts.Add(ADCAlertType.CycleTypeMistmatch);
@@ -1200,22 +1169,25 @@ namespace Arysoft.ARI.NF48.Api.Services
                     Guid? categoryID = null;
                     int? haccpCount = null;
 
-                    using (var doc = JsonDocument.Parse(item.ExtraInfoJSON))
+                    if (!string.IsNullOrEmpty(item.ExtraInfoJSON))
                     {
-                        var root = doc.RootElement;
-                        categoryID = root.GetNullableGuid("Category22KID");
-                        haccpCount = root.GetNullableInt("HACCPCount");
+                        using (var doc = JsonDocument.Parse(item.ExtraInfoJSON))
+                        {
+                            var root = doc.RootElement;
+                            categoryID = root.GetNullableGuid("Category22KID");
+                            haccpCount = root.GetNullableInt("HACCPCount");
+                        }
                     }
 
                     // Cambió la categoría de ISO 22K
-                    if (item.AppForm.Category22KID != categoryID)
+                    if (categoryID.HasValue && item.AppForm.Category22KID != categoryID.Value)
                     {
                         if (!alerts.Contains(ADCAlertType.Category22KMistmatch))
                             alerts.Add(ADCAlertType.Category22KMistmatch);
                     }
 
                     // Cambió el número de planes HACCP
-                    if (item.AppForm.HACCPCount != haccpCount)
+                    if (haccpCount.HasValue && item.AppForm.HACCPCount != haccpCount.Value)
                     {
                         if (!alerts.Contains(ADCAlertType.HACCPCountMistmatch))
                             alerts.Add(ADCAlertType.HACCPCountMistmatch);
@@ -1253,83 +1225,6 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return true;
         } // SitesMistmatch
-
-        ///// <summary>
-        ///// Obtiene la lista de pasos de auditoría que corresponden a un ciclo de auditoría, 
-        ///// considerando el tipo de ciclo, el paso inicial y la periodicidad.
-        ///// </summary>
-        ///// <param name="cycleType">Tipo de ciclo, ya sea Inicial, de Recertificación o de Transferencia</param>
-        ///// <param name="initialStep">Paso inicial del ciclo - para ciclos de Transferencia</param>
-        ///// <param name="periodicity">Periodicidad del ciclo</param>
-        ///// <returns>Lista de pasos de auditoría correspondientes</returns>
-        //private static List<AuditStepType> GetStepList(AuditCycleType cycleType, AuditStepType initialStep, AuditCyclePeriodicityType periodicity)
-        //{
-        //    var stepList = new List<AuditStepType>();
-
-        //    switch (cycleType)
-        //    {
-        //        case AuditCycleType.Initial:
-        //            stepList.Add(AuditStepType.Stage1); // para registrar los días de ST1
-        //            stepList.Add(AuditStepType.Stage2);
-        //            stepList.Add(AuditStepType.Surveillance1);
-        //            stepList.Add(AuditStepType.Surveillance2);
-        //            if (periodicity == AuditCyclePeriodicityType.Biannual)
-        //            {
-        //                stepList.Add(AuditStepType.Surveillance3);
-        //                stepList.Add(AuditStepType.Surveillance4);
-        //                stepList.Add(AuditStepType.Surveillance5);
-        //            }
-        //            break;
-        //        case AuditCycleType.Recertification:
-        //            stepList.Add(AuditStepType.Recertification);
-        //            stepList.Add(AuditStepType.Surveillance1);
-        //            stepList.Add(AuditStepType.Surveillance2);
-        //            if (periodicity == AuditCyclePeriodicityType.Biannual)
-        //            {
-        //                stepList.Add(AuditStepType.Surveillance3);
-        //                stepList.Add(AuditStepType.Surveillance4);
-        //                stepList.Add(AuditStepType.Surveillance5);
-        //            }
-        //            break;
-        //        case AuditCycleType.Transfer:
-        //            switch (initialStep)
-        //            {
-        //                case AuditStepType.Recertification:
-        //                    stepList.Add(AuditStepType.Recertification);
-        //                    stepList.Add(AuditStepType.Surveillance1);
-        //                    stepList.Add(AuditStepType.Surveillance2);
-        //                    if (periodicity == AuditCyclePeriodicityType.Biannual)
-        //                    {
-        //                        stepList.Add(AuditStepType.Surveillance3);
-        //                        stepList.Add(AuditStepType.Surveillance4);
-        //                        stepList.Add(AuditStepType.Surveillance5);
-        //                    }
-        //                    break;
-        //                case AuditStepType.Surveillance1:
-        //                    stepList.Add(AuditStepType.Surveillance1);
-        //                    stepList.Add(AuditStepType.Surveillance2);
-        //                    if (periodicity == AuditCyclePeriodicityType.Biannual)
-        //                    {
-        //                        stepList.Add(AuditStepType.Surveillance3);
-        //                        stepList.Add(AuditStepType.Surveillance4);
-        //                        stepList.Add(AuditStepType.Surveillance5);
-        //                    }
-        //                    break;
-        //                case AuditStepType.Surveillance2:
-        //                    stepList.Add(AuditStepType.Surveillance2);
-        //                    if (periodicity == AuditCyclePeriodicityType.Biannual)
-        //                    {
-        //                        stepList.Add(AuditStepType.Surveillance3);
-        //                        stepList.Add(AuditStepType.Surveillance4);
-        //                        stepList.Add(AuditStepType.Surveillance5);
-        //                    }
-        //                    break;
-        //            }
-        //            break;
-        //    }
-
-        //    return stepList;
-        //} // GetStepList
 
         #endregion // STATIC METHODS
     }
