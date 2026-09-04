@@ -616,7 +616,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 } : null,
                 Companies = item.Organization.Companies
                     .Where(c => c.Status == StatusType.Active)
-                    .Select(c => new { c.ID, c.Name, c.LegalEntity, c.COID }),
+                    .Select(c => new { c.ID, c.Name, c.LegalEntity }),
                 Contacts = item.Contacts
                     .Where(c => c.Status == StatusType.Active)
                     .Select(c => new 

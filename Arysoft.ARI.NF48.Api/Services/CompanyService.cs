@@ -40,7 +40,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 items = items.Where(e =>
                     (e.Name != null && e.Name.ToLower().Contains(filters.Text))
                     || (e.LegalEntity != null && e.LegalEntity.ToLower().Contains(filters.Text))
-                    || (e.COID != null && e.COID.ToLower().Contains(filters.Text))
+                    //|| (e.COID != null && e.COID.ToLower().Contains(filters.Text))
                 );
             }
 
@@ -66,9 +66,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case CompanyOrderType.LegalEntity:
                     items = items.OrderBy(e => e.LegalEntity);
                     break;
-                case CompanyOrderType.COID:
-                    items = items.OrderBy(e => e.COID);
-                    break;
+                //case CompanyOrderType.COID:
+                //    items = items.OrderBy(e => e.COID);
+                //    break;
                 case CompanyOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
@@ -78,9 +78,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case CompanyOrderType.LegalEntityDesc:
                     items = items.OrderByDescending(e => e.LegalEntity);
                     break;
-                case CompanyOrderType.COIDDesc:
-                    items = items.OrderByDescending(e => e.COID);
-                    break;
+                //case CompanyOrderType.COIDDesc:
+                //    items = items.OrderByDescending(e => e.COID);
+                //    break;
                 case CompanyOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
@@ -155,7 +155,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Name = item.Name;
             foundItem.LegalEntity = item.LegalEntity;
-            foundItem.COID = item.COID;
+            //foundItem.COID = item.COID;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active
                 : item.Status != StatusType.Nothing

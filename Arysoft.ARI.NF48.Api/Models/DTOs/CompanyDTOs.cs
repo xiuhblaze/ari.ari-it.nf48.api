@@ -15,7 +15,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string LegalEntity { get; set; }
 
-        public string COID { get; set; }
+        //public string COID { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -36,7 +36,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string LegalEntity { get; set; }
 
-        public string COID { get; set; }
+        //public string COID { get; set; }
 
         public StatusType Status { get; set; }
 
@@ -74,8 +74,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string LegalEntity { get; set; }
                 
-        [StringLength(20)]
-        public string COID { get; set; }
+        //[StringLength(20)]
+        //public string COID { get; set; }
 
         [Required]
         public StatusType Status { get; set; }

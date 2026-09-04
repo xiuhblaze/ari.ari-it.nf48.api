@@ -28,7 +28,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
-                COID = item.COID,
+                //COID = item.COID,
                 Status = item.Status,
                 UpdatedUser = item.UpdatedUser,
                 OrganizationName = item.Organization != null
@@ -45,7 +45,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
-                COID = item.COID,
+                //COID = item.COID,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
@@ -72,7 +72,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Name = itemDto.Name,
                 LegalEntity = itemDto.LegalEntity,
-                COID = itemDto.COID,
+                //COID = itemDto.COID,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
             };

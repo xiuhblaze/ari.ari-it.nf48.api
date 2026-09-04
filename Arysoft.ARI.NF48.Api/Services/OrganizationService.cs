@@ -56,7 +56,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (e.Companies != null && e.Companies.Any(c => 
                         (c.Name != null && c.Name.ToLower().Contains(filters.Text))
                         || (c.LegalEntity != null && c.LegalEntity.ToLower().Contains(filters.Text))
-                        || (c.COID != null && c.COID.ToLower().Contains(filters.Text))
                     ))
                     || (e.Sites != null && e.Sites.Any(s => 
                         (s.Address != null && s.Address.ToLower().Contains(filters.Text))
@@ -458,10 +457,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (item.AuditCycles == null || item.AuditCycles.Count == 0)
                 throw new BusinessException("You must create one audit cycle and add the minimal documentation");
 
-            var auditCycle = item.AuditCycles.First(ac => ac.Status == StatusType.Active);
-
-            if (auditCycle == null)
-                throw new BusinessException("Must have at least one active audit cycle");
+            var auditCycle = item.AuditCycles.First(ac => ac.Status == StatusType.Active)
+                ?? throw new BusinessException("Must have at least one active audit cycle");
 
             if (auditCycle.AuditCycleDocuments == null || auditCycle.AuditCycleDocuments.Count == 0)
                 throw new BusinessException("The audit cycle don't have any document");

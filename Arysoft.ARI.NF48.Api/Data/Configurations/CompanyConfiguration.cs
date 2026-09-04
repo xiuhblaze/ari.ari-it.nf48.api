@@ -23,9 +23,9 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .Property(m => m.LegalEntity)
                 .HasMaxLength(50);
 
-            modelBuilder.Entity<Company>()
-                .Property(m => m.COID)
-                .HasMaxLength(20);
+            //modelBuilder.Entity<Company>()
+            //    .Property(m => m.COID)
+            //    .HasMaxLength(20);
 
             modelBuilder.Entity<Company>()
                 .Property(m => m.Status)
