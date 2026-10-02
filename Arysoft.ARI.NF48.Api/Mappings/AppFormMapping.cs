@@ -98,7 +98,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : new List<string>(),
                 Sites = item.Sites != null
                     ? item.Sites
-                        .OrderByDescending(s => s.IsMainSite)
+                        .OrderBy(s => s.Type)
                             .ThenBy(s => s.Description)
                         .Select(s => s.Description)
                         .ToList()
@@ -206,7 +206,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 Sites = item.Sites != null
                     ? SiteMapping.SiteToListDto(
-                        item.Sites.OrderByDescending(s => s.IsMainSite)
+                        item.Sites.OrderBy(s => s.Type)
                             .ThenBy(s => s.Description)
                         ).ToList()
                     : null,

@@ -62,18 +62,18 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Site.Description);
                     break;
                 case ADCSiteOrderType.IsMainSite:
-                    items = items.OrderByDescending(e => e.Site.IsMainSite)
+                    items = items.OrderBy(e => e.Site.Type)
                         .ThenByDescending(e => e.Site.Description);
                     break;
                 case ADCSiteOrderType.SiteDescriptionDesc:
                     items = items.OrderBy(e => e.Site.Description);
                     break;
                 case ADCSiteOrderType.IsMainSiteDesc:
-                    items = items.OrderByDescending(e => e.Site.IsMainSite)
+                    items = items.OrderByDescending(e => e.Site.Type)
                         .ThenByDescending(e => e.Site.Description);
                     break;
                 default:
-                    items = items.OrderByDescending(e => e.Site.IsMainSite)
+                    items = items.OrderBy(e => e.Site.Type)
                         .ThenByDescending(e => e.Site.Description);
                     break;
             }
@@ -527,7 +527,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 Status = StatusType.Active
             };
 
-            if (site.IsMainSite)
+            if (site.Type == SiteType.Main)
             { 
                 adcSite.InitialMD5 = mainDays;
                 adcSite.TotalInitial = mainDays;
@@ -607,7 +607,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             adcSite.TotalWorkers = OrganizationCalculations
                 .GetTotalWorkers(adcSite.WorkersOnSite, adcSite.WorkersOffSite);
 
-            if (foundItem.Site.IsMainSite)
+            if (foundItem.Site.Type == SiteType.Main)
             {
                 adcSite.InitialMD5 = mainDays;
                 //adcSite.TotalInitial = mainDays;

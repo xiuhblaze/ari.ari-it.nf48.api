@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Services;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteAddress = item.Site != null
                     ? item.Site.Address
                     : string.Empty,
-                IsMainSite = item.Site?.IsMainSite,
+                IsMainSite = item.Site?.Type == SiteType.Main,
                 MD5Range = item.MD5 != null
                     ? $"{item.MD5.StartValue} - {item.MD5.EndValue}"
                     : string.Empty,

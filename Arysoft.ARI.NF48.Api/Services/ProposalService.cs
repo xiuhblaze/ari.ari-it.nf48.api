@@ -450,7 +450,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var proposalAuditRepository = new ProposalAuditRepository();
             var mainADCSite = adc.ADCSites
                 .Where(adcs => adcs.Status == StatusType.Active
-                    && adcs.Site.IsMainSite)
+                    && adcs.Site.Type == SiteType.Main)
                 .FirstOrDefault()
                 ?? throw new BusinessException("The ADC does not have the main site");
             bool hasChanges = false;
@@ -511,7 +511,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             {
                 var mainSiteByProposal = adcByProposal.ADCSites
                     .Where(adcs => adcs.Status == StatusType.Active
-                        && adcs.Site.IsMainSite)
+                        && adcs.Site.Type == SiteType.Main)
                     .FirstOrDefault()
                     ?? throw new BusinessException("The ADC associated with the proposal does not have the main site");
 

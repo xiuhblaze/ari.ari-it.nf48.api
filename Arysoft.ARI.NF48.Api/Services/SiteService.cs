@@ -66,7 +66,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderBy(e => e.Description);
                     break;
                 case SiteOrderType.IsMainSite:
-                    items = items.OrderByDescending(e => e.IsMainSite)
+                    items = items.OrderBy(e => e.Type)
                         .ThenBy(e => e.Description);
                     break;
                 case SiteOrderType.Type:
@@ -77,7 +77,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     items = items.OrderByDescending(e => e.Description);
                     break;
                 case SiteOrderType.IsMainSiteDesc:
-                    items = items.OrderBy(e => e.IsMainSite)
+                    items = items.OrderByDescending(e => e.Type)
                         .ThenByDescending(e => e.Description);
                     break;
                 case SiteOrderType.TypeDesc:
@@ -85,7 +85,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         .ThenByDescending(e => e.Description);
                     break;
                 default:
-                    items = items.OrderByDescending(e => e.IsMainSite)
+                    items = items.OrderBy(e => e.Type)
                         .ThenBy(e => e.Description);
                     break;
             }
@@ -115,9 +115,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 ? proposalItem.ADCs.Where(adc => adc.ADCSites != null)
                     .SelectMany(adc => adc.ADCSites)
                     .Select(adcSite => adcSite.Site)
-                    .Distinct()
-                    .OrderByDescending(adc => adc.IsMainSite)
-                    .ThenBy(adc => adc.Description)
+                        .Distinct()
+                        .OrderBy(site => site.Type)
+                        .ThenBy(site => site.Description)
                     .ToList()
                 : new List<Site>();
 
@@ -183,7 +183,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var foundItem = await _siteRepository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
-            if (item.IsMainSite || item.Type == SiteType.Main)
+            if (item.Type == SiteType.Main)
             {
                 await _siteRepository.SetToNotSiteMainAsync(foundItem.OrganizationID);
             }
@@ -191,7 +191,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             foundItem.Description = item.Description;
-            foundItem.IsMainSite = item.Type == SiteType.Main; // item.IsMainSite;
+            //foundItem.IsMainSite = item.Type == SiteType.Main; // item.IsMainSite;
             foundItem.Address = item.Address;
             foundItem.Country = item.Country;
             foundItem.Type = item.Type;

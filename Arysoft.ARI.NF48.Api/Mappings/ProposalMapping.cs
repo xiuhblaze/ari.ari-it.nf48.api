@@ -152,7 +152,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                                 .Select(ads => ads.Site)
                                 .Distinct()
                             )
-                        .OrderByDescending(s => s.IsMainSite)
+                        .OrderBy(s => s.Type)
                         .ThenBy(s => s.Description)
                         .ToList()
                     : new List<SiteItemListDto>(),

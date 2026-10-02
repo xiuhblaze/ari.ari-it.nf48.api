@@ -256,7 +256,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 var currentSite = appForm.Sites
                     .Where(s => s.ID == adcSite.SiteID)
                     .FirstOrDefault() ?? new Site();
-                bool isOneOrMainSite = !isMultiSite || currentSite.IsMainSite;
+                bool isOneOrMainSite = !isMultiSite || currentSite.Type == SiteType.Main;
 
                 foreach (AuditStepType step in stepList)
                 {
@@ -316,7 +316,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             var currentSite = appForm.Sites
                 .Where(s => s.ID == adcSite.SiteID)
                 .FirstOrDefault() ?? new Site();
-            bool isOneOrMainSite = !isMultiSite || currentSite.IsMainSite;
+            bool isOneOrMainSite = !isMultiSite || currentSite.Type == SiteType.Main;
             var existingSteps = _repository.Gets()
                 .Where(x => x.ADCSiteID == adcSite.ID)
                 .Select(x => x.AuditStep)

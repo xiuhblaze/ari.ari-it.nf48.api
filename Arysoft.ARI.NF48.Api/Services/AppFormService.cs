@@ -632,7 +632,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Select(s => new {
                         s.ID,
                         s.Description,
-                        s.IsMainSite,
+                        s.Type,
                         s.Address,
                         s.Country,
                         Shifts = s.Shifts
@@ -740,7 +740,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!organization.Sites.Any(s => s.Status == StatusType.Active))
                 throw new BusinessException("The organization must have at least one active site");
 
-            if (!organization.Sites.Any(s => s.Status == StatusType.Active && s.IsMainSite))
+            if (!organization.Sites.Any(s => s.Status == StatusType.Active && s.Type == SiteType.Main))
                 throw new BusinessException("The organization must have an active main site");
 
             // - Validar que el Standard asociado al AuditCycle esté activo tanto en la
@@ -792,7 +792,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             var organization = await organizationRepository.GetAsync(appForm.OrganizationID)
                 ?? throw new BusinessException("AddMainSiteAsync: The organization was not found");
             var mainSite = organization.Sites
-                .Where(s => s.Status == StatusType.Active && (s.IsMainSite || s.Type == SiteType.Main))
+                .Where(s => s.Status == StatusType.Active 
+                    && (s.Type == SiteType.Main || s.Type == SiteType.Main)
+                )
                 .FirstOrDefault();
 
             if (mainSite != null)
@@ -958,7 +960,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 && item.Status <= AppFormStatusType.Active)
             {
                 // - Validar que tenga al menos un sitio activo y que sea el principal
-                if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.IsMainSite).Any())
+                if (!currentItem.Sites.Where(s => s.Status == StatusType.Active && s.Type == SiteType.Main).Any())
                     throw new BusinessException("The Application Form must have an active main site assigned");
 
                 // - Validar que tenga al menos un contacto asignado
@@ -1253,7 +1255,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 alerts.Add(AppFormAlertType.NoActiveSites);
 
             // - Que tenga al menos un sitio activo y que uno de ellos sea el sitio principal
-            if (item.Sites == null || !item.Sites.Any(s => s.Status == StatusType.Active && s.IsMainSite))
+            if (item.Sites == null || !item.Sites.Any(s => s.Status == StatusType.Active && s.Type == SiteType.Main))
                 alerts.Add(AppFormAlertType.MainSiteMissing);
 
             return alerts;

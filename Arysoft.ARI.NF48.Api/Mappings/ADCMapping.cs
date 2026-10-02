@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,7 +89,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     : null,
                 ADCSites = item.ADCSites != null
                     ? ADCSiteMapping.ADCSiteToListDto(
-                        item.ADCSites.OrderByDescending(x => x.Site?.IsMainSite)
+                        item.ADCSites.OrderBy(x => x.Site?.Type)
                             .ThenBy(x => x.Site?.Description)
                         ).ToList()
                     : null,

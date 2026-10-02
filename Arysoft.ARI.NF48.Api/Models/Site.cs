@@ -11,7 +11,7 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public string Description { get; set; }
 
-        public bool IsMainSite { get; set; }
+        // public bool IsMainSite { get; set; }
 
         public string Address { get; set; }
 

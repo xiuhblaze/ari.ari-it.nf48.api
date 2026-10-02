@@ -415,7 +415,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException("The Application Form Standard is not valid for creating an ADC.");
 
             // Validar que el AppForm tenga un Sitio principal activo
-            if (!appForm.Sites.Any(s => s.IsMainSite && s.Status == StatusType.Active))
+            if (!appForm.Sites.Any(s => s.Type == SiteType.Main && s.Status == StatusType.Active))
                 throw new BusinessException("The Application Form must have an active main Site to create an ADC.");
 
             // Validaciones por Standard
@@ -522,7 +522,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 {
                     // Validar que tenga el sitio principal
                     if (!foundItem.ADCSites.Any(adcs =>
-                        adcs.Site.IsMainSite
+                        adcs.Site.Type == SiteType.Main
                         && adcs.Status == StatusType.Active
                         && adcs.Site.Status == StatusType.Active))
                         throw new BusinessException("The ADC must have an active main Site.");
@@ -661,7 +661,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 adcSiteRepository.Add(adcSite);
 
-                if (site.IsMainSite)
+                if (site.Type == SiteType.Main)
                 {
                     // Agregar los ADCConceptValues si no existen, solo al sitio principal
                     await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
@@ -715,7 +715,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 adcSite.UpdatedUser = item.UpdatedUser;
                 adcSiteRepository.Add(adcSite);
 
-                if (site.IsMainSite)
+                if (site.Type == SiteType.Main)
                 {
                     await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
                 }
@@ -765,7 +765,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 adcSiteRepository.Add(adcSite);
 
                 // Agregar los ADCConceptValues si no existen
-                if (site.IsMainSite)
+                if (site.Type == SiteType.Main)
                 {
                     await RegisterADCConceptsAsync(adcSite, appForm.StandardID ?? Guid.Empty);
                 }
@@ -1037,7 +1037,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                     .Select(s => new {
                         s.SiteID,
                         s.Site.Description,
-                        s.Site.IsMainSite,
+                        s.Site.Type,
                         s.Site.Address,
                         s.Site.Country,
                         s.Site.LocationURL
@@ -1126,7 +1126,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
                 // Si falta asignar el sitio principal (que hayan
                 // actualizado los sitios y no esté el principal) o algo así
-                if (!item.ADCSites.Any(adcs => adcs.Site.IsMainSite
+                if (!item.ADCSites.Any(adcs => adcs.Site.Type == SiteType.Main
                     && adcs.Status == StatusType.Active
                     && adcs.Site.Status == StatusType.Active))
                 {

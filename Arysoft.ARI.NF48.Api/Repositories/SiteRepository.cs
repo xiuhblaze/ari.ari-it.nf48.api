@@ -19,12 +19,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             var items = await _model
                 .Where(m => m.OrganizationID == organizationID
-                    && (m.IsMainSite || m.Type == SiteType.Main))
+                    && (m.Type == SiteType.Main))
                 .ToListAsync();
 
             foreach (var item in items)
             {
-                item.IsMainSite = false;                
+                //item.IsMainSite = false;                
                 item.Type = SiteType.Secondary;                
                 Update(item);
             }

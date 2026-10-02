@@ -32,7 +32,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 .Where(c => c.IsMainContact && c.Status == StatusType.Active)
                 .FirstOrDefault();
             var mainSite = item.Sites?
-                .Where(s => s.IsMainSite)
+                .Where(s => s.Type == SiteType.Main)
                 .FirstOrDefault();
 
             // Si no hay un contacto principal, pone el que sea
@@ -163,7 +163,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Sites = item.Sites != null
                     ? SiteMapping.SiteToListDto(item.Sites
                         .Where(i => i.Status != StatusType.Nothing)
-                        .OrderByDescending(i => i.IsMainSite)
+                        .OrderBy(i => i.Type)
                         .ThenBy(i => i.Description))
                     : null,
                 Standards = item.OrganizationStandards != null
