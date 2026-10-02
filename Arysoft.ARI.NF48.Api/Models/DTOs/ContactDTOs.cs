@@ -18,7 +18,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Phone { get; set; }
 
-        public string PhoneAlt { get; set; }
+        // public string PhoneAlt { get; set; }
 
         public string Address { get; set; }
 
@@ -50,7 +50,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Phone { get; set; }
 
-        public string PhoneAlt { get; set; }
+        // public string PhoneAlt { get; set; }
 
         public string Address { get; set; }
 
@@ -105,8 +105,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(25)]
         public string Phone { get; set; }
 
-        [StringLength(25)]
-        public string PhoneAlt { get; set; }
+        //[StringLength(25)]
+        //public string PhoneAlt { get; set; }
 
         [StringLength(500)]
         public string Address { get; set; }

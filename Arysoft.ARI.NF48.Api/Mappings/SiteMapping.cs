@@ -1,6 +1,7 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
+using Arysoft.ARI.NF48.Api.Tools;
 using System.Collections.Generic;
 // using System.Data.Entity.Spatial;
 using System.Linq;
@@ -30,9 +31,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 OrganizationID = item.OrganizationID,
                 OrganizationName = item.Organization?.Name ?? string.Empty,
                 Description = item.Description,
-                IsMainSite = item.IsMainSite,
+                //IsMainSite = item.IsMainSite,
                 Address = item.Address,
                 Country = item.Country,
+                Type = item.Type,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 ShiftsCount = item.Shifts != null 
@@ -40,11 +42,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                         .Where(i => i.Status != StatusType.Nothing)
                         .Count() 
                     : 0,
-                EmployeesCount = item.Shifts != null 
-                    ? item.Shifts
-                        .Where(i => i.Status == StatusType.Active)
-                        .Sum(i => i.NoEmployees) ?? 0 
-                    : 0,
+                TotalWorkersOnSite = OrganizationCalculations.GetWorkersOnSite(item),
+                TotalWorkersOffSite = OrganizationCalculations.GetWorkersOffSite(item),
+                TotalWorkers = OrganizationCalculations.GetTotalWorkers(item),
                 Shifts = item.Shifts != null // Para el preview del AppForm
                     ? ShiftMapping.ShiftsToListDto(item.Shifts
                         .Where(i => i.Status != StatusType.Nothing))
@@ -59,9 +59,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 Description = item.Description,
-                IsMainSite = item.IsMainSite,
+                //IsMainSite = item.IsMainSite,
                 Address = item.Address,
                 Country = item.Country,
+                Type = item.Type,
                 LocationURL = item.LocationURL,
                 Status = item.Status,
                 Created = item.Created,
@@ -92,9 +93,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             { 
                 ID = itemDto.ID,
                 Description = itemDto.Description,
-                IsMainSite = itemDto.IsMainSite,
+                //IsMainSite = itemDto.IsMainSite,
                 Address = itemDto.Address,
                 Country = itemDto.Country,
+                Type = itemDto.Type,
                 LocationURL = itemDto.LocationURL,
                 Status = itemDto.Status,
                 UpdatedUser = itemDto.UpdatedUser
@@ -116,7 +118,5 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemDeleteDtoToSite
-
-
     }
 }

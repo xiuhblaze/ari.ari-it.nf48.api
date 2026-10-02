@@ -32,6 +32,10 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasPrecision(5, 2);
 
             modelBuilder.Entity<ADCConcept>()
+                .Property(m => m.HelpText)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<ADCConcept>()
                 .Property(m => m.ExtraInfo)
                 .HasMaxLength(500);
 

@@ -12,11 +12,15 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public Guid? MD5ID { get; set; }
 
-        public decimal? InitialMD5 { get; set; }    // Se obtiene de tabla MD5
-            
-        public int? NoEmployees { get; set; }       // Se obtiene de Sites
+        public decimal? InitialMD5 { get; set; }    // Total de días inicial, se obtiene de tabla MD5
 
-        public decimal? TotalInitial { get; set; }  // Se calcula con los descuentos a InitialMD5
+        public int? WorkersOnSite { get; set; }     // para normas como ISO 45001 que necesitan tener serparado los trabajdores en sitio y fuera de el, igual se obtiene de Sites/Shifts
+
+        public int? WorkersOffSite { get; set; }
+
+        public int? TotalWorkers { get; set; }       // Se obtiene de Sites -> shifts
+
+        public decimal? TotalInitial { get; set; }  // Total de días de auditoria, se calcula con los descuentos a InitialMD5
 
         public decimal? MD11 { get; set; }          // Ahora se va a manejar como porcentaje
 

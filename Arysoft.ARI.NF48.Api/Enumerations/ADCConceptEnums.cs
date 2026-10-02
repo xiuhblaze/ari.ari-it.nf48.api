@@ -7,6 +7,12 @@
         Days            // Días        
     }
 
+    public enum ADCConceptCustomFunctionType
+    {
+        Nothing,            // No se ha definido función        
+        ForAdditionalSite,  // Para sitio adicional
+    }
+
     public enum ADCConceptOrderType
     { 
         Nothing,

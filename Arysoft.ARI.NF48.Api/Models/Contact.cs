@@ -1,5 +1,4 @@
-﻿using Arysoft.ARI.NF48.Api.Enumerations;
-using System;
+﻿using System;
 
 namespace Arysoft.ARI.NF48.Api.Models
 {
@@ -16,8 +15,6 @@ namespace Arysoft.ARI.NF48.Api.Models
         public string Email { get; set; }
 
         public string Phone { get; set; }
-
-        public string PhoneAlt { get; set; }
 
         public string Address { get; set; }
 

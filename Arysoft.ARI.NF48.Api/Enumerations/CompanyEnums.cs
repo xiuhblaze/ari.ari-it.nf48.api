@@ -5,11 +5,11 @@
         Nothing,
         Name,
         LegalEntity,
-        COID,
+        //COID,
         Updated,
         NameDesc,
         LegalEntityDesc,
-        COIDDesc,
+        //COIDDesc,
         UpdatedDesc,
     }
 }

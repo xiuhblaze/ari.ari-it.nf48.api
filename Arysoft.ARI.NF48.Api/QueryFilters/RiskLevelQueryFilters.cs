@@ -7,7 +7,7 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
     {
         public Guid? StandardID { get; set; }
 
-        public RiskLevelCategory? Category { get; set; }
+        public RiskLevelCategoryType? Category { get; set; }
 
         public string Text { get; set; }
 

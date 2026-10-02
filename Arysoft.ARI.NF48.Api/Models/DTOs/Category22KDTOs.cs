@@ -20,6 +20,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Examples { get; set; }
 
+        public decimal? BasicDaysTD { get; set; }
+
+        public decimal? HACCPDaysTH { get; set; }
+
+        public Categories22KVersionType? Version { get; set; }
+
         public Category22KAccreditedType? AccreditedStatus { get; set; }
 
         public StatusType Status { get; set; }
@@ -40,6 +46,12 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string SubCategoryDescription { get; set; }
 
         public string Examples { get; set; }
+
+        public decimal? BasicDaysTD { get; set; }
+
+        public decimal? HACCPDaysTH { get; set; }
+
+        public Categories22KVersionType? Version { get; set; }
 
         public Category22KAccreditedType? AccreditedStatus { get; set; }
 
@@ -83,6 +95,17 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string SubCategoryDescription { get; set; }
 
         public string Examples { get; set; }
+
+        [Required]
+        [Range(0, 999.99)]
+        public decimal? BasicDaysTD { get; set; }
+
+        [Required]
+        [Range(0, 999.99)]
+        public decimal? HACCPDaysTH { get; set; }
+
+        [Required]
+        public Categories22KVersionType? Version { get; set; }
 
         public Category22KAccreditedType? AccreditedStatus { get; set; }
 

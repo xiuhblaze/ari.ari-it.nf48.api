@@ -19,11 +19,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public CycleYearType? CycleYear { get; set; }
 
-        //public string Description { get; set; }
+        public RiskLevelCategoryType? RiskLevelCategory { get; set; }
 
         public bool? IncludePreAudit { get; set; }
 
-        public int? TotalEmployees { get; set; }
+        public int? TotalWorkers { get; set; }
 
         public decimal? TotalInitial { get; set; }
 
@@ -79,11 +79,11 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public CycleYearType? CycleYear { get; set; }
 
-        // public string Description { get; set; }
+        public RiskLevelCategoryType? RiskLevelCategory { get; set; }
 
         public bool? IncludePreAudit { get; set; }
 
-        public int? TotalEmployees { get; set; }
+        public int? TotalWorkers { get; set; }
 
         public decimal? TotalInitial { get; set; }
 
@@ -110,6 +110,8 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // INTERNAL
 
         public string HistoricalDataJSON { get; set; }
+
+        public string ExtraInfoJSON { get; set; }
 
         // RELATIONS
 
@@ -145,9 +147,6 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
     {
         [Required]
         public Guid ID { get; set; }
-
-        //[StringLength(500)]
-        //public string Description { get; set; }
 
         [Required(ErrorMessage = "Indicate whether pre audit are included")]
         public bool? IncludePreAudit { get; set; }
@@ -210,4 +209,10 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         [StringLength(50)]
         public string UpdatedUser { get; set; }
     } // ADCDeleteDto
+
+    public class ADCExtraInfo22KDto
+    {
+        public Guid? Category22KID { get; set; }
+        public int? HACCPCount { get; set; }
+    }
 }

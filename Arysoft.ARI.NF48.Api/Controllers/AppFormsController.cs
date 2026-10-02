@@ -79,7 +79,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
             var item = AppFormMapping.ItemCreateDtoToAppForm(itemAddDto);
-            var itemDto = await AppFormMapping.AppFormToItemDetailDto(await _service.AddAsync(item));
+            var itemDto = await AppFormMapping
+                .AppFormToItemDetailDto(await _service.AddAsync(item));
             var response = new ApiResponse<AppFormItemDetailDto>(itemDto);
 
             return Ok(response);
@@ -111,7 +112,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
                 throw new BusinessException("The ID of the item does not match the ID of the request");
 
             var item = AppFormMapping.ItemUpdateDtoToAppForm(itemEditDto);            
-            var itemDto = await AppFormMapping.AppFormToItemDetailDto(await _service.UpdateAsync(item));
+            var itemDto = await AppFormMapping
+                .AppFormToItemDetailDto(await _service.UpdateAsync(item));
             var response = new ApiResponse<AppFormItemDetailDto>(itemDto);
 
             return Ok(response);

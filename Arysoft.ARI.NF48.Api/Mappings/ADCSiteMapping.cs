@@ -1,4 +1,5 @@
-﻿using Arysoft.ARI.NF48.Api.Models;
+﻿using Arysoft.ARI.NF48.Api.Enumerations;
+using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Services;
 using System.Collections.Generic;
@@ -29,7 +30,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteID = item.SiteID,
                 MD5ID = item.MD5ID,
                 InitialMD5 = item.InitialMD5,
-                NoEmployees = item.NoEmployees,
+                WorkersOnSite = item.WorkersOnSite,
+                WorkersOffSite = item.WorkersOffSite,
+                TotalWorkers = item.TotalWorkers,
                 TotalInitial = item.TotalInitial,
                 MD11 = item.MD11,
                 MD11Filename = item.MD11Filename,
@@ -48,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteAddress = item.Site != null
                     ? item.Site.Address
                     : string.Empty,
-                IsMainSite = item.Site?.IsMainSite,
+                IsMainSite = item.Site?.Type == SiteType.Main,
                 MD5Range = item.MD5 != null
                     ? $"{item.MD5.StartValue} - {item.MD5.EndValue}"
                     : string.Empty,
@@ -72,7 +75,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteID = item.SiteID,
                 MD5ID = item.MD5ID,
                 InitialMD5 = item.InitialMD5,
-                NoEmployees = item.NoEmployees,
+                WorkersOnSite = item.WorkersOffSite,
+                WorkersOffSite = item.WorkersOffSite,
+                TotalWorkers = item.TotalWorkers,
                 TotalInitial = item.TotalInitial,
                 MD11 = item.MD11,
                 MD11Filename = item.MD11Filename,

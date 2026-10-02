@@ -40,7 +40,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                     || (e.MiddleName != null && e.MiddleName.ToLower().Contains(filters.Text))
                     || (e.LastName != null && e.LastName.ToLower().Contains(filters.Text))
                     || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))
-                    || (e.PhoneAlt != null && e.PhoneAlt.ToLower().Contains(filters.Text))
                     || (e.Email != null && e.Email.ToLower().Contains(filters.Text))
                     || (e.Address != null && e.Address.ToLower().Contains(filters.Text))
                     || (e.Position != null && e.Position.ToLower().Contains(filters.Text))
@@ -195,7 +194,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.LastName = item.LastName;
             foundItem.Email = item.Email;
             foundItem.Phone = item.Phone;
-            foundItem.PhoneAlt = item.PhoneAlt;
             foundItem.Address = item.Address;
             foundItem.Position = item.Position;
             foundItem.PhotoFilename = item.PhotoFilename;
