@@ -2,9 +2,9 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
-using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -224,6 +224,145 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync
 
+        /// <summary>
+        /// Genera los registros de ADCSiteAudit para un ADCSite, de acuerdo al tipo de 
+        /// ciclo de auditoría del AppForm
+        /// </summary>
+        /// <param name="adcSite">ADCSite al cual asociar los ADCSiteAudits</param>
+        /// <param name="appForm">AppForm con la información del ciclo de auditoría</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task AddADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm)
+        {
+            if (adcSite == null) throw new BusinessException("The ADCSite is required.");
+            if (appForm == null) throw new BusinessException("The AppForm is required.");
+
+            bool isMultiSite = appForm.Sites.Count > 1;
+            var cycleType = appForm.AuditCycle.CycleType ?? AuditCycleType.Nothing;
+            var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing;
+            var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
+
+            if (cycleType == AuditCycleType.Nothing
+                || (cycleType == AuditCycleType.Transfer && initialStep == AuditStepType.Nothing))
+                throw new BusinessException("The Audit Cycle Type or Initial Step are not valid, can't be generate the ADCSiteAudits.");
+
+            if (periodicity == AuditCyclePeriodicityType.Nothing)
+                throw new BusinessException("The Audit Cycle Periodicity is not valid, can't be generate the ADCSiteAudits.");
+                        
+            var stepList = AuditCycleCalculations.GetStepList(cycleType, initialStep, periodicity);
+
+            if (stepList.Count > 0)
+            {
+                var currentSite = appForm.Sites
+                    .Where(s => s.ID == adcSite.SiteID)
+                    .FirstOrDefault() ?? new Site();
+                bool isOneOrMainSite = !isMultiSite || currentSite.Type == SiteType.Main;
+
+                foreach (AuditStepType step in stepList)
+                {
+                    var adcStepAudit = CreateTmpItem("system");
+
+                    adcStepAudit.ADCSiteID = adcSite.ID;
+                    adcStepAudit.Value = isOneOrMainSite; // si es un solo sitio o es el principal, por default en true (el sitio recibe todas las auditorias)
+                    adcStepAudit.AuditStep = step;
+                    adcStepAudit.Days = isOneOrMainSite && step == AuditStepType.Stage1
+                        ? (decimal?)1
+                        : null;
+
+                    _repository.Add(adcStepAudit);
+                }
+
+                try
+                {
+                    await _repository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new BusinessException($"ADCSiteAuditService.AddADCSiteAuditsToADCSiteAsync: {ex.Message}");
+                }
+            }
+        } // AddADCSiteAuditsAsync
+
+        /// <summary>
+        /// Sincroniza los registros de ADCSiteAudit para un ADCSite, de acuerdo con los
+        /// steps adecuados para el tipo de ciclo de auditoría. Agrega los que no existan
+        /// y elimina los que ya no correspondan.
+        /// </summary>
+        /// <param name="adcSite"></param>
+        /// <param name="appForm"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task SyncADCSiteAuditsAsync(ADCSite adcSite, AppForm appForm)
+        {
+            if (adcSite == null) throw new BusinessException("The ADCSite is required.");
+            if (appForm == null) throw new BusinessException("The AppForm is required.");
+
+            bool isMultiSite = appForm.Sites.Count > 1;
+            var cycleType = appForm.AuditCycle.CycleType ?? AuditCycleType.Nothing;
+            var initialStep = appForm.AuditCycle.InitialStep ?? AuditStepType.Nothing;
+            var periodicity = appForm.AuditCycle.Periodicity ?? AuditCyclePeriodicityType.Nothing;
+
+            if (cycleType == AuditCycleType.Nothing
+                || (cycleType == AuditCycleType.Transfer && initialStep == AuditStepType.Nothing))
+                throw new BusinessException("The Audit Cycle Type or Initial Step are not valid, can't be generate the ADCSiteAudits.");
+
+            if (periodicity == AuditCyclePeriodicityType.Nothing)
+                throw new BusinessException("The Audit Cycle Periodicity is not valid, can't be generate the ADCSiteAudits.");
+
+            var stepList = AuditCycleCalculations
+                .GetStepList(cycleType, initialStep, periodicity);
+
+            // 1. Agregar los Steps que no existan
+            var currentSite = appForm.Sites
+                .Where(s => s.ID == adcSite.SiteID)
+                .FirstOrDefault() ?? new Site();
+            bool isOneOrMainSite = !isMultiSite || currentSite.Type == SiteType.Main;
+            var existingSteps = _repository.Gets()
+                .Where(x => x.ADCSiteID == adcSite.ID)
+                .Select(x => x.AuditStep)
+                .ToList();
+            foreach (AuditStepType step in stepList)
+            {
+                if (!existingSteps.Contains(step))
+                {   
+                    var adcStepAudit = CreateTmpItem("system");
+
+                    adcStepAudit.ADCSiteID = adcSite.ID;
+                    adcStepAudit.Value = isOneOrMainSite; // si es un solo sitio o es el principal, por default en true (el sitio recibe todas las auditorias)
+                    adcStepAudit.AuditStep = step;
+                    adcStepAudit.Days = isOneOrMainSite && step == AuditStepType.Stage1
+                        ? (decimal?)1
+                        : null;
+
+                    _repository.Add(adcStepAudit);
+                }
+            }
+
+            // 2. Eliminar los Steps que ya no existan
+            foreach (var existingStep in existingSteps)
+            {
+                if (!stepList.Contains(existingStep ?? AuditStepType.Nothing))
+                {
+                    var adcStepAuditToDelete = _repository.Gets()
+                        .Where(x => x.ADCSiteID == adcSite.ID && x.AuditStep == existingStep)
+                        .FirstOrDefault();
+                    if (adcStepAuditToDelete != null)
+                    {
+                        _repository.Delete(adcStepAuditToDelete);
+                    }
+                }
+            }
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException($"ADCSiteAuditService.SyncADCSiteAuditsAsync: {ex.Message}");
+            }
+        } // SyncADCSiteAuditsAsync
+
         // PRIVATE
 
         private async Task ValidateCreateItemAtList(ADCSiteAudit item)
@@ -285,51 +424,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Validar que el AuditStep sea válido para el tipo de AuditCycle del ADCSite
             if (!await IsValidAuditStepAsync(item.AuditStep ?? AuditStepType.Nothing, foundItem.ADCSiteID))
                 throw new BusinessException("The Audit Step is not valid for the Audit Cycle Type of that ADCSite.");
-
-            // xBlaze: Por borrar, se mandó al metodo IsValidAuditStepAsync
-            //var auditCycleType = await _adcRepository
-            //    .GetAuditCycleTypeByADCSiteAuditIDAsync(item.ID);
-            //switch (auditCycleType)
-            //{
-            //    case AuditCycleType.Initial:
-            //        if (item.AuditStep != AuditStepType.PreAudit &&
-            //            item.AuditStep != AuditStepType.Stage1 &&
-            //            item.AuditStep != AuditStepType.Stage2 &&
-            //            item.AuditStep != AuditStepType.Surveillance1 &&
-            //            item.AuditStep != AuditStepType.Surveillance2 &&
-            //            item.AuditStep != AuditStepType.Surveillance3 &&
-            //            item.AuditStep != AuditStepType.Surveillance4 &&
-            //            item.AuditStep != AuditStepType.Surveillance5)
-            //        {
-            //            throw new BusinessException("The Audit Step is not valid for the Initial Audit Cycle.");
-            //        }
-            //        break;
-            //    case AuditCycleType.Recertification:
-            //        if (item.AuditStep != AuditStepType.Recertification &&
-            //            item.AuditStep != AuditStepType.Surveillance1 &&
-            //            item.AuditStep != AuditStepType.Surveillance2 &&
-            //            item.AuditStep != AuditStepType.Surveillance3 &&
-            //            item.AuditStep != AuditStepType.Surveillance4 &&
-            //            item.AuditStep != AuditStepType.Surveillance5)
-            //        {
-            //            throw new BusinessException("The Audit Step is not valid for the Recertification Audit Cycle.");
-            //        }
-            //        break;
-            //    case AuditCycleType.Transfer:
-            //        if (item.AuditStep != AuditStepType.Transfer &&
-            //            item.AuditStep != AuditStepType.Recertification &&
-            //            item.AuditStep != AuditStepType.Surveillance1 &&
-            //            item.AuditStep != AuditStepType.Surveillance2 &&
-            //            item.AuditStep != AuditStepType.Surveillance3 &&
-            //            item.AuditStep != AuditStepType.Surveillance4 &&
-            //            item.AuditStep != AuditStepType.Surveillance5)
-            //        {
-            //            throw new BusinessException("The Audit Step is not valid for the Transfer Audit Cycle.");
-            //        }
-            //        break;
-            //    default:
-            //        throw new BusinessException("The Audit Cycle Type is not valid.");
-            //}
 
         } // validateUpdateItem 
 
@@ -418,5 +512,21 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             return true;
         } // IsValidAuditStepAsync
+
+        #region SHARED HELPERS
+
+        public static ADCSiteAudit CreateTmpItem(string user)
+        {
+            return new ADCSiteAudit()
+            {
+                ID = Guid.NewGuid(),
+                Status = StatusType.Nothing,
+                Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
+                UpdatedUser = user
+            };
+        } // CreateTmpItem
+
+        #endregion
     }
 }

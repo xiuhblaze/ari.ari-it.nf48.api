@@ -4,11 +4,14 @@
     {
         Nothing,
         Name,
+        StandardBase,
         Status,
         Update,
         NameDesc,
+        StandardBaseDesc,
         StatusDesc,
         UpdateDesc,
+
     }
 
     public enum StandardBaseType

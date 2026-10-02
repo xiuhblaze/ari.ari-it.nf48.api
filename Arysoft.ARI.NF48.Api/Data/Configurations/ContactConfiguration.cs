@@ -36,10 +36,6 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .HasMaxLength(25);
 
             modelBuilder.Entity<Contact>()
-                .Property(m => m.PhoneAlt)
-                .HasMaxLength(25);
-
-            modelBuilder.Entity<Contact>()
                 .Property(m => m.Address)
                 .HasMaxLength(500);
 

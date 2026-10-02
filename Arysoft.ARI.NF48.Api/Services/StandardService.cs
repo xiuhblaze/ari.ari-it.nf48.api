@@ -57,6 +57,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case StandardsOrderType.Name:
                     items = items.OrderBy(s => s.Name);
                     break;
+                case StandardsOrderType.StandardBase:
+                    items = items.OrderBy(s => s.StandardBase);
+                    break;
                 case StandardsOrderType.Status:
                     items = items.OrderBy(s => s.Status);
                     break;
@@ -65,6 +68,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                     break;
                 case StandardsOrderType.NameDesc:
                     items = items.OrderByDescending(s => s.Name);
+                    break;
+                case StandardsOrderType.StandardBaseDesc:
+                    items = items.OrderByDescending(s => s.StandardBase);
                     break;
                 case StandardsOrderType.StatusDesc:
                     items = items.OrderByDescending(s => s.Status);
@@ -132,8 +138,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             foundItem.Name = item.Name;
             foundItem.Description = item.Description;
-            foundItem.MaxReductionDays = item.MaxReductionDays;
-            foundItem.SalesMaxReductionDays = item.SalesMaxReductionDays;
+            //foundItem.MaxReductionDays = item.MaxReductionDays;
+            //foundItem.SalesMaxReductionDays = item.SalesMaxReductionDays;
             foundItem.StandardBase = item.StandardBase;
             foundItem.Status = foundItem.Status == StatusType.Nothing && item.Status == StatusType.Nothing
                 ? StatusType.Active

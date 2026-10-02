@@ -1,6 +1,6 @@
 namespace Arysoft.ARI.NF48.Api.Enumerations
 {
-    public enum RiskLevelCategory
+    public enum RiskLevelCategoryType
     {
         Nothing,
         High,
@@ -8,7 +8,7 @@ namespace Arysoft.ARI.NF48.Api.Enumerations
         Low,
         Limited,
         SpecialCases
-    } // RiskLevelCategory
+    } // RiskLevelCategoryType
 
     public enum RiskLevelOrderType
     {

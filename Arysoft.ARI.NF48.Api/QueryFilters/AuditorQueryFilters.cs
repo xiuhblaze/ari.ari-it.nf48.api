@@ -11,6 +11,8 @@ namespace Arysoft.ARI.NF48.Api.QueryFilters
 
         public AuditorLeaderType? IsLeader { get; set; }
 
+        public StandardBaseType? StandardBase { get; set; }
+
         public AuditorDocumentStatusType? DocumentStatus { get; set; }
 
         public StatusType? Status { get; set; }

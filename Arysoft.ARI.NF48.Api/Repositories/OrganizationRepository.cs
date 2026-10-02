@@ -58,7 +58,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// Creacion: 2026-01-28
         /// Ultima Modificacion: 2026-01-28
         /// </remarks>
-        public async Task<bool> IsMultiStandard(Guid id)
+        public async Task<bool> IsMultiStandardAsync(Guid id)
         {
             var organization = await _model
                 .Include(o => o.OrganizationStandards)

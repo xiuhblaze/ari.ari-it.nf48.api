@@ -42,7 +42,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 items = items.Where(x => x.StandardID == filters.StandardID);
             }
 
-            if (filters.Category != null && filters.Category != RiskLevelCategory.Nothing)
+            if (filters.Category != null && filters.Category != RiskLevelCategoryType.Nothing)
             {
                 items = items.Where(x => x.Category == filters.Category);
             }

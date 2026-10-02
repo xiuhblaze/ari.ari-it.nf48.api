@@ -18,6 +18,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 query = query.AsNoTracking();
 
             return await query
+                .Include(m => m.AuditCycle)
                 .Include(m => m.AppForm)
                 .Include("AppForm.Standard")
                 .Include("AppForm.RiskLevels")
@@ -145,12 +146,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         {
             var query = _model
                 .Include(m => m.AuditCycle)
-                // .Include("AuditCycle.AuditCycleStandards")
                 .Where(m => m.ID == id);
             var adc = await query.FirstOrDefaultAsync();
-            //var auditCycleStandard = adc.AuditCycle
-            //    .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
-            //    .FirstOrDefault();
 
             return adc.AuditCycle.CycleType == cycleType;
         } // IsAuditCycleInitialByADCID
@@ -171,15 +168,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(m => m.ADCSites)
                 .Include("ADCSites.ADCSiteAudits")
                 .Include(m => m.AuditCycle)
-                //.Include("AuditCycle.AuditCycleStandards")
                 .Where(m => m.ADCSites
                     .Any(s => s.ADCSiteAudits
                         .Any(a => a.ID == id)));
             var adc = await query.FirstOrDefaultAsync();
-            //var auditCycleStandard = adc.AuditCycle
-            //    .AuditCycleStandards.Where(acs => acs.StandardID == adc.StandardID)
-            //    .FirstOrDefault();
-
+            
             return adc.AuditCycle.CycleType ?? AuditCycleType.Nothing;
         } // GetAuditCycleTypeByADCIDAsync
 
@@ -231,6 +224,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 _context.Entry(existing).State = EntityState.Detached;
             }
 
+            _context.Set<ADC>().Attach(item);
             _context.Entry(item).State = EntityState.Modified;
         } // UpdateValues
 

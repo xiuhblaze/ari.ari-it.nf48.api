@@ -10,7 +10,9 @@ namespace Arysoft.ARI.NF48.Api.Models
 
         public ShiftType? Type { get; set; }
 
-        public int? NoEmployees { get; set; }
+        public int? WorkersOnSite { get; set; }
+
+        public int? WorkersOffSite { get; set; }
 
         public string ActivitiesDescription { get; set; }
 
