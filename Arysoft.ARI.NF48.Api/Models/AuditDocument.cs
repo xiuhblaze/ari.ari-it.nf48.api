@@ -8,7 +8,7 @@ namespace Arysoft.ARI.NF48.Api.Models
     {
         public Guid AuditID { get; set; }
 
-        public Guid? StandardID { get; set; }
+        //public Guid? StandardID { get; set; }
 
         public string Filename { get; set; }
 

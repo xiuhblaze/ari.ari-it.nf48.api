@@ -237,140 +237,140 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
         } // DeleteAsync 
 
-        public async Task CreateMissingAuditCyclesAsync()
-        {
-            var _auditStandardsRepository = new AuditStandardRepository();
-            var _auditCycleStandardRepository = new AuditCycleStandardRepository();
+        //public async Task CreateMissingAuditCyclesAsync()
+        //{
+        //    var _auditStandardsRepository = new AuditStandardRepository();
+        //    var _auditCycleStandardRepository = new AuditCycleStandardRepository();
 
-            var auditStandards = _auditStandardsRepository.Gets()
-                .Where(e => e.AuditCycleID == null)
-                .ToList();
+        //    var auditStandards = _auditStandardsRepository.Gets()
+        //        .Where(e => e.AuditCycleID == null)
+        //        .ToList();
 
-            var errorList = new List<string>();
-            var newCycles = new List<AuditCycle>();
-            var standardsToUpdate = new List<AuditStandard>();
+        //    var errorList = new List<string>();
+        //    var newCycles = new List<AuditCycle>();
+        //    var standardsToUpdate = new List<AuditStandard>();
 
-            foreach (var auditStandard in auditStandards)
-            {
-                // Validaciones básicas de existencia
-                if (auditStandard.Audit == null || auditStandard.Audit.OrganizationID == null)
-                {
-                    errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: Audit or OrganizationID is null");
-                    continue;
-                }
+        //    foreach (var auditStandard in auditStandards)
+        //    {
+        //        // Validaciones básicas de existencia
+        //        if (auditStandard.Audit == null || auditStandard.Audit.OrganizationID == null)
+        //        {
+        //            errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: Audit or OrganizationID is null");
+        //            continue;
+        //        }
 
-                if (auditStandard.Audit.AuditCycle == null || auditStandard.Audit.AuditCycleID == null)
-                {
-                    errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: AuditCycle or AuditCycleID is null");
-                    continue;
-                }
+        //        if (auditStandard.Audit.AuditCycle == null || auditStandard.Audit.AuditCycleID == null)
+        //        {
+        //            errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: AuditCycle or AuditCycleID is null");
+        //            continue;
+        //        }
 
-                var auditCycleStandard = _auditCycleStandardRepository.Gets()
-                    .FirstOrDefault(e =>
-                        e.StandardID == auditStandard.StandardID
-                        && e.AuditCycleID == auditStandard.Audit.AuditCycleID);
+        //        var auditCycleStandard = _auditCycleStandardRepository.Gets()
+        //            .FirstOrDefault(e =>
+        //                e.StandardID == auditStandard.StandardID
+        //                && e.AuditCycleID == auditStandard.Audit.AuditCycleID);
 
-                if (auditCycleStandard == null)
-                {
-                    errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: No matching AuditCycleStandard found");
-                    continue;
-                }
+        //        if (auditCycleStandard == null)
+        //        {
+        //            errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: No matching AuditCycleStandard found");
+        //            continue;
+        //        }
 
-                var existingCycle = _repository.Gets()
-                    .Where(e =>
-                        e.OrganizationID == (auditStandard.Audit.OrganizationID ?? Guid.Empty)
-                        && e.StandardID == auditStandard.StandardID
-                        && e.StartDate == auditStandard.Audit.AuditCycle.StartDate
-                        && e.EndDate == auditStandard.Audit.AuditCycle.EndDate)
-                    .ToList();
+        //        var existingCycle = _repository.Gets()
+        //            .Where(e =>
+        //                e.OrganizationID == (auditStandard.Audit.OrganizationID ?? Guid.Empty)
+        //                && e.StandardID == auditStandard.StandardID
+        //                && e.StartDate == auditStandard.Audit.AuditCycle.StartDate
+        //                && e.EndDate == auditStandard.Audit.AuditCycle.EndDate)
+        //            .ToList();
 
-                var preCreatedCycle = newCycles
-                    .Where(e =>
-                        e.OrganizationID == (auditStandard.Audit.OrganizationID ?? Guid.Empty)
-                        && e.StandardID == auditStandard.StandardID
-                        && e.StartDate == auditStandard.Audit.AuditCycle.StartDate
-                        && e.EndDate == auditStandard.Audit.AuditCycle.EndDate)
-                    .ToList();
+        //        var preCreatedCycle = newCycles
+        //            .Where(e =>
+        //                e.OrganizationID == (auditStandard.Audit.OrganizationID ?? Guid.Empty)
+        //                && e.StandardID == auditStandard.StandardID
+        //                && e.StartDate == auditStandard.Audit.AuditCycle.StartDate
+        //                && e.EndDate == auditStandard.Audit.AuditCycle.EndDate)
+        //            .ToList();
 
-                if (existingCycle.Count > 0)
-                {
-                    auditStandard.AuditCycleID = existingCycle.First().ID;
-                }
-                else if (preCreatedCycle.Count > 0)
-                {
-                    auditStandard.AuditCycleID = preCreatedCycle.First().ID;
-                }
-                else
-                {
-                    // Crear nuevo ciclo de auditoría
-                    var newAuditCycle = new AuditCycle
-                        {
-                            ID = Guid.NewGuid(),
-                            OrganizationID = auditStandard.Audit.OrganizationID ?? Guid.Empty,
-                            StandardID = auditStandard.StandardID,
-                            Name = auditStandard.Audit.AuditCycle.Name ?? string.Empty,
-                            CycleType = auditCycleStandard.CycleType,
-                            InitialStep = auditCycleStandard.InitialStep,
-                            StartDate = auditStandard.Audit.AuditCycle.StartDate,
-                            EndDate = auditStandard.Audit.AuditCycle.EndDate,
-                            Periodicity = auditStandard.Audit.AuditCycle.Periodicity,
-                            ExtraInfo = auditStandard.Audit.AuditCycle.ExtraInfo,
-                            Status = StatusType.Active,
-                            Created = DateTime.UtcNow,
-                            Updated = DateTime.UtcNow,
-                            UpdatedUser = "system"
-                        };
+        //        if (existingCycle.Count > 0)
+        //        {
+        //            auditStandard.AuditCycleID = existingCycle.First().ID;
+        //        }
+        //        else if (preCreatedCycle.Count > 0)
+        //        {
+        //            auditStandard.AuditCycleID = preCreatedCycle.First().ID;
+        //        }
+        //        else
+        //        {
+        //            // Crear nuevo ciclo de auditoría
+        //            var newAuditCycle = new AuditCycle
+        //                {
+        //                    ID = Guid.NewGuid(),
+        //                    OrganizationID = auditStandard.Audit.OrganizationID ?? Guid.Empty,
+        //                    StandardID = auditStandard.StandardID,
+        //                    Name = auditStandard.Audit.AuditCycle.Name ?? string.Empty,
+        //                    CycleType = auditCycleStandard.CycleType,
+        //                    InitialStep = auditCycleStandard.InitialStep,
+        //                    StartDate = auditStandard.Audit.AuditCycle.StartDate,
+        //                    EndDate = auditStandard.Audit.AuditCycle.EndDate,
+        //                    Periodicity = auditStandard.Audit.AuditCycle.Periodicity,
+        //                    ExtraInfo = auditStandard.Audit.AuditCycle.ExtraInfo,
+        //                    Status = StatusType.Active,
+        //                    Created = DateTime.UtcNow,
+        //                    Updated = DateTime.UtcNow,
+        //                    UpdatedUser = "system"
+        //                };
 
-                    // Validación mínima: si se requiere Start/End para crear el ciclo...
-                    if (newAuditCycle.StartDate == null || newAuditCycle.EndDate == null)
-                    {
-                        errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: StartDate or EndDate is null");
-                        continue;
-                    }
+        //            // Validación mínima: si se requiere Start/End para crear el ciclo...
+        //            if (newAuditCycle.StartDate == null || newAuditCycle.EndDate == null)
+        //            {
+        //                errorList.Add($"AuditStandard ID {auditStandard.ID} skipped: StartDate or EndDate is null");
+        //                continue;
+        //            }
 
-                    newCycles.Add(newAuditCycle);
-                    auditStandard.AuditCycleID = newAuditCycle.ID;
-                }
+        //            newCycles.Add(newAuditCycle);
+        //            auditStandard.AuditCycleID = newAuditCycle.ID;
+        //        }
 
-                // Preparar actualización del AuditStandard para que apunte al nuevo ciclo o al existente                
-                standardsToUpdate.Add(auditStandard);
-            }
+        //        // Preparar actualización del AuditStandard para que apunte al nuevo ciclo o al existente                
+        //        standardsToUpdate.Add(auditStandard);
+        //    }
 
-            // Guardar todos los nuevos ciclos en un solo SaveChanges (mejor rendimiento)
-            if (newCycles.Count > 0)
-            {
-                try
-                {
-                    foreach (var c in newCycles) _repository.Add(c);
-                    await _repository.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    // Si falla aquí, no intentamos actualizar standards (evita inconsistencias)
-                    throw new BusinessException($"CreateMissingAuditCyclesAsync (saving cycles): {ex.Message}");
-                }
-            }
+        //    // Guardar todos los nuevos ciclos en un solo SaveChanges (mejor rendimiento)
+        //    if (newCycles.Count > 0)
+        //    {
+        //        try
+        //        {
+        //            foreach (var c in newCycles) _repository.Add(c);
+        //            await _repository.SaveChangesAsync();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Si falla aquí, no intentamos actualizar standards (evita inconsistencias)
+        //            throw new BusinessException($"CreateMissingAuditCyclesAsync (saving cycles): {ex.Message}");
+        //        }
+        //    }
 
-            // Actualizar todos los AuditStandard en un solo SaveChanges
-            if (standardsToUpdate.Count > 0)
-            {
-                try
-                {
-                    foreach (var s in standardsToUpdate) _auditStandardsRepository.Update(s);
-                    await _auditStandardsRepository.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    throw new BusinessException($"CreateMissingAuditCyclesAsync (updating auditStandards): {ex.Message}");
-                }
-            }
+        //    // Actualizar todos los AuditStandard en un solo SaveChanges
+        //    if (standardsToUpdate.Count > 0)
+        //    {
+        //        try
+        //        {
+        //            foreach (var s in standardsToUpdate) _auditStandardsRepository.Update(s);
+        //            await _auditStandardsRepository.SaveChangesAsync();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            throw new BusinessException($"CreateMissingAuditCyclesAsync (updating auditStandards): {ex.Message}");
+        //        }
+        //    }
 
-            if (errorList.Count > 0)
-            {
-                throw new BusinessException("Errors found creating missing audit cycles: "
-                    + String.Join("; ", errorList));
-            }
-        } // CreateMissingAuditCycles
+        //    if (errorList.Count > 0)
+        //    {
+        //        throw new BusinessException("Errors found creating missing audit cycles: "
+        //            + String.Join("; ", errorList));
+        //    }
+        //} // CreateMissingAuditCycles
 
         // PRIVATE
 

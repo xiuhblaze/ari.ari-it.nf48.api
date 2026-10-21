@@ -67,7 +67,7 @@ namespace Arysoft.ARI.NF48.Api.Data.Configurations
                 .WithMany(acd => acd.AuditCycles)
                 .Map(e => e.MapLeftKey("AuditCycleID")
                     .MapRightKey("AuditCycleDocumentID")
-                    .ToTable("AuditCycleDocumentsStandards"));
+                    .ToTable("AuditCyclesDocuments"));
 
         }
     }

@@ -261,7 +261,6 @@
     <Compile Include="Controllers\AuditAuditorsController.cs" />
     <Compile Include="Controllers\AuditCyclesController.cs" />
     <Compile Include="Controllers\AuditCycleDocumentsController.cs" />
-    <Compile Include="Controllers\AuditCycleStandardsController.cs" />
     <Compile Include="Controllers\AuditDocumentsController.cs" />
     <Compile Include="Controllers\AuditorDocumentsController.cs" />
     <Compile Include="Controllers\AuditorsController.cs" />
@@ -306,12 +305,12 @@
     <Compile Include="Data\Configurations\AuditConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditCycleConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditCycleDocumentConfiguration.cs" />
-    <Compile Include="Data\Configurations\AuditCycleStandardConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditDocumentConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditorConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditorDocumentConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditorStandardConfiguration.cs" />
     <Compile Include="Data\Configurations\AuditStandardConfiguration.cs" />
+    <Compile Include="Data\Configurations\CalendarBlockConfiguration.cs" />
     <Compile Include="Data\Configurations\CatAuditorDocumentConfiguration.cs" />
     <Compile Include="Data\Configurations\Category22KConfiguration.cs" />
     <Compile Include="Data\Configurations\CertificateConfiguration.cs" />
@@ -348,6 +347,7 @@
     <Compile Include="Enumerations\AuditorEnums.cs" />
     <Compile Include="Enumerations\AuditorStandardEnums.cs" />
     <Compile Include="Enumerations\AuditStandardEnum.cs" />
+    <Compile Include="Enumerations\CalendarBlockEnums.cs" />
     <Compile Include="Enumerations\CatAuditorDocumentEnums.cs" />
     <Compile Include="Enumerations\Category22KEnums.cs" />
     <Compile Include="Enumerations\CertificateEnums.cs" />
@@ -385,7 +385,6 @@
     <Compile Include="Mappings\AuditAuditorMapping.cs" />
     <Compile Include="Mappings\AuditCycleDocumentMapping.cs" />
     <Compile Include="Mappings\AuditCycleMapping.cs" />
-    <Compile Include="Mappings\AuditCycleStandardMapping.cs" />
     <Compile Include="Mappings\AuditDocumentMapping.cs" />
     <Compile Include="Mappings\AuditMapping.cs" />
     <Compile Include="Mappings\AuditorDocumentMapping.cs" />
@@ -422,13 +421,13 @@
     <Compile Include="Models\AuditAuditor.cs" />
     <Compile Include="Models\AuditCycle.cs" />
     <Compile Include="Models\AuditCycleDocument.cs" />
-    <Compile Include="Models\AuditCycleStandard.cs" />
     <Compile Include="Models\AuditDocument.cs" />
     <Compile Include="Models\Auditor.cs" />
     <Compile Include="Models\AuditorDocument.cs" />
     <Compile Include="Models\AuditorStandard.cs" />
     <Compile Include="Models\AuditStandard.cs" />
     <Compile Include="Models\BaseModel.cs" />
+    <Compile Include="Models\CalendarBlock.cs" />
     <Compile Include="Models\CatAuditorDocument.cs" />
     <Compile Include="Models\Category22K.cs" />
     <Compile Include="Models\Certificate.cs" />
@@ -536,12 +535,12 @@
     <Compile Include="Repositories\AuditRepository.cs" />
     <Compile Include="Repositories\AuditCycleDocumentRepository.cs" />
     <Compile Include="Repositories\AuditCycleRepository.cs" />
-    <Compile Include="Repositories\AuditCycleStandardRepository.cs" />
     <Compile Include="Repositories\AuditorDocumentRepository.cs" />
     <Compile Include="Repositories\AuditorRepository.cs" />
     <Compile Include="Repositories\AuditorStandardRepository.cs" />
     <Compile Include="Repositories\AuditStandardRepository.cs" />
     <Compile Include="Repositories\BaseRepository.cs" />
+    <Compile Include="Repositories\CalendarBlockRepository.cs" />
     <Compile Include="Repositories\CatAuditorDocumentRepository.cs" />
     <Compile Include="Repositories\Category22KRepository.cs" />
     <Compile Include="Repositories\CertificateRepository.cs" />
@@ -571,7 +570,6 @@
     <Compile Include="Services\AuditAuditorService.cs" />
     <Compile Include="Services\AuditCycleDocumentService.cs" />
     <Compile Include="Services\AuditCycleService.cs" />
-    <Compile Include="Services\AuditCycleStandardService.cs" />
     <Compile Include="Services\AuditDocumentService.cs" />
     <Compile Include="Services\AuditorDocumentService.cs" />
     <Compile Include="Services\AuditorService.cs" />
