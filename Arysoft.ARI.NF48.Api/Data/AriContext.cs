@@ -42,20 +42,19 @@ namespace Arysoft.ARI.NF48.Api.Data
             ADCSiteAuditConfiguration.Configure(modelBuilder);
 
             // Módulo de Propuestas
-
             ProposalConfiguration.Configure(modelBuilder);
             ProposalAuditConfiguration.Configure(modelBuilder);
 
             // Módulo de Auditorias
             AuditCycleConfiguration.Configure(modelBuilder);
             AuditCycleDocumentConfiguration.Configure(modelBuilder);
-            AuditCycleStandardConfiguration.Configure(modelBuilder);
             AuditConfiguration.Configure(modelBuilder);
             AuditDocumentConfiguration.Configure(modelBuilder);
             AuditStandardConfiguration.Configure(modelBuilder);
             AuditAuditorConfiguration.Configure(modelBuilder);
 
             // Catálogos
+            CalendarBlockConfiguration.Configure(modelBuilder);
             Category22KConfiguration.Configure(modelBuilder);
             NaceCodeConfiguration.Configure(modelBuilder);
             NoteConfiguration.Configure(modelBuilder);

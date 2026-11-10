@@ -127,7 +127,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch(Exception ex)
             {
-                throw new BusinessException($"RisklevelSerivice.AddAsync: {ex.Message}");
+                throw new BusinessException($"RisklevelService.AddAsync: {ex.Message}");
             }
 
             return item;
@@ -211,7 +211,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"RisklevelSerivice.DeleteAsync: {ex.Message}");
+                throw new BusinessException($"RisklevelService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
     }

@@ -110,14 +110,14 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // DeleteAuditCycle
 
-        [HttpPost]
-        [ResponseType(typeof(ApiResponse<bool>))]
-        [Route("api/auditcycles/createmissingauditcycles")]
-        public async Task<IHttpActionResult> CreateMissingAuditCycles()
-        { 
-            await _service.CreateMissingAuditCyclesAsync();
-            var response = new ApiResponse<bool>(true);
-            return Ok(response);
-        } // CreateMissingAuditCycles
+        //[HttpPost]
+        //[ResponseType(typeof(ApiResponse<bool>))]
+        //[Route("api/auditcycles/createmissingauditcycles")]
+        //public async Task<IHttpActionResult> CreateMissingAuditCycles()
+        //{ 
+        //    await _service.CreateMissingAuditCyclesAsync();
+        //    var response = new ApiResponse<bool>(true);
+        //    return Ok(response);
+        //} // CreateMissingAuditCycles
     }
 }

@@ -36,7 +36,10 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (filters.StandardID != null && filters.StandardID != Guid.Empty)
             {
-                items = items.Where(e => e.StandardID == filters.StandardID);
+                items = items.Where(e => e.AuditStandards
+                    .Where(a => a.StandardID == filters.StandardID)
+                    .Any()
+                );
             }
 
             if (!string.IsNullOrEmpty(filters.Text))

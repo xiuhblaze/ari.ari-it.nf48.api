@@ -23,16 +23,19 @@ namespace Arysoft.ARI.NF48.Api.Invokers
             if(result.Exception != null && result.Exception.GetBaseException() != null)
             {
                 var baseException = result.Exception.GetBaseException();
-                if (baseException is BusinessException)
+                if (baseException is BusinessException _exception)
                 {
+                    var statusCode = _exception.StatusCode ?? HttpStatusCode.BadRequest;
+
                     return Task.Run<HttpResponseMessage>(() =>
-                        new HttpResponseMessage(HttpStatusCode.BadRequest)
+                        new HttpResponseMessage(statusCode)
                         {
                             Content = new StringContent(baseException.Message),
                             ReasonPhrase = "Business Error"
                         });
                 }
-                else {
+                else
+                {
                     // Log critical error
                     Debug.WriteLine(baseException);
 
