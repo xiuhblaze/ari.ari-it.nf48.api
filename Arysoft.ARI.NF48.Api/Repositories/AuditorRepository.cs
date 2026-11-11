@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Data.Entity;
 using System.Linq;
@@ -26,6 +27,19 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await item.FirstOrDefaultAsync();
         } // GetByFullNameAsync
+
+        public async Task<string> GetFullNameByIDAsync(Guid id)
+        {
+            var item = await GetAsync(id);
+
+            if (item == null) return string.Empty;
+
+            return Strings.FullName(
+                item.FirstName, 
+                item.MiddleName, 
+                item.LastName
+            );
+        } // GetFullNameByIDAsync
 
         ///// <summary>
         ///// Elimina todos los registros temporales generados por el usuario

@@ -267,6 +267,7 @@
     <Compile Include="Controllers\AuditorStandardsController.cs" />
     <Compile Include="Controllers\AuditsController.cs" />
     <Compile Include="Controllers\AuditStandardsController.cs" />
+    <Compile Include="Controllers\CalendarBlocksController.cs" />
     <Compile Include="Controllers\CatAuditorDocumentsController.cs" />
     <Compile Include="Controllers\Categories22KController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
@@ -390,6 +391,7 @@
     <Compile Include="Mappings\AuditorDocumentMapping.cs" />
     <Compile Include="Mappings\AuditorStandardMapping.cs" />
     <Compile Include="Mappings\AuditStandardMapping.cs" />
+    <Compile Include="Mappings\CalendarBlockMapping.cs" />
     <Compile Include="Mappings\CatAuditorDocumentMapping.cs" />
     <Compile Include="Mappings\Category22KMapping.cs" />
     <Compile Include="Mappings\AuditorMapping.cs" />
@@ -449,6 +451,7 @@
     <Compile Include="Models\DTOs\AuditCycleStandardDTOs.cs" />
     <Compile Include="Models\DTOs\AuditStandardDTOs.cs" />
     <Compile Include="Models\DTOs\AuthDTOs.cs" />
+    <Compile Include="Models\DTOs\CalendarBlockDTOs.cs" />
     <Compile Include="Models\DTOs\CatAuditorDocumentDTOs.cs" />
     <Compile Include="Models\DTOs\Category22KDTOs.cs" />
     <Compile Include="Models\DTOs\CertificateDTOs.cs" />
@@ -706,6 +709,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\CalendarBlocks\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

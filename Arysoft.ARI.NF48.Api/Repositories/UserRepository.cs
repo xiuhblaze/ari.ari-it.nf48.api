@@ -1,5 +1,6 @@
 ﻿using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -50,6 +51,19 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Where(m => m.Username == username && m.PasswordHash == passwordHash)
                 .FirstOrDefaultAsync();
         } // GetUserByLoginAsync
+
+        public async Task<string> GetFullNameByIDAsync(Guid id)
+        {
+            var item = await GetAsync(id);
+
+            if (item == null) return string.Empty;
+
+            return Strings.FullName(
+                item.FirstName, 
+                string.Empty, 
+                item.LastName
+            );
+        } // GetFullNameByIDAsync
 
         public async Task<bool> ValidatePasswordAsync(Guid id, string passwordHash)
         {
