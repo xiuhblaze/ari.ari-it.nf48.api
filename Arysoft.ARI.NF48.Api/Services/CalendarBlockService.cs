@@ -239,7 +239,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (!item.EndDate.HasValue)
                 throw new BusinessException("Must specify the end date");
 
-            // Evaluar si es necesario pues podria haber dos bloqueos con diferente descripción
             if (await _repository.ExistCalendarBlockAsync(
                 item.OwnerID,
                 item.StartDate ?? new DateTime(),

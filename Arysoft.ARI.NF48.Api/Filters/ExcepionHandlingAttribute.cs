@@ -17,6 +17,7 @@ namespace Arysoft.ARI.NF48.Api.Filters
 
             if (context.Exception is BusinessException businessException)
             {
+                var statusCode = businessException.StatusCode ?? HttpStatusCode.BadRequest;                
                 var validation = new { 
                     Status = 400,
                     Title = "Bad request",
@@ -24,9 +25,9 @@ namespace Arysoft.ARI.NF48.Api.Filters
                 };
                 string jsonCustom = JsonConvert.SerializeObject(validation);
 
-                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest)
+                throw new HttpResponseException(new HttpResponseMessage(statusCode)
                 {
-                    StatusCode = HttpStatusCode.BadRequest,
+                    StatusCode = statusCode,
                     Content = new StringContent(jsonCustom, Encoding.UTF8, "application/json"),
                     ReasonPhrase = "Business Exception"
                 });

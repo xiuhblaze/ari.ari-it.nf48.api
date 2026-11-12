@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
+using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
@@ -124,6 +125,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
+                //await _repository.LoadReferenceAsync(item, c => c.Organization);
             }
             catch (Exception ex)
             {
@@ -141,7 +143,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Validations
 
             // - No duplicar el nombre de la compañia en la misma organización
-            if (await _repository.ExistCompanyNameAsync(item.Name, item.OrganizationID, item.ID))
+            if (await _repository.ExistCompanyNameAsync(item.Name, foundItem.OrganizationID, item.ID))
                 throw new BusinessException("The name already exists");
 
             // - No duplicar el Legal Entity en cualquier organización

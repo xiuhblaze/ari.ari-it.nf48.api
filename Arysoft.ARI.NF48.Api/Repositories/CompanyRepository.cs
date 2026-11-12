@@ -13,8 +13,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             name = name.ToLower().Trim();
             var response = _model.Where(o => 
                 o.Name.ToLower() == name 
-                && o.ID == organizationID);
-            if (exceptionID != null && exceptionID != Guid.Empty)
+                && o.OrganizationID == organizationID);
+            if (exceptionID.HasValue && exceptionID.Value != Guid.Empty)
             {
                 response = response.Where(o => o.ID != exceptionID);
             }

@@ -9,7 +9,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 {
     public class CalendarBlockMapping
     {
-        public static async Task<IEnumerable<CalendarBlockItemListDto>> CalendarBlockToItemDtoAsync(IEnumerable<CalendarBlock> items)
+        public static async Task<IEnumerable<CalendarBlockItemListDto>> CalendarBlockToListAsync(IEnumerable<CalendarBlock> items)
         {
             var itemsDto = new List<CalendarBlockItemListDto>();
 
@@ -19,7 +19,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             }
 
             return itemsDto;
-        } // CalendarBlockToItemDto
+        } // CalendarBlockToListAsync
 
         public static async Task<CalendarBlockItemListDto> CalendarBlockToItemListDtoAsync(CalendarBlock item)
         {
@@ -53,7 +53,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 
                 OwnerName = ownerName,
             };
-        } // CalendarBlockToItemListDto
+        } // CalendarBlockToItemListDtoAsync
 
         public static CalendarBlockItemDetailDto CalendarBlockToItemDetailDto(CalendarBlock item)
         {
@@ -71,7 +71,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
-                UpdatedUser = item.UpdatedUser,
+                UpdatedUser = item.UpdatedUser
             };
         } // CalendarBlockToItemDetailDto
 
@@ -84,12 +84,30 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         } // ItemCreateDtoToCalendarBlock
 
         public static CalendarBlock ItemUpdateDtoToCalendarBlock(CalendarBlockUpdateDto itemDto)
-        {
-            // TODO: AQUI VOY - Falta terminar los mappings de CalendarBlocks
+        {   
             return new CalendarBlock
-            { 
-
-            }
+            {
+                ID = itemDto.ID,
+                OwnerID = itemDto.OwnerID,
+                BlockType = itemDto.BlockType,
+                Description = itemDto.Description,
+                StartDate = itemDto.StartDate,
+                EndDate = itemDto.EndDate,
+                OwnerType = itemDto.OwnerType,
+                AllowOverride= itemDto.AllowOverride,
+                ExtraInfo = itemDto.ExtraInfo,
+                Status = itemDto.Status,
+                UpdatedUser = itemDto.UpdatedUser
+            };
         } // ItemUpdateDtoToCalendarBlock
+
+        public static CalendarBlock ItemDeleteDtoToCalendarBlock(CalendarBlockDeleteDto itemDto)
+        {
+            return new CalendarBlock
+            {
+                ID = itemDto.ID,
+                UpdatedUser = itemDto.UpdatedUser
+            };
+        } // ItemDeleteDtoToCalendarBlock
     }
 }

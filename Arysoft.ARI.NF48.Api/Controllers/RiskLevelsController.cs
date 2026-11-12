@@ -52,7 +52,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetRiskLevels
 
         [HttpGet]
-        [ResponseType(typeof(ApiResponse<RiskLevel>))]
+        [ResponseType(typeof(ApiResponse<RiskLevelItemDetailDto>))]
         public async Task<IHttpActionResult> GetRiskLevel(Guid id)
         {
             var item = await _riskLevelService.GetAsync(id)
