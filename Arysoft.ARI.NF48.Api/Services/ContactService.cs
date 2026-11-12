@@ -12,22 +12,24 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class ContactService
+    public class ContactService : IDisposable
     {
-        private readonly ContactRepository _contactRepository;
+        private readonly ContactRepository _repository;
 
         // CONSTRUCTOR
 
         public ContactService()
         {
-            _contactRepository = new ContactRepository();
+            _repository = new ContactRepository();
         }
 
         // METHODS
 
         public PagedList<Contact> Gets(ContactQueryFilters filters)
         {
-            var items = _contactRepository.Gets();
+            // Query sin ejecutar: todo lo siguiente se traduce a SQL
+            var items = _repository.Query();
+            //var items = _repository.Gets();
 
             // Filters
 
@@ -59,8 +61,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             else
             {
-                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
-                items = (bool)filters.IncludeDeleted
+                var includeDeleted = filters.IncludeDeleted ?? false;
+                items = includeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)
                     : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
@@ -135,7 +137,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Contact> GetAsync(Guid id)
         { 
-            return await _contactRepository.GetAsync(id);
+            return await _repository.GetAsync(id);
         } // GetAsync
 
         public async Task<Contact> AddAsync(Contact item)
@@ -157,9 +159,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
             try
             {
-                await _contactRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-                _contactRepository.Add(item);
-                await _contactRepository.SaveChangesAsync();
+                await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _repository.Add(item);
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -178,13 +180,13 @@ namespace Arysoft.ARI.NF48.Api.Services
             // - Que al menos traiga el First name y el Last name
             // - Que el correo sea válido y requerido
 
-            var foundItem = await _contactRepository.GetAsync(item.ID)
+            var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             if (item.IsMainContact)
             {
                 // Poner los demas contactos de la organización en false
-                await _contactRepository.SetToNotContactMainAsync(foundItem.OrganizationID);
+                await _repository.SetToNotContactMainAsync(foundItem.OrganizationID);
             }
 
             // Assigning values
@@ -211,8 +213,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             try
             { 
-                _contactRepository.Update(foundItem);
-                await _contactRepository.SaveChangesAsync();
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -224,7 +226,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task DeleteAsync(Contact item)
         {
-            var foundItem = await _contactRepository.GetAsync(item.ID)
+            var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
 
             // Validations
@@ -235,7 +237,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             if (foundItem.Status == StatusType.Deleted)
             {
-                _contactRepository.Delete(foundItem);
+                _repository.Delete(foundItem);
             }
             else 
             {
@@ -245,17 +247,24 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                _contactRepository.Update(foundItem);
+                _repository.Update(foundItem);
             }
 
             try
             {
-                await _contactRepository.SaveChangesAsync();
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 throw new BusinessException($"Contact.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // DISPOSE
+
+        public void Dispose()
+        {
+            _repository.Dispose();
+        } // Dispose
     }
 }

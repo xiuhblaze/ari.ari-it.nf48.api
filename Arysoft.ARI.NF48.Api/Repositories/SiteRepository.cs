@@ -9,6 +9,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class SiteRepository : BaseRepository<Site>
     {
+        public override IQueryable<Site> Query()
+        {
+            return base.Query()
+                .Include(s => s.Organization)
+                .Include(s => s.Shifts);
+        } // Query
+
         /// <summary>
         /// Marca todos los sitios que esten como principal como secundario o no principal
         /// Debe de ser solo uno, pero por cualquier cosa, mejor la busqueda en general.
@@ -23,8 +30,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .ToListAsync();
 
             foreach (var item in items)
-            {
-                //item.IsMainSite = false;                
+            {   
                 item.Type = SiteType.Secondary;                
                 Update(item);
             }

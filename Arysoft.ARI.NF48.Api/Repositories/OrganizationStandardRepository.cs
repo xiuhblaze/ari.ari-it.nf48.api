@@ -8,6 +8,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class OrganizationStandardRepository : BaseRepository<OrganizationStandard>
     {
+        public override IQueryable<OrganizationStandard> Query()
+        {
+            return base.Query()
+                .Include(os => os.Organization)
+                .Include(os => os.Standard);
+        } // Query
 
         public async Task<bool> ExistStandardAsync(Guid OrganizationID, Guid StandardID, Guid OrganizationStandardExceptionID)
         {

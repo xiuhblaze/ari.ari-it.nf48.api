@@ -54,13 +54,13 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetCalendarBlocks
 
         // GET: api/CalendarBlocks/{id}
-        [HttpGet]
-        [ResponseType(typeof(ApiResponse<CalendarBlockItemDetailDto>))]
-        public async Task<IHttpActionResult> GetCalendarBlock(Guid id)
-        {
-            var item = await _calendarBlockService.GetAsync(id)
-                ?? throw new BusinessException("Calendar block item not found", System.Net.HttpStatusCode.NotFound);
+        //[HttpGet]
+        //[ResponseType(typeof(ApiResponse<CalendarBlockItemDetailDto>))]
+        //public async Task<IHttpActionResult> GetCalendarBlock(Guid id)
+        //{
+        //    var item = await _calendarBlockService.GetAsync(id)
+        //        ?? throw new BusinessException("Calendar block item not found", System.Net.HttpStatusCode.NotFound);
 
-        } // GetCalendarBlock
+        //} // GetCalendarBlock
     }
 }

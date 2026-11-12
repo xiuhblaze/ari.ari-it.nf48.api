@@ -8,6 +8,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class CompanyRepository : BaseRepository<Company>
     {
+        public override IQueryable<Company> Query() 
+        {
+            return base.Query()
+                .Include(c => c.Organization);
+        } // Query
+
         public async Task<bool> ExistCompanyNameAsync(string name, Guid organizationID, Guid? exceptionID)
         {
             name = name.ToLower().Trim();

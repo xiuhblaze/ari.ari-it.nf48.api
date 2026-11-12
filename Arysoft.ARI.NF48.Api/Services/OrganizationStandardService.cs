@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class OrganizationStandardService
+    public class OrganizationStandardService : IDisposable
     {
         private readonly OrganizationStandardRepository _repository;
 
@@ -25,7 +25,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public PagedList<OrganizationStandard> Gets(OrganizationStandardQueryFilters filters)
         {
-            var items = _repository.Gets();
+            // Query sin ejecutar: todo lo siguiente se traduce a SQL
+            var items = _repository.Query();
+            //var items = _repository.Gets();
 
             // Filters
 
@@ -53,8 +55,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             else
             {
-                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
-                items = (bool)filters.IncludeDeleted
+                var includeDeleted = filters.IncludeDeleted ?? false;
+                items = includeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)
                     : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
@@ -204,5 +206,12 @@ namespace Arysoft.ARI.NF48.Api.Services
                 throw new BusinessException($"OrganizationStandardService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // DISPOSE
+
+        public void Dispose()
+        {
+            _repository.Dispose();
+        }
     }
 }

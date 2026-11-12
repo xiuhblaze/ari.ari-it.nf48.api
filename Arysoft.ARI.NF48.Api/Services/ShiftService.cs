@@ -10,22 +10,24 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class ShiftService
+    public class ShiftService : IDisposable
     {
-        private readonly BaseRepository<Shift> _shiftRepository;
+        private readonly BaseRepository<Shift> _repository;
 
         // CONSTRUCTOR
 
         public ShiftService()
         {
-            _shiftRepository = new BaseRepository<Shift>();
+            _repository = new BaseRepository<Shift>();
         }
 
         // METHODS
 
         public PagedList<Shift> Gets(ShiftQueryFilters filters)
         {
-            var items = _shiftRepository.Gets();
+            // Query sin ejecutar: todo lo siguiente se traduce a SQL
+            var items = _repository.Query();
+            //var items = _repository.Gets();
 
             // Filters
 
@@ -70,8 +72,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             else
             {
-                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
-                items = (bool)filters.IncludeDeleted
+                var includeDeleted = filters.IncludeDeleted ?? false;
+                items = includeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)
                     : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
@@ -104,6 +106,9 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case ShiftOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
+                default:
+                    items = items.OrderBy(e => e.ShiftStart);
+                    break;
             }
 
             // Paging
@@ -116,7 +121,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task<Shift> GetAsync(Guid id)
         {
-            return await _shiftRepository.GetAsync(id);
+            return await _repository.GetAsync(id);
         } // GetAsync
 
         public async Task<Shift> AddAsync(Shift item)
@@ -140,9 +145,9 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            await _shiftRepository.DeleteTmpByUserAsync(item.UpdatedUser);
-            _shiftRepository.Add(item);
-            await _shiftRepository.SaveChangesAsync();
+            await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
+            _repository.Add(item);
+            await _repository.SaveChangesAsync();
 
             return item;
         } // AddAsync
@@ -151,7 +156,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         {
             // Validations
 
-            var foundItem = await _shiftRepository.GetAsync(item.ID)
+            var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             // Validar que al menos WorkersOnSite o WorkersOffSite sea mayor a cero
@@ -181,8 +186,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             try
             { 
-                _shiftRepository.Update(foundItem);            
-                await _shiftRepository.SaveChangesAsync();
+                _repository.Update(foundItem);            
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -194,12 +199,12 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task DeleteAsync(Shift item)
         {
-            var foundItem = await _shiftRepository.GetAsync(item.ID)
+            var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
 
             if (foundItem.Status == StatusType.Deleted)
             {
-                _shiftRepository.Delete(foundItem);
+                _repository.Delete(foundItem);
             }
             else
             {
@@ -209,17 +214,24 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                _shiftRepository.Update(foundItem);
+                _repository.Update(foundItem);
             }
 
             try 
             { 
-                _shiftRepository.SaveChanges();
+                _repository.SaveChanges();
             }
             catch (Exception ex)
             {
                 throw new BusinessException($"ShiftService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // DISPOSE
+
+        public void Dispose()
+        {
+            _repository.Dispose();
+        } // Dispose
     }
 }

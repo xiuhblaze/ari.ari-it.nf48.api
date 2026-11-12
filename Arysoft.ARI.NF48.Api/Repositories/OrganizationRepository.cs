@@ -11,12 +11,79 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class OrganizationRepository : BaseRepository<Organization>
     {
-        public new IEnumerable<Organization> Gets()
-        { 
-            return _model
-                .Include(o => o.AuditCycles)
-                .AsEnumerable();
-        } // Gets
+        //public new IEnumerable<Organization> Gets()
+        //{ 
+        //    return _model
+        //        .Include(o => o.AuditCycles)
+        //        .AsEnumerable();
+        //} // Gets
+
+        /// <summary>
+        /// Detalle de la organización. Una sola colección va en el Include (con su
+        /// referencia Standard, evita el N+1) y las demás se cargan con un query
+        /// pequeño cada una, así no se multiplican las filas del resultado.
+        /// </summary>
+        public override async Task<Organization> GetAsync(Guid id, bool asNoTracking = false)
+        {
+            var query = _model
+                .Include(o => o.OrganizationStandards.Select(os => os.Standard));
+
+            // Sin tracking no se puede usar Entry().Collection(): solo viaja el Include
+            // anterior y el resto de colecciones queda en null (el lazy loading tampoco
+            // funciona en entidades sin tracking).
+            if (asNoTracking)
+                return await query.AsNoTracking().FirstOrDefaultAsync(o => o.ID == id);
+
+            var item = await query.FirstOrDefaultAsync(o => o.ID == id);
+            if (item == null) return null;
+
+            var entry = _context.Entry(item);
+            await entry.Collection(o => o.AuditCycles).LoadAsync();
+            await entry.Collection(o => o.Companies).LoadAsync();
+            await entry.Collection(o => o.Contacts).LoadAsync();
+            await entry.Collection(o => o.Notes).LoadAsync();
+            await entry.Collection(o => o.Sites).LoadAsync();
+
+            return item;
+        } // GetAsync
+
+        /// <summary>
+        /// Para el LISTADO: carga las relaciones de TODA la página con un query por
+        /// colección (6 queries en total, sin importar el tamaño de la página), en lugar
+        /// de uno por organización (lazy loading) o un JOIN gigante (Include).
+        /// Requiere que las organizaciones estén rastreadas (sin AsNoTracking): EF une
+        /// cada fila hija con su Organization por relationship fixup.
+        /// Se asume que cada hijo tiene la FK OrganizationID.
+        /// </summary>
+        public async Task LoadListRelationsAsync(IList<Organization> organizations)
+        {
+            if (organizations == null || organizations.Count == 0) return;
+
+            var ids = organizations.Select(o => o.ID).ToList();
+
+            await _context.Set<AuditCycle>().Where(x => ids.Contains(x.OrganizationID)).LoadAsync();
+            await _context.Set<Company>().Where(x => ids.Contains(x.OrganizationID)).LoadAsync();
+            await _context.Set<Contact>().Where(x => ids.Contains(x.OrganizationID)).LoadAsync();
+            await _context.Set<Note>().Where(x => ids.Contains(x.OwnerID)).LoadAsync();
+            await _context.Set<Site>().Where(x => ids.Contains(x.OrganizationID)).LoadAsync();
+            await _context.Set<OrganizationStandard>()
+                .Where(x => ids.Contains(x.OrganizationID))
+                .Include(x => x.Standard)
+                .LoadAsync();
+
+            // Sin esto, el proxy de lazy loading vuelve a consultar la BD la primera vez
+            // que se lee cada colección, aunque ya esté poblada por el fixup.
+            foreach (var organization in organizations)
+            {
+                var entry = _context.Entry(organization);
+                entry.Collection(o => o.AuditCycles).IsLoaded = true;
+                entry.Collection(o => o.Companies).IsLoaded = true;
+                entry.Collection(o => o.Contacts).IsLoaded = true;
+                entry.Collection(o => o.Notes).IsLoaded = true;
+                entry.Collection(o => o.Sites).IsLoaded = true;
+                entry.Collection(o => o.OrganizationStandards).IsLoaded = true;
+            }
+        } // LoadListRelationsAsync
 
         public async Task<Organization> GetAsync(int folio)
         {

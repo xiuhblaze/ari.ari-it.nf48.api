@@ -12,22 +12,24 @@ using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class SiteService
+    public class SiteService : IDisposable
     {
-        private readonly SiteRepository _siteRepository;
+        private readonly SiteRepository _repository;
 
         // CONSTRUCTOR
 
         public SiteService()
         {
-            _siteRepository = new SiteRepository();
+            _repository = new SiteRepository();
         }
 
         // METHODS
 
         public PagedList<Site> Gets(SiteQueryFilters filters)
         {
-            var items = _siteRepository.Gets();
+            // Query sin ejecutar: todo lo siguiente se traduce a SQL
+            var items = _repository.Query();
+            //var items = _repository.Gets();
 
             // Filters
 
@@ -52,8 +54,8 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             else
             {
-                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
-                items = (bool)filters.IncludeDeleted
+                var includeDeleted = filters.IncludeDeleted ?? false;
+                items = includeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)
                     : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
@@ -132,7 +134,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <returns></returns>
         public async Task<Site> GetAsync(Guid id)
         { 
-            return await _siteRepository.GetAsync(id);
+            return await _repository.GetAsync(id);
         } // GetAsync
 
         /// <summary>
@@ -162,9 +164,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Execute queries
 
             // Nota: Cuenta con eliminación en cascada para los Shifts
-            await _siteRepository.DeleteTmpByUserAsync(item.UpdatedUser); 
-            _siteRepository.Add(item);
-            await _siteRepository.SaveChangesAsync();
+            await _repository.DeleteTmpByUserAsync(item.UpdatedUser); 
+            _repository.Add(item);
+            await _repository.SaveChangesAsync();
 
             return item;
         } // AddAsync
@@ -180,12 +182,12 @@ namespace Arysoft.ARI.NF48.Api.Services
         { 
             // Validations
 
-            var foundItem = await _siteRepository.GetAsync(item.ID)
+            var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to update was not found");
 
             if (item.Type == SiteType.Main)
             {
-                await _siteRepository.SetToNotSiteMainAsync(foundItem.OrganizationID);
+                await _repository.SetToNotSiteMainAsync(foundItem.OrganizationID);
             }
 
             // Assigning values
@@ -209,8 +211,8 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             try
             { 
-                _siteRepository.Update(foundItem);
-                await _siteRepository.SaveChangesAsync();
+                _repository.Update(foundItem);
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -222,7 +224,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public async Task DeleteAsync(Site item)
         {
-            var foundItem = await _siteRepository.GetAsync(item.ID)
+            var foundItem = await _repository.GetAsync(item.ID)
                 ?? throw new BusinessException("The record to delete was not found");
 
 
@@ -231,7 +233,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                 if (foundItem.Shifts.Any())
                     throw new BusinessException("The record want to delete, still has Shifts");
 
-                _siteRepository.Delete(foundItem);
+                _repository.Delete(foundItem);
             }
             else
             {
@@ -241,17 +243,24 @@ namespace Arysoft.ARI.NF48.Api.Services
                 foundItem.Updated = DateTime.UtcNow;
                 foundItem.UpdatedUser = item.UpdatedUser;
 
-                _siteRepository.Update(foundItem);
+                _repository.Update(foundItem);
             }
 
             try
             { 
-                _siteRepository.SaveChanges();
+                _repository.SaveChanges();
             }
             catch (Exception ex)
             {
                 throw new BusinessException($"SiteService.DeleteAsync: {ex.Message}");
             }
         } // DeleteAsync
+
+        // DISPOSE
+
+        public void Dispose()
+        {
+            _repository.Dispose();
+        }
     }
 }

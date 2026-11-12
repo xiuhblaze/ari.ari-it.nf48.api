@@ -1,9 +1,16 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
+using System.Data.Entity;
+using System.Linq;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {
     public class ShiftRepository : BaseRepository<Shift>
-    {   
+    {
+        public override IQueryable<Shift> Query()
+        {
+            return base.Query()
+                .Include(c => c.Notes);
+        } // Query
 
         //public async Task DeleteTmpByUser(string username)
         //{

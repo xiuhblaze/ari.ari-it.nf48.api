@@ -5,14 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Repositories
 {
-    public class BaseRepository<T> where T : BaseModel
+    public class BaseRepository<T> : IDisposable where T : BaseModel
     {
         protected readonly AriContext _context;
         protected readonly DbSet<T> _model;
+        private bool _disposed;
 
         // CONSTRUCTOR
 
@@ -24,12 +26,24 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         // METHODS
 
+        /// <summary>
+        /// Query base SIN ejecutar. Los repositorios hijos pueden sobrescribirlo
+        /// para agregar .Include() de las relaciones que siempre se necesitan.
+        /// Los filtros, orden y paginación se traducen a SQL.
+        /// </summary>
+        public virtual IQueryable<T> Query()
+        {
+            return _model.AsQueryable();
+        } // Query
+
+        /// <summary>
+        /// Se mantiene por compatibilidad con los servicios que aún no migran a Query().
+        /// OJO: ejecuta el query completo y el resto de filtros corre en memoria.
+        /// </summary>
         public virtual IEnumerable<T> Gets()
         {
-            return _model
-                .AsEnumerable();
-                // .AsNoTracking()
-        }
+            return Query().AsEnumerable();
+        } // Gets
 
         /// <summary>
         /// Obtiene un registro por su ID
@@ -48,10 +62,22 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return await query
                 .FirstOrDefaultAsync(m => m.ID == id);
-        }
+        } // GetAsync
+
+        /// <summary>
+        /// Carga explícitamente una navigation property de una entidad ya
+        /// rastreada por el contexto (por ejemplo, recién insertada con new,
+        /// que no es un proxy y por tanto no soporta lazy loading).
+        /// </summary>
+        public async Task LoadReferenceAsync<TProperty>(
+            T item,
+            Expression<Func<T, TProperty>> navigation) where TProperty : class
+        {
+            await _context.Entry(item).Reference(navigation).LoadAsync();
+        } // LoadReferenceAsync
 
         public void Add(T item)
-        { 
+        {
             _model.Add(item);
         }
 
@@ -67,12 +93,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         }
 
         public void SaveChanges()
-        { 
+        {
             _context.SaveChanges();
         }
 
         public async Task SaveChangesAsync()
-        { 
+        {
             await _context.SaveChangesAsync();
         }
 
@@ -94,5 +120,25 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 _model.Remove(item);
             }
         } // DeleteTmpByUser
+
+        // DISPOSE
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+
+            _disposed = true;
+        } // Dispose
     }
 }

@@ -2,16 +2,16 @@
 using Arysoft.ARI.NF48.Api.Enumerations;
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
-using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class CompanyService
+    public class CompanyService : IDisposable
     {
         public readonly CompanyRepository _repository;
 
@@ -26,13 +26,16 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         public PagedList<Company> Gets(CompanyQueryFilters filters)
         {
-            var items = _repository.Gets();
+            // Query sin ejecutar: todo lo siguiente se traduce a SQL
+            var items = _repository.Query();
+            //var items = _repository.Gets();
 
             // Filters
 
             if (filters.OrganizationID != null && filters.OrganizationID != Guid.Empty)
             {
-                items = items.Where(e => e.OrganizationID == filters.OrganizationID);
+                var organizationID = filters.OrganizationID.Value;
+                items = items.Where(e => e.OrganizationID == organizationID);
             }
 
             if (!string.IsNullOrEmpty(filters.Text))
@@ -41,23 +44,23 @@ namespace Arysoft.ARI.NF48.Api.Services
                 items = items.Where(e =>
                     (e.Name != null && e.Name.ToLower().Contains(filters.Text))
                     || (e.LegalEntity != null && e.LegalEntity.ToLower().Contains(filters.Text))
-                    //|| (e.COID != null && e.COID.ToLower().Contains(filters.Text))
                 );
             }
 
             if (filters.Status != null && filters.Status != StatusType.Nothing)
             {
-                items = items.Where(e => e.Status == filters.Status);
+                var status = filters.Status.Value;
+                items = items.Where(e => e.Status == status);
             }
             else
             {
-                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
-                items = (bool)filters.IncludeDeleted
+                var includeDeleted = filters.IncludeDeleted ?? false;
+                items = includeDeleted
                     ? items.Where(e => e.Status != StatusType.Nothing)
                     : items.Where(e => e.Status != StatusType.Nothing && e.Status != StatusType.Deleted);
             }
 
-            // Order
+            // Order (siempre debe haber OrderBy antes de Skip/Take en EF6)
 
             switch (filters.Order)
             {
@@ -67,9 +70,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case CompanyOrderType.LegalEntity:
                     items = items.OrderBy(e => e.LegalEntity);
                     break;
-                //case CompanyOrderType.COID:
-                //    items = items.OrderBy(e => e.COID);
-                //    break;
                 case CompanyOrderType.Updated:
                     items = items.OrderBy(e => e.Updated);
                     break;
@@ -79,9 +79,6 @@ namespace Arysoft.ARI.NF48.Api.Services
                 case CompanyOrderType.LegalEntityDesc:
                     items = items.OrderByDescending(e => e.LegalEntity);
                     break;
-                //case CompanyOrderType.COIDDesc:
-                //    items = items.OrderByDescending(e => e.COID);
-                //    break;
                 case CompanyOrderType.UpdatedDesc:
                     items = items.OrderByDescending(e => e.Updated);
                     break;
@@ -113,7 +110,6 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             item.ID = Guid.NewGuid();
-            //item.OrganizationID = item.OrganizationID; // no se ocupa volver a asignar
             item.Status = StatusType.Nothing;
             item.Created = DateTime.UtcNow;
             item.Updated = DateTime.UtcNow;
@@ -125,11 +121,17 @@ namespace Arysoft.ARI.NF48.Api.Services
                 await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
                 _repository.Add(item);
                 await _repository.SaveChangesAsync();
-                //await _repository.LoadReferenceAsync(item, c => c.Organization);
+
+                // item es un "new Company" (no un proxy), el lazy loading no aplica:
+                // se carga explícitamente para que el DTO de detalle traiga Organization
+                await _repository.LoadReferenceAsync(item, c => c.Organization);
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"CompanyService.AddAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"CompanyService.AddAsync: {ex.Message}", 
+                    HttpStatusCode.InternalServerError, 
+                    ex);
             }
 
             return item;
@@ -172,7 +174,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"CompanyService.UpdateAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"CompanyService.UpdateAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
 
             return foundItem;
@@ -204,8 +209,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"CompanyService.DeleteAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"CompanyService.DeleteAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
         } // DeleteAsync
+
+        // DISPOSE
+
+        public void Dispose()
+        {
+            _repository.Dispose();
+        } // Dispose
     }
 }
