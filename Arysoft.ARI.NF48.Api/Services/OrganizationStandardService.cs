@@ -6,6 +6,7 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -100,7 +101,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             return await _repository.GetAsync(id);
         } // GetAsync
 
-        public async Task<OrganizationStandard> AddAsync(OrganizationStandard item)
+        public async Task<OrganizationStandard> CreateAsync(OrganizationStandard item)
         {
             // Assigning values
 
@@ -119,11 +120,14 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"OrganizationStandardService.AddAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"OrganizationStandardService.CreateAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
 
             return item;
-        } // AddAsync
+        } // CreateAsync
 
         public async Task<OrganizationStandard> UpdateAsync(OrganizationStandard item)
         {
@@ -165,7 +169,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"OrganizationStandardService.UpdateAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"OrganizationStandardService.UpdateAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
 
             return foundItem;
@@ -203,7 +210,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"OrganizationStandardService.DeleteAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"OrganizationStandardService.DeleteAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
         } // DeleteAsync
 

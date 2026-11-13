@@ -78,14 +78,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // SiteToItemDetailDto
 
-        public static Site ItemAddDtoToSite(SitePostDto itemDto)
+        public static Site ItemCreateDtoToSite(SitePostDto itemDto)
         {
             return new Site
             {
                 OrganizationID = itemDto.OrganizationID,
                 UpdatedUser = itemDto.UpdatedUser
             };
-        } // ItemAddDtoToSite
+        } // ItemCreateDtoToSite
 
         public static Site ItemEditDtoToSite(SitePutDto itemDto)
         {

@@ -25,7 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Services
 
         // METHODS
 
-        public PagedList<Organization> Gets(OrganizationQueryFilters filters)
+        public async Task<PagedList<Organization>> GetsAsync(OrganizationQueryFilters filters)
         {
             var items = _organizationRepository.Gets();
 
@@ -211,14 +211,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
 
             // Paging
-
-            Console.WriteLine(items.ToString());
-
             var pagedItems = PagedList<Organization>
                 .Create(items, filters.PageNumber, filters.PageSize);
+            await _organizationRepository.LoadListRelationsAsync(pagedItems);
 
             return pagedItems;
-        } // Gets
+        } // GetsAsync
 
         public async Task<Organization> GetAsync(Guid id)
         { 

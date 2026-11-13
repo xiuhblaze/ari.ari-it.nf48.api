@@ -7,6 +7,7 @@ using Arysoft.ARI.NF48.Api.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -144,12 +145,9 @@ namespace Arysoft.ARI.NF48.Api.Services
         /// <param name="item"></param>
         /// <returns></returns>
         /// <exception cref="BusinessException"></exception>
-        public async Task<Site> AddAsync(Site item)
+        public async Task<Site> CreateAsync(Site item)
         {
             // Validations
-
-            //if (string.IsNullOrEmpty(item.UpdatedUser)) // Debe de validar si existe el usuario
-            //    throw new BusinessException("Updated user was not specified");
 
             if (item.OrganizationID == null || item.OrganizationID == Guid.Empty)
                 throw new BusinessException("Must first assign Organization");
@@ -163,13 +161,22 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             // Execute queries
 
-            // Nota: Cuenta con eliminación en cascada para los Shifts
-            await _repository.DeleteTmpByUserAsync(item.UpdatedUser); 
-            _repository.Add(item);
-            await _repository.SaveChangesAsync();
-
+            try
+            {
+                // Nota: Cuenta con eliminación en cascada para los Shifts
+                await _repository.DeleteTmpByUserAsync(item.UpdatedUser);
+                _repository.Add(item);
+                await _repository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(
+                    $"SiteService.CreateAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
+            }
             return item;
-        } // AddAsync
+        } // CreateAsync
 
         /// <summary>
         /// Actualiza la información de un Site, si es un registro nuevo (Status: 0), lo marca como
@@ -216,7 +223,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"SiteService.UpdateAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"SiteService.UpdateAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
 
             return foundItem;
@@ -252,7 +262,10 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"SiteService.DeleteAsync: {ex.Message}");
+                throw new BusinessException(
+                    $"SiteService.DeleteAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
         } // DeleteAsync
 

@@ -100,7 +100,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             return await _repository.GetAsync(id);
         } // GetAsync
 
-        public async Task<Company> AddAsync(Company item)
+        public async Task<Company> CreateAsync(Company item)
         {
             // Validations
 
@@ -129,18 +129,18 @@ namespace Arysoft.ARI.NF48.Api.Services
             catch (Exception ex)
             {
                 throw new BusinessException(
-                    $"CompanyService.AddAsync: {ex.Message}", 
+                    $"CompanyService.CreateAsync: {ex.Message}", 
                     HttpStatusCode.InternalServerError, 
                     ex);
             }
 
             return item;
-        } // AddAsync
+        } // CreateAsync
 
         public async Task<Company> UpdateAsync(Company item)
         { 
             var foundItem = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found");
+                ?? throw new BusinessException("Company to update not found");
 
             // Validations
 
@@ -186,7 +186,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task DeleteAsync(Company item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The record to update was not found");
+                ?? throw new BusinessException("Company to delete not found");
 
             if (foundItem.Status == StatusType.Deleted)
             {

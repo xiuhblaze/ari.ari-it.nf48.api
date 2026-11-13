@@ -76,14 +76,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return itemDto;
         } // ShiftToItemDetailDto
 
-        public static Shift ItemAddDtoToShift(ShiftPostDto itemDto)
+        public static Shift ItemCreateDtoToShift(ShiftPostDto itemDto)
         {
             return new Shift
             {
                 SiteID = itemDto.SiteID,
                 UpdatedUser = itemDto.UpdatedUser
             };
-        } // ItemEditDtoToShift
+        } // ItemCreateDtoToShift
 
         public static Shift ItemEditDtoToShift(ShiftPutDto itemDto)
         {

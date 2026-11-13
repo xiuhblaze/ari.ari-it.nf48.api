@@ -25,6 +25,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             _shiftService = new ShiftService();
         }
 
+        // GET: api/Shift
         [HttpGet]
         [ResponseType(typeof(ApiResponse<IEnumerable<ShiftItemListDto>>))]
         public IHttpActionResult GetShifts([FromUri] ShiftQueryFilters filters)
@@ -48,6 +49,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetShifts
 
+        // GET: api/Shift/5
         [ResponseType(typeof(ApiResponse<ShiftItemDetailDto>))]
         public async Task<IHttpActionResult> GetShift(Guid id)
         {
@@ -67,8 +69,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            var itemToAdd = ShiftMapping.ItemAddDtoToShift(shiftDto);
-            var item = await _shiftService.AddAsync(itemToAdd);
+            var itemToAdd = ShiftMapping.ItemCreateDtoToShift(shiftDto);
+            var item = await _shiftService.CreateAsync(itemToAdd);
             var itemDto = ShiftMapping.ShiftToItemDetailDto(item);
             var response = new ApiResponse<ShiftItemDetailDto>(itemDto);
 

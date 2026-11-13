@@ -65,14 +65,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ContactToItemDetailDto
 
-        public static Contact ItemAddDtoToContact(ContactPostDto itemDto)
+        public static Contact ItemCreateDtoToContact(ContactPostDto itemDto)
         {
             return new Contact
             {
                 OrganizationID = itemDto.OrganizationID,
                 UpdatedUser = itemDto.UpdatedUser
             };
-        } // ItemAddDtoToContact
+        } // ItemCreateDtoToContact
 
         public static Contact ItemEditDtoToContact(ContactPutDto itemDto)
         {

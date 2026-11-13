@@ -140,38 +140,38 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,                
-                //Certificates = item.Certificates != null
-                //    ? CertificateMapping.CertificatesToListDto(item.Certificates
-                //        .Where(i => i.Status != CertificateStatusType.Nothing))
-                //    : new List<CertificateItemListDto>(),
-                AuditCycles = item.AuditCycles != null
-                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
-                        .Where(i => i.Status != StatusType.Nothing)
-                        .OrderByDescending(i => i.Created))
-                    : null,
+                ////Certificates = item.Certificates != null
+                ////    ? CertificateMapping.CertificatesToListDto(item.Certificates
+                ////        .Where(i => i.Status != CertificateStatusType.Nothing))
+                ////    : new List<CertificateItemListDto>(),
+                //AuditCycles = item.AuditCycles != null
+                //    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
+                //        .Where(i => i.Status != StatusType.Nothing)
+                //        .OrderByDescending(i => i.Created))
+                //    : null,
                 Companies = item.Companies != null
                     ? CompanyMapping.CompanyToListDto(item.Companies)
                     : null,
-                Contacts = item.Contacts != null
-                    ? ContactMapping.ContactToListDto(item.Contacts
-                        .Where(i => i.Status != StatusType.Nothing))
-                    : null,
+                //Contacts = item.Contacts != null
+                //    ? ContactMapping.ContactToListDto(item.Contacts
+                //        .Where(i => i.Status != StatusType.Nothing))
+                //    : null,
                 Notes = item.Notes != null
                     ? NoteMapping.NotesToListDto(item.Notes
                         .Where(i => i.Status != StatusType.Nothing))
                     : null,
-                Sites = item.Sites != null
-                    ? SiteMapping.SiteToListDto(item.Sites
-                        .Where(i => i.Status != StatusType.Nothing)
-                        .OrderBy(i => i.Type)
-                        .ThenBy(i => i.Description))
-                    : null,
-                Standards = item.OrganizationStandards != null
-                    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
-                        .Where(os => os.Status != StatusType.Nothing))
-                    : null,                
-                //CertificatesValidityStatus = item.CertificatesValidityStatus
-                //    ?? CertificateValidityStatusType.Nothing,
+                //Sites = item.Sites != null
+                //    ? SiteMapping.SiteToListDto(item.Sites
+                //        .Where(i => i.Status != StatusType.Nothing)
+                //        .OrderBy(i => i.Type)
+                //        .ThenBy(i => i.Description))
+                //    : null,
+                //Standards = item.OrganizationStandards != null
+                //    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                //        .Where(os => os.Status != StatusType.Nothing))
+                //    : null,                
+                ////CertificatesValidityStatus = item.CertificatesValidityStatus
+                ////    ?? CertificateValidityStatusType.Nothing,
             };
         } // OrganizationToItemDetailDto
 

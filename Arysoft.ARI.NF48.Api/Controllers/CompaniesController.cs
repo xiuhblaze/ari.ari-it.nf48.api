@@ -34,7 +34,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(ApiResponse<IEnumerable<CompanyItemListDto>>))]
         public IHttpActionResult GetCompanies([FromUri] CompanyQueryFilters filters)
         {
-            var items = _service.Gets(filters);
+            var items = _service.Gets(filters);            
             var itemsDto = CompanyMapping.CompanyToListDto(items);
             var response = new ApiResponse<IEnumerable<CompanyItemListDto>>(itemsDto)
             {
@@ -69,8 +69,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            var item = CompanyMapping.ItemAddDtoToCompany(itemAddDto);
-            item = await _service.AddAsync(item);
+            var item = CompanyMapping.ItemCreateDtoToCompany(itemAddDto);
+            item = await _service.CreateAsync(item);
             var itemDto = await CompanyMapping.CompanyToItemDetailDto(item);
             var response = new ApiResponse<CompanyItemDetailDto>(itemDto);
 

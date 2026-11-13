@@ -76,14 +76,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // OrganizationStandardToItemDetailDto
 
-        public static OrganizationStandard ItemAddDtoToOrganizationStandard(OrganizationStandardPostDto itemDto)
+        public static OrganizationStandard ItemCreateDtoToOrganizationStandard(OrganizationStandardPostDto itemDto)
         {
             return new OrganizationStandard
             { 
                 OrganizationID = itemDto.OrganizationID,
                 UpdatedUser = itemDto.UpdatedUser
             };
-        } // ItemAddDtoToOrganizationStandard
+        } // ItemCreateDtoToOrganizationStandard
 
         public static OrganizationStandard ItemEditDtoToOrganizationStandard(OrganizationStandardPutDto itemDto)
         {

@@ -77,8 +77,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            var itemToAdd = SiteMapping.ItemAddDtoToSite(siteDto);
-            var item = await _siteService.AddAsync(itemToAdd);
+            var itemToAdd = SiteMapping.ItemCreateDtoToSite(siteDto);
+            var item = await _siteService.CreateAsync(itemToAdd);
             var itemDto = await SiteMapping.SiteToItemDetailDto(item);
             var response = new ApiResponse<SiteItemDetailDto>(itemDto);
 

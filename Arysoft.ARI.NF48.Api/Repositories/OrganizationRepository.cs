@@ -25,8 +25,8 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         /// </summary>
         public override async Task<Organization> GetAsync(Guid id, bool asNoTracking = false)
         {
-            var query = _model
-                .Include(o => o.OrganizationStandards.Select(os => os.Standard));
+            var query = _model;
+                //.Include(o => o.OrganizationStandards.Select(os => os.Standard));
 
             // Sin tracking no se puede usar Entry().Collection(): solo viaja el Include
             // anterior y el resto de colecciones queda en null (el lazy loading tampoco
@@ -38,11 +38,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             if (item == null) return null;
 
             var entry = _context.Entry(item);
-            await entry.Collection(o => o.AuditCycles).LoadAsync();
+            //await entry.Collection(o => o.AuditCycles).LoadAsync();
             await entry.Collection(o => o.Companies).LoadAsync();
-            await entry.Collection(o => o.Contacts).LoadAsync();
+            //await entry.Collection(o => o.Contacts).LoadAsync();
             await entry.Collection(o => o.Notes).LoadAsync();
-            await entry.Collection(o => o.Sites).LoadAsync();
+            //await entry.Collection(o => o.Sites).LoadAsync();
 
             return item;
         } // GetAsync
@@ -144,7 +144,6 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(o => o.Companies)
                 .Include(o => o.Contacts)
                 .Include(o => o.Sites.Select(s => s.Shifts))
-                //.Include(o => o.Certificates)
                 .Where(m =>
                     m.UpdatedUser.ToUpper() == username.ToUpper().Trim()
                     && m.Status == OrganizationStatusType.Nothing

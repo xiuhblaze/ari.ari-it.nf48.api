@@ -8,6 +8,7 @@ using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
@@ -140,7 +141,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             return await _repository.GetAsync(id);
         } // GetAsync
 
-        public async Task<Contact> AddAsync(Contact item)
+        public async Task<Contact> CreateAsync(Contact item)
         {
             // Validations
 
@@ -165,10 +166,12 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"Contact.AddAsync: {ex.Message}");
+                throw new BusinessException($"Contact.CreateAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
             return item;
-        } // AddAsync
+        } // CreateAsync
 
         public async Task<Contact> UpdateAsync(Contact item)
         {
@@ -218,7 +221,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"Contact.UpdateAsync: {ex.Message}");
+                throw new BusinessException($"Contact.UpdateAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
 
             return foundItem;
@@ -227,7 +232,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         public async Task DeleteAsync(Contact item)
         {
             var foundItem = await _repository.GetAsync(item.ID)
-                ?? throw new BusinessException("The record to delete was not found");
+                ?? throw new BusinessException("Contact to delete not found");
 
             // Validations
 
@@ -256,7 +261,9 @@ namespace Arysoft.ARI.NF48.Api.Services
             }
             catch (Exception ex)
             {
-                throw new BusinessException($"Contact.DeleteAsync: {ex.Message}");
+                throw new BusinessException($"Contact.DeleteAsync: {ex.Message}",
+                    HttpStatusCode.InternalServerError,
+                    ex);
             }
         } // DeleteAsync
 

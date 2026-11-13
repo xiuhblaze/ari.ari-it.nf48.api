@@ -38,7 +38,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         [ResponseType(typeof(ApiResponse<IEnumerable<OrganizationItemListDto>>))]
         public async Task<IHttpActionResult> GetOrganizations([FromUri] OrganizationQueryFilters filters)
         {
-            var items = _organizationService.Gets(filters);
+            var items = await _organizationService.GetsAsync(filters);
             var itemsDto = await OrganizationMapping.OrganizationToListDto(items);
             var response = new ApiResponse<IEnumerable<OrganizationItemListDto>>(itemsDto)
             {

@@ -68,8 +68,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             if (!ModelState.IsValid)
                 throw new BusinessException(Strings.GetModelStateErrors(ModelState));
 
-            var item = OrganizationStandardMapping.ItemAddDtoToOrganizationStandard(itemPostDto);
-            item = await _service.AddAsync(item);
+            var item = OrganizationStandardMapping.ItemCreateDtoToOrganizationStandard(itemPostDto);
+            item = await _service.CreateAsync(item);
             var itemDto = await OrganizationStandardMapping.OrganizationStandardToItemDetailDto(item);
             var response = new ApiResponse<OrganizationStandardItemDetailDto>(itemDto);
 

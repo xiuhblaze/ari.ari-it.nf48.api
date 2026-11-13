@@ -56,14 +56,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // CompanyToItemDetailDto
 
-        public static Company ItemAddDtoToCompany(CompanyPostDto itemDto)
+        public static Company ItemCreateDtoToCompany(CompanyPostDto itemDto)
         {
             return new Company
             {
                 OrganizationID = itemDto.OrganizationID,
                 UpdatedUser = itemDto.UpdatedUser
             };
-        } // ItemAddDtoToCompany
+        } // ItemCreateDtoToCompany
 
         public static Company ItemEditDtoToCompany(CompanyPutDto itemDto)
         {
