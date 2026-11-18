@@ -10,7 +10,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
     public class AuditMapping
     {
         public static async Task<IEnumerable<AuditItemListDto>> AuditToListDto(IEnumerable<Audit> items)
-        { 
+        {
             var itemsDto = new List<AuditItemListDto>();
             foreach (var item in items)
             {
@@ -19,69 +19,49 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return itemsDto;
         } // AuditToListDto
 
+        /// <summary>
+        /// Ruta individual: el status de OrganizationStandard de cada AuditStandard se
+        /// consulta a la BD por registro. Para LISTADOS usar la sobrecarga que recibe
+        /// los OrganizationStandards ya cargados.
+        /// </summary>
         public static async Task<AuditItemListDto> AuditToItemListDto(Audit item)
         {
-            return new AuditItemListDto
-            { 
-                ID = item.ID,
-                OrganizationID = item.OrganizationID,
-                //AuditCycleID = item.AuditCycleID,
-                Description = item.Description,
-                StartDate = item.StartDate,
-                EndDate = item.EndDate,
-                IsMultisite = item.IsMultisite,
-                Days = item.Days,
-                IncludeSaturday = item.IncludeSaturday,
-                IncludeSunday = item.IncludeSunday,
-                ExtraInfo = item.ExtraInfo,
-                Status = item.Status,
-                OrganizationName = item.Organization != null
-                    ? item.Organization.Name
-                    : string.Empty,
-                //AuditCycleName = item.AuditCycle != null
-                //    ? item.AuditCycle.Name
-                //    : string.Empty,
-                AuditorsCount = item.AuditAuditors != null
-                    ? item.AuditAuditors.Where(aa =>
-                        aa.Status != StatusType.Nothing
-                        && aa.Status != StatusType.Deleted)
-                        .Count()
-                    : 0,
-                DocumentsCount = item.AuditDocuments != null
-                    ? item.AuditDocuments.Where(ad =>
-                        ad.Status != StatusType.Nothing
-                        && ad.Status != StatusType.Deleted)
-                        .Count()
-                    : 0,
-                NotesCount = item.Notes != null
-                    ? item.Notes.Where(n =>
-                        n.Status != StatusType.Nothing
-                        && n.Status != StatusType.Deleted)
-                        .Count()
-                    : 0,
-                Auditors = item.AuditAuditors != null
-                    ? AuditAuditorMapping.AuditAuditorToListDto(item.AuditAuditors.Where(aa =>
-                        aa.Status != StatusType.Nothing
-                        && aa.Status != StatusType.Deleted))
-                    : null,
-                Standards = item.AuditStandards != null
-                    ? await AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
-                        asd.Status != StatusType.Nothing
-                        && asd.Status != StatusType.Deleted))
-                    : null,
-                SitesCount = item.Sites != null
-                    ? item.Sites.Where(s =>
-                        s.Status != StatusType.Nothing
-                        && s.Status != StatusType.Deleted)
-                        .Count()
-                    : 0,
-            };
+            var itemDto = AuditToItemListDtoBase(item);
+
+            itemDto.Standards = item.AuditStandards != null
+                ? await AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
+                    asd.Status != StatusType.Nothing
+                    && asd.Status != StatusType.Deleted))
+                : null;
+
+            return itemDto;
         } // AuditToItemListDto
+
+        /// <summary>
+        /// Para LISTADOS: no accede a la BD. El status de OrganizationStandard de cada
+        /// AuditStandard se resuelve en memoria con los OrganizationStandards recibidos
+        /// (los de la organización dueña de la auditoría, ya cargados por lote).
+        /// </summary>
+        public static AuditItemListDto AuditToItemListDto(
+            Audit item,
+            IEnumerable<OrganizationStandard> organizationStandards)
+        {
+            var itemDto = AuditToItemListDtoBase(item);
+
+            itemDto.Standards = item.AuditStandards != null
+                ? AuditStandardMapping.AuditStandardToListDto(item.AuditStandards.Where(asd =>
+                    asd.Status != StatusType.Nothing
+                    && asd.Status != StatusType.Deleted),
+                    organizationStandards)
+                : null;
+
+            return itemDto;
+        } // AuditToItemListDto (con OrganizationStandards)
 
         public static async Task<AuditItemDetailDto> AuditToItemDetailDto(Audit item)
         {
             return new AuditItemDetailDto
-            { 
+            {
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 // AuditCycleID = item.AuditCycleID,
@@ -134,7 +114,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         public static Audit ItemAddDtoToAudit(AuditPostDto itemDto)
         {
             return new Audit
-            { 
+            {
                 //AuditCycleID = itemDto.AuditCycleID,
                 OrganizationID = itemDto.OrganizationID,
                 UpdatedUser = itemDto.UpdatedUser,
@@ -145,7 +125,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         {
             return new Audit
             {
-                ID = itemDto.ID,                
+                ID = itemDto.ID,
                 Description = itemDto.Description,
                 StartDate = itemDto.StartDate,
                 EndDate = itemDto.EndDate,
@@ -180,5 +160,65 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ClosedCount = items[5]
             };
         } // ItemArrayToAuditsInMonth
+
+        // PRIVATE
+
+        /// <summary>
+        /// Todo el DTO de listado excepto Standards, que depende de cómo se resuelva
+        /// el status de OrganizationStandard (ver las dos sobrecargas de AuditToItemListDto).
+        /// </summary>
+        private static AuditItemListDto AuditToItemListDtoBase(Audit item)
+        {
+            return new AuditItemListDto
+            {
+                ID = item.ID,
+                OrganizationID = item.OrganizationID,
+                //AuditCycleID = item.AuditCycleID,
+                Description = item.Description,
+                StartDate = item.StartDate,
+                EndDate = item.EndDate,
+                IsMultisite = item.IsMultisite,
+                Days = item.Days,
+                IncludeSaturday = item.IncludeSaturday,
+                IncludeSunday = item.IncludeSunday,
+                ExtraInfo = item.ExtraInfo,
+                Status = item.Status,
+                OrganizationName = item.Organization != null
+                    ? item.Organization.Name
+                    : string.Empty,
+                //AuditCycleName = item.AuditCycle != null
+                //    ? item.AuditCycle.Name
+                //    : string.Empty,
+                AuditorsCount = item.AuditAuditors != null
+                    ? item.AuditAuditors.Where(aa =>
+                        aa.Status != StatusType.Nothing
+                        && aa.Status != StatusType.Deleted)
+                        .Count()
+                    : 0,
+                DocumentsCount = item.AuditDocuments != null
+                    ? item.AuditDocuments.Where(ad =>
+                        ad.Status != StatusType.Nothing
+                        && ad.Status != StatusType.Deleted)
+                        .Count()
+                    : 0,
+                NotesCount = item.Notes != null
+                    ? item.Notes.Where(n =>
+                        n.Status != StatusType.Nothing
+                        && n.Status != StatusType.Deleted)
+                        .Count()
+                    : 0,
+                Auditors = item.AuditAuditors != null
+                    ? AuditAuditorMapping.AuditAuditorToListDto(item.AuditAuditors.Where(aa =>
+                        aa.Status != StatusType.Nothing
+                        && aa.Status != StatusType.Deleted))
+                    : null,
+                SitesCount = item.Sites != null
+                    ? item.Sites.Where(s =>
+                        s.Status != StatusType.Nothing
+                        && s.Status != StatusType.Deleted)
+                        .Count()
+                    : 0,
+            };
+        } // AuditToItemListDtoBase
     }
 }

@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Repositories;
 using Arysoft.ARI.NF48.Api.Tools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,10 @@ namespace Arysoft.ARI.NF48.Api.Mappings
 {
     public class OrganizationMapping
     {
+        /// <summary>
+        /// Ruta individual: cada organización consulta su próxima auditoría a la BD.
+        /// Para el LISTADO paginado usar la sobrecarga que recibe los NextAudit por lote.
+        /// </summary>
         public static async Task<IEnumerable<OrganizationItemListDto>> OrganizationToListDto(IEnumerable<Organization> items)
         {
             var itemsDto = new List<OrganizationItemListDto>();
@@ -23,11 +28,45 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return itemsDto;
         } // OrganizationToListDto 
 
+        /// <summary>
+        /// Para el LISTADO paginado: recibe la próxima auditoría de cada organización ya
+        /// resuelta por lote (OrganizationService.GetNextAuditsAsync), así el mapping no
+        /// consulta la BD por fila. La llave del diccionario es el ID de la organización.
+        /// </summary>
+        public static async Task<IEnumerable<OrganizationItemListDto>> OrganizationToListDto(
+            IEnumerable<Organization> items,
+            IDictionary<Guid, Audit> nextAudits)
+        {
+            var itemsDto = new List<OrganizationItemListDto>();
+
+            foreach (var item in items)
+            {
+                Audit nextAudit = null;
+                nextAudits?.TryGetValue(item.ID, out nextAudit);
+
+                itemsDto.Add(await OrganizationToItemListDto(item, nextAudit));
+            }
+
+            return itemsDto;
+        } // OrganizationToListDto (NextAudit por lote)
+
+        /// <summary>
+        /// Ruta individual (detalle de Audit, detalle de Company, ...): consulta la próxima
+        /// auditoría de esa organización y libera el contexto al terminar el mapping.
+        /// </summary>
         public static async Task<OrganizationItemListDto> OrganizationToItemListDto(Organization item)
         {
-            var auditRepository = new AuditRepository();
-            var nextAudit = auditRepository
-                .GetNextAudit(item.ID, null, AuditNextAuditOwnerType.Organization);
+            using (var auditRepository = new AuditRepository())
+            {
+                var nextAudit = auditRepository
+                    .GetNextAudit(item.ID, null, AuditNextAuditOwnerType.Organization);
+
+                return await OrganizationToItemListDto(item, nextAudit);
+            }
+        } // OrganizationToItemListDto
+
+        public static async Task<OrganizationItemListDto> OrganizationToItemListDto(Organization item, Audit nextAudit)
+        {
             var mainContact = item.Contacts?
                 .Where(c => c.IsMainContact && c.Status == StatusType.Active)
                 .FirstOrDefault();
@@ -75,7 +114,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                     ? SiteMapping.SiteToItemListDto(mainSite)
                     : null,
                 NextAudit = nextAudit != null
-                    ? await AuditMapping.AuditToItemListDto(nextAudit)
+                    ? AuditMapping.AuditToItemListDto(nextAudit, item.OrganizationStandards)
                     : null,
                 AuditCyclesCount = item.AuditCycles != null
                     ? item.AuditCycles.Where(i =>
@@ -113,7 +152,6 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteLocationURL = mainSite != null
                     ? mainSite.LocationURL
                     : string.Empty,
-                //SitesEmployeesCount = employeesCount,
                 TotalWorkers = OrganizationCalculations.GetTotalWorkers(item.Sites.ToList()),
                 Standards = item.OrganizationStandards != null
                     ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
@@ -139,44 +177,44 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
-                UpdatedUser = item.UpdatedUser,                
+                UpdatedUser = item.UpdatedUser,
                 ////Certificates = item.Certificates != null
                 ////    ? CertificateMapping.CertificatesToListDto(item.Certificates
                 ////        .Where(i => i.Status != CertificateStatusType.Nothing))
                 ////    : new List<CertificateItemListDto>(),
-                //AuditCycles = item.AuditCycles != null
-                //    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
-                //        .Where(i => i.Status != StatusType.Nothing)
-                //        .OrderByDescending(i => i.Created))
-                //    : null,
+                AuditCycles = item.AuditCycles != null
+                    ? AuditCycleMapping.AuditCyclesToListDto(item.AuditCycles
+                        .Where(i => i.Status != StatusType.Nothing)
+                        .OrderByDescending(i => i.Created))
+                    : null,
                 Companies = item.Companies != null
                     ? CompanyMapping.CompanyToListDto(item.Companies)
                     : null,
-                //Contacts = item.Contacts != null
-                //    ? ContactMapping.ContactToListDto(item.Contacts
-                //        .Where(i => i.Status != StatusType.Nothing))
-                //    : null,
+                Contacts = item.Contacts != null
+                    ? ContactMapping.ContactToListDto(item.Contacts
+                        .Where(i => i.Status != StatusType.Nothing))
+                    : null,
                 Notes = item.Notes != null
                     ? NoteMapping.NotesToListDto(item.Notes
                         .Where(i => i.Status != StatusType.Nothing))
                     : null,
-                //Sites = item.Sites != null
-                //    ? SiteMapping.SiteToListDto(item.Sites
-                //        .Where(i => i.Status != StatusType.Nothing)
-                //        .OrderBy(i => i.Type)
-                //        .ThenBy(i => i.Description))
-                //    : null,
-                //Standards = item.OrganizationStandards != null
-                //    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
-                //        .Where(os => os.Status != StatusType.Nothing))
-                //    : null,                
+                Sites = item.Sites != null
+                    ? SiteMapping.SiteToListDto(item.Sites
+                        .Where(i => i.Status != StatusType.Nothing)
+                        .OrderBy(i => i.Type)
+                        .ThenBy(i => i.Description))
+                    : null,
+                Standards = item.OrganizationStandards != null
+                    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
+                        .Where(os => os.Status != StatusType.Nothing))
+                    : null,
                 ////CertificatesValidityStatus = item.CertificatesValidityStatus
                 ////    ?? CertificateValidityStatusType.Nothing,
             };
         } // OrganizationToItemDetailDto
 
         public static OrganizationMiniStatisticDto OrganizationDataToMiniStatisticDataDto(int[] items)
-        { 
+        {
             return new OrganizationMiniStatisticDto
             {
                 ActivesCount = items[0],
@@ -213,11 +251,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ID = itemDto.ID,
                 Name = itemDto.Name,
                 Website = itemDto.Website,
-                Phone= itemDto.Phone,
+                Phone = itemDto.Phone,
                 ExtraInfo = itemDto.ExtraInfo,
                 FolderFolio = itemDto.FolderFolio,
                 Status = itemDto.Status,
-                UpdatedUser= itemDto.UpdatedUser
+                UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemEditDtoToOrganization
 

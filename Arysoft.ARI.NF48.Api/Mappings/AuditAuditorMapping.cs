@@ -36,9 +36,11 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 AuditorName = item.Auditor != null
                     ? Tools.Strings.FullName(item.Auditor.FirstName, item.Auditor.MiddleName, item.Auditor.LastName)
                     : string.Empty,
+                // ToList: se evalúa aquí y no al serializar (el contexto ya pudo liberarse)
                 StandardsNames = item.AuditStandards?
-                    .Where(ads => ads.Status != StatusType.Nothing)
+                    .Where(ads => ads.Status != StatusType.Nothing && ads.Standard != null)
                     .Select(ads => ads.Standard.Name)
+                    .ToList()
             };
         } // AuditAuditorToItemListDto
 
@@ -49,7 +51,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             var auditStandardsDto = new List<AuditStandardItemListDto>();
 
             if (auditStandards != null)
-            { 
+            {
                 foreach (var auditStandard in auditStandards)
                 {
                     var auditStandardDto = await AuditStandardMapping.AuditStandardToItemListDto(auditStandard);
@@ -110,5 +112,5 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemDeleteDtoToAuditAuditor
-    } 
+    }
 }

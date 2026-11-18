@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Exceptions;
 using Arysoft.ARI.NF48.Api.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Include(a => a.Notes)
                 .Include(a => a.Sites);
 
-            if (initialDate == null) initialDate = DateTime.Now;
+            if (initialDate == null) initialDate = DateTime.UtcNow;
 
             items = items.Where(a =>
                 a.StartDate >= initialDate
@@ -71,6 +72,114 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
             return items.FirstOrDefault();
         } // GetNextAudit
+
+        /// <summary>
+        /// Para el LISTADO de organizaciones: obtiene la próxima auditoría de cada una
+        /// con un número fijo de queries (sin importar cuántas organizaciones haya), en
+        /// lugar de un GetNextAudit por fila. Aplica los mismos filtros que GetNextAudit
+        /// (StartDate >= initialDate, Status distinto de Nothing y menor que Canceled).
+        /// Devuelve un diccionario OrganizationID -> Audit; las organizaciones sin
+        /// próxima auditoría no aparecen. Los Audit quedan rastreados en el contexto de
+        /// este repositorio con todo lo que lee AuditMapping.AuditToItemListDto ya
+        /// cargado, así que el mapping no dispara lazy loading.
+        /// </summary>
+        /// <param name="organizationIDs">IDs de las organizaciones de la página</param>
+        /// <param name="initialDate">Fecha desde la cual buscar (por default, ahora)</param>
+        public async Task<Dictionary<Guid, Audit>> GetNextAuditsByOrganizationsAsync(
+            IList<Guid> organizationIDs,
+            DateTime? initialDate = null)
+        {
+            var result = new Dictionary<Guid, Audit>();
+
+            if (organizationIDs == null || organizationIDs.Count == 0)
+                return result;
+
+            var fromDate = initialDate ?? DateTime.UtcNow; // Igual que GetNextAudit
+            // Guid? para que compile igual si Audit.OrganizationID es nullable o no
+            var ids = organizationIDs.Select(id => (Guid?)id).ToList();
+
+            // 1) ID de la próxima auditoría por organización (un solo query, resuelto en SQL)
+            var nextAuditIDs = await _model
+                .Where(a =>
+                    ids.Contains(a.OrganizationID)
+                    && a.StartDate >= fromDate
+                    && a.Status != AuditStatusType.Nothing
+                    && a.Status < AuditStatusType.Canceled)
+                .GroupBy(a => a.OrganizationID)
+                .Select(g => g
+                    .OrderBy(a => a.StartDate)
+                    .ThenBy(a => a.ID)
+                    .Select(a => a.ID)
+                    .FirstOrDefault())
+                .ToListAsync();
+
+            if (nextAuditIDs.Count == 0)
+                return result;
+
+            // 2) Las auditorías, con su Organization y Sites (una sola colección en el Include)
+            var audits = await _model
+                .Include(a => a.Organization)
+                .Include(a => a.Sites)
+                .Where(a => nextAuditIDs.Contains(a.ID))
+                .ToListAsync();
+
+            var auditIDs = audits.Select(a => a.ID).ToList();
+
+            // 3) Auditores, con su Auditor y los AuditStandards (+ Standard) que atiende cada uno
+            await _context.Set<AuditAuditor>()
+                .Where(aa => auditIDs.Contains(aa.AuditID))
+                .Include(aa => aa.Auditor)
+                .Include(aa => aa.AuditStandards.Select(s => s.Standard))
+                .LoadAsync();
+
+            // 4) Estándares de la auditoría, con su AuditCycle y Standard
+            await _context.Set<AuditStandard>()
+                .Where(s => auditIDs.Contains(s.AuditID))
+                .Include(s => s.AuditCycle)
+                .Include(s => s.Standard)
+                .LoadAsync();
+
+            // 5) Documentos, con su relación a AuditStandards (para AuditStandard.AuditDocuments.Count)
+            await _context.Set<AuditDocument>()
+                .Where(d => auditIDs.Contains(d.AuditID))
+                .Include(d => d.AuditStandards)
+                .LoadAsync();
+
+            // 6) Notas
+            await _context.Set<Note>()
+                .Where(n => auditIDs.Contains(n.OwnerID))
+                .LoadAsync();
+
+            // Sin esto, el proxy de lazy loading vuelve a consultar la BD la primera vez
+            // que se lee cada colección, aunque ya esté poblada por el fixup.
+            foreach (var audit in audits)
+            {
+                var auditEntry = _context.Entry(audit);
+                auditEntry.Collection(a => a.AuditAuditors).IsLoaded = true;
+                auditEntry.Collection(a => a.AuditStandards).IsLoaded = true;
+                auditEntry.Collection(a => a.AuditDocuments).IsLoaded = true;
+                auditEntry.Collection(a => a.Notes).IsLoaded = true;
+                auditEntry.Collection(a => a.Sites).IsLoaded = true;
+
+                foreach (var auditAuditor in audit.AuditAuditors ?? new List<AuditAuditor>())
+                {
+                    _context.Entry(auditAuditor).Collection(aa => aa.AuditStandards).IsLoaded = true;
+                }
+
+                foreach (var auditStandard in audit.AuditStandards ?? new List<AuditStandard>())
+                {
+                    var auditStandardEntry = _context.Entry(auditStandard);
+                    auditStandardEntry.Collection(s => s.AuditAuditors).IsLoaded = true;
+                    auditStandardEntry.Collection(s => s.AuditDocuments).IsLoaded = true;
+                }
+
+                var organizationID = (Guid?)audit.OrganizationID;
+                if (organizationID.HasValue && organizationID.Value != Guid.Empty)
+                    result[organizationID.Value] = audit;
+            }
+
+            return result;
+        } // GetNextAuditsByOrganizationsAsync
 
         public async Task<bool> HasAuditorAnAudit(
             Guid auditorID, 

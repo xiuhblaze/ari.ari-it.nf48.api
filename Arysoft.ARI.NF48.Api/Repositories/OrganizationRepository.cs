@@ -38,11 +38,11 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             if (item == null) return null;
 
             var entry = _context.Entry(item);
-            //await entry.Collection(o => o.AuditCycles).LoadAsync();
+            await entry.Collection(o => o.AuditCycles).LoadAsync();
             await entry.Collection(o => o.Companies).LoadAsync();
-            //await entry.Collection(o => o.Contacts).LoadAsync();
+            await entry.Collection(o => o.Contacts).LoadAsync();
             await entry.Collection(o => o.Notes).LoadAsync();
-            //await entry.Collection(o => o.Sites).LoadAsync();
+            await entry.Collection(o => o.Sites).LoadAsync();
 
             return item;
         } // GetAsync

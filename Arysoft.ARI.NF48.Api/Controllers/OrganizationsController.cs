@@ -39,7 +39,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> GetOrganizations([FromUri] OrganizationQueryFilters filters)
         {
             var items = await _organizationService.GetsAsync(filters);
-            var itemsDto = await OrganizationMapping.OrganizationToListDto(items);
+            var nextAudits = await _organizationService.GetNextAuditsAsync(items);
+            var itemsDto = await OrganizationMapping.OrganizationToListDto(items, nextAudits);
             var response = new ApiResponse<IEnumerable<OrganizationItemListDto>>(itemsDto)
             {
                 Meta = new Metadata
@@ -178,6 +179,18 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             return Ok(response);
         } // DeleteOrganization
+
+        // DISPOSE
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _organizationService.Dispose();
+            }
+
+            base.Dispose(disposing);
+        } // Dispose
 
     }
 }

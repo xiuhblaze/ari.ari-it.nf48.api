@@ -21,21 +21,53 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return itemsDto;
         } // AuditStandarToListDto
 
+        /// <summary>
+        /// Para LISTADOS: no accede a la BD. El status de OrganizationStandard se resuelve
+        /// en memoria con los OrganizationStandards recibidos (ya cargados por lote).
+        /// </summary>
+        public static IEnumerable<AuditStandardItemListDto> AuditStandardToListDto(
+            IEnumerable<AuditStandard> items,
+            IEnumerable<OrganizationStandard> organizationStandards)
+        {
+            var itemsDto = new List<AuditStandardItemListDto>();
+            foreach (var item in items)
+            {
+                itemsDto.Add(AuditStandardToItemListDto(
+                    item,
+                    GetOrganizationStandardStatus(item, organizationStandards)));
+            }
+            return itemsDto;
+        } // AuditStandardToListDto (con OrganizationStandards)
+
+        /// <summary>
+        /// Ruta individual: consulta a la BD el status de OrganizationStandard. Para
+        /// LISTADOS usar la sobrecarga que recibe ese status ya resuelto.
+        /// </summary>
         public static async Task<AuditStandardItemListDto> AuditStandardToItemListDto(AuditStandard item)
         {
-            var _organizationStandardRepository = new OrganizationStandardRepository();
-            var organizatinoStandardStatus = StatusType.Nothing;
-            var organizationStandard = await _organizationStandardRepository
-                .GetByOrganizationAndStandardAsync(
-                    item.AuditCycle != null && item.AuditCycle.OrganizationID != Guid.Empty 
-                        ? item.AuditCycle.OrganizationID 
-                        : Guid.Empty,
-                    item.AuditCycle?.StandardID ?? Guid.Empty
-                );
+            var organizationStandardStatus = StatusType.Nothing;
 
-            if (organizationStandard != null)
-                organizatinoStandardStatus = organizationStandard.Status;
+            using (var organizationStandardRepository = new OrganizationStandardRepository())
+            {
+                var organizationStandard = await organizationStandardRepository
+                    .GetByOrganizationAndStandardAsync(
+                        item.AuditCycle != null && item.AuditCycle.OrganizationID != Guid.Empty
+                            ? item.AuditCycle.OrganizationID
+                            : Guid.Empty,
+                        item.AuditCycle?.StandardID ?? Guid.Empty
+                    );
 
+                if (organizationStandard != null)
+                    organizationStandardStatus = organizationStandard.Status;
+            }
+
+            return AuditStandardToItemListDto(item, organizationStandardStatus);
+        } // AuditStandardToItemListDto
+
+        public static AuditStandardItemListDto AuditStandardToItemListDto(
+            AuditStandard item,
+            StatusType organizationStandardStatus)
+        {
             return new AuditStandardItemListDto
             {
                 ID = item.ID,
@@ -57,13 +89,13 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardName = item.Standard != null
                     ? item.Standard.Name
                     : string.Empty,
-                StandardBase = item.Standard != null 
+                StandardBase = item.Standard != null
                     ? item.Standard.StandardBase ?? StandardBaseType.Nothing
                     : StandardBaseType.Nothing,
                 StandardStatus = item.Standard != null
                     ? item.Standard.Status
                     : StatusType.Nothing,
-                OrganizationStandardStatus = organizatinoStandardStatus,
+                OrganizationStandardStatus = organizationStandardStatus,
                 AuditorsCount = item.AuditAuditors != null
                     ? item.AuditAuditors.Count
                     : 0,
@@ -138,5 +170,34 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemDeleteDtoToAuditStandard
+
+        // PRIVATE
+
+        /// <summary>
+        /// Mismo criterio que OrganizationStandardRepository.GetByOrganizationAndStandardAsync
+        /// (organización y estándar del AuditCycle), pero sobre los OrganizationStandards
+        /// que ya están en memoria. Sin AuditCycle o sin coincidencia devuelve Nothing.
+        /// </summary>
+        private static StatusType GetOrganizationStandardStatus(
+            AuditStandard item,
+            IEnumerable<OrganizationStandard> organizationStandards)
+        {
+            if (organizationStandards == null || item.AuditCycle == null)
+                return StatusType.Nothing;
+
+            var organizationID = item.AuditCycle.OrganizationID;
+            var standardID = item.AuditCycle.StandardID ?? Guid.Empty;
+
+            if (organizationID == Guid.Empty || standardID == Guid.Empty)
+                return StatusType.Nothing;
+
+            var organizationStandard = organizationStandards.FirstOrDefault(os =>
+                os.OrganizationID == organizationID
+                && os.StandardID == standardID);
+
+            return organizationStandard != null
+                ? organizationStandard.Status
+                : StatusType.Nothing;
+        } // GetOrganizationStandardStatus
     }
 }

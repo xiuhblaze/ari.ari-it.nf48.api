@@ -7,71 +7,79 @@ using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Repositories;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Services
 {
-    public class OrganizationService
+    public class OrganizationService : IDisposable
     {
         private readonly OrganizationRepository _organizationRepository;
+        private readonly AuditRepository _auditRepository;
 
         // CONSTRUCTOR
 
         public OrganizationService()
         {
             _organizationRepository = new OrganizationRepository();
+            _auditRepository = new AuditRepository();
         }
 
         // METHODS
 
         public async Task<PagedList<Organization>> GetsAsync(OrganizationQueryFilters filters)
         {
-            var items = _organizationRepository.Gets();
+            // Query sin ejecutar: todo lo siguiente se traduce a SQL
+            var items = _organizationRepository.Query();
 
             // Filters
 
             if (filters.StandardID != null && filters.StandardID != Guid.Empty)
             {
+                var standardID = filters.StandardID.Value;
                 items = items.Where(e => e.OrganizationStandards
-                    .Any(os => os.StandardID == filters.StandardID
+                    .Any(os => os.StandardID == standardID
                         && os.Status != StatusType.Nothing
                     ));
             }
 
-            if (filters.Folio != null) 
+            if (filters.Folio != null)
             {
-                items = items.Where(e => 
-                    e.Folio == filters.Folio || 
-                    e.FolderFolio == filters.Folio
+                var folio = filters.Folio.Value;
+                items = items.Where(e =>
+                    e.Folio == folio ||
+                    e.FolderFolio == folio
                 );
             }
 
             if (!string.IsNullOrEmpty(filters.Text))
             {
-                filters.Text = filters.Text.ToLower().Trim();
-                filters.Text = Strings.EscapeLikeValue(filters.Text);
+                // Sin Strings.EscapeLikeValue: EF6 ya escapa %, _ y [ en Contains,
+                // escapar a mano los duplicaría y rompería búsquedas como "100%".
+                var text = filters.Text.ToLower().Trim();
                 items = items.Where(e =>
-                    (e.Name != null && e.Name.ToLower().Contains(filters.Text))
-                    || (e.Companies != null && e.Companies.Any(c => 
-                        (c.Name != null && c.Name.ToLower().Contains(filters.Text))
-                        || (c.LegalEntity != null && c.LegalEntity.ToLower().Contains(filters.Text))
-                    ))
-                    || (e.Sites != null && e.Sites.Any(s => 
-                        (s.Address != null && s.Address.ToLower().Contains(filters.Text))
-                        || (s.Country != null && s.Country.ToLower().Contains(filters.Text))
-                    ))
-                    || (e.Website != null && e.Website.ToLower().Contains(filters.Text))
-                    || (e.Phone != null && e.Phone.ToLower().Contains(filters.Text))                    
-                    || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(filters.Text))
+                    (e.Name != null && e.Name.ToLower().Contains(text))
+                    || e.Companies.Any(c =>
+                        (c.Name != null && c.Name.ToLower().Contains(text))
+                        || (c.LegalEntity != null && c.LegalEntity.ToLower().Contains(text))
+                    )
+                    || e.Sites.Any(s =>
+                        (s.Address != null && s.Address.ToLower().Contains(text))
+                        || (s.Country != null && s.Country.ToLower().Contains(text))
+                    )
+                    || (e.Website != null && e.Website.ToLower().Contains(text))
+                    || (e.Phone != null && e.Phone.ToLower().Contains(text))
+                    || (e.ExtraInfo != null && e.ExtraInfo.ToLower().Contains(text))
                 );
             }
 
             if (filters.StandardBase != null && filters.StandardBase != StandardBaseType.Nothing)
             {
+                var standardBase = filters.StandardBase.Value;
                 items = items.Where(e => e.OrganizationStandards
-                    .Any(os => os.Standard != null 
-                        && os.Standard.StandardBase == filters.StandardBase
+                    .Any(os => os.Standard != null
+                        && os.Standard.StandardBase == standardBase
                         && os.Status != StatusType.Nothing
                     ));
             }
@@ -80,52 +88,45 @@ namespace Arysoft.ARI.NF48.Api.Services
             if (filters.CertificateCycleAlert != null && filters.CertificateCycleAlert != OrganizationCertificateCycleAlertType.Nothing)
             {
                 DateTime alertDate = DateTime.UtcNow;
+                // EF6 no traduce AddYears/AddMonths sobre la columna: la aritmética se pasa
+                // al lado del parámetro (EndDate - 1 año < hoy  <=>  EndDate < hoy + 1 año)
+                DateTime limitOneYear = alertDate.AddYears(1);
+                DateTime limitThreeMonths = alertDate.AddMonths(3);
 
                 switch (filters.CertificateCycleAlert)
                 {
                     case OrganizationCertificateCycleAlertType.Active:
-                        items = items.Where(e => e.AuditCycles != null &&
-                            e.AuditCycles
-                                .Where(ac => ac.Status == StatusType.Active)
-                                .Any()
+                        items = items.Where(e => e.AuditCycles
+                            .Any(ac => ac.Status == StatusType.Active)
                         );
                         break;
 
                     case OrganizationCertificateCycleAlertType.LastYear:
-                        items = items.Where(e => e.AuditCycles != null
-                            && e.AuditCycles
-                                .Where(ac =>
-                                    ac.Status == StatusType.Active
-                                    && ac.EndDate != null
-                                    && ac.EndDate.Value.AddYears(-1) < alertDate
-                                    && alertDate <= ac.EndDate.Value
-                                )
-                                .Any()
+                        items = items.Where(e => e.AuditCycles
+                            .Any(ac =>
+                                ac.Status == StatusType.Active
+                                && ac.EndDate < limitOneYear
+                                && alertDate <= ac.EndDate
+                            )
                         );
                         break;
 
                     case OrganizationCertificateCycleAlertType.LeftThreeMonths:
-                        items = items.Where(e => e.AuditCycles != null
-                            && e.AuditCycles
-                                .Where(ac =>
-                                    ac.Status == StatusType.Active
-                                    && ac.EndDate != null
-                                    && ac.EndDate.Value.AddMonths(-3) < alertDate
-                                    && alertDate <= ac.EndDate.Value
-                                )
-                                .Any()
+                        items = items.Where(e => e.AuditCycles
+                            .Any(ac =>
+                                ac.Status == StatusType.Active
+                                && ac.EndDate < limitThreeMonths
+                                && alertDate <= ac.EndDate
+                            )
                         );
                         break;
 
                     case OrganizationCertificateCycleAlertType.Expired:
-                        items = items.Where(e => e.AuditCycles != null
-                            && e.AuditCycles
-                                .Where(ac =>
-                                    ac.Status == StatusType.Active
-                                    && ac.EndDate != null
-                                    && ac.EndDate.Value < alertDate
-                                )
-                                .Any()
+                        items = items.Where(e => e.AuditCycles
+                            .Any(ac =>
+                                ac.Status == StatusType.Active
+                                && ac.EndDate < alertDate
+                            )
                         );
                         break;
                 }
@@ -134,15 +135,16 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Status
             if (filters.Status != null && filters.Status != OrganizationStatusType.Nothing)
             {
-                items = items.Where(e => e.Status == filters.Status);
+                var status = filters.Status.Value;
+                items = items.Where(e => e.Status == status);
             }
             else
             {
                 // Un listado general omitiendo los registros de tipo Applicant
                 items = items.Where(e => e.Status != OrganizationStatusType.Applicant);
 
-                if (filters.IncludeDeleted == null) filters.IncludeDeleted = false;
-                items = (bool)filters.IncludeDeleted
+                var includeDeleted = filters.IncludeDeleted ?? false;
+                items = includeDeleted
                     ? items.Where(e => e.Status != OrganizationStatusType.Nothing)
                     : items.Where(e => e.Status != OrganizationStatusType.Nothing && e.Status != OrganizationStatusType.Deleted);
             }
@@ -161,52 +163,55 @@ namespace Arysoft.ARI.NF48.Api.Services
             //    items = items.Where(e => e.CertificatesValidityStatus == filters.CertificatesValidityStatus);
             //}
 
-            // Order
+            // Order (siempre debe haber OrderBy antes de Skip/Take en EF6; el ThenBy(ID)
+            // desempata para que las páginas no repitan ni se salten filas)
 
             switch (filters.Order)
             {
                 case OrganizationOrderType.Folio:
-                    items = items.OrderBy(e => e.Folio);
+                    items = items.OrderBy(e => e.Folio).ThenBy(e => e.ID);
                     break;
                 case OrganizationOrderType.Name:
-                    items = items.OrderBy(e => e.Name);
-                    break;                
+                    items = items.OrderBy(e => e.Name).ThenBy(e => e.ID);
+                    break;
                 case OrganizationOrderType.Status:
                     items = items.OrderBy(e => e.Status)
-                        .ThenBy(e => e.Name);
+                        .ThenBy(e => e.Name)
+                        .ThenBy(e => e.ID);
                     break;
                 case OrganizationOrderType.FolderFolio:
-                    items = items.OrderBy(e => e.FolderFolio);
+                    items = items.OrderBy(e => e.FolderFolio).ThenBy(e => e.ID);
                     break;
                 //case OrganizationOrderType.CertificatesValidityStatus:
                 //    items = items.OrderBy(e => e.CertificatesValidityStatus)
                 //        .ThenBy(e => e.Name);
                 //    break;
                 case OrganizationOrderType.Updated:
-                    items = items.OrderBy(e => e.Updated);
+                    items = items.OrderBy(e => e.Updated).ThenBy(e => e.ID);
                     break;
                 case OrganizationOrderType.FolioDesc:
-                    items = items.OrderByDescending(e => e.Folio);
+                    items = items.OrderByDescending(e => e.Folio).ThenBy(e => e.ID);
                     break;
                 case OrganizationOrderType.NameDesc:
-                    items = items.OrderByDescending(e => e.Name);
-                    break;                
+                    items = items.OrderByDescending(e => e.Name).ThenBy(e => e.ID);
+                    break;
                 case OrganizationOrderType.StatusDesc:
                     items = items.OrderByDescending(e => e.Status)
-                        .ThenByDescending(e => e.Name);
+                        .ThenByDescending(e => e.Name)
+                        .ThenBy(e => e.ID);
                     break;
                 case OrganizationOrderType.FolderFolioDesc:
-                    items = items.OrderByDescending(e => e.FolderFolio);
+                    items = items.OrderByDescending(e => e.FolderFolio).ThenBy(e => e.ID);
                     break;
                 //case OrganizationOrderType.CertificatesValidityStatusDesc:
                 //    items = items.OrderByDescending(e => e.CertificatesValidityStatus)
                 //        .ThenByDescending(e => e.Name);
                 //    break;
                 case OrganizationOrderType.UpdatedDesc:
-                    items = items.OrderByDescending(e => e.Updated);
+                    items = items.OrderByDescending(e => e.Updated).ThenBy(e => e.ID);
                     break;
                 default:
-                    items = items.OrderByDescending(e => e.Folio);
+                    items = items.OrderByDescending(e => e.Folio).ThenBy(e => e.ID);
                     break;
             }
 
@@ -218,8 +223,21 @@ namespace Arysoft.ARI.NF48.Api.Services
             return pagedItems;
         } // GetsAsync
 
+        /// <summary>
+        /// Próxima auditoría de cada organización de la página, resuelta por lote
+        /// (ver AuditRepository.GetNextAuditsByOrganizationsAsync). La llave es el ID de
+        /// la organización. Los Audit viven en el contexto de _auditRepository, que se
+        /// libera junto con el servicio: hay que mapearlos antes de eso.
+        /// </summary>
+        public async Task<Dictionary<Guid, Audit>> GetNextAuditsAsync(IEnumerable<Organization> organizations)
+        {
+            var ids = organizations.Select(o => o.ID).ToList();
+
+            return await _auditRepository.GetNextAuditsByOrganizationsAsync(ids);
+        } // GetNextAuditsAsync
+
         public async Task<Organization> GetAsync(Guid id)
-        { 
+        {
             var item = await _organizationRepository.GetAsync(id)
                 ?? throw new BusinessException("Item not found");
 
@@ -278,7 +296,7 @@ namespace Arysoft.ARI.NF48.Api.Services
         // EDIT METHODS
 
         public async Task<Organization> AddAsync(Organization item)
-        {   
+        {
             // Assigning values
 
             item.ID = Guid.NewGuid();
@@ -295,7 +313,7 @@ namespace Arysoft.ARI.NF48.Api.Services
                         o.UpdatedUser.ToUpper() == item.UpdatedUser.ToUpper() &&
                         o.Status == OrganizationStatusType.Nothing)
                     .ToList();
-                if (items != null && items.Count > 0) 
+                if (items != null && items.Count > 0)
                 {
                     foreach (var i in items)
                     {
@@ -328,7 +346,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             // Assigning values
 
             // Si cambió a estatus activo, generar el folio
-            if (foundItem.Status < OrganizationStatusType.Active 
+            if (foundItem.Status < OrganizationStatusType.Active
                 && item.Status == OrganizationStatusType.Active
                 && foundItem.Folio == null)
             {
@@ -345,7 +363,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             foundItem.Name = item.Name;
             foundItem.LogoFile = item.LogoFile;
             foundItem.Website = item.Website;
-            foundItem.Phone = item.Phone;;
+            foundItem.Phone = item.Phone; ;
             foundItem.ExtraInfo = item.ExtraInfo;
             foundItem.FolderFolio = item.FolderFolio;
             foundItem.Status = foundItem.Status == OrganizationStatusType.Nothing && item.Status == OrganizationStatusType.Nothing
@@ -467,7 +485,7 @@ namespace Arysoft.ARI.NF48.Api.Services
             bool haveContract = false;
 
             haveAppForm = auditCycle.AuditCycleDocuments
-                .Where(acd => 
+                .Where(acd =>
                     acd.DocumentType == AuditCycleDocumentType.AppForm
                     && acd.Status == StatusType.Active)
                 .Any();
@@ -495,5 +513,13 @@ namespace Arysoft.ARI.NF48.Api.Services
 
             //return true;
         } // CheckMinimalDocumentation
+
+        // DISPOSE
+
+        public void Dispose()
+        {
+            _organizationRepository.Dispose();
+            _auditRepository.Dispose();
+        } // Dispose
     }
 }
