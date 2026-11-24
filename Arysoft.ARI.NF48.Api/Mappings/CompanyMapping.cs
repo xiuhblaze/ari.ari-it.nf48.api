@@ -1,18 +1,14 @@
 ﻿using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
     public class CompanyMapping
     {
-        public static IEnumerable<CompanyItemListDto> CompanyToListDto(IEnumerable<Company> items)
+        public static IEnumerable<CompanyListDto> CompanyToListDto(IEnumerable<Company> items)
         {
-            var itemsDto = new List<CompanyItemListDto>();
+            var itemsDto = new List<CompanyListDto>();
             foreach (var item in items)
             {
                 itemsDto.Add(CompanyToItemListDto(item));
@@ -20,15 +16,14 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return itemsDto;
         } // CompanyToListDto
 
-        public static CompanyItemListDto CompanyToItemListDto(Company item)
+        public static CompanyListDto CompanyToItemListDto(Company item)
         {
-            return new CompanyItemListDto
+            return new CompanyListDto
             {
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
-                //COID = item.COID,
                 Status = item.Status,
                 UpdatedUser = item.UpdatedUser,
                 OrganizationName = item.Organization != null
@@ -37,21 +32,20 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // CompanyToItemListDto
 
-        public static async Task<CompanyItemDetailDto> CompanyToItemDetailDto(Company item)
+        public static CompanyDetailDto CompanyToItemDetailDto(Company item)
         {
-            return new CompanyItemDetailDto
+            return new CompanyDetailDto
             {
                 ID = item.ID,
                 OrganizationID = item.OrganizationID,
                 Name = item.Name,
                 LegalEntity = item.LegalEntity,
-                //COID = item.COID,
                 Status = item.Status,
                 Created = item.Created,
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Organization = item.Organization != null
-                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization)
+                    ? OrganizationMapping.OrganizationToSummaryDto(item.Organization)
                     : null
             };
         } // CompanyToItemDetailDto

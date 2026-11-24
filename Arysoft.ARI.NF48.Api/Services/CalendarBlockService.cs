@@ -114,6 +114,62 @@ namespace Arysoft.ARI.NF48.Api.Services
             return item;
         } // GetAsync
 
+        public async Task<Dictionary<Guid, string>> GetOwnerNamesAsync(IEnumerable<CalendarBlock> items)
+        {
+            var result = new Dictionary<Guid, string>();
+
+            if (items == null || items.Count() == 0)
+                return result;
+
+            var auditorIDs = items
+                .Where(i => i.OwnerType == CalendarBlockOwnerType.Auditor
+                    && i.OwnerID.HasValue)
+                .Select(i => i.OwnerID.Value)
+                .Distinct()
+                .ToList();
+
+            if (auditorIDs.Count > 0)
+            {
+                using (var auditorRepository = new AuditorRepository())
+                {
+                    var auditorNames = await auditorRepository.GetFullNamesByIDsAsync(auditorIDs);
+
+                    foreach (var item in items
+                        .Where(i => i.OwnerType == CalendarBlockOwnerType.Auditor
+                            && i.OwnerID.HasValue))
+                    {
+                        auditorNames.TryGetValue(item.OwnerID.Value, out var ownerName);
+                        result[item.ID] = ownerName ?? string.Empty;
+                    }
+                }
+            }
+
+            var usersIDs = items
+                .Where(i => i.OwnerType == CalendarBlockOwnerType.User
+                    && i.OwnerID.HasValue)
+                .Select(i => i.OwnerID.Value)
+                .Distinct()
+                .ToList();
+
+            if (usersIDs.Count > 0)
+            {
+                using (var userRepository = new UserRepository())
+                {
+                    var userNames = await userRepository.GetFullNamesByIDsAsync(usersIDs);
+
+                    foreach (var item in items
+                        .Where(i => i.OwnerType == CalendarBlockOwnerType.User
+                        && i.OwnerID.HasValue))
+                    {
+                        userNames.TryGetValue(item.OwnerID.Value, out var ownerName);
+                        result[item.ID] = ownerName ?? string.Empty;
+                    }
+                }
+            }
+
+            return result;
+        } // GetOwnerNamesAsync
+
         public async Task<CalendarBlock> CreateAsync(CalendarBlock item)
         {
             // Validations

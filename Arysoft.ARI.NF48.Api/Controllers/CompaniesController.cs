@@ -31,12 +31,12 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         // END POINTS
 
         [HttpGet]
-        [ResponseType(typeof(ApiResponse<IEnumerable<CompanyItemListDto>>))]
+        [ResponseType(typeof(ApiResponse<IEnumerable<CompanyListDto>>))]
         public IHttpActionResult GetCompanies([FromUri] CompanyQueryFilters filters)
         {
             var items = _service.Gets(filters);            
             var itemsDto = CompanyMapping.CompanyToListDto(items);
-            var response = new ApiResponse<IEnumerable<CompanyItemListDto>>(itemsDto)
+            var response = new ApiResponse<IEnumerable<CompanyListDto>>(itemsDto)
             {
                 Meta = new Metadata
                 {
@@ -51,19 +51,19 @@ namespace Arysoft.ARI.NF48.Api.Controllers
             return Ok(response);
         } // GetCompanies
 
-        [ResponseType(typeof(ApiResponse<CompanyItemDetailDto>))]
+        [ResponseType(typeof(ApiResponse<CompanyDetailDto>))]
         public async Task<IHttpActionResult> GetCompany(Guid id)
         {
             var item = await _service.GetAsync(id)
                 ?? throw new BusinessException("Item not found");            
-            var itemDto = await CompanyMapping.CompanyToItemDetailDto(item);
-            var response = new ApiResponse<CompanyItemDetailDto>(itemDto);
+            var itemDto = CompanyMapping.CompanyToItemDetailDto(item);
+            var response = new ApiResponse<CompanyDetailDto>(itemDto);
 
             return Ok(response);
         } // GetCompany
 
         [HttpPost]
-        [ResponseType(typeof(ApiResponse<CompanyItemDetailDto>))]
+        [ResponseType(typeof(ApiResponse<CompanyDetailDto>))]
         public async Task<IHttpActionResult> PostCompany([FromBody] CompanyPostDto itemAddDto)
         {
             if (!ModelState.IsValid)
@@ -71,14 +71,14 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = CompanyMapping.ItemCreateDtoToCompany(itemAddDto);
             item = await _service.CreateAsync(item);
-            var itemDto = await CompanyMapping.CompanyToItemDetailDto(item);
-            var response = new ApiResponse<CompanyItemDetailDto>(itemDto);
+            var itemDto = CompanyMapping.CompanyToItemDetailDto(item);
+            var response = new ApiResponse<CompanyDetailDto>(itemDto);
 
             return Ok(response);
         } // PostCompany
 
         [HttpPut]
-        [ResponseType(typeof(ApiResponse<CompanyItemDetailDto>))]
+        [ResponseType(typeof(ApiResponse<CompanyDetailDto>))]
         public async Task<IHttpActionResult> PutCompany(Guid id, [FromBody] CompanyPutDto itemEditDto)
         {
             if (!ModelState.IsValid)
@@ -89,8 +89,8 @@ namespace Arysoft.ARI.NF48.Api.Controllers
 
             var item = CompanyMapping.ItemEditDtoToCompany(itemEditDto);            
             item = await _service.UpdateAsync(item);
-            var itemDto = await CompanyMapping.CompanyToItemDetailDto(item);
-            var response = new ApiResponse<CompanyItemDetailDto>(itemDto);
+            var itemDto = CompanyMapping.CompanyToItemDetailDto(item);
+            var response = new ApiResponse<CompanyDetailDto>(itemDto);
 
             return Ok(response);
         } // PutCompany

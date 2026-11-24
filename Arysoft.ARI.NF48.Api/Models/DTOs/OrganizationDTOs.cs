@@ -63,7 +63,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public int NotesCount { get; set; }
 
-        public IEnumerable<CompanyItemListDto> Companies { get; set; }
+        public IEnumerable<CompanyListDto> Companies { get; set; }
 
         public IEnumerable<OrganizationStandardItemListDto> Standards { get; set; }
 
@@ -103,7 +103,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public IEnumerable<AuditCycleItemListDto> AuditCycles { get; set; }
 
-        public IEnumerable<CompanyItemListDto> Companies { get; set; }
+        public IEnumerable<CompanyListDto> Companies { get; set; }
 
         public IEnumerable<ContactItemListDto> Contacts { get; set; }
 
@@ -116,6 +116,21 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // CALCULATED
 
         // public CertificateValidityStatusType CertificatesValidityStatus { get; set; }
+    } // OrganizationItemDetailDto
+
+    public class OrganizationSummaryDto
+    {
+        public Guid ID { get; set; }
+
+        public int? Folio { get; set; }
+
+        public string Name { get; set; }
+
+        public string LogoFile { get; set; }
+
+        public int? FolderFolio { get; set; }
+
+        public OrganizationStatusType Status { get; set; }
     }
 
     public class OrganizationItemProposalDto
@@ -128,7 +143,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         public string Phone { get; set; }
 
-        public IEnumerable<CompanyItemListDto> Companies { get; set; }
+        public IEnumerable<CompanyListDto> Companies { get; set; }
     } // OrganizationItemProposalDto
 
     public class OrganizationPostDto

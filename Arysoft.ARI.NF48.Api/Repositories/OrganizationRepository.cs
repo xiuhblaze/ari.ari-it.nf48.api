@@ -26,7 +26,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public override async Task<Organization> GetAsync(Guid id, bool asNoTracking = false)
         {
             var query = _model;
-                //.Include(o => o.OrganizationStandards.Select(os => os.Standard));
+            //.Include(o => o.OrganizationStandards.Select(os => os.Standard));
 
             // Sin tracking no se puede usar Entry().Collection(): solo viaja el Include
             // anterior y el resto de colecciones queda en null (el lazy loading tampoco
@@ -49,11 +49,13 @@ namespace Arysoft.ARI.NF48.Api.Repositories
 
         /// <summary>
         /// Para el LISTADO: carga las relaciones de TODA la página con un query por
-        /// colección (6 queries en total, sin importar el tamaño de la página), en lugar
+        /// colección (7 queries en total, sin importar el tamaño de la página), en lugar
         /// de uno por organización (lazy loading) o un JOIN gigante (Include).
         /// Requiere que las organizaciones estén rastreadas (sin AsNoTracking): EF une
         /// cada fila hija con su Organization por relationship fixup.
         /// Se asume que cada hijo tiene la FK OrganizationID.
+        /// Los Shifts se cargan con un solo query (join a Sites) para que TotalWorkers
+        /// no dispare lazy loading por cada sitio.
         /// </summary>
         public async Task LoadListRelationsAsync(IList<Organization> organizations)
         {
@@ -70,6 +72,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 .Where(x => ids.Contains(x.OrganizationID))
                 .Include(x => x.Standard)
                 .LoadAsync();
+            await _context.Set<Shift>().Where(x => ids.Contains(x.Site.OrganizationID)).LoadAsync();
 
             // Sin esto, el proxy de lazy loading vuelve a consultar la BD la primera vez
             // que se lee cada colección, aunque ya esté poblada por el fixup.
@@ -82,6 +85,12 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 entry.Collection(o => o.Notes).IsLoaded = true;
                 entry.Collection(o => o.Sites).IsLoaded = true;
                 entry.Collection(o => o.OrganizationStandards).IsLoaded = true;
+
+                // Sites ya está marcada como cargada: se puede leer sin disparar lazy loading
+                foreach (var site in organization.Sites ?? new List<Site>())
+                {
+                    _context.Entry(site).Collection(s => s.Shifts).IsLoaded = true;
+                }
             }
         } // LoadListRelationsAsync
 
@@ -94,7 +103,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
         public async Task<int> GetNextFolioAsync()
         {
             var folio = await _model
-                .Where(o => 
+                .Where(o =>
                     o.Status > OrganizationStatusType.Applicant
                 )
                 .MaxAsync(o => o.Folio);
@@ -107,7 +116,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             name = name.ToLower().Trim();
             var response = _model.Where(o => o.Name.ToLower() == name);
 
-            if (exceptionID != null && exceptionID != Guid.Empty) 
+            if (exceptionID != null && exceptionID != Guid.Empty)
             {
                 response = response.Where(o => o.ID != exceptionID);
             }
@@ -150,7 +159,7 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 ).ToListAsync();
 
             foreach (var item in items)
-            {   
+            {
                 _model.Remove(item);
             }
         } // DeleteTmpByUser

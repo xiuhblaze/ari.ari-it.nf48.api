@@ -2,44 +2,30 @@
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.Repositories;
-using System.Collections.Generic;
+using System;
+using System.Collections;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
 {
-    public class CalendarBlockMapping
+    public static class CalendarBlockMapper
     {
-        public static async Task<IEnumerable<CalendarBlockItemListDto>> CalendarBlockToListAsync(IEnumerable<CalendarBlock> items)
-        {
-            var itemsDto = new List<CalendarBlockItemListDto>();
+        //public static async Task<IEnumerable<CalendarBlockListDto>> CalendarBlockToListAsync(IEnumerable<CalendarBlock> items)
+        //{
+        //    var itemsDto = new List<CalendarBlockListDto>();
 
-            foreach (var item in items)
-            {
-                itemsDto.Add(await CalendarBlockToItemListDtoAsync(item));
-            }
+        //    foreach (var item in items)
+        //    {
+        //        itemsDto.Add(await CalendarBlockToItemListDtoAsync(item));
+        //    }
 
-            return itemsDto;
-        } // CalendarBlockToListAsync
+        //    return itemsDto;
+        //} // CalendarBlockToListAsync
+        // usar: calendarBlock.Select(x => x.ToListDto())
 
-        public static async Task<CalendarBlockItemListDto> CalendarBlockToItemListDtoAsync(CalendarBlock item)
-        {
-            var _auditorRepository = new AuditorRepository();
-            var _userRepository = new UserRepository();
-            string ownerName = string.Empty;
-
-            switch (item.OwnerType)
-            {
-                case CalendarBlockOwnerType.Auditor:
-                    if (item.OwnerID.HasValue)
-                        ownerName = await _auditorRepository.GetFullNameByIDAsync(item.OwnerID.Value);
-                    break;
-                case CalendarBlockOwnerType.User:
-                    if (item.OwnerID.HasValue)
-                        ownerName = await _userRepository.GetFullNameByIDAsync(item.OwnerID.Value);
-                    break;
-            }
-
-            return new CalendarBlockItemListDto
+        public static CalendarBlockListDto ToListDto(this CalendarBlock item, string ownerName)
+        {   
+            return new CalendarBlockListDto
             {
                 ID = item.ID,
                 OwnerID = item.OwnerID,
@@ -55,9 +41,9 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // CalendarBlockToItemListDtoAsync
 
-        public static CalendarBlockItemDetailDto CalendarBlockToItemDetailDto(CalendarBlock item)
+        public static CalendarBlockDetailDto ToDetailDto(this CalendarBlock item)
         {
-            return new CalendarBlockItemDetailDto
+            return new CalendarBlockDetailDto
             {
                 ID = item.ID,
                 OwnerID = item.OwnerID,
@@ -75,7 +61,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // CalendarBlockToItemDetailDto
 
-        public static CalendarBlock ItemCreateDtoToCalendarBlock(CalendarBlockCreateDto itemDto)
+        public static CalendarBlock ToCalendarBlock(this CalendarBlockCreateDto itemDto)
         {
             return new CalendarBlock
             {
@@ -83,7 +69,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemCreateDtoToCalendarBlock
 
-        public static CalendarBlock ItemUpdateDtoToCalendarBlock(CalendarBlockUpdateDto itemDto)
+        public static CalendarBlock ToCalendarBlock(this CalendarBlockUpdateDto itemDto)
         {   
             return new CalendarBlock
             {
@@ -101,7 +87,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             };
         } // ItemUpdateDtoToCalendarBlock
 
-        public static CalendarBlock ItemDeleteDtoToCalendarBlock(CalendarBlockDeleteDto itemDto)
+        public static CalendarBlock ToCalendarBlock(this CalendarBlockDeleteDto itemDto)
         {
             return new CalendarBlock
             {

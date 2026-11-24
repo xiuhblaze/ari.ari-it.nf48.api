@@ -152,11 +152,17 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 SiteLocationURL = mainSite != null
                     ? mainSite.LocationURL
                     : string.Empty,
-                TotalWorkers = OrganizationCalculations.GetTotalWorkers(item.Sites.ToList()),
-                Standards = item.OrganizationStandards != null
-                    ? await OrganizationStandardMapping.OrganizationStandardToListDto(item.OrganizationStandards
-                        .Where(os => os.Status != StatusType.Nothing))
-                    : null
+                TotalWorkers = OrganizationCalculations.GetTotalWorkers(item.Sites?.ToList()), // null -> 0
+                Standards = item.OrganizationStandards == null
+                    ? null
+                    : item.AuditCycles != null
+                        // Con los AuditCycles ya cargados: sin un query por estándar
+                        ? OrganizationStandardMapping.OrganizationStandardToListDto(
+                            item.OrganizationStandards.Where(os => os.Status != StatusType.Nothing),
+                            item.AuditCycles)
+                        // Sin AuditCycles en memoria: ruta legada (un query por estándar)
+                        : await OrganizationStandardMapping.OrganizationStandardToListDto(
+                            item.OrganizationStandards.Where(os => os.Status != StatusType.Nothing))
                 //CertificatesValidityStatus = item.CertificatesValidityStatus
                 //    ?? CertificateValidityStatusType.Nothing
             };
@@ -212,6 +218,19 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 ////    ?? CertificateValidityStatusType.Nothing,
             };
         } // OrganizationToItemDetailDto
+
+        public static OrganizationSummaryDto OrganizationToSummaryDto(Organization item)
+        {
+            return new OrganizationSummaryDto
+            {
+                ID = item.ID,
+                Folio = item.Folio,
+                Name = item.Name,
+                LogoFile = item.LogoFile,
+                FolderFolio = item.FolderFolio,
+                Status = item.Status
+            };
+        } // OrganizationToSummaryDto
 
         public static OrganizationMiniStatisticDto OrganizationDataToMiniStatisticDataDto(int[] items)
         {

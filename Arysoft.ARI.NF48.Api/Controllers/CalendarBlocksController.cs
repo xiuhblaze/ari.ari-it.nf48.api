@@ -6,14 +6,13 @@ using Arysoft.ARI.NF48.Api.Models.DTOs;
 using Arysoft.ARI.NF48.Api.QueryFilters;
 using Arysoft.ARI.NF48.Api.Response;
 using Arysoft.ARI.NF48.Api.Services;
+using Arysoft.ARI.NF48.Api.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
-using System.Web.Management;
 
 namespace Arysoft.ARI.NF48.Api.Controllers
 {
@@ -24,7 +23,7 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         // CONSTRUCTOR
 
         public CalendarBlocksController()
-        { 
+        {
             _calendarBlockService = new CalendarBlockService();
         }
 
@@ -36,8 +35,15 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         public async Task<IHttpActionResult> GetCalendarBlocks([FromUri] CalendarBlockQueryFilters filters)
         {
             var items = _calendarBlockService.Gets(filters);
-            var itemsDto = await CalendarBlockMapping.CalendarBlockToListAsync(items);
-            var response = new ApiResponse<IEnumerable<CalendarBlockItemListDto>>(itemsDto)
+            var ownerNames = await _calendarBlockService.GetOwnerNamesAsync(items);
+            var itemsDto = items
+                .Select(i =>
+                {
+                    ownerNames.TryGetValue(i.ID, out var ownerName);
+                    return i.ToListDto(ownerName ?? string.Empty);
+                })
+                .ToList();
+            var response = new ApiResponse<IEnumerable<CalendarBlockListDto>>(itemsDto)
             {
                 Meta = new Metadata
                 {
@@ -54,13 +60,68 @@ namespace Arysoft.ARI.NF48.Api.Controllers
         } // GetCalendarBlocks
 
         // GET: api/CalendarBlocks/{id}
-        //[HttpGet]
-        //[ResponseType(typeof(ApiResponse<CalendarBlockItemDetailDto>))]
-        //public async Task<IHttpActionResult> GetCalendarBlock(Guid id)
-        //{
-        //    var item = await _calendarBlockService.GetAsync(id)
-        //        ?? throw new BusinessException("Calendar block item not found", System.Net.HttpStatusCode.NotFound);
+        [HttpGet]
+        [ResponseType(typeof(ApiResponse<CalendarBlockDetailDto>))]
+        public async Task<IHttpActionResult> GetCalendarBlock(Guid id)
+        {
+            var item = await _calendarBlockService.GetAsync(id)
+                ?? throw new BusinessException("Item not found", System.Net.HttpStatusCode.NotFound);
+            var itemDto = item.ToDetailDto();
+            var response = new ApiResponse<CalendarBlockDetailDto>(itemDto);
 
-        //} // GetCalendarBlock
-    }
+            return Ok(response);
+        } // GetCalendarBlock
+
+        // POST: api/CalendarBlock
+        [HttpPost]
+        [ResponseType(typeof(ApiResponse<CalendarBlockDetailDto>))]
+        public async Task<IHttpActionResult> PostCalendarBlock([FromBody] CalendarBlockCreateDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            var item = itemDto.ToCalendarBlock();
+            item = await _calendarBlockService.CreateAsync(item);
+            var createdItemDto = item.ToDetailDto();
+            var response = new ApiResponse<CalendarBlockDetailDto>(createdItemDto);
+
+            return Ok(response);
+        } // PostCalendarBlock
+
+        [HttpPut]
+        [ResponseType(typeof(ApiResponse<CalendarBlockDetailDto>))]
+        public async Task<IHttpActionResult> PutCalendarBlock(Guid id, [FromBody] CalendarBlockUpdateDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.ID)
+                throw new BusinessException("ID mismatch");
+
+            var item = itemDto.ToCalendarBlock();
+            item = await _calendarBlockService.UpdateAsync(item);
+            var updatedItemDto = item.ToDetailDto();
+            var response = new ApiResponse<CalendarBlockDetailDto>(updatedItemDto);
+
+            return Ok(response);
+        } // PutCalendarBlock
+
+        [HttpDelete]
+        [ResponseType(typeof(ApiResponse<bool>))]
+        public async Task<IHttpActionResult> DeleteCalendarBlock(Guid id, [FromBody] CalendarBlockDeleteDto itemDto)
+        {
+            if (!ModelState.IsValid)
+                throw new BusinessException(Strings.GetModelStateErrors(ModelState));
+
+            if (id != itemDto.ID)
+                throw new BusinessException("ID mismatch");
+
+            var item = itemDto.ToCalendarBlock();
+            await _calendarBlockService.DeleteAsync(item);
+            var response = new ApiResponse<bool>(true);
+
+            return Ok(response);
+        } // DeleteCalendarBlock
+
+    } // CalendarBlockController
 }

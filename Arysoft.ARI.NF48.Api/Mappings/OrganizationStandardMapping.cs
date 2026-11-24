@@ -3,6 +3,7 @@ using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Models.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arysoft.ARI.NF48.Api.Mappings
@@ -10,7 +11,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
     public class OrganizationStandardMapping
     {
         public static async Task<IEnumerable<OrganizationStandardItemListDto>> OrganizationStandardToListDto(IEnumerable<OrganizationStandard> items)
-        { 
+        {
             var itemsDto = new List<OrganizationStandardItemListDto>();
 
             foreach (var item in items)
@@ -21,13 +22,48 @@ namespace Arysoft.ARI.NF48.Api.Mappings
             return itemsDto;
         } // OrganizationStandardToListDto
 
+        /// <summary>
+        /// Para LISTADOS: no accede a la BD. El último ciclo activo (o el último inactivo)
+        /// de cada estándar se resuelve en memoria con los AuditCycles recibidos (los de la
+        /// organización dueña, ya cargados).
+        /// </summary>
+        public static IEnumerable<OrganizationStandardItemListDto> OrganizationStandardToListDto(
+            IEnumerable<OrganizationStandard> items,
+            IEnumerable<AuditCycle> auditCycles)
+        {
+            var itemsDto = new List<OrganizationStandardItemListDto>();
+
+            foreach (var item in items)
+            {
+                itemsDto.Add(OrganizationStandardToItemListDto(
+                    item,
+                    GetLastOrActiveAuditCycle(item, auditCycles)));
+            }
+
+            return itemsDto;
+        } // OrganizationStandardToListDto (con AuditCycles)
+
+        /// <summary>
+        /// Ruta individual: consulta a la BD el último ciclo activo (o inactivo) del estándar.
+        /// Para LISTADOS usar la sobrecarga que recibe los AuditCycles ya cargados.
+        /// </summary>
         public static async Task<OrganizationStandardItemListDto> OrganizationStandardToItemListDto(OrganizationStandard item)
         {
-            var _audiyCycleRepository = new Repositories.AuditCycleRepository();
-            var lastOrActiveAuditCycle = await _audiyCycleRepository
-                .GetLastOrActiveByStandardAndOrganizationAsync(item.OrganizationID, item.StandardID ?? Guid.Empty);
+            AuditCycle lastOrActiveAuditCycle;
 
+            using (var auditCycleRepository = new Repositories.AuditCycleRepository())
+            {
+                lastOrActiveAuditCycle = await auditCycleRepository
+                    .GetLastOrActiveByStandardAndOrganizationAsync(item.OrganizationID, item.StandardID ?? Guid.Empty);
+            }
 
+            return OrganizationStandardToItemListDto(item, lastOrActiveAuditCycle);
+        } // OrganizationStandardToItemListDto
+
+        public static OrganizationStandardItemListDto OrganizationStandardToItemListDto(
+            OrganizationStandard item,
+            AuditCycle lastOrActiveAuditCycle)
+        {
             return new OrganizationStandardItemListDto
             {
                 ID = item.ID,
@@ -35,7 +71,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 StandardID = item.StandardID ?? Guid.Empty,
                 ExtraInfo = item.ExtraInfo,
                 OrganizationName = item.Organization != null
-                    ? item.Organization.Name 
+                    ? item.Organization.Name
                     : string.Empty,
                 StandardName = item.Standard != null
                     ? item.Standard.Name
@@ -68,7 +104,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 Updated = item.Updated,
                 UpdatedUser = item.UpdatedUser,
                 Organization = item.Organization != null
-                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization) 
+                    ? await OrganizationMapping.OrganizationToItemListDto(item.Organization)
                     : null,
                 Standard = item.Standard != null
                     ? StandardMapping.StandardToItemListDto(item.Standard)
@@ -79,7 +115,7 @@ namespace Arysoft.ARI.NF48.Api.Mappings
         public static OrganizationStandard ItemCreateDtoToOrganizationStandard(OrganizationStandardPostDto itemDto)
         {
             return new OrganizationStandard
-            { 
+            {
                 OrganizationID = itemDto.OrganizationID,
                 UpdatedUser = itemDto.UpdatedUser
             };
@@ -105,5 +141,35 @@ namespace Arysoft.ARI.NF48.Api.Mappings
                 UpdatedUser = itemDto.UpdatedUser
             };
         } // ItemDeleteDtoToOrganizationStandard
+
+        // PRIVATE
+
+        /// <summary>
+        /// Mismo criterio que AuditCycleRepository.GetLastOrActiveByStandardAndOrganizationAsync
+        /// pero en memoria: el ciclo Active con EndDate más reciente y, si no hay ninguno,
+        /// el Inactive con EndDate más reciente. Sin estándar o sin ciclos devuelve null.
+        /// </summary>
+        private static AuditCycle GetLastOrActiveAuditCycle(
+            OrganizationStandard item,
+            IEnumerable<AuditCycle> auditCycles)
+        {
+            var standardID = item.StandardID ?? Guid.Empty;
+
+            if (auditCycles == null || standardID == Guid.Empty)
+                return null;
+
+            var cycles = auditCycles
+                .Where(c => c.OrganizationID == item.OrganizationID && c.StandardID == standardID)
+                .ToList();
+
+            return cycles
+                    .Where(c => c.Status == StatusType.Active)
+                    .OrderByDescending(c => c.EndDate)
+                    .FirstOrDefault()
+                ?? cycles
+                    .Where(c => c.Status == StatusType.Inactive)
+                    .OrderByDescending(c => c.EndDate)
+                    .FirstOrDefault();
+        } // GetLastOrActiveAuditCycle
     }
 }

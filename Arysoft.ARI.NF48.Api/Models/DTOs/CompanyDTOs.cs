@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
-    public class CompanyItemListDto
+    public class CompanyListDto
     {
         public Guid ID { get; set; }
 
@@ -24,7 +24,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public string OrganizationName { get; set; }
     } // CompanyItemListDto
 
-    public class CompanyItemDetailDto
+    public class CompanyDetailDto
     {
         public Guid ID { get; set; }
 
@@ -44,7 +44,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
 
         // RELATIONS
 
-        public OrganizationItemListDto Organization { get; set; }
+        public OrganizationSummaryDto Organization { get; set; }
     } // CompanyItemDetailDto
 
     public class CompanyPostDto

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Arysoft.ARI.NF48.Api.Models.DTOs
 {
-    public class CalendarBlockItemListDto
+    public class CalendarBlockListDto
     {
         public Guid ID { get; set; }
 
@@ -27,9 +27,9 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         // Relations
 
         public string OwnerName { get; set; }
-    } // CalendarBlockItemListDto
+    } // CalendarBlockListDto
 
-    public class CalendarBlockItemDetailDto
+    public class CalendarBlockDetailDto
     {
         public Guid ID { get; set; }
 
@@ -56,7 +56,7 @@ namespace Arysoft.ARI.NF48.Api.Models.DTOs
         public DateTime Updated { get; set; }
 
         public string UpdatedUser { get; set; }
-    } // CalendarBlockItemDetailDto
+    } // CalendarBlockDetailDto
 
     public class CalendarBlockCreateDto
     {

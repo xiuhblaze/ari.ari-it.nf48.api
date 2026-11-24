@@ -65,6 +65,26 @@ namespace Arysoft.ARI.NF48.Api.Repositories
             );
         } // GetFullNameByIDAsync
 
+        /// <summary>
+        /// Obtiene una lista de los nombres de usuario en base al listado de
+        /// IDs relacionados con UserID
+        /// </summary>
+        /// <param name="ids">IDs de los usuarios</param>
+        /// <returns>
+        /// Diccionario UsuarioID -> FullName encontrados
+        /// </returns>
+        public async Task<Dictionary<Guid, string>> GetFullNamesByIDsAsync(IEnumerable<Guid> ids)
+        {
+            var items = await _model
+                .Where(i => ids.Contains(i.ID))
+                .ToListAsync();
+
+            return items.ToDictionary(
+                x => x.ID,
+                x => Strings.FullName(x.FirstName, string.Empty, x.LastName)
+            );
+        } // GetFullNamesByIDsAsync
+
         public async Task<bool> ValidatePasswordAsync(Guid id, string passwordHash)
         {
             return await _model

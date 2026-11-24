@@ -2,6 +2,7 @@
 using Arysoft.ARI.NF48.Api.Models;
 using Arysoft.ARI.NF48.Api.Tools;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,6 +41,26 @@ namespace Arysoft.ARI.NF48.Api.Repositories
                 item.LastName
             );
         } // GetFullNameByIDAsync
+
+        /// <summary>
+        /// Obtiene una lista de los nombres de auditores en base al listado de
+        /// IDs relacionados con AuditID
+        /// </summary>
+        /// <param name="ids">IDs de los auditores</param>
+        /// <returns>
+        /// Diccionario AuditID -> FullName encontrados
+        /// </returns>
+        public async Task<Dictionary<Guid, string>> GetFullNamesByIDsAsync(IEnumerable<Guid> ids)
+        {
+            var items = await _model
+                .Where(i => ids.Contains(i.ID))
+                .ToListAsync();
+
+            return items.ToDictionary(
+                x => x.ID,
+                x => Strings.FullName(x.FirstName, x.MiddleName, x.LastName)
+            );
+        } // GetFullNamesByIDsAsync
 
         ///// <summary>
         ///// Elimina todos los registros temporales generados por el usuario

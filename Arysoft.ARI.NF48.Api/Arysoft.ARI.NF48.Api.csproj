@@ -391,7 +391,7 @@
     <Compile Include="Mappings\AuditorDocumentMapping.cs" />
     <Compile Include="Mappings\AuditorStandardMapping.cs" />
     <Compile Include="Mappings\AuditStandardMapping.cs" />
-    <Compile Include="Mappings\CalendarBlockMapping.cs" />
+    <Compile Include="Mappings\CalendarBlockMapper.cs" />
     <Compile Include="Mappings\CatAuditorDocumentMapping.cs" />
     <Compile Include="Mappings\Category22KMapping.cs" />
     <Compile Include="Mappings\AuditorMapping.cs" />
