@@ -13,7 +13,7 @@
         TechReport,             // No for FSSC
         CDC,                    // Certification decision checklist - Aquí se quedó
         FsscScreenShot,         // Solo para FSSC
-        TravelExpenses,         // Viaticos
+        TravelExpenses,         // Viaticos - Evidencia de gastos
         WitnessReport,          // Informe de testigo   
         Other
     } // AuditDocumentType
